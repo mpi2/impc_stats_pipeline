@@ -1,0 +1,1 @@
+http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/select?q=parameter_stable_id%3AIMPC_VIA_001_001&rows=1000&wt=csv&indent=true

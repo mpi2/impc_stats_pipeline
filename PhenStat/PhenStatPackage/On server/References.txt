@@ -1,0 +1,262 @@
+@book{tartakovsky2014sequential,
+  title={Sequential Analysis: Hypothesis Testing and Changepoint Detection},
+  author={Tartakovsky, A. and Nikiforov, I. and Basseville, M.},
+  isbn={9781439838204},
+  lccn={2014022603},
+  series={Chapman \& Hall/CRC Monographs on Statistics \& Applied Probability},
+  url={https://books.google.co.uk/books?id=zhsbBAAAQBAJ},
+  year={2014},
+  publisher={Taylor \& Francis}
+}
+@article{bleakley2011group,
+  title={The group fused lasso for multiple change-point detection},
+  author={Bleakley, Kevin and Vert, Jean-Philippe},
+  journal={arXiv preprint arXiv:1106.4199},
+  year={2011}
+}
+
+@book{brodsky2013nonparametric,
+  title={Nonparametric Methods in Change Point Problems},
+  author={Brodsky, E. and Darkhovsky, B.S.},
+  isbn={9789401581639},
+  lccn={92043810},
+  series={Mathematics and Its Applications},
+  url={https://books.google.co.uk/books?id=GLvwCAAAQBAJ},
+  year={2013},
+  publisher={Springer Netherlands}
+}
+
+
+
+@book{jiang2007linear,
+  title={Linear and Generalized Linear Mixed Models and Their Applications},
+  author={Jiang, J.},
+  isbn={9780387479460},
+  lccn={2006935876},
+  series={Springer Series in Statistics},
+  url={https://books.google.co.uk/books?id=aUFHAAAAQBAJ},
+  year={2007},
+  publisher={Springer New York}
+}
+@book{pett2015nonparametric,
+  title={Nonparametric Statistics for Health Care Research: Statistics for Small Samples and Unusual Distributions},
+  author={Pett, M.A.},
+  isbn={9781483324524},
+  url={https://books.google.co.uk/books?id=5j1CCgAAQBAJ},
+  year={2015},
+  publisher={SAGE Publications}
+}
+
+
+
+@article{haselimashhadi2016new,
+  title={A new Bayesian regression model for counts in medicine},
+  author={Haselimashhadi, Hamed and Vinciotti, Veronica and Yu, Keming},
+  journal={arXiv preprint arXiv:1601.02820},
+  year={2016}
+}
+
+@book{gilks1995markov,
+  title={Markov Chain Monte Carlo in Practice},
+  author={Gilks, W.R. and Richardson, S. and Spiegelhalter, D.},
+  isbn={9780412055515},
+  lccn={98033429},
+  series={Chapman \& Hall/CRC Interdisciplinary Statistics},
+  url={https://books.google.co.uk/books?id=TRXrMWY\_i2IC},
+  year={1995},
+  publisher={Taylor \& Francis}
+}
+
+
+
+@book{dey2000generalized,
+  title={Generalized Linear Models: A Bayesian Perspective},
+  author={Dey, D.K. and Ghosh, S.K. and Mallick, B.K.},
+  isbn={9780824790349},
+  lccn={00024055},
+  series={Chapman \& Hall/CRC Biostatistics Series},
+  url={https://books.google.co.uk/books?id=Y5AARf7oTNkC},
+  year={2000},
+  publisher={Taylor \& Francis}
+}
+
+
+@article{groll2014variable,
+  title={Variable selection for generalized linear mixed models by L 1-penalized estimation},
+  author={Groll, Andreas and Tutz, Gerhard},
+  journal={Statistics and computing},
+  volume={24},
+  number={2},
+  pages={137--154},
+  year={2014},
+  publisher={Springer}
+}
+
+@article{goeman2010l1,
+  title={L1 penalized estimation in the Cox proportional hazards model},
+  author={Goeman, Jelle J},
+  journal={Biometrical journal},
+  volume={52},
+  number={1},
+  pages={70--84},
+  year={2010},
+  publisher={Wiley Online Library}
+}
+
+@book{chambers1991statistical,
+  title={Statistical models in S},
+  author={Chambers, John M and Hastie, Trevor J},
+  year={1991},
+  publisher={CRC Press, Inc.}
+}
+
+@book{stroup2016generalized,
+  title={Generalized Linear Mixed Models: Modern Concepts, Methods and Applications},
+  author={Stroup, W.W.},
+  isbn={9781439815137},
+  series={Chapman \& Hall/CRC Texts in Statistical Science},
+  url={https://books.google.co.uk/books?id=tkvRBQAAQBAJ},
+  year={2016},
+  publisher={CRC Press}
+}
+
+
+@book{konishi2008information,
+  title={Information Criteria and Statistical Modeling},
+  author={Konishi, S. and Kitagawa, G.},
+  isbn={9780387718866},
+  lccn={2007925718},
+  series={Springer Series in Statistics},
+  url={https://books.google.co.uk/books?id=3I9ZJusaYh0C},
+  year={2008},
+  publisher={Springer}
+}
+@book{west2014linear,
+  title={Linear Mixed Models: A Practical Guide Using Statistical Software, Second Edition},
+  author={West, B.T. and Welch, K.B. and Galecki, A.T.},
+  isbn={9781466560994},
+  lccn={2014010347},
+  url={https://books.google.co.uk/books?id=hjT6AwAAQBAJ},
+  year={2014},
+  publisher={Taylor \& Francis}
+}
+
+
+@book{kanji2006100,
+  title={100 Statistical Tests},
+  author={Kanji, G.K.},
+  isbn={9781446222508},
+  url={https://books.google.co.uk/books?id=c16MhjA4pHgC},
+  year={2006},
+  publisher={SAGE Publications}
+}
+
+@article{cohen1992statistical,
+  title={Statistical power analysis},
+  author={Cohen, Jacob},
+  journal={Current directions in psychological science},
+  volume={1},
+  number={3},
+  pages={98--101},
+  year={1992},
+  publisher={SAGE Publications Sage CA: Los Angeles, CA}
+}
+
+@article{birnbaum1951one,
+  title={One-sided confidence contours for probability distribution functions},
+  author={Birnbaum, ZW and Tingey, Fred H and others},
+  journal={The Annals of Mathematical Statistics},
+  volume={22},
+  number={4},
+  pages={592--596},
+  year={1951},
+  publisher={Institute of Mathematical Statistics}
+}
+@article{conover1980practical,
+  title={Practical nonparametric statistics},
+  author={Conover, William Jay and Conover, William Jay},
+  year={1980},
+  publisher={Wiley New York}
+}
+@book{durbin1973distribution,
+  title={Distribution theory for tests based on the sample distribution function},
+  author={Durbin, James},
+  year={1973},
+  publisher={SIAM}
+}
+
+@book{dalgaard2008introductory,
+  title={Introductory statistics with R},
+  author={Dalgaard, Peter},
+  year={2008},
+  publisher={Springer Science \& Business Media}
+}
+
+@article{clark1992statistical,
+  title={Statistical models in S},
+  author={Clark, LA and Pregibon, Daryl and Chambers, JM},
+  journal={chapter Tree-Based Models},
+  pages={377--419},
+  year={1992}
+}
+@article{wilkinson1973symbolic,
+  title={Symbolic description of factorial models for analysis of variance},
+  author={Wilkinson, GN and Rogers, CE},
+  journal={Applied Statistics},
+  pages={392--399},
+  year={1973},
+  publisher={JSTOR}
+}
+
+@article{tibshirani1996regression,
+  title={Regression shrinkage and selection via the lasso},
+  author={Tibshirani, Robert},
+  journal={Journal of the Royal Statistical Society. Series B (Methodological)},
+  pages={267--288},
+  year={1996},
+  publisher={JSTOR}
+}
+
+@article{hoerl1970ridge,
+  title={Ridge regression: Biased estimation for nonorthogonal problems},
+  author={Hoerl, Arthur E and Kennard, Robert W},
+  journal={Technometrics},
+  volume={12},
+  number={1},
+  pages={55--67},
+  year={1970},
+  publisher={Taylor \& Francis Group}
+}
+
+@book{venables2013modern,
+  title={Modern applied statistics with S-PLUS},
+  author={Venables, William N and Ripley, Brian D},
+  year={2013},
+  publisher={Springer Science \& Business Media}
+}
+
+@book{box2015time,
+  title={Time series analysis: forecasting and control},
+  author={Box, George EP and Jenkins, Gwilym M and Reinsel, Gregory C and Ljung, Greta M},
+  year={2015},
+  publisher={John Wiley \& Sons}
+}
+@article{lindstrom1990nonlinear,
+  title={Nonlinear mixed effects models for repeated measures data},
+  author={Lindstrom, Mary J and Bates, Douglas M},
+  journal={Biometrics},
+  pages={673--687},
+  year={1990},
+  publisher={JSTOR}
+}
+@article{laird1982random,
+  title={Random-effects models for longitudinal data},
+  author={Laird, Nan M and Ware, James H},
+  journal={Biometrics},
+  pages={963--974},
+  year={1982},
+  publisher={JSTOR}
+}
+
+
+
