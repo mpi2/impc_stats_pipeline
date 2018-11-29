@@ -1,0 +1,3087 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper, left=.5in, right=.5in, top=1in]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{filecontents}
+\usepackage{natbib}
+\usepackage{cite}
+\usepackage{xcolor}
+\usepackage[many]{tcolorbox}
+
+\usepackage{bibentry}
+\definecolor{bibentrybg}{RGB}{249,245,233}
+\makeatletter
+\renewcommand\bibentry[1]{
+\begin{tcolorbox}[
+breakable,
+enhanced jigsaw,
+boxsep=0pt,
+arc=0pt,
+outer arc=0pt,
+frame code={},
+interior code={
+\fill[bibentrybg] (interior.north west) rectangle (interior.south east);
+\draw[double] (interior.north west) -- (interior.north east);
+\draw[double] (interior.south west) -- (interior.south east);
+}
+]%
+\nocite{#1}{\frenchspacing
+\hyper@natanchorstart{#1\@extra@b@citeb}%
+\@nameuse{BR@r@#1\@extra@b@citeb}\hyper@natanchorend}
+\end{tcolorbox}
+}
+\makeatother
+
+\nobibliography*
+
+\usepackage[pageref]{backref}
+\usepackage[automark,headsepline,markusedcase]{scrlayer-scrpage}
+\usepackage{lipsum}
+\pagestyle{scrheadings}
+
+
+
+\automark{section}
+\automark*{subsection}
+\automark*{subsubsection}
+
+\renewcommand*\sectionmarkformat{}
+\renewcommand*\subsectionmarkformat{}
+\let\originaltabular\tabular
+\let\endoriginaltabular\endtabular
+
+\hypersetup{
+colorlinks   = true  ,
+citecolor    = brown
+}
+%\usepackage{Sweave}
+%------------------------------------------------------------
+% newcommand
+%------------------------------------------------------------
+\makeatletter
+\renewcommand\BR@b@bibitem[2][]{\BR@bibitem[#1]{#2}\BR@c@bibitem{#2}}
+\makeatother
+
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rclass}[1]{\textit{#1}}
+\newcommand{\Rpackage}[1]{\textit{#1}}
+\newcommand{\Rexpression}[1]{\texttt{#1}}
+\newcommand{\Rmethod}[1]{{\texttt{#1}}}
+\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
+% \begin{filecontents}{mybib1.bib}
+%     @book{example,
+%         author = "John",
+%         title = "The book's title",
+%         year = "2013",
+%         publisher = "Cambridge",
+%     }
+%
+% \end{filecontents}
+
+
+\begin{document}
+
+<<>>==
+#rm(list = ls(all.names = TRUE))
+# Install necessary packages
+checkPackages = function(x, bioC = FALSE) {
+  for (i in x) {
+    if (!suppressPackageStartupMessages(require(
+      i ,
+      character.only = TRUE ,
+      warn.conflicts = FALSE,
+      quietly = TRUE
+    ))) {
+      options(repos = c(CRAN = "https://cloud.r-project.org/"))
+      install.packages(i , dependencies = TRUE)
+      #remove.packages(i,.libPaths()[2])
+      suppressPackageStartupMessages(require(i , character.only = TRUE))
+    }
+  }
+}
+checkPackages(
+  c(
+    #'tibble'       ,
+    'logistf'       ,
+    #'longpower'    ,
+    'glmmLasso'     ,
+    'nlme'          ,
+    'msgps'         ,
+    'BDWreg'        ,
+    'tools'         ,
+    'corrplot'      ,
+    'TeachingDemos',
+    'MASS'          ,
+    #'DLASS'        ,
+    'lme4'          ,
+    #'readxl'       ,
+    'reshape2'      ,
+    'knitr'         ,
+    'coin'          ,
+    'nnet'          ,
+    #'ssize.fdr'    ,
+    #'broom'        ,
+    'blme'          ,
+    'outliers'      ,
+    'plyr'          ,
+    'pryr'          ,
+    'ggplot2'       ,
+    #'parcor'       ,
+    'PhenStat'      ,
+    'pwr'           ,
+    'fdrtool'       ,
+    'mice'          ,
+    'reshape'       ,
+    'robustlmm'     ,
+    #'SparseM'      ,
+    'gmodels'       ,
+    #'huge'         ,
+    'graph'         ,
+    'sfsmisc'       ,
+    #'rapport'      ,
+    'rcompanion'    ,
+    #'forecast'     ,
+    'gridExtra'     ,
+    #'parsedate'    ,
+    'plotly'        #,
+    #'roxygen2'     ,
+    #'commonmark'
+    )
+)
+
+###
+set.seed(123456789) # Never change this line
+MHmakeRandomString <- function(n = 1, lenght = 5)
+{
+  randomString <- c(1:n)                  # initialize vector
+  for (i in 1:n)
+  {
+    randomString[i] <- paste(sample(c(LETTERS, 0:9, LETTERS),
+                                    lenght, replace = TRUE),
+                             collapse = "")
+  }
+  return(randomString)
+}
+sectionID     = MHmakeRandomString(1000, lenght = 4)#1000 unique section id
+if (!is.null(DataRelease))
+  sectionID     = paste('DR', DataRelease, '-', sectionID, sep = '')
+
+ReprtDate      = 2017
+ReportVersion  = '2.12.0'
+Error.indic    = TRUE
+
+kable1         = function(Var, caption = NULL, ...) {
+  cat('\n\n', '[Begin:]', rep('*', 41), '\n')
+  if (!is.null(caption)) {
+    cat(' [Description:]', caption, '\n')
+    cat('', rep('-', 45), '\n')
+  }
+  print(Var)
+  cat('[End.]', rep('*', 43), '\n')
+  #return (Var)
+}
+unlist1        = function(Var, ...) {
+  return (Var)
+}
+tidy1          = function(Var, ...) {
+  return (Var)
+}
+data.frame1    = function(Var, ...) {
+  return (Var)
+}
+as.data.frame1 = function(Var, ...) {
+  return (Var)
+}
+
+reformulate2 = function(termlabels           ,
+                        response             ,
+                        intercept = TRUE     ,
+                        data = data          ,
+                        rand = NULL          ,
+                        plot = FALSE         ,
+                        active = TRUE        ,
+                        show = TRUE          ,
+                        onlyL = FALSE)
+{
+  f     = reformulate(termlabels = termlabels,
+                      response = response,
+                      intercept = intercept)
+  TwoLevCovs = which(lapply(as.data.frame(data[, all.vars(f)[-1]]),
+                            function(x) {
+                              if (is.factor(x)) {
+                                length(levels(x))
+                              } else{
+                                length(x)
+                              }
+                            }) <= 1)
+
+  if (length(TwoLevCovs)  &
+      length(TwoLevCovs) != length(all.vars(f)[-1])) {
+    if(show){
+      cat (
+        '\n',
+        rep('\\-/', 20),
+        '\n *** The following variable(s) are removed since they only contain one level : \n'
+        ,
+        paste(termlabels[grep(pattern = termlabels[TwoLevCovs], x = c(termlabels))], collapse = ', '),
+        '\n',
+        rep('/-\\', 20),
+        '\n'
+      )
+    }
+    termlabels = termlabels[-grep(pattern = termlabels[TwoLevCovs], x = c(termlabels))]
+  }
+  if (length(termlabels) > 0) {
+    f     = reformulate(termlabels = termlabels,
+                        response = response,
+                        intercept = intercept)
+  } else{
+    f      = as.formula(paste(response, 1, sep = '~'))
+    active = FALSE
+  }
+  if (active) {
+    if (min(data[, response]) > 0) {
+      lam   = boxcox(f,
+                     lambda = seq(-5, 5, length.out = 150),
+                     plotit = plot,data=data)
+      l     = round(lam$x[which.max(lam$y)], 5)[1]
+      l     = ifelse(abs(l) > 4, 1, l)
+    } else{
+      l     = 1
+      cat('\n** Data contains negative values. Box-cox transformation is not applied.\n')
+    }
+  } else{
+    l = 1
+  }
+  if (onlyL) {
+    if(show & active){
+      cat(
+        '\n',
+        rep('~', 50),
+        '\n [Transformation:] Box-Cox Transformation is applied.\n * Boxcox optimal parameter = ',
+        l,
+        ' for model :\n => ',
+        paste(f[2], f[3], sep = '~'),
+        '\n',
+        rep('~', 50),
+        '\n'
+      )
+    }
+    return(l)
+  } else{
+    if (l != 0) {
+      f2    = noquote(paste(f[2], '^', l, '~.', sep = ''))
+    } else{
+      f2    = noquote(paste('log(', f[2], ')', '~.', sep = ''))
+    }
+    if (show & active)
+      cat(
+        '\n',
+        rep('~', 50),
+        '\n [Transformation:] Box-Cox Transformation applies.\n * Boxcox optimal parameter = ',
+        l,
+        ' for model :\n => ',
+        paste(f[2], f[3], sep = ' ~ '),
+        '\n',
+        rep('~', 50),
+        '\n'
+      )
+    f     = update.formula(old = f, f2)
+    if (!is.null(rand)) {
+      f3    = noquote(paste(f[2], '~', f[3], '+', rand, sep = ''))
+      f3    = as.formula(f3)
+      f     = f3
+      if (show & active){
+        cat('\n [Final model:] ',
+            ifelse(is.null(rand),
+                   paste(f[2], f[3], sep = '~'),
+                   paste(paste(f[2], f[3], sep = '~'))
+            ),'\n')
+      }
+    }
+    return (as.formula(f))
+  }
+}
+
+reformulate3 = function(termlabels,...){
+  reformulate2(termlabels,...,onlyL = TRUE)
+}
+reformulate4 = function(termlabels ,
+                        response ,
+                        intercept = TRUE,
+                        data = data,
+                        plot = FALSE,
+                        active = TRUE) {
+  if (min(data[, response], na.rm = TRUE) > 0) {
+    f     = reformulate(termlabels = termlabels,
+                        response = response,
+                        intercept = intercept)
+    TwoLevCovs = which(lapply(as.data.frame(data[, all.vars(f)[-1]]),
+                              function(x) {
+                                if (is.factor(x)) {
+                                  length(levels(x))
+                                } else{
+                                  length(x)
+                                }
+                              }) <= 1)
+
+    if (length(TwoLevCovs) & length(TwoLevCovs) != length(all.vars(f)[-1])) {
+      cat ('\n',
+           rep('\\-/', 20),
+           '\n *** The following variable(s) are removed since they only contain one level : \n'
+           ,
+           paste(termlabels[grep(pattern = termlabels[TwoLevCovs],x = c(termlabels) )],collapse = ', '),
+           '\n',
+           rep('/-\\', 20),'\n'
+      )
+
+      termlabels = termlabels[-grep(pattern = termlabels[TwoLevCovs],x = c(termlabels) )]
+    }
+    f   = reformulate(termlabels = termlabels,
+                      response = response,
+                      intercept = intercept)
+    f   = as.formula(f)
+    lf  = lm(f, data = data)
+    lam = boxcox(f,
+                 lambda = seq(-15, 15, length.out = 251),
+                 plotit = plot)
+    l   = lam$x[which.max(lam$y)][1]
+    l   = ifelse(abs(l)>4,1,l)
+    l   = ifelse(l == 0, 1, l)
+    if (active)
+      cat(
+        '\n',
+        rep('~', 50),
+        '\n [Transformation:] Boxcox optimal parameter = ',
+        l,
+        ' for model :\n => ',
+        paste(f[2], f[3], sep = '~'),
+        '\n',
+        rep('~', 50),
+        '\n'
+      )
+  } else{
+    l  = 1
+  }
+  return (l)
+}
+
+######
+TargetResponse = TargetResponse0 = depVariable[1]
+zygosity       = 'homozygote'
+Current        = 'This'
+Source         = 'gene'
+Control.Gene  = ifelse(!is.na(PhenListInput@refGenotype)            ,
+                       PhenListInput@refGenotype           , '+/+')
+Test.Gene0 = Test.Gene  = ifelse(!is.na(PhenListInput@testGenotype)           ,
+                                 PhenListInput@testGenotype,
+                                 'Sparc/Sparc')
+MaleLabel     = 'Male'
+FemaleLabel   = 'Female'
+Sex0 = Sex    = 'Sex'
+Batch0  = Batch  = 'Batch'
+Weight0 = Weight = 'Weight'
+Group0 = Group   = 'Genotype'
+Dates0 = Dates   = paste(Batch, '.Unix', sep = '')
+ModelWeight0     = ModelWeight = 'ModelWeight'
+RawData =  PhenStat:::getDataset(PhenListInput)
+rnk = order(
+  as.numeric(as.Date(
+    RawData[,Batch0]
+  )
+  )
+)
+# IMPORTANT! sort the entire dataset with respect to date!
+RawData = RawData[rnk,]
+
+#########################
+ExpColonyIndex = which   ((RawData$Genotype == Test.Gene0))# & (RawData$zygosity == zygosity))
+ConColonyIndex = which   ((RawData$Genotype == Control.Gene))# & (RawData$zygosity != zygosity))
+if (!is.null(other.response)) {
+  OtherResponses = cbind(RawData[, TargetResponse0, drop = FALSE], other.response)
+} else{
+  OtherResponses = RawData[, TargetResponse0, drop = FALSE]
+}
+TargetIndex    = which(colnames(OtherResponses) == TargetResponse0)
+### Just a copy of the dataset with the columns of interest
+RawData.Copy   = data.frame(
+  assign(TargetResponse , RawData[, TargetResponse]),
+  assign(Weight    , RawData[, Weight0]),
+  assign(Group     , as.factor(RawData[, Group0])),
+  assign(Sex       , as.factor(RawData[, Sex0])),
+  assign(Dates     , as.numeric(as.Date(
+    RawData[, Batch0]
+  ))),
+  assign(Batch     ,
+         as.factor(RawData[, Batch0]))
+)#[c(ExpColonyIndex, ConColonyIndex),]
+
+if(1 == 2){ # Not used in this version
+  lookup        = FALSE
+  if (lookup) {
+    load(file.path(
+      system.file(package = "PhenStat", mustWork = TRUE),
+      'report',
+      'GeCoSy.Rdata'
+    ))
+    Gene.name = as.character(GsGn[GsGn$colony_id == PhenlistObject@testGenotype[1], 2])[1]
+    IMPReSS   = as.character(IMPRESS[IMPRESS$parameter_stable_id == depVariable, 2])[1]
+    Gene.name = ifelse(length(Gene.name) > 0,
+                       Gene.name[1],
+                       PhenlistObject@testGenotype[1])
+    IMPReSS   = ifelse(length(IMPReSS) > 0, IMPReSS, depVariable[1])
+  } else{
+    Gene.name = PhenlistObject@testGenotype[1]
+    IMPReSS   = depVariable
+  }
+}
+Gene.name = ifelse(!is.null(Gene.Symbol),Gene.Symbol[1],PhenlistObject@testGenotype[1])
+IMPReSS   = ifelse(!is.null(Response.name) , Response.name[1] , depVariable[1] )
+
+TargetResponse0          = gsub('[^a-zA-Z0-9]','_',IMPReSS) # change TargetResponse to the actual name
+Test.Gene                = Gene.name # the same as above
+colnames(RawData.Copy)   = c(TargetResponse0, Weight0, Group0, Sex0, Dates0, Batch0)
+missing      = sapply (RawData.Copy, function(x)
+  sum(is.na(x)))
+data                  = na.omit(RawData.Copy) # Remove missings
+data[, Group0]        = as.factor(data[, Group0])
+levels(data[, Group0])= c(Control.Gene, Test.Gene)
+data           = data[order(data[, Dates0], decreasing = 0), ]
+data           = data[order(data[, Group0], decreasing = 1), ]
+data           = droplevels(data)
+data           = data[!duplicated(data), ]
+###
+data           = data[data[, Weight0] > 0, ]
+###
+for (i.sd in 1:10 ^ 5) {
+  e.index  = which(data[, Group0] == Test.Gene)
+  tm       = 24 * 60 * 60 * 7 # Weeks!
+  xt       = data[, Dates0] / tm - mean(data[e.index, Dates0] / tm)
+  wt       = dnorm(xt, 0, i.sd)
+  Wei.Size = sum(!(which(wt > 0.001) %in% e.index))
+  if (Wei.Size > 100)
+    break
+}
+data   = cbind(data,ModelWeight = wt)
+data [ , Dates0] = data [ , Dates0]/ifelse(
+  min(data [ , Dates0],na.rm = TRUE)>0,
+  min(data [ , Dates0],na.rm = TRUE),1)
+rownames(data) = NULL
+#### variable indeces
+### Control indices
+NewConIndexInData  = which(data[, Group0] == Control.Gene)
+### Males Control indices
+NewConIndexInDataM = which(data[, Group0] == Control.Gene &
+                             data[, Sex0] == MaleLabel)
+### Females Control indices
+NewConIndexInDataF = which(data[, Group0] == Control.Gene &
+                             data[, Sex0] == FemaleLabel)
+###
+NewExpIndexInData  = which(data[, Group0] == Test.Gene) # Mutant  indices
+NewExpIndexInDataM = which(data[, Group0] == Test.Gene &
+                             data[, Sex0] == MaleLabel)  # Males Mutant
+NewExpIndexInDataF = which(data[, Group0] == Test.Gene &
+                             data[, Sex0] == FemaleLabel)# Females Mutant
+
+if(length(NewConIndexInDataM) &
+   length(NewExpIndexInDataM) &
+   length(NewConIndexInDataF) &
+   length(NewExpIndexInDataF)){
+  SexProc  = TRUE
+}else{
+  SexProc  = FALSE
+}
+### Is response continuous?
+if (all(data[, TargetResponse0] %% 1 == 0)  &&
+    length(unique(data[, TargetResponse0])) < 5) {
+  varType = 'categorical'
+  active = FALSE
+} else {
+  varType = 'continuous'
+  active = TRUE
+}
+Error.indic  = FALSE
+#####
+@
+\newif\ifPositive
+<<condtion2, echo = FALSE>>=
+### If the missing in the response is more than 15% of total data, then STOP!
+# if (max(sapply(data, function(x) sum(is.na(x)))) < 0.15 * nrow(data) & !Error.indic) {
+#   cat("\\Positivetrue")
+# } else {
+#   cat("\\Positivefalse")
+# }
+@
+%\ifPositive
+\newpage
+\begin{center}
+\huge  \verb!\Sexpr{reportTitle}!\\
+\small Colony id         : \verb!\Sexpr{Test.Gene0}!\\
+\small Gene symbol       : \verb!\Sexpr{ifelse(!is.null(Gene.Symbol),Gene.Symbol,'Not Specified')}!\\
+\small Response variable : \verb!\Sexpr{depVariable}!\\
+\small Response name     : \verb!\Sexpr{ifelse(!is.null(Response.name),IMPReSS,'Not Specified')}!\\
+\line(1,0){150}\\
+\small Report version    : $\verb!\Sexpr{ReportVersion}!$\\
+\small Report release date: $\verb!\Sexpr{ReprtDate}!$\\
+\small Data release      :  $\verb!\Sexpr{ifelse(is.null(DataRelease),'Not specified',DataRelease)}!$  \\
+\line(1,0){150} \\
+\small Report Generated  : \today\\
+\end{center}
+\addtocontents{toc}{\protect\sloppy}
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\section{Data introduction - Sec Id: \Sexpr{sectionID[1]}}
+\verb!\Sexpr{Current}! dataset contains \verb!\Sexpr{nrow(data)}! datapoints from an experiment on \verb!\Sexpr{Source}! \verb!\Sexpr{Test.Gene}!. The variables of interest are  \verb!\Sexpr{TargetResponse0}! (response),  \verb!\Sexpr{Group0}!,  \verb!\Sexpr{Sex0}!,  \verb!\Sexpr{Weight0}!, \verb!\Sexpr{Batch0}! and \verb!\Sexpr{Dates0}! (the corresponding UNIX timestamp to dates that is normalized to be started from $1$). The entire dataset is sorted by date using \verb!\Sexpr{Dates0}!. The response,  \verb!\Sexpr{TargetResponse0}!, is a \verb!\Sexpr{varType}! variable ranging from  \verb!\Sexpr{min(data[,TargetResponse0])}! to  \verb!\Sexpr{max(data[,TargetResponse0])}!.
+<<>>==
+cat('\n Data \n Total number of samples   : ',dim(data)[1],
+    '\n Total number of variables : ',dim(data)[2],'\n')
+
+
+kable1(
+  head(data[c(NewExpIndexInData,NewConIndexInData),],20),
+  caption = ' The first 20 datapoints sorted to have the mutants first'
+)
+
+kable1(
+  summary(data[,TargetResponse0]),
+  caption = 'Response summary'
+)
+@
+
+<<>>==
+T2 = paste('Power calculation - Sec Id:', sectionID[2])
+@
+\section{\Sexpr{T2}}
+One of the main concerns in the analysis of biological data is the optimal critical level $\alpha$ to be compared with p-values that are resulted from hypothesis tests. In this section we perform a power calculation analysis to find out the optimal number of samples for the power of interest. The calculations are on the basis of a two-sample t-test under the following hypothesis:
+% \begin{center}
+% \begin{tabular}{l|cc}
+% &  $H_0$ is true & $H_1$ is true \\
+% \hline
+% Test is significant & V & S \\
+% \hline
+% Test is not significant & U & T \\
+% \hline
+% \end{tabular}
+% \end{center}
+%
+% \begin{align*}
+% FDR = {\hat\alpha}= {V/(V+S)}
+% \end{align*}
+% where $\hat\alpha$ is estimated Type I error from the control data. In other words, FDR is the probability of  rejecting the null hypothesis when it is true from an iteratively sampling procedure from the control data. More precisely, a random sample of $14$ observations are selected from the control data and the following test is performed on the this sample,
+\begin{align*}
+\begin{cases}
+H_0 : \mu_{control}=   \mu_{test}\\
+H_1 : \mu_{control}\ne \mu_{test}\\
+\end{cases}
+\end{align*}
+where $\mu_{control}$, $\mu_{test}$ are the mean of the control data and mean of a simulated sample from a normal distribution. We define the maximum \textbf{standard} distance between two means $d$ by $d=|\mu_{control}-\mu_{test}|/\sigma_{mixture}$ and fixed this value to $d=0.5$ unit. That is, the power calculation is defined for detecting a maximum standard distance of $0.5$ unit between means (not be confused with Type I error). In other words, the power is calculated on the basis of the following statistic:
+\begin{align*}
+t=\frac{\mu_{control}-\mu_{test}}{\sigma_{mixture}}
+\end{align*}
+where $\sigma_{mixture}$ is the mixtured standard deviation and the power is calculated for $|t|>0.05$ that is the minimum standard deviance is allowed to be $0.5$.  \\
+%
+% We should stress that none of the mutant data are involved in the sampling procedure. In other words, the simulation is only performed on the control data. Moreover, we  know that the all samples are coming from the control set, then the ideal value of FDR should be one. however, because of the variability in the data this value is less which is an estimation of the true FDR in the data.
+<<fig.cap=paste('Power Calculation for the response - Sec Id:', sectionID[2],sep = '') >>==
+### Initializing parameters
+if(varType == 'continuous'){
+  power           = seq(.35,.99,length.out=10)
+  control         = na.omit(data[NewConIndexInData,TargetResponse0,drop=FALSE]) # population
+  control.size    = nrow(control)
+  alpha           = c(.05,.01,.001,.0001) # Type I error
+  maximumDistance = 0.5                 # Moderate distance
+  ###
+  lalpha          = length(alpha)
+  lpower          = length(power)
+  m               = matrix(ncol=lalpha,nrow=lpower)
+  colnames(m)     = paste('Alpha=',alpha,sep = '')
+  cnames          = colnames(m)
+  for(a in 1:lalpha){
+    for(p in 1:lpower){
+      res     = pwr.t2n.test(d=maximumDistance  ,
+                             n1=control.size    ,
+                             n2=NULL            , #estimate n2!
+                             sig.level=alpha[a] ,
+                             power=power[p])
+      m[p,a ] = res$n2
+    }
+  }
+  ### Output
+  matplot(m,power,type='l'                  ,
+          lwd=3,col=1:lalpha                ,
+          xlab='Sample Size'                ,
+          ylab='Power'                      ,
+          lty=1:lalpha                      ,
+          main=paste('Power Calculation for [', TargetResponse0,']',sep = ''),
+          axes=F )
+  abline(v=round(m[,1]),col='gray',h=power)
+  legend('bottomright',
+         legend=paste(cnames,' # Control size',control.size,
+                      ', MaxSDis=',maximumDistance) ,
+         fill=1:lalpha                                   ,
+         lty=1:10                                        ,
+         lwd=2                                           ,
+         col=1:lalpha                                    ,
+         cex=1,bg = 'white')
+  axis(side = 2,at = power    ,labels = round(power,2)   ,las=2)
+  axis(side = 1,at = round(m[,1]) ,
+       labels      = round(m[,1]) ,
+       las=2 , cex.axis=.5)
+}else{
+  print('Not applicable.')
+}
+@
+<<>>==
+#### Table of powers
+if(varType == 'continuous'){
+  kable1(
+    head(cbind(' Power %'=round(power*100,1)       ,
+               ' Sample Needed'=round(m)     ,
+               'Max S.distance'=maximumDistance,
+               ' Control size'=control.size) ,
+         10),
+    caption = 'Mutant sample size that is required for a certain power under a particular type I error'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+\textbf{Reference:}
+\bibentry{cohen1992statistical}
+
+
+\section{Descriptive statistics - Sec Id: \Sexpr{sectionID[3]}}
+In this section, we look for missing data, outliers, and show a summary of data as well as boxplots and empirical distribution of the variables.
+<<fig.cap=paste('Boxplot of the response', ' and ',Weight0,' split on ',Group0,' and ',Sex0,' - Sex Id = ',sectionID[3], sep = '')>>==
+### QC for missing! Table of missing values
+kable1(
+  as.data.frame1(
+    missing # frequency of missings
+  ),
+  caption = 'The number of missing, split on variables'
+)
+### Total data summary
+kable1(
+  summary(data),
+  caption = 'Data summary'
+)
+
+
+
+
+### Summary of response & the weight
+if(varType == 'continuous'){
+  ### Summary of the response
+  kable1(
+    ddply((data),       c(bquote(.(w=Sex0)),bquote(.(w=Group0))),
+          summarise,
+          N         = length  (get(TargetResponse0)),
+          Mean      = mean    (get(TargetResponse0) ,na.rm = TRUE),
+          sd        = sd      (get(TargetResponse0) ,na.rm = TRUE),
+          Min       = min     (get(TargetResponse0) ,na.rm = TRUE),
+          '1st Qu.' = quantile(get(TargetResponse0) , probs = .25,na.rm = TRUE),
+          Median    = median  (get(TargetResponse0) ,na.rm = TRUE),
+          '3st Qu.' = quantile(get(TargetResponse0) , probs = .75,na.rm = TRUE),
+          Max       = max     (get(TargetResponse0),na.rm = TRUE)
+    ),
+    caption = 'Response summary split on Sex ad Genotype: '
+  )
+
+
+  kable1(ddply(data, c(bquote(.(w=Sex0)),bquote(.(w=Group0))),
+               summarise,
+               N          = length(get(Weight0))               ,
+               Mean       = mean(get(Weight0),na.rm = TRUE)                 ,
+               sd         = sd(get(Weight0),na.rm = TRUE)                   ,
+               Min        = min(get(Weight0),na.rm = TRUE)                  ,
+               '1st Qu.'  = quantile(get(Weight0), probs = .25,na.rm = TRUE),
+               Median     = median(get(Weight0),na.rm = TRUE)               ,
+               '3st Qu.'  = quantile(get(Weight0), probs = .75,na.rm = TRUE),
+               Max        = max(get(Weight0),na.rm=TRUE)
+  )			   ,
+  caption = 'Weight summary split on Sex ad Genotype: '
+  )
+  if(SexProc){
+    ### Boxplots
+    par(mfrow=c(2, 2))
+    boxplot(data[ NewExpIndexInDataM, 1:2],
+            outline = TRUE, cex.main=.7,
+            main=paste('Boxplot: ',TargetResponse0,'\n',Test.Gene,'&', MaleLabel      ,sep = ''))
+    boxplot(data[ NewExpIndexInDataF, 1:2],
+            outline = TRUE, cex.main=.7,
+            main=paste('Boxplot: ',TargetResponse0,'\n',Test.Gene,'&', FemaleLabel    ,sep = ''))
+    boxplot(data[ NewConIndexInDataM, 1:2],
+            outline = TRUE, cex.main=.7,
+            main=paste('Boxplot: ',TargetResponse0,'\n',Control.Gene,'&', MaleLabel   ,sep = ''))
+    boxplot(data[ NewConIndexInDataF, 1:2],
+            outline = TRUE, cex.main=.7,
+            main=paste('Boxplot: ',TargetResponse0,'\n',Control.Gene,'&', FemaleLabel ,sep = ''))
+
+    ### Outliers in e.g. mutant males
+    kable1(
+      as.data.frame(
+        rbind('Outlier value',
+              outlier(data[ NewExpIndexInDataM, 1:2], logical = FALSE),
+              ### Outliers in e.g. mutant females
+              outlier(data[ NewExpIndexInDataF, 1:2], logical = FALSE),
+              ### Outliers in e.g. contrl males
+              outlier(data[NewConIndexInDataM, 1:2], logical = FALSE),
+              ### Outliers in e.g. contrl females
+              outlier(data[NewConIndexInDataF, 1:2], logical = FALSE)
+        )
+      ),
+      caption = 'Outliers!'
+    )
+
+    ### Replace outliers with the median
+    data[ NewExpIndexInDataM, 1:2] = rm.outlier(data[ NewExpIndexInDataM, 1:2],
+                                                fill = TRUE, median = TRUE)
+    data[ NewExpIndexInDataF, 1:2] = rm.outlier(data[ NewExpIndexInDataF, 1:2],
+                                                fill = TRUE, median = TRUE)
+    data[ NewConIndexInDataM, 1:2] = rm.outlier(data[ NewConIndexInDataM, 1:2],
+                                                fill = TRUE, median = TRUE)
+    data[ NewConIndexInDataF, 1:2] = rm.outlier(data[ NewConIndexInDataF, 1:2],
+                                                fill = TRUE, median = TRUE)
+  }
+}else{
+  print('Not applicable.')
+}
+@
+<<echo=FALSE, results='hide'>>==
+### Frequency table of the response and covariates
+if (varType=='categorical') {
+  table(data[,TargetResponse0])
+  kable1(
+    as.data.frame1(
+      addmargins(
+        table(data[, Group0])
+      )
+    )
+    ,col.names = c('Var','Freq'),
+    caption = 'Genotype summary'
+  )
+  kable1(
+    as.data.frame(
+      addmargins(
+        xtabs(
+          reformulate(
+            c(Group0,Sex0,Sex0),response = NULL
+          ),data = data)
+        ,margin = 1)
+    ),
+    caption = paste(Group0,'/',Sex0,' summary',sep = '')
+  )
+}else{
+  cat('\n Not applicable.\n')
+}
+#### END OF TABLES ####
+@
+
+<<fig1, fig.cap = paste('Boxplot of the response over ',Batch0,' split on ', Sex0, ' - Sec Id = ',sectionID[3])>>=
+#### START OF PLOT ####
+if(varType == 'continuous'){
+  ### Scatterplot
+  gg1 = ggplot(data = data,type='b') +
+    aes(x = as.factor(get(Batch0)), y = get(TargetResponse0), color = get(Sex0)) +
+    facet_wrap( reformulate(Sex0,response = NULL),shrink = TRUE,dir = 'v')+
+    #geom_point(size=2, shape=5)+
+    geom_boxplot()+
+    labs(x=Batch0,y=TargetResponse0,color=Sex0)+
+    theme(axis.text.x =
+            element_text(angle = 75, hjust = 1,size=8))
+  grid.arrange(gg1,nrow=1,ncol=1,padding=.051)
+}else{
+  print('Not applicable.')
+}
+@
+
+<<fig2,  fig.cap = paste('(top) Histogram and QQnorm (or Boxplot) of the response, (bottom) histogram of the response split into', Control.Gene, 'and', Test.Gene,' - Sec Id :',sectionID[3]), tidy=FALSE>>=
+if(varType == 'continuous'){
+  ### Histograms
+  par  (mfrow=c(2, 2), xpd=FALSE)
+  response = as.numeric(data[,TargetResponse0])
+  hist (response, probability = TRUE, add=0, density = 0, col=1,
+        right=FALSE, main = paste('Histogram of [',TargetResponse0,']',sep = ''),
+        xlab=TargetResponse0)
+  lines(density(response), col=2, lwd=2, lty=2)
+  lines(density(response, bw = density(response)$bw*10), col=3, lwd=2, lty=3)
+  mres     = mean(response)
+  medres   = median(response)
+  modres   = BDWreg:::Mode(response)
+  abline(v = c(mres, medres, modres)-0, col=4:6, lty=4:6, lwd=2)
+  abline(v = c(mres-1.96*sd(response), mres+1.96*sd(response)), col=7, lty=3, lwd=2)
+  legend('topleft', legend = c('Emp.density'   ,
+                               'Emp.densX10'    ,
+                               paste('mean~'   , round(mres, 3)   , sep = ''),
+                               paste('median~' , round(medres, 3) , sep = ''),
+                               paste('mode~'   , round(modres, 3) , sep = ''),
+                               '95% CI'
+  ), fill = 2:7, col=2:7, cex=.7, bg = 'white')
+  # QQ plot
+  if (varType=='continuous') {
+    qqnorm(response, main=
+             paste('[',TargetResponse0,']','- Normal QQ plot',sep = '') ,
+           cex.main=.6)
+  }else{
+    boxplot(response, main=paste('[',TargetResponse0,'] - Boxplot'),cex.main=.6)
+  }
+  # Other histograms
+  hist(response[NewConIndexInData], probability = TRUE, right=FALSE,
+       main= paste('Histogram of ',Control.Gene), xlab=TargetResponse0)
+  lines(density(response[NewConIndexInData], adjust = 2.5), lwd=2, col=2)
+  hist(response[NewExpIndexInData], probability = TRUE, right=FALSE,
+       main= paste('Histogram of ', Test.Gene), xlab=TargetResponse0)
+  lines(density(response[NewExpIndexInData], adjust = 2.5), lwd=2, col=2)
+}else{
+  print('Not applicable.')
+}
+#### END OF PLOT ####
+@
+<<fig3, echo=FALSE, fig.cap = paste('Histogram of the response split on', Sex0,' - Sec Id :',sectionID[3]), tidy=FALSE >>=
+if(varType == 'continuous' & SexProc){
+  #### Histograms on males and Females
+  par(mfrow=c(2, 2))
+  ### Hist 1
+  hist(response[data[, Group0]==Control.Gene & data[,Sex0]==MaleLabel], probability = TRUE,
+       main= paste('Histogram of ',Control.Gene,'&',MaleLabel), xlab=TargetResponse0, right=FALSE)
+  lines(density(response[data[, Group0]==Control.Gene & data[,Sex0]==MaleLabel], adjust = 2.5),
+        lwd=2, col=2)
+  ### Hist 2
+  hist(response[data[, Group0]==Control.Gene & data[,Sex0] ==FemaleLabel], probability = TRUE,
+       main= paste('Histogram of ',Control.Gene,' &',FemaleLabel), xlab=TargetResponse0, right=FALSE)
+  lines(density(response[data[, Group0]==Control.Gene & data[,Sex0]==FemaleLabel], adjust = 2.5),
+        lwd=2, col=2)
+  ### Experiment
+  ### Hist 3
+  hist(response[data[, Group0]==Test.Gene & data[,Sex0] == MaleLabel], probability = TRUE,
+       main= paste('Histogram of ',Test.Gene,'&',MaleLabel), xlab=TargetResponse0, right=FALSE)
+  lines(density(response[data[, Group0]==Test.Gene & data[,Sex0]==MaleLabel], adjust = 3),
+        lwd=2, col=2)
+  ### Hist 4
+  hist(response[data[, Group0]==Test.Gene & data[,Sex0] ==FemaleLabel], probability = TRUE,
+       main= paste('Histogram of ',Test.Gene,'&',FemaleLabel), xlab=TargetResponse0, right=FALSE)
+  lines(density(response[data[, Group0]==Test.Gene & data[,Sex0]==FemaleLabel], adjust = 3),
+        lwd=2, col=2)
+}else{
+  print('Not applicable.')
+}
+#### END OF PLOT ####
+@
+
+
+\textbf{Reference:}
+\bibentry{chambers1991statistical}
+
+\section{Test of normality - Sec Id: \Sexpr{sectionID[63]}}
+In this section we run a one-sample Kolmgorov-Smirnov test to examine the assumption of normality for the response. To make the values unique, we add a small random number in $(-10^{-8},10^{-8})$ interval to each single datapoint. It is due to the fact that we consider the categorical variables with more than $5$ categories as continuous. In fact, we assume $y=response+e$ where $e\sim U(-10^{-8},10^{8}).$
+<<>>==
+if(varType == 'continuous'){
+  lresponse =length(response)
+  kable1(
+    tidy1(
+      ks.test(x=response+runif(lresponse,-10^-8,10^-8),'pnorm')
+    ),
+    caption = 'Test of normality for the response. \n
+    How response conforms to the normal distribution?'
+  )
+}else{
+  print('Not applicable.')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{birnbaum1951one}
+\bibentry{conover1980practical}
+\bibentry{durbin1973distribution}
+
+
+<<>>==
+T4 = paste('Sample boosting plots - Sec Id:', sectionID[4],sep='')
+@
+\section{\Sexpr{T4}}
+In this section, we discuss a method of increasing the number of samples by considering the correlation among the measurements from the same mutant specimens.\\
+
+Let $x$ and $y$ be two random variables with the correlation defined by,
+\begin{align*}
+\rho(x, y)=\frac{\sigma_{xy}}{\sigma_x \sigma_y},
+\end{align*}
+where $\sigma_{xy}$, $\sigma_x$ and $\sigma_y$ denote the covariance between random variables, standard deviation of $x$ and $y$ respectively. Further, we assume that $x$ and $y$ are highly correlated, that is $|\rho|$ tends sufficiently close to one. \\
+
+From the properties of the correlation function, for any set of values $\{a, b, c, d\}\in\mathbb{R}$,
+\begin{align*}
+\rho(ax+b, ct+d)=\rho(x, y).
+\end{align*}
+This shows that $x$ and $y$ correlate via a linear function, provided they are highly correlated. As a result,
+\begin{align*}
+y=b_0 + b_1 x+e
+\end{align*}
+where $e$, the random error, is a mean zero, fixed variance random variable. Then, the sample boosting steps are summarized as below:
+\begin{itemize}
+\item[1.]{Find the most correlated variables \boldmath{($|\rho|>0.85$)}, denoted by $y_1, \dots, y_k$, to the the variable of interest $y$ (response). }
+\item[2.]{Regress $y$ on $y_1,\ldots,y_k$ separately to remove the effect of scaling}
+\item[3.]{Estimate response by the $y_1,\ldots,y_k$}
+\end{itemize}
+
+<<fig.cap=T4>>==
+if(!is.null(other.response) && varType == 'continuous'){
+  OtherResponsesExp = OtherResponses [ ExpColonyIndex, ]
+  OtherResponsesCon = OtherResponses [ ConColonyIndex, ]
+  ### The number of missings in other responses
+  missing = sapply(OtherResponses, function(x) sum(is.na(x)))
+  kable1(
+    as.data.frame1(
+      missing
+    ),
+    caption = 'The number of missings data in each variable'
+  )
+  ### Remove the variables that are included more than 15% missing
+  missingIndex = which(missing > nrow(RawData) * 0.15 )
+  if (!(TargetIndex %in% missingIndex) && ncol(OtherResponses)>1){
+    OtherResponsesExp = na.omit(OtherResponsesExp[, -missingIndex])
+    OtherResponsesCon = na.omit(OtherResponsesCon[, -missingIndex])
+
+    ### Correlation plot
+    corrplot(cor(OtherResponsesExp), method="pie",na.label='-',
+             main=paste('Correlation plot for',
+                        Test.Gene, 'responses \n (upper triangle) and',
+                        Control.Gene, '(lower one)'),
+             sig.level=0.05,tl.srt=60,mar=c(3,1,2,1),
+             tl.pos='lower',outline=TRUE)
+    corrplot(cor(OtherResponsesCon), method="pie",na.label='-',
+             mar=c(3,1,2,1),type='lower',add=1,tl.pos='n',bg='white',tl.srt=60)
+
+    ### Step 1 : find the most correlated variables to the response
+    CorrelationMatrix      = (cor(OtherResponsesExp)+cor(OtherResponsesCon))/2
+    Cindex    = which(abs(CorrelationMatrix)>.85 & abs(CorrelationMatrix) != 1,
+                      arr.ind = TRUE)
+    MainVar   = Cindex[which(rownames(Cindex) == TargetResponse0)[1], 1]
+    OtherVars = Cindex[which(Cindex[, 1] == MainVar), 2]
+
+    ### The list of the correlated variables
+    OtherVars
+    MainRes   = (OtherResponsesExp[, MainVar])
+    NewRes    = (OtherResponsesExp[, c(MainVar, OtherVars)])
+
+    ### Step 2 : fit a linear model
+    res2      = apply(NewRes, 2, FUN = function(x){lm(MainRes~x)})
+    #res3     = lapply(res2, plot)
+
+    ### Step 3 : predicting the response values
+    res3      = lapply(res2, predict)
+    NRes      = as.vector(unlist(res3))
+
+    ### plot results
+    par(mfrow=c(2, 2))
+    tmp       = lapply(colnames(NewRes),
+                       function(Ind){hist(NewRes[, Ind],
+                                          main = paste('Histogram of',Ind), xlab=Ind)})
+
+    hist(NRes, main='Boosted sample histogram',xlab=paste('Combined response'))
+    #cor(NewRes)
+  }else{
+    print ('Not applicable.')
+  }
+}else{
+  print ('Not applicable.')
+}
+#######
+@
+%%%%%% Section
+\section{Independent tests - Sec Id: \Sexpr{sectionID[5]}}
+\subsection{Z-test - Sec Id: \Sexpr{sectionID[6]}}
+If response is normally distributed, then we can assume that all data, regardless of the group (control/experiment), are independent samples from a Gaussian population. As a result, we do the following test,
+\begin{align*}
+\begin{cases}
+H_0 : \mu_{experiment}-\mu_{control}=0\\
+H_1 : \mu_{experiment}-\mu_{control}\neq 0
+\end{cases}.
+\end{align*}
+%where $\mu_{.}$ denotes the mean of a random variable.
+Then test statistics is defined by,
+\begin{align*}
+Z =\frac{\mu_{experiment}-\mu_{control}}{\sigma_{control}/\sqrt{n}}
+\end{align*}
+where $\mu_{experiment}$, $\mu_{control}$, $\sigma_{control}$ and $n$ are mean of experiment and control groups, standard deviation of the control group and the number of samples in the experiment group respectively.
+
+<<>>==
+if(varType == 'continuous'){
+  # Z-test
+  resCoMa = response[NewConIndexInDataM];lresCoMa=length(resCoMa)
+  resCoFe = response[NewConIndexInDataF];lresCoFe=length(resCoFe)
+  resExMa = response[NewExpIndexInDataM];lresExMa=length(resExMa)
+  resExFe = response[NewExpIndexInDataF];lresExFe=length(resExFe)
+  # Z-test on overal mutant/control values
+  kable1(
+    data.frame1(
+      unlist1(
+        z.test(x = c(resExMa, resExFe),mu = mean(c(resCoMa, resCoFe)),
+               stdev = sd(c(resCoMa, resCoFe)))
+      )
+    )
+    ,col.names = c('Stat'),
+    caption    = 'Z-test on overal mutant/control values'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+\subsection{Z-test on mutant/control \Sexpr{gsub('_', '.',MaleLabel)}s - Sec Id: \Sexpr{sectionID[65]}}
+The purpose of this section is to detect the genotype effect between {\verb!\Sexpr{MaleLabel}! animals by applying a Z-test to the data.
+<<>>==
+if(SexProc & varType == 'continuous'){
+  # Z-test on mutant/control males
+  kable1(
+    data.frame1(
+      unlist1(
+        z.test(x = resExMa,mu = mean(resCoMa),stdev = sd(resCoMa))
+      )
+    )
+    ,col.names = c('Stat'),
+    caption    = paste('Z-test on mutant/control',MaleLabel)
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+\subsection{Z-test on mutant/control \Sexpr{gsub('_', '.',FemaleLabel)}s - Sec Id: \Sexpr{sectionID[66]}}
+The purpose of this section is to detect the genotype effect between \verb!\Sexpr{FemaleLabel}! animals by applying a Z-test to the data.
+<<>>==
+if(SexProc & varType == 'continuous'){
+  # Z-test on mutant/control females
+  kable1(
+    data.frame1(
+      unlist1(
+        z.test(resExFe,mean(resCoFe),sd(resCoFe))
+      )
+    ),
+    col.names = c('Stat'),
+    caption   = paste('Z-test on mutant/control',FemaleLabel)
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{dalgaard2008introductory}
+
+\subsection{Two samples T-test - Sec Id: \Sexpr{sectionID[7]}}
+Similarly to Z-test, one can perform a T-test by replacing the denominator ($\sigma_{control}$) by the the sample estimation of the variations. Then, t-statistics is given by
+\begin{align*}
+T =\frac{\mu_{experiment}-\mu_{control}}{\sigma_{p}\sqrt{1/n_{control}+1/n_{experiment}}}
+\end{align*}
+where
+\begin{align*}
+\sigma_p=\sqrt{
+\frac{(n_{control}-1)s^2_{control}+(n_{experiment}-1)s^2_{experiment}}{n_{control}+n_{experiment}-2}.
+}
+\end{align*}
+<<>>==
+if(varType == 'continuous'){
+  # Result
+  # T-test between control and mutant (regardless of the sex)
+  kable1(
+    data.frame1(
+      unlist1(
+        t.test(c(resExMa, resExFe), c(resCoMa, resCoFe))
+      )
+    ),
+    col.names = 'Stat',
+    caption = 'T-test between control and mutant (regardless of the sex)')
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+\subsection{Two samples T-test on mutant/control \Sexpr{gsub('_', '.',MaleLabel)}s - Sec Id: \Sexpr{sectionID[67]}}
+The purpose of this section is to detect the genotype effect between \verb!\Sexpr{MaleLabel}! animals by applying a T-test to the data.
+<<>>==
+if(SexProc & varType == 'continuous'){
+  # T-test on mutant/control males
+  kable1(
+    data.frame1(
+      unlist1(
+        t.test(resExMa, resCoMa)
+      )
+    ),
+    col.names = 'Stat',
+    caption   = paste('T-test on mutant/control',MaleLabel)
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+\subsection{Two samples T-test on mutant/control \Sexpr{gsub('_', '.',FemaleLabel)}s - Sec Id: \Sexpr{sectionID[68]}}
+The purpose of this section is to detect the genotype effect between \verb!\Sexpr{FemaleLabel}! animals by applying a T-test to the data.
+<<>>==
+# T-test on mutant/control females
+if(SexProc & varType == 'continuous'){
+  kable1(
+    data.frame1(
+      unlist1(
+        t.test(resExFe, resCoFe)
+      )
+    ),
+    col.names = 'Stat',
+    caption = paste('T-test on mutant/control',FemaleLabel)
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{dalgaard2008introductory}
+
+% \section{Fisher exact test - Sec Id: \Sexpr{sectionID[8]}}
+% In tis section we perform Fisher's exact test for the
+%  null of independence of rows and columns in a contingency table with
+% response and genotype.
+%
+% <<>>==
+% #table(data[,TargetResponse0],data[, Group0])
+% kable1(
+%   data.frame1(
+%     unlist1(
+%       fisher.test(data[,TargetResponse0],data[, Group0])
+%     )
+%   )
+%   ,col.names = 'Stat',
+%   caption='Fisher exact test'
+%   )
+% @
+%%%%%% Section
+\section{Linear framework - Sec Id: \Sexpr{sectionID[9]}}
+\subsection{Introduction - Sec Id: \Sexpr{sectionID[10]}}
+\normalsize
+{\textbf{Model:}
+Let $y$ denote the variable of interest (\verb!\Sexpr{TargetResponse0}!), $X$ and $Z$ be two sets of covariates, e.g. \verb!\Sexpr{Sex0}!, \verb!\Sexpr{Weight0}!, \verb!\Sexpr{Group0}! etc. In a general (continuous) case, one can consider a linear mixed model of the form
+\begin{align*}
+y=X\beta + Z\gamma+e,
+\end{align*}
+where $\beta=(\beta_0, \ldots, \beta_p)$ and $\gamma=(\gamma_0, \ldots, \gamma_q)$ are  sets of $p$ fixed  and $q$ random effects respectively.  We assume that the error components $e_i, i=1, 2, \ldots, n$
+follow a multivariate  normal (MVN) distribution. Further we assume that the random effects are independent of errors and follow a mean zero MVN distribution. We also relax the assumption of normality on the errors
+when we move to more general cases such as {generalized mixed model}. For simplicity we assume that the covariance structure of the random effects is fixed that is, $\mathbb{C}cov(\gamma)=I\sigma_\gamma$ where $I$ is a digonal matrix of 1s.\\
+
+}
+{\textbf{Hypothesis test:} Let the test of  interest be
+\begin{align*}
+\begin{cases}
+H_0: & \beta_t =0\\
+H_1:& \beta_t \neq 0
+\end{cases}
+\end{align*}
+where it accounts for the effect of treatment by testing the corresponded coefficient $\beta_t$ in the model. In what follows we propose a gradually developing model on the data from knocking out {\verb!\Sexpr{Test.Gene}!}.
+}\\
+
+{\textbf{Comparison:}
+We propose to compare the results with respect to Akaike information criterion (AIC) and Bayesian information criterion (BIC),
+\begin{align*}
+& AIC= -2logLik + 2 \times df\\
+& BIC= -2logLik + df \times \log(n)
+\end{align*}
+where $logLik$ is the log likelihood and $df$ is defined as the number of unique parameters that are estimated from the model.\\
+}
+
+
+\textbf{Reference:}
+\bibentry{konishi2008information}
+\bibentry{kanji2006100}
+\bibentry{west2014linear}
+
+
+
+\subsection{Simple linear model - Sec Id: \Sexpr{sectionID[11]}}
+Assuming that the response variable is continuous (or it is categorical but with enough categories) and the model is linear on all covariates,
+\begin{align*}
+y=x\beta+e.
+\end{align*}
+We consider two general cases where in the first one \verb!\Sexpr{Batch0}! is not included as an explanatory variable and in the second one we consider \verb!\Sexpr{Batch0}! as a continuous variable by considering a continues transformation e.g. to Unix timestamps if it is a date. Moreover, we consider two more cases where the interactions are included in the model. The results are compared with respect to BIC and AIC in the end of this section.\\
+
+
+
+\textbf{Reference:}
+\bibentry{clark1992statistical}
+\bibentry{wilkinson1973symbolic}
+
+
+<<>>==
+T12 = paste('Linear model on (',gsub('_', '.', Group0),') - Sec Id:',sectionID[12],sep = '')
+@
+\subsubsection{\Sexpr{T12}}
+<<fig.cap=paste('(diagnostic plots)', T12) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  data[,TargetResponse0]   = as.numeric(data[,TargetResponse0])
+  freslmg = reformulate2(termlabels = c(Group0),
+                         response = TargetResponse0,
+                         intercept=TRUE,
+                         data=data,
+                         active = active)
+  reslmg                   = lm(freslmg , data = data)
+  par(mfrow                = c(3, 2))
+  plot(reslmg,ask          = FALSE)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmg) ,main ='Residual ACF ')
+  pacf(resid(reslmg), main= 'Residual PACF')
+  ### RESULTS
+  kable1(
+    tidy1(
+      summary (reslmg)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmg)
+    ),
+    caption = 'ANOVA'
+  )
+
+  ### AIC and BIC ###
+  kable1(
+    tidy1(
+      cbind(
+        AIC=AIC(reslmg),BIC=BIC(reslmg)
+      )
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+<<>>==
+T13 = paste('Linear model on (',gsub('_', '.', paste(Group0,Weight0,sep=','  )),') - Sec Id:', sectionID[13],sep = '')
+@
+\subsubsection{\Sexpr{T13}}
+<<fig.cap=paste('(diagnostic plots)',T13) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  data[,TargetResponse0] = as.numeric(data[,TargetResponse0])
+  freslmwg              =  reformulate2(c(Group0,Weight0),
+                                        TargetResponse0,data=data,
+                                        active = active)
+  reslmwg               = lm( freslmwg ,
+                              data = data)
+  par(mfrow             = c(3, 2))
+  plot(reslmwg,ask      = FALSE)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmwg) ,main ='Residual ACF ')
+  pacf(resid(reslmwg), main= 'Residual PACF')
+  ### RESULTS
+  kable1(
+    tidy1(
+      summary (reslmwg)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmwg)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmwg),BIC=BIC(reslmwg)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+<<>>==
+T14 = paste('Linear model on (',gsub('_', '.', paste(Group0,Sex0,sep=',' )),') - Sec Id:', sectionID[14],sep = '')
+@
+\subsubsection{\Sexpr{T14}}
+<<fig.cap=paste('(diagnostic plots)' ,T14) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  data[,TargetResponse0] = as.numeric(data[,TargetResponse0])
+  freslmsg               = reformulate2(c(Sex0,Group0),TargetResponse0,
+                                        data=data,
+                                        active = active)
+  reslmsg               = lm(freslmsg ,
+                             data = data)
+  par(mfrow             = c(3, 2))
+  plot(reslmsg,ask= FALSE)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmsg) ,main = 'Residual ACF ')
+  pacf(resid(reslmsg), main = 'Residual PACF')
+  ### RESULTS
+  kable1(
+    tidy1(
+      summary (reslmsg)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmsg)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmsg),BIC=BIC(reslmsg)
+    ),
+    'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+<<>>==
+T16 = paste('Linear model on (',gsub('_', '.', paste(Group0,Sex0,sep=','  )),') and interactions - Sec Id:', sectionID[16],sep='')
+@
+\subsubsection{\Sexpr{T16}}
+<<fig.cap=paste('(diagnostic plots)',T16) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  data[,TargetResponse0] = as.numeric(data[,TargetResponse0])
+  freslmigs              = reformulate2(c(Sex0,Group0,paste(Sex0,Group0,sep='*')),
+                                        TargetResponse0,
+                                        data=data,
+                                        active = active)
+  reslmigs       = lm( freslmigs, data = data)
+  par(mfrow      = c(3, 2))
+  plot(reslmigs)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmigs) ,main = 'Residual ACF ')
+  pacf(resid(reslmigs), main = 'Residual PACF')
+  ### Results
+  kable1(
+    tidy1(
+      summary (reslmigs)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmigs)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmigs),BIC=BIC(reslmigs)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+<<>>==
+T17 = paste('Linear model on (',gsub('_', '.', paste(Group0,Sex0,Batch0,sep=','  )),') - Sec Id:',sectionID[17],sep = '')
+@
+\subsubsection{\Sexpr{T17}}
+<<fig.cap=paste('(diagnostic plots)',T17) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  data[,TargetResponse0] = as.numeric(data[,TargetResponse0])
+  freslmdgs              = reformulate2(
+    c(Sex0,Group0,Dates0),
+    TargetResponse0,
+    data=data,
+    active = active)
+  reslmdgs       = lm(freslmdgs,
+                      data = data)
+  par(mfrow      = c(3, 2))
+  plot(reslmdgs)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmdgs) ,main = 'Residual ACF ')
+  pacf(resid(reslmdgs), main = 'Residual PACF')
+  ### Result
+  kable1(
+    tidy1(
+      summary (reslmdgs)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmdgs)
+    ),
+    'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmdgs),BIC=BIC(reslmdgs)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+<<>>==
+T18 = paste('Linear model on (',gsub('_', '.', paste(Group0,Sex0,Batch0,sep=',')),') and interactions on (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') - Sec Id:', sectionID[18],sep = '')
+@
+\subsubsection{\Sexpr{T18}}
+<<fig.cap=paste('(diagnostic plots)',T18) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  ### linear model - interaction between sex and group
+  freslmdigs     = reformulate2(
+    c(Sex0,Group0,Dates0,
+      paste(Sex0,Group0,sep='*')),
+    TargetResponse0,
+    data=data,
+    active = active)
+  reslmdigs            = lm( freslmdigs,
+                             data = data)
+  par(mfrow      = c(3, 2))
+  plot(reslmdigs)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmdigs) ,main = 'Residual ACF ')
+  pacf(resid(reslmdigs) ,main = 'Residual PACF')
+  ### Result
+  kable1(
+    tidy1(
+      summary (reslmdigs)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmdigs)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmdigs),BIC=BIC(reslmdigs)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+<<>>==
+T19 = paste('Linear model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),') - Sec Id:', sectionID[19],sep='')
+@
+\subsubsection{\Sexpr{T19}}
+<<fig.cap=paste('(diagnostic plots)',T19) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  data[,TargetResponse0]      = as.numeric(data[,TargetResponse0])
+  freslmwgs                    = reformulate2(
+    c(Sex0,Group0,Weight0),
+    TargetResponse0,
+    data=data,
+    active = active)
+  reslmwgs                   = lm(freslmwgs,
+                                  data    = data)
+  par(mfrow      = c(3, 2))
+  plot(reslmwgs)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmwgs) ,main = 'Residual ACF ')
+  pacf(resid(reslmwgs), main = 'Residual PACF')
+  ### RESULTS
+  kable1(
+    tidy1(
+      summary (reslmwgs)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmwgs)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmwgs),BIC=BIC(reslmwgs)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+<<>>==
+T20=paste('Linear model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),'), interactions,(',gsub('_', '.', paste(Group0,Sex0,sep=',')),') - Sec Id:', sectionID[20],sep='')
+@
+\subsubsection{\Sexpr{T20}}
+<<fig.cap=paste('(diagnostic plots)',T20) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  data[,TargetResponse0]   = as.numeric(data[,TargetResponse0])
+  freslmiwgs = reformulate2(
+    c(Sex0,Group0,Weight0,
+      paste(Sex0,Group0,sep   =':')),
+    TargetResponse0,data=data,
+    active = active)
+  reslmiwgs               = lm( freslmiwgs,
+                                data = data)
+  par(mfrow               = c(3, 2))
+  plot(reslmiwgs)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmiwgs), main = 'Residual ACF ')
+  pacf(resid(reslmiwgs), main = 'Residual PACF')
+  ### Results
+  kable1(
+    tidy1(
+      summary (reslmiwgs)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmiwgs)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmiwgs),BIC=BIC(reslmiwgs)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+<<>>==
+T21 = paste('Linear model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,Batch0,sep=',')),') - Sec Id:', sectionID[21],sep='')
+@
+\subsubsection{\Sexpr{T21}}
+<<fig.cap=paste('(diagnostic plots)',T21) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  data[,TargetResponse0] = as.numeric(data[,TargetResponse0])
+  freslmdwgs = reformulate2(
+    c(Sex0,Group0,Weight0,Dates0),
+    TargetResponse0,data=data,
+    active = active)
+  reslmdwgs             = lm( freslmdwgs,
+                              data = data)
+  par(mfrow     = c(3, 2))
+  plot(reslmdwgs)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmdwgs) ,main = 'Residual ACF ')
+  pacf(resid(reslmdwgs), main = 'Residual PACF')
+  ### Result
+  kable1(
+    tidy1(
+      summary (reslmdwgs)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmdwgs)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmdwgs),BIC=BIC(reslmdwgs)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+<<>>==
+T22 = paste('Linear model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,Batch0,sep=',')),') and interactions on (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') - Sec Id:', sectionID[22],sep = '')
+@
+\subsubsection{\Sexpr{T22}}
+<<fig.cap=paste('(diagnostic plots)',T22) >>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  ### linear model - interaction between sex and group
+  data[,TargetResponse0] = as.numeric(data[,TargetResponse0])
+  freslmdiwgs = reformulate2(
+    c(Sex0,Group0,Weight0,Dates0,
+      paste(Sex0,Group0,sep =':')),
+    TargetResponse0,data=data,
+    active = active)
+  reslmdiwgs            = lm( freslmdiwgs,
+                              data = data)
+  par(mfrow      = c(3, 2))
+  plot(reslmdiwgs)
+  ### ACF and PACF of Residuals
+  acf (resid(reslmdiwgs) ,main = 'Residual ACF ')
+  pacf(resid(reslmdiwgs) ,main = 'Residual PACF')
+  ### Result
+  kable1(
+    tidy1(
+      summary (reslmdiwgs)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reslmdiwgs)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmdiwgs),BIC=BIC(reslmdiwgs)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+<<>>==
+T69 = paste('Weighted linear model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,Batch0,sep=',')),') and interactions on (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') - Sec Id:', sectionID[69],sep = '')
+@
+\subsubsection{\Sexpr{T69}}
+In this section we consider a window over the mutant date-of-experiments so that a minimum number of $100$ control animals are included in the analysis. To this end, we impose a Gaussian weighting function so that a less weight is imposed on the control animals that are experimented far enough from the mutant date-of-experiment.
+<<fig.cap=paste('(diagnostic plots)',T69) >>==
+if(varType == 'continuous'){
+  ### weighted linear model - interaction between sex and group
+  # plot(xt, wt, main = paste('ModelWeight~N(0,', i.sd, '), Sample size = ',
+  #                           Wei.Size , sep = ''),
+  #      xlab = 'Date (Week) centered on Mutant DOE',ylab='ModelWeight'
+  # )
+  data[,TargetResponse0] = as.numeric(data[,TargetResponse0])
+  freswlmdiwgs = reformulate2(
+    c(Sex0,Group0,Weight0,Dates0,
+      paste(Sex0,Group0,sep =':')),
+    TargetResponse0,data=data,
+    active = active)
+  reswlmdiwgs            = lm(freswlmdiwgs ,
+                              weights = ModelWeight   ,
+                              data = data)
+  par(mfrow      = c(3, 2))
+  plot(reswlmdiwgs)
+  ### ACF and PACF of Residuals
+  acf (resid(reswlmdiwgs) ,main = 'Residual ACF ')
+  pacf(resid(reswlmdiwgs) ,main = 'Residual PACF')
+  ### Result
+  kable1(
+    tidy1(
+      summary (reswlmdiwgs)
+    ),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    tidy1(
+      anova(reswlmdiwgs)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reswlmdiwgs),BIC=BIC(reswlmdiwgs)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+\newpage
+\subsubsection{Comparison - Sec Id: \Sexpr{sectionID[23]}}
+In this section we compare the linear models above with respect to AIC and BIC.\\
+<<>>==
+if(varType == 'continuous'){
+  ### Simple linear model
+  ### Comparision
+  totSimLm = list()
+  totSimLm[[paste('simple linear model on', Group0)]]          =
+    c( AIC(reslmg)   , BIC(reslmg))
+  totSimLm[[paste('simple linear model on', Group0,Weight0)]]  =
+    c( AIC(reslmwg)  , BIC(reslmwg))
+  # totSimLm[[paste('simple linear model on', Sex0,Group0)]]      =
+  #   c( AIC(reslmsg)  , BIC(reslmsg))
+  ###
+  totSimLm[[paste('simple linear model', Weight0,Group0,Sex0)]]  =
+    c( AIC(reslmwgs) , BIC(reslmwgs))
+  totSimLm[[paste('simple linear', Weight0,Group0,Sex0,'Interaction X',Sex0,Group0)]] =
+    c( AIC(reslmiwgs), BIC(reslmiwgs))
+  totSimLm[[paste('simple linear',Weight0,Group0,Sex0,Batch0)]]   =
+    c( AIC(reslmdwgs), BIC(reslmdwgs))
+  totSimLm[[paste('simple linear', Weight0,Sex0,Batch0,Group0,'Interaction X',Group0,Sex0)]] =
+    c( AIC(reslmdiwgs),BIC(reslmdiwgs))
+  totSimLm[[paste('Weighted linear', Weight0,Sex0,Batch0,Group0,'Interaction X',Group0,Sex0)]] =
+    c( AIC(reswlmdiwgs),BIC(reswlmdiwgs))
+  ###
+  totSimLm[[paste('simple linear model',Group0,Sex0)]]          =
+    c( AIC(reslmsg) , BIC(reslmsg))
+  totSimLm[[paste('simple linear',Group0,Sex0,' Interaction X',Group0,Sex0)]]=
+    c( AIC(reslmigs), BIC(reslmigs))
+  totSimLm[[paste('simple linear',Group0,Sex0,Batch0)]]          =
+    c( AIC(reslmdgs), BIC(reslmdgs))
+  totSimLm[[paste('simple linear', Group0,Sex0,Batch0,' Interaction X', Group0, Sex0)]]    =
+    c( AIC(reslmdigs),BIC(reslmdigs))
+
+
+  tmptotSimLm = matrix(unlist(totSimLm), ncol=2, byrow=TRUE)
+  rownames(tmptotSimLm) = names(totSimLm)
+  colnames(tmptotSimLm) = c('AIC', 'BIC')
+  ######## COMPARING RESULTS
+  kable1(
+    tmptotSimLm[order(tmptotSimLm[, 2]), ],
+    caption = 'Simple linear model comparisions'
+
+  )
+  ### ANOVA on Linear models
+  ### anova(reslmwg, reslmg, reslmsg, reslmwgs, reslmiwgs, reslmdwgs, reslmdiwgs)
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+\newpage
+%%% subsection
+\subsection{Penalized linear model - Sec Id: \Sexpr{sectionID[24]}}
+<<>>==
+T25 = paste('L1 penalized linear model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),') - Sec Id:', sectionID[25],sep='')
+@
+\subsubsection{\Sexpr{T25}}
+In this case, the model is assumed to be linear but the estimations are subject to a penalized likelihood of the form,
+\begin{align*}
+\arg\min_\beta (y-x\beta)'(y-x\beta) + \lambda \sum_{k=1}^p |\beta_k|
+\end{align*}
+where $(')$, $x$, $y$ denote the transpose of a matrix, covariates such as \verb!\Sexpr{Weight0}!, \verb!\Sexpr{Sex0}! etc., response (\verb!\Sexpr{TargetResponse0}!) and $\lambda$, tuning parameter, is selected by minimizing BIC.
+<<fig.cap=paste('(diagnostic plots)',T25) >>==
+if(varType == 'continuous'){
+  r2d = data
+  r2d[,Group0]        = as.numeric(r2d[,Group0])-1 # 0=Con,1=Exp
+  r2d[,Sex0]          = as.numeric(r2d[,Sex0])-1   # 0=Fem,1=Mal
+  if(SexProc){
+    trms = c(Weight0,Group0,Sex0)
+  }else{
+    cat (
+      rep('\\-/', 20),
+      '\n *** The following variable(s) are removed since they only contain one level : \n'
+      , Sex0,
+      '\n',
+      rep('/-\\', 20)
+    )
+    trms = c(Weight0,Group0)
+  }
+  tmpl                = reformulate3(termlabels = trms ,
+                                     response = TargetResponse0,
+                                     intercept = TRUE,
+                                     data=data)
+  resDlassol1=msgps(X  = data.matrix(r2d[, trms,drop=FALSE]),
+                    y  = as.numeric(r2d[,TargetResponse0])^tmpl)
+  #plot(resDlassol1)
+  resDlassol1resid     =  as.numeric(r2d[,TargetResponse0])^tmpl -
+    cbind(1,data.matrix(r2d[, trms])) %*% coef(resDlassol1)[,4]
+  ### Penalized plot
+  par(mfrow=c(2,2))
+  plot(resDlassol1,stand.coef = TRUE)
+  qqnorm(resDlassol1resid,main='Residuals QQ-norm plot')
+  ### ACF and PACF of Residuals
+  acf (resDlassol1resid ,main = 'Residual ACF ')
+  pacf(resDlassol1resid ,main = 'Residual PACF')
+  ### Estimation of the coefficients
+  kable1(
+    tidy1(
+      coef(resDlassol1)
+    ),
+    caption = 'Model summary'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{tibshirani1996regression}
+
+
+<<>>==
+T26 = paste('L2 penalized linear model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),') - Sec Id:', sectionID[26],sep='')
+@
+\subsubsection{\Sexpr{T26}}
+This model is still a linear model and differes from $L_1$ penalized likelihood in the sense that the absolute value function is replaced by a quadratic function in the (log)likelihood,
+\begin{align*}
+\arg\min_\beta (y-x\beta)'(y-x\beta) + \lambda \sum_{k=1}^p \beta_k^2.
+\end{align*}
+<<fig.cap=paste('(diagnostic plots)',T26) >>==
+if(varType == 'continuous'){
+  r2d = data
+  r2d[,Group0]           = as.numeric(r2d[,Group0])-1
+  r2d[,Sex0]             = as.numeric(r2d[,Sex0])-1
+  if(SexProc){
+    trms = c(Weight0,Group0,Sex0)
+  }else{
+    cat (
+      rep('\\-/', 20),
+      '\n *** The following variable(s) are removed since they only contain one level : \n'
+      , Sex0,
+      '\n',
+      rep('/-\\', 20)
+    )
+    trms = c(Weight0,Group0)
+  }
+  tmpl                   = reformulate3(termlabels = trms ,
+                                        response = TargetResponse0,
+                                        intercept = TRUE,data=data)
+  resDlassol2=msgps(X    = data.matrix(r2d[, trms]),
+                    y    = as.numeric(r2d[,TargetResponse0])^tmpl,
+                    penalty = 'enet', alpha = .999)
+  #plot(resDlassol2)
+  resDlassol2resid     =  as.numeric(r2d[,TargetResponse0])^tmpl -
+    cbind(1,data.matrix(r2d[, trms])) %*% coef(resDlassol2)[,4]
+  ### Penalized plot
+  par(mfrow=c(2,2))
+  plot(resDlassol2,stand.coef = TRUE)
+  qqnorm(resDlassol2resid,main='Residuals QQ-norm plot')
+  ### ACF and PACF of Residuals
+  acf (resDlassol2resid ,main = 'Residual ACF ')
+  pacf(resDlassol2resid ,main = 'Residual PACF')
+  ### Estimation of the coefficients
+  kable1(
+    tidy1(
+      coef(resDlassol2)
+    ),
+    caption = 'Model summary'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{hoerl1970ridge}
+
+<<echp=FALSE>>==
+T27 = paste('L1 penalized linear model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,Batch0,sep=',')),') - Sec Id:',sectionID[27],sep='')
+@
+\subsubsection{\Sexpr{T27}}
+<<fig.cap=paste('(diagnostic plots)',T27) >>==
+if(varType == 'continuous'){
+  r2d = data
+  r2d[,Group0]             = as.numeric(r2d[,Group0])-1
+  r2d[,Sex0]               = as.numeric(r2d[,Sex0])-1
+  if(SexProc){
+    trms = c(Group0,Weight0,Sex0,Dates0)
+  }else{
+    cat (
+      rep('\\-/', 20),
+      '\n *** The following variable(s) are removed since they only contain one level : \n'
+      , Sex0,
+      '\n',
+      rep('/-\\', 20)
+    )
+    trms = c(Group0,Weight0,Dates0)
+  }
+  tmpl                    = reformulate3(termlabels = trms ,
+                                         response = TargetResponse0,
+                                         intercept = TRUE,data=data,show=FALSE)
+  resDlassol1d=msgps(X    = data.matrix(r2d[, trms],
+                                        rownames.force = FALSE),
+                     y    = as.numeric(r2d[,TargetResponse0])^tmpl)
+  #plot(resDlassol1d)
+  resDlassol1dresid       =  as.numeric(r2d[,TargetResponse0])^tmpl -
+    cbind(1,data.matrix(r2d[, trms])) %*% coef(resDlassol1d)[,4]
+  ### Penalized plot
+  par(mfrow=c(2,2))
+  plot(resDlassol1d,stand.coef = TRUE)
+  qqnorm(resDlassol1dresid,main='Residuals QQ-norm plot')
+  ### ACF and PACF of Residual
+  acf (resDlassol1dresid ,main = 'Residual ACF ')
+  pacf(resDlassol1dresid ,main = 'Residual PACF')
+  ### Estimation of the coefficients
+  kable1(
+    tidy1(
+      coef(resDlassol1d)
+    ),
+    caption = 'Model summary'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{tibshirani1996regression}
+
+<<>>==
+T28 = paste('L2 penalized linear model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,Batch0,sep=',')),') - Sec Id:',sectionID[28],sep = '')
+@
+\subsubsection{\Sexpr{T28}}
+<<fig.cap=paste('(diagnostic plots)',T28) >>==
+if(varType == 'continuous'){
+  r2d = data
+  r2d[,Group0]             = as.numeric(r2d[,Group0])
+  r2d[,Sex0]               = as.numeric(r2d[,Sex0])
+  if(SexProc){
+    trms = c(Group0,Weight0,Sex0,Dates0)
+  }else{
+    cat (
+      rep('\\-/', 20),
+      '\n *** The following variable(s) are removed since they only contain one level : \n'
+      , Sex0,
+      '\n',
+      rep('/-\\', 20)
+    )
+    trms = c(Group0,Weight0,Dates0)
+  }
+  tmpl                    = reformulate3(termlabels = trms ,
+                                         response = TargetResponse0,
+                                         intercept = TRUE,data=data)
+  resDlassol2d=msgps(X    = data.matrix(r2d[, trms]),
+                     y    = as.numeric(r2d[,TargetResponse0])^tmpl,
+                     penalty = 'enet', alpha = .999)
+  #plot(resDlassol2d)
+  resDlassol2dresid       =  as.numeric(r2d[,TargetResponse0])^tmpl -
+    cbind(1,data.matrix(r2d[, trms])) %*% coef(resDlassol2d)[,4]
+  ### Penalized plot
+  par(mfrow=c(2,2))
+  plot(resDlassol2d,stand.coef = TRUE)
+  ### QQnorm of residuals
+  qqnorm(resDlassol2dresid,main='Residuals QQ-norm plot')
+  ### ACF and PACF of Residuals
+  acf (resDlassol2dresid ,main = 'Residual ACF ')
+  pacf(resDlassol2dresid ,main = 'Residual PACF')
+  ### Estimation of the coefficients
+  kable1(
+    tidy1(
+      coef(resDlassol2d)
+    ),
+    caption = 'Model summary'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{hoerl1970ridge}
+
+\newpage
+\subsubsection{Comparison - Sec Id: \Sexpr{sectionID[29]}}
+In this section we compare the penalized linear methods in the previous section.
+<<>>==
+if(varType == 'continuous'){
+  ### Comparision
+  totresLmPen = list()
+  totresLmPen[[paste('L1 penalized linear', Weight0, Group0, Sex0)]]   =
+    c(min(resDlassol1$dfaicc_result$result)  [1],
+      min(resDlassol1$dfbic_result$result)  [1])
+  totresLmPen[[paste('L2 penalized linear',Weight0,Group0,Sex0)]]      =
+    c(min(resDlassol2$dfaicc_result$result)  [1],
+      min(resDlassol2$dfbic_result$result)  [1])
+  totresLmPen[[paste('L1 Penalized linear',Weight0,Group0,Sex0,Batch0)]]=
+    c(min(resDlassol1d$dfaicc_result$result) [1],
+      min(resDlassol1d$dfbic_result$result) [1])
+  totresLmPen[[paste('L2 Penalized linear',Weight0,Group0,Sex0,Batch0)]]=
+    c(min(resDlassol2d$dfaicc_result$result)[1],
+      min(resDlassol2d$dfbic_result$result) [1])
+
+  tmptotresLmPen = matrix(unlist(totresLmPen), ncol=2, byrow=TRUE)
+  rownames(tmptotresLmPen) = names(totresLmPen)
+  colnames(tmptotresLmPen) = c('AIC', 'BIC')
+  ######## COMPARING RESULTS
+  kable1(
+    tidy1(
+      tmptotresLmPen[order(tmptotresLmPen[, 2]), ]
+    ),
+    caption = 'Comparisions of the penalized linear models'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+\newpage
+
+%\section{Mixed model - Sec Id: \Sexpr{sectionID[31]}}
+\subsection{Linear mixed model - Sec Id: \Sexpr{sectionID[32]}}
+In this section we fit a mixed model to data. The covariance of the random effect is left to be independent unless stated otherwise.\\
+
+\textbf{Reference:}
+\bibentry{laird1982random}
+\bibentry{lindstrom1990nonlinear}
+\bibentry{lindstrom1990nonlinear}
+
+<<>>==
+T33 = paste(
+  'Mixed model on (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') with the random effect on  (',gsub('_', '.', paste(Batch0,sep=',')),') and (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interaction - Sec Id:', sectionID[33],sep='')
+@
+\subsubsection{\Sexpr{T33}}
+<<fig.cap=paste('(diagnostic plots)',T33) >>==
+if(varType == 'continuous'){
+  ### linear mixed model with random effect on Batch
+  freslmmisdg            = reformulate2(c(Group0,Sex0,paste(Group0,Sex0,sep = '*')),
+                                        TargetResponse0,data=data,
+                                        active = active)
+  reslmmisdg=lme(fixed  = freslmmisdg,
+                 random = reformulate(paste(1,Batch0,sep = '|'),
+                                      response = NULL),
+                 data   = data)
+  # --------- similar in lme4 package
+  #reslmmiwsdg = lmer(formula = get(TargetResponse0) ~ get(Weight0)+get(Group0)*get(Sex0) + (1|Batch0),
+  #            data = data)
+  ### Plot
+  par(mfrow=c(2,2))
+  pl1 = plot(fitted(reslmmisdg),resid(reslmmisdg),xlab='Fitted',ylab='Residuals')
+  abline(h=0)
+  qqnorm(resid(reslmmisdg))
+  ### ACF and PACF of residuals
+  acf (resid(reslmmisdg) ,main = 'Residual ACF ')
+  pacf(resid(reslmmisdg) ,main = 'Residual PACF')
+  ### Result
+  kable1(
+    summary (reslmmisdg),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    (
+      anova(reslmmisdg)
+    ),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(reslmmisdg),BIC=BIC(reslmmisdg)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+<<>>==
+T34 = paste('Generalized linear mixed model on ',gsub('_', '.', paste(Group0,Sex0,sep=',')),'), (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interaction and random effect on (',gsub('_', '.', paste(Batch0,sep=',')),') - Poisson family - Sec Id: ',sectionID[34],sep='')
+@
+\subsubsection{\Sexpr{T34}}
+<<fig.cap=paste('(diagnostic plots)',T34) >>==
+### Linear generalized mixed model with random effect on Batch
+if(varType == 'categorical'){
+  fresglmerigsd =	reformulate2(
+    c(
+      Group0,Sex0,paste(Group0,Sex0,sep = ':')
+    ),
+    TargetResponse0,
+    data=data,
+    rand = paste(1,Batch0,sep = '|'),
+    active = active
+  )
+  resglmerigsd=glmer(formula = fresglmerigsd,
+                     ,
+                     data = data, family = poisson(link = "log"))
+  ### Plot
+  pl1 = plot(resglmerigsd)
+  grid.arrange(pl1,ncol=1,nrow=1,padding='.051')
+  ### Result
+  kable1(
+    summary(resglmerigsd),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    anova(resglmerigsd),
+    caption = 'ANOVA'
+  )
+  ### No ACF and PACF applicable
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(resglmerigsd),BIC=BIC(resglmerigsd)
+    )
+  )
+}else{
+  print ('Not applicable.')
+}
+@
+
+<<>>==
+T35 = paste('Mixed model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),') with the random effect on (',gsub('_', '.', paste(Batch0,sep=',')),') and (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interaction - Sec Id: ',sectionID[35],sep='')
+@
+\subsubsection{\Sexpr{T35}}
+<<fig.cap=paste('(diagnostic plots)',T35) >>==
+if(varType == 'continuous'){
+  # linear mixed model with random effect on Batch
+  freslmmiwsdg = reformulate2(
+    c(Weight0,Group0,Sex0,paste(Sex0,Group0,sep = '*')),
+    response = TargetResponse0,data=data,
+    active   = active)
+  reslmmiwsdg=lme(fixed  =  freslmmiwsdg,
+                  random   = reformulate(paste(1,Batch0,sep = '|'),response = NULL),
+                  data     = data)
+  # --------- similar in lme4 package
+  #reslmmiwsdg = lmer(formula = get(TargetResponse0) ~ get(Weight0)+get(Group0)*get(Sex0) + (1|Batch0),
+  #            data = data)
+  ### Plot
+  par(mfrow=c(2,2))
+  pl1 = plot(fitted(reslmmiwsdg),resid(reslmmiwsdg),xlab='Fitted',ylab='Residuals')
+  abline(h=0)
+  qqnorm(resid(reslmmiwsdg))
+  ### ACF and PACF of residuals
+  acf (resid(reslmmiwsdg) ,main = 'Residual ACF ')
+  pacf(resid(reslmmiwsdg) ,main = 'Residual PACF')
+  ### Result
+  kable1(
+    summary (reslmmiwsdg),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    anova(reslmmiwsdg),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC ###
+  kable1(cbind(
+    AIC=AIC(reslmmiwsdg),BIC=BIC(reslmmiwsdg)
+  ),
+  caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+<<>>==
+T36 = paste('Generalized linear mixed model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),'), (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interaction and random effect on (',gsub('_', '.', paste(Batch0,sep=',')),') - Poisson family - Sec Id: ',sectionID[36],sep='')
+@
+\subsubsection{\Sexpr{T36}}
+<<fig.cap=paste('(diagnostic plots)',T36) >>==
+### Generalized linear mized model
+if(varType == 'categorical'){
+  fresglmeriwgsd = reformulate2(
+    c(Weight0,Group0,Sex0,
+      paste(Sex0,Group0,sep = ':')
+    ) ,
+    response = TargetResponse0,
+    data=data,
+    rand=paste(1,Batch0,  sep = '|'),
+    active = active)
+  resglmeriwgsd=glmer(formula = fresglmeriwgsd,
+                      data = data, family = poisson(link = "log"))
+  ### Plot
+  pl1 = plot(resglmeriwgsd)
+  grid.arrange(pl1,ncol=2,nrow=1,padding='.051')
+  ### Result
+  kable1(
+    summary(resglmeriwgsd),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    anova(resglmeriwgsd),
+    caption = 'ANOVA'
+  )
+  ### No ACF and PACF applicable
+  ### AIC and BIC ###
+  kable1(
+    cbind(
+      AIC=AIC(resglmeriwgsd),BIC=BIC(resglmeriwgsd)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  print ('Not applicable.')
+}
+@
+
+\textbf{Reference:}
+\bibentry{stroup2016generalized}
+
+
+\subsection{Penalized linear mixed model - Sec Id: \Sexpr{sectionID[37]}}
+<<>>==
+T38 = paste('L1 penalized linear mixed model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),'), random effect on (',gsub('_', '.', paste(Batch0,sep=',')),') and (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interaction - Sec Id: ',sectionID[38],sep='')
+@
+\subsubsection{\Sexpr{T38}}
+<<fig.cap=paste('(diagnostic plots)',T38) >>==
+if(varType == 'continuous'){
+  if(length(unique(data[,Batch0]))<30){
+    ### Penalized linear mixed model
+    ### Note : zero estimation of the parameters is equivalent to p-value=1
+    ### This algorithm comes from authur page
+    ### https://github.com/cran/glmmLasso/blob/master/demo/glmmLasso-soccer.r
+    lambda      = seq(0,200,length.out = 250)
+    BIC_vec     = rep(Inf,length(lambda))
+    Delta.start = as.matrix(t(rep(0,length(unique(data$Batch))+5)))
+    Q.start     = 0.01
+    ###
+    tmpData     = data
+    colnames(tmpData)[which(colnames(data)==Batch0)]='Batch'
+    for (j in 1:length(lambda)){
+      freslml1T = reformulate2(
+        c(Weight0,Sex0,Group0,paste(Group0,Sex0,sep = ':')
+        ),response = TargetResponse0,data=tmpData,
+        active= active,show=FALSE)
+      reslml1T = glmmLasso(fix = freslml1T
+                           ,
+                           rnd       = list(Batch=~1),
+                           data      = tmpData  ,
+                           lambda    = lambda[j],
+                           switch.NR = FALSE    ,
+                           final.re  = TRUE     ,
+                           control   = list(start=Delta.start[j,]+10^-5,
+                                            q_start=Q.start[j])
+      )
+      #print(j)
+      BIC_vec [j]  = reslml1T$bic
+      Delta.start  = rbind(Delta.start,
+                           reslml1T$Deltamatrix[reslml1T$conv.step,])
+      Q.start      = c(Q.start,reslml1T$Q_long[[reslml1T$conv.step+1]])
+    }
+    opt3           = which.min(BIC_vec)
+    freslml1liwgs  = reformulate2(
+      c(Weight0,Sex0,Group0,paste(Group0,Sex0,sep = ':')
+      ),response = TargetResponse0,data=data,
+      active = active)
+    reslml1liwgs   = glmmLasso(fix = freslml1liwgs,
+                               rnd       = list(Batch=~1)  ,
+                               data      = tmpData         ,
+                               lambda    = lambda[opt3]    ,
+                               switch.NR = FALSE    ,
+                               final.re  = TRUE     ,
+                               #control   = list(start  = Delta.start[opt3,],
+                               # q_start= Q.start[opt3])
+    )
+    residreslml1liwgs = reslml1liwgs$y_hat-tmpData[,TargetIndex]
+    # Plot(reslml1liwgs,plot.data = TRUE)
+    par(mfrow=c(2,2))
+    plot(x=reslml1liwgs$y_hat,y=residreslml1liwgs,
+         main='Residuals',ylab='Residuals',xlab='Fitted values')
+    abline(h=0)
+    qqnorm(residreslml1liwgs,main='Residuals QQ-norm')
+    # ACF and PACF of residuals
+    acf (data[,TargetResponse0]- reslml1liwgs$y_hat, main = 'Residual ACF ')
+    pacf(data[,TargetResponse0]- reslml1liwgs$y_hat, main = 'Residual PACF')
+    ### RESULTS
+    kable1(
+      summary(reslml1liwgs), # Note that there is no p-value for the penalized likelihood!
+      caption = 'Model summary'
+    )
+    ### AIC and BIC ###
+    kable1(
+      cbind(
+        AIC=reslml1liwgs$aic,BIC=reslml1liwgs$bic
+      ),
+      col.names = c('AIC','BIC'),
+      caption = 'AIC and BIC'
+    )
+    reslml1liwgsInd = TRUE
+  }else{
+    cat ('\n Not applied since it can take a significant amount of time! \n')
+    reslml1liwgsInd = FALSE
+  }
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+\textbf{Reference:}
+\bibentry{goeman2010l1}
+\bibentry{groll2014variable}
+
+<<>>==
+T39 = paste('L1 penalized generalized linear mixed model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),'), (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interactions and random effect on (',gsub('_', '.', paste(Batch0,sep=',')),')  - Poisson family - Sec Id:', sectionID[39],sep='')
+
+@
+\subsubsection{\Sexpr{T39}}
+<<fig.cap=paste('(diagnostic plots)',T39) >>==
+### Generalized penalized mixed model
+if (varType=='categorical'){
+  if(length(unique(data[,Batch0]))<30){
+    lambda      = seq(0,200,length.out = 250)
+    BIC_vec     = rep(Inf,length(lambda))
+    Delta.start = as.matrix(t(rep(0,length(unique(data$Batch))+5)))
+    Q.start     = 0.1
+    ###
+    tmpData     = data
+    colnames(tmpData)[which(colnames(data)==Batch0)]='Batch'
+    for (j in 1:length(lambda)){
+      fresglml1T   =  reformulate2(
+        c(Weight0,Sex0,Group0,paste(Group0,Sex0,sep = ':')
+        ),response = TargetResponse0,data=data,
+        show  = FALSE,
+        active= active)
+      resglml1T = glmmLasso(fix = fresglml1T,
+                            rnd       = list(Batch=~1)       ,
+                            data      = tmpData              ,
+                            family    = poisson(link = "log"),
+                            lambda    = lambda[j]            ,
+                            switch.NR = FALSE                ,
+                            final.re  = TRUE                 ,
+                            control   = list(start=Delta.start[j,],
+                                             q_start=Q.start[j])
+      )
+      BIC_vec[j]   = resglml1T$bic
+      Delta.start  = rbind(Delta.start,
+                           resglml1T$Deltamatrix[resglml1T$conv.step,])
+      Q.start      = c(Q.start,resglml1T$Q_long[[resglml1T$conv.step+1]])
+    }
+    opt3           = which.min(BIC_vec)
+    fresglml1idwgs = eformulate2(
+      c(Weight0,Sex0,Group0,paste(Group0,Sex0,sep = ':')
+      ),response = TargetResponse0,
+      data=data, show = TRUE,
+      active          = active)
+    resglml1idwgs  = glmmLasso(fix = fresglml1idwgs,
+                               rnd       = list(Batch=~1)     ,
+                               data      = tmpData            ,
+                               family = poisson(link = "log") ,
+                               lambda    = lambda[opt3]       ,
+                               switch.NR = FALSE              ,
+                               final.re  = TRUE               ,
+                               control   = list(start = Delta.start[opt3,],
+                                                q_start=Q.start[opt3])
+    )
+    ### RESULTS
+    kable1(
+      summary(resglml1idwgs), # Note that there is no p-value for the penalized likelihood!
+      caption = 'Model summary'
+    )
+    ### AIC and BIC ###
+    kable1(
+      list(
+        'AIC' = resglml1idwgs$aic,
+        'BIC' =resglml1idwgs$bic
+      ),
+      caption = 'AIC and BIC'
+    )
+    ###
+    #plot(reslml1liwgs,plot.data = TRUE)
+    #par(mfrow=c(1,2))
+    #acf (data[,TargetResponse0]- reslml1liwgs$y_hat, main = 'Residual ACF ')
+    #pacf(data[,TargetResponse0]- reslml1liwgs$y_hat, main = 'Residual PACF')
+    ### RESULTS
+    kable1(
+      summary(reslml1liwgs), # Note that there is no p-value for the penalized likelihood!
+      caption = 'Model summary'
+    )
+    ### AIC and BIC ###
+    kable1(
+      cbind(
+        AIC=reslml1liwgs$aic,BIC=reslml1liwgs$bic
+      ),col.names = c('AIC','BIC')
+    )
+    resglml1idwgsInd = TRUE
+  }else{
+    cat ('\n Not applied since it can take a significant amount of time! \n')
+    resglml1idwgsInd = FALSE
+  }
+}else{
+  print('Not applicable.')
+}
+@
+
+\textbf{Reference:}
+\bibentry{goeman2010l1}
+\bibentry{groll2014variable}
+
+\subsection{Bayesian linear mixed model - Sec Id: \Sexpr{sectionID[40]}}
+<<>>==
+T41 = paste('Bayesian linear mixed model on (',gsub('_', '.', paste(Group0,Sex0,sep=',')),'), (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interaction and random effect on (',gsub('_', '.', paste(Batch0,sep=',')),') - Sec Id: ',sectionID[41],sep='')
+@
+\subsubsection{\Sexpr{T41}}
+<<fig.cap=paste('(diagnostic plots)',T41) >>==
+if(varType == 'continuous'){
+  ### Bayesian linear mixed model
+  ### for more details and the priors please see blmer page on R
+  fresblmmidsg = reformulate2(c(Sex0,Group0,
+                                paste(Sex0,Group0,sep = '*')
+  ),
+  TargetResponse0,
+  data   = data,
+  rand   = paste('(',paste(1,Batch0,sep = '|'),')'),
+  active = active
+  )
+  resblmmidsg=blmer(formula = fresblmmidsg,
+                    data = data,
+                    cov.prior = gamma)
+  par(mfrow=c(2,2))
+  plot(fitted(resblmmidsg),resid(resblmmidsg),xlab='Fitted',ylab='Residuals')
+  abline(h=0)
+  qqnorm(resid(resblmmidsg))
+  ### AIC and BIC ###
+  #par(mfrow=c(1,2))
+  acf (resid(resblmmidsg), main = 'Residual ACF ')
+  pacf(resid(resblmmidsg), main = 'Residual PACF')
+  ### Results
+  kable1(
+    summary(resblmmidsg),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    anova(resblmmidsg),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC
+  kable1(
+    cbind(
+      AIC=AIC(resblmmidsg),BIC=BIC(resblmmidsg)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{jiang2007linear}
+
+
+
+<<>>==
+T42 = paste('Bayesian linear mixed model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),'), (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interaction and random effect on (',gsub('_', '.', paste(Batch0,sep=',')),') - Sec Id: ',sectionID[42],sep='')
+@
+
+\subsubsection{\Sexpr{T42}}
+<<fig.cap=paste('(diagnostic plots)',T42) >>==
+if(varType == 'continuous'){
+  ### Bayesian linear mixed model
+  fresblmmidwsg = reformulate2(c(Weight0,Sex0,Group0,
+                                 paste(Sex0,Group0,sep = '*')
+  ),
+  TargetResponse0,
+  data   = data,
+  active = active,
+  rand   = paste('(',paste(1,Batch0,sep = '|'),')')
+  )
+  resblmmidwsg=blmer(formula = fresblmmidwsg,
+                     data = data,
+                     cov.prior = gamma)
+  par(mfrow=c(2,2))
+  plot(fitted(resblmmidwsg),resid(resblmmidwsg),xlab='Fitted',ylab='Residuals')
+  abline(h=0)
+  qqnorm(resid(resblmmidwsg))
+  ### AIC and BIC ###
+  #par(mfrow=c(1,2))
+  acf (resid(resblmmidwsg), main = 'Residual ACF ')
+  pacf(resid(resblmmidwsg), main = 'Residual PACF')
+  ### RESULTS
+  kable1(
+    summary(resblmmidwsg),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    anova(resblmmidwsg),
+    caption = 'AIC and BIC'
+  )
+
+  ### AIC and BIC
+  kable1(
+    cbind(
+      AIC=AIC(resblmmidwsg),BIC=BIC(resblmmidwsg)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+\textbf{Reference:}
+\bibentry{jiang2007linear}
+
+% \subsubsection{Bayesian mixed model on (\Sexpr{gsub('_', '.', paste(Group0,Sex0,sep=','))}) and GS interaction - Sec Id: \Sexpr{sectionID[43]}}
+% <<>>==
+% resblmmidsg=blmer(formula =
+%                     reformulate(c(paste(Sex0,Group0,sep = '*'),
+%                                   paste('(',paste(1,Batch0,sep = '|'),')')),
+%                                 TargetResponse0),
+%                   data = data,
+%                   cov.prior = gamma)
+% plot(resblmmidsg)
+% ### AIC and BIC ###
+% acf (resid(resblmmidsg), main = 'Residual ACF ')
+% pacf(resid(resblmmidsg), main = 'Residual PACF')
+% ### RESULTS
+% summary(resblmmidsg)
+% ### ANOVA
+% kable1(
+%   anova(resblmmidsg)
+% )
+% ### AIC and BIC
+% kable1(
+%   cbind(
+%     AIC=AIC(resblmmidsg),BIC=BIC(resblmmidsg)
+%   )
+% )
+% @
+
+<<>>==
+T44 = paste('Bayesian generalized linear mixed model on (',gsub('_', '.', paste(Group0,Sex0,Weight0,sep=',')),'), (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interaction and random effect on (',gsub('_', '.', paste(Batch0,sep=',')),') - Poisson family - Sec Id: ', sectionID[44],sep='')
+@
+\subsubsection{\Sexpr{T44}}
+<<fig.cap=paste('(diagnostic plots)',T44) >>==
+if(varType=='categorical'){
+  fresbglmmiwsg  = reformulate2(c(Weight0,Sex0,Group0,
+                                  paste(Sex0,Group0,sep = '*'))           ,
+                                TargetResponse0                            ,
+                                data   = data                             ,
+                                active = active                           ,
+                                rand=paste('(',paste(1,Batch0,sep = '|'),')'))
+  resbglmmiwsg <- bglmer(formula = fresbglmmiwsg,
+                         family = poisson(link = "log")                           ,
+                         data = data                                              ,
+                         cov.prior = gamma)
+  pl1 = plot(resbglmmiwsg)
+  grid.arrange(pl1,ncol=2,nrow=1,padding='.051')
+  ### AIC and BIC are Not applicable.
+  ### Results
+  kable1(
+    summary(resbglmmiwsg),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    anova(resbglmmiwsg),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC
+  kable1(
+    cbind(
+      AIC=AIC(resbglmmiwsg),BIC=BIC(resbglmmiwsg)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  print('Not applicable.')
+}
+@
+
+\textbf{Reference:}
+\bibentry{dey2000generalized}
+
+<<>>==
+T45 = paste('Bayesian generalized linear mixed model on (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') and (',gsub('_', '.', paste(Group0,Sex0,sep=',')),') interaction and random effect on (',gsub('_', '.', paste(Batch0,sep=',')),') - Poisson family - Sec Id: ',sectionID[45],sep='')
+@
+\subsubsection{\Sexpr{T45}}
+<<fig.cap=paste('(diagnostic plots)',T45) >>==
+if(varType=='categorical'){
+  fresbglmmisg =
+    reformulate2(c(Sex0,Group0,paste(Sex0,Group0,sep = '*'))  ,
+                 TargetResponse0                               ,
+                 data=data                                    ,
+                 rand=paste('(',paste(1,Batch0,sep = '|'),')'),
+                 show=TRUE,active=active)
+  resbglmmisg <- bglmer( fresbglmmisg               ,
+                         family = poisson(link = "log")                              ,
+                         data = data                                                 ,
+                         cov.prior = gamma)
+  pl1 = plot(resbglmmisg)
+  grid.arrange(pl1,ncol=2,nrow=1,padding='.051')
+  ### AIC and BIC are Not applicable.
+  ### RESULTS
+  kable1(
+    summary(resbglmmisg),
+    caption = 'Model summary'
+  )
+  ### ANOVA
+  kable1(
+    anova(resbglmmisg),
+    caption = 'ANOVA'
+  )
+  ### AIC and BIC
+  kable1(
+    cbind(
+      AIC=AIC(resbglmmisg),BIC= BIC(resbglmmisg)
+    ),
+    caption = 'AIC and BIC'
+  )
+}else{
+  print('Not applicable.')
+}
+@
+
+\textbf{Reference:}
+\bibentry{dey2000generalized}
+
+
+\newpage
+\subsection{Comparisons - Sec Id: \Sexpr{sectionID[46]}}\label{comparision-section}
+In this section we compare the results with respect to AIC and BIC.
+
+<<>>==
+if(varType == 'continuous'){
+  totreslmm = list()
+  totreslmm[[paste('Linear mixed model', Weight0,Sex0,Batch0,Group0,'Interaction X',Group0,Sex0) ]]          =
+    c ( AIC(reslmmiwsdg), BIC(reslmmiwsdg))
+  totreslmm[[paste('Penalized linear mixed model', Weight0,Sex0,Batch0,Group0,'Interaction X',Group0,Sex0) ]]=
+    c ( ifelse(reslml1liwgsInd,reslml1liwgs$aic,Inf), ifelse(reslml1liwgsInd,reslml1liwgs$bic,Inf))
+  totreslmm[[paste('Bayesian  mixed model', Weight0,Sex0,Batch0,Group0,'Interaction X',Group0,Sex0) ]]       =
+    c ( AIC(resblmmidwsg), BIC(resblmmidwsg))
+  ###
+  totreslmm[[paste('Linear mixed model', Sex0,Batch0,Group0,'Interaction X',Group0,Sex0) ]]                 =
+    c ( AIC(reslmmisdg), BIC(reslmmisdg))
+  totreslmm[[paste('Bayesian linear mixed model', Sex0,Batch0,Group0,'Interaction X',Group0,Sex0) ]]        =
+    c ( AIC(resblmmidsg), BIC(resblmmidsg))
+  tmptotreslmm = matrix(unlist(totreslmm), ncol=2, byrow=TRUE)
+  rownames(tmptotreslmm) = names(totreslmm)
+  colnames(tmptotreslmm) = c('AIC', 'BIC')
+}
+######## Comparing the models on the categorical data
+if (varType=='categorical'){
+  totresCount = list()
+  totresCount[[paste('Generalized mixed model', Weight0,Sex0,Batch0,Group0,'Interaction X',Group0,Sex0)]]   =
+    c(AIC(resglmeriwgsd), BIC(resglmeriwgsd))
+  totresCount[[paste('Generalized mixed model',        Sex0,Batch0,Group0,'Interaction X',Group0,Sex0)]]   =
+    c(AIC(resglmerigsd), BIC(resglmerigsd))
+  totresCount[[paste('Penalized generalized linear mixed model', Weight0,Sex0,Batch0,Group0,'Interaction X',
+                     Group0,Sex0)]] =
+    -c(ifelse(resglml1idwgsInd,resglml1idwgs$aic,Inf), ifelse(resglml1idwgsInd,resglml1idwgs$bic,Inf))
+  totresCount[[paste('Bayesian generalized mixed model', Weight0,Sex0,Batch0,Group0,'Interaction X'        ,
+                     Group0,Sex0) ]]     =
+    c(AIC(resbglmmiwsg), BIC(resbglmmiwsg))
+  totresCount[[paste('Bayesian generalized mixed model', Weight0,Sex0,Batch0,Group0,'Interaction X'        ,
+                     Group0,Sex0)]] =
+    c(AIC(resbglmmisg), BIC(resbglmmisg))
+  tmptotresCount = matrix(unlist(totresCount), ncol=2, byrow=TRUE)
+  rownames(tmptotresCount) = names(totresCount)
+  colnames(tmptotresCount) = c('AIC', 'BIC')
+  kable1(
+    tmptotresCount[order(tmptotresCount[, 2]), ],
+    caption = 'Comparision')
+}
+######## Comparing the models on the continuous data
+kable1(
+  tmptotreslmm[order(tmptotreslmm[, 2]), ],
+  caption = 'Linear mixed model comparisions'
+)
+#########
+### ANOVA on linear mixed models
+### anova(reslmmiwsdg, resglmeriwgsd)
+### ANOVA on Bayesian mixed models
+### anova(resblmmidwsg, resbglmmiwsg)
+@
+
+\subsection{Linear logistic model on (\Sexpr{gsub('_', '.', paste(Group0,Sex0,Weight0,sep=','))}) - Sec Id: \Sexpr{sectionID[30]}}
+Logistic regression is a type of regression model where the dependent variable is categorical. In particular it assumes a binary dependent variable such as normal/abnormal, yes/no. Logistic regression impose a logit structure on the population parameter,
+\begin{align*}
+\log(\frac{p}{1-p}) = x\beta
+\end{align*}
+where $p$ is the binomial probability, $x$ a set of covariates and $\beta$ the unknown coefficients where are estimable from the data. Logistic regression can be extended to include more than two categories by replacing the Binomial distribution with a Multinomial distribution. For the sake of generality, we apply a multinomial regression to the data in this section.
+
+<<fig.cap=paste('Sec Id:', sectionID[30]) >>==
+if(varType == 'categorical'){
+  fresloRegiwsg = reformulate2(termlabels = c(Sex0,Group0,Weight0),
+                               response = TargetResponse0,
+                               intercept = TRUE     ,
+                               data = data          ,
+                               plot = FALSE         ,
+                               active = FALSE       ,
+                               show = TRUE)
+  resloRegiwsg = multinom(formula= fresloRegiwsg,
+                          #weights = get(),
+                          data=data)
+  kable1(
+    summary(resloRegiwsg),
+    caption = 'Model summary'
+  )
+
+}else{
+  print ('Not applicable..')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{venables2013modern}
+
+
+
+\newpage
+\section{Bayesian Markov chain Monte Carlo (MCMC) samplers  - Sec Id: \Sexpr{sectionID[61]}}
+In this section we apply Markov Chain Monte Carlo (MCMC) samplers directly to the data.
+<<>>==
+T62 = paste('Bayesian Discrete Weibull model for categorical data - Sec Id:',sectionID[62],sep='')
+@
+\subsection{\Sexpr{T62}}
+Discrete Weibull distribution is defined by the probability mass function (pmf),
+\begin{align*}
+p(y;q,\beta)=q^{y^\beta}-q^{(y+1)^\beta}
+\end{align*}
+where $y$ is the discrete response and $\beta\in(0,\infty)$, $q\in[0,1]$ are parameters. We assume that $\log(\frac{q}{1-q})=x\beta$ where $x$ is a design matrix that contains the covariates, e.g. \verb!\Sexpr{Sex0}! , \verb!\Sexpr{Weight0}!, \verb!\Sexpr{Group0}!.  We apply an uninformative prior adaptive Metropolise-Hasting algorithm to find the posterior as well as the estimation of the parameters and the confident interval for the estimations.
+<<fig.cap=paste('(Results)',T62) >>==
+if(varType =='categorical'){
+  fresbdw.wgs = reformulate2(c(Sex0,Weight0,Group0)          ,
+                             TargetResponse0                               ,
+                             data=data                                    ,
+                             show=TRUE,active=active)
+  resbdw.wgs = invisible(bdw(data = na.omit(data),
+                             formula =   fresbdw.wgs  ,
+                             reg.q = TRUE       ,
+                             logit = TRUE       ,
+                             iteration = 20000  ,
+                             initial = rep(.1,ifelse(SexProc,5,4))
+  )
+  )
+  plot.resbdw.wgs = plot(resbdw.wgs,density = TRUE)
+  rownames(plot.resbdw.wgs)=paste(c('Intercept',Sex0,Weight0,Group0,'beta'),
+                                  rownames(plot.resbdw.wgs)             ,
+                                  sep = ' -in model-> ')
+  plot.resbdw.wgs
+}else{
+  print('Not applicable.')
+}
+@
+
+\textbf{Reference:}
+\bibentry{gilks1995markov}
+\bibentry{haselimashhadi2016new}
+
+\newpage
+\section{Non-parametric framework - Sec Id: \Sexpr{sectionID[47]}}
+The purpose of the non-parametric methods is to remove as much as possible the dependency of the analysis to the distribution of the population. Then the analysis is more data driven than the distribution dependent. In this section, we apply several non-parametric methods on the data.
+\subsection{Independent tests - Sec Id: \Sexpr{sectionID[48]}}
+\subsubsection{Wilcoxon rank sum test - Sec Id: \Sexpr{sectionID[49]}}
+The purpose of the test is to find the difference between location (median) of two populations regardless of the the population distribution (nonparametrically). Similar to Z-test and T-test, the null hypothesis is defined by,
+\begin{align*}
+\begin{cases}
+H_0 : median_{experiment}-median_{control}=0\\
+H_1 : median_{experiment}-median_{control}\neq 0
+\end{cases}.
+\end{align*}
+
+
+<<fig.cap=paste('Sec Id:', sectionID[49]) >>==
+if(varType == 'continuous'){
+  # Result
+  # WRS-Test on overall mutant/control values
+  kable1(
+    tidy1(
+      wilcox.test(c(resExMa, resExFe), c(resCoMa, resCoFe),
+                  conf.int = TRUE,exact = FALSE)
+    ),
+    caption = 'WRS-Test on overall mutant/control values'
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+\subsubsection{Wilcoxon rank sum test on mutant/control \Sexpr{gsub('_', '.',MaleLabel)} - Sec Id: \Sexpr{sectionID[70]}}
+The purpose of this section is to detect the genotype effect between \verb!\Sexpr{MaleLabel}! animals by applying a Z-test to the data.
+<<fig.cap=paste('Sec Id:', sectionID[70]) >>==
+if(SexProc & varType == 'continuous'){
+  # WRS-Test on mutant/control males
+  kable1(
+    tidy1(
+      wilcox.test(resExMa, resCoMa,
+                  conf.int = TRUE,exact = FALSE)
+    ),
+    caption = paste('WRS-Test on mutant/control',MaleLabel)
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+\subsubsection{Wilcoxon rank sum test on mutant/control \Sexpr{gsub('_', '.',FemaleLabel)} - Sec Id: \Sexpr{sectionID[71]}}
+The purpose of this section is to detect the genotype effect between \verb!\Sexpr{FemaleLabel}! animals by applying a Z-test to the data.
+<<fig.cap=paste('Sec Id:', sectionID[71]) >>==
+if(SexProc & varType == 'continuous'){
+  # WRS-Test on mutant/control females
+  kable1(
+    tidy1(
+      wilcox.test(resExFe, resCoFe,conf.int = TRUE,
+                  exact = FALSE)
+    ),
+    paste('WRS-Test on mutant/control',FemaleLabel)
+  )
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+% \subsubsection{More tests ... - Sec Id: \Sexpr{sectionID[50]}}
+% *****Should be read from the package manual
+% <<>>==
+% # Exact Wilcoxon Mann Whitney Rank Sum Test
+% wilcox_test(reformulate(Group0,TargetResponse0), data=data, distribution="exact")
+% # One-Way Permutation Test based on 9999 Monte-Carlo
+% oneway_test(reformulate(Group0,TargetResponse0), data=data,
+%             distribution=approximate(B=9999))
+%
+% @
+
+\textbf{Reference:}
+\bibentry{pett2015nonparametric}
+
+
+
+\subsection{Change point detection (CPD) - Sec Id: \Sexpr{sectionID[51]}}
+<<>>==
+T52 = paste('Change point detection on (',gsub('_', '.', paste(TargetResponse0,sep='')),') - Sec Id: ',sectionID[52],sep='')
+@
+\subsubsection{\Sexpr{T52}}
+Let $y$ be a random variable that follows an unknown distribution. The purpose of the analysis is to find the pivot points (change points) in the mean of the data. To this end, response data is divided into experiment and control group where they are attached to each other. That is the first $\Sexpr{length(NewExpIndexInData)}$ datapoints are from the experiment group whereas the rests are from the control group. The border is shown with a dashed red line on the plot and the change points are shown with the green dotted lines. The magnitude of the change points is represented with the thickness of the green line. For saving space and time, we have included only one-fifth on the control data in the analysis.
+<<fig.cap=paste('(Results)',T52) >>==
+if(varType == 'continuous'){
+  CPD.function = function(data,cex=.75,reg=0,index=NewExpIndexInData,...){
+    y      = data[,TargetResponse0]
+    ly     = length(y)
+    dates  =  data[,Dates0] # Unix time
+    if(reg == 1){
+      deTimeY = resid(lm(y~dates))
+    }else if(reg == 2){
+      deTimeY  = resid(lm(y~dates+data[,Weight0]+0))
+    }else{
+      deTimeY  = y
+    }
+    ### Matrix of differences
+    short.ly    = round(ly/5)
+    cat('\n ** Not all datapoints are included in the analysis.\n',
+        short.ly,' datapoints from the responses are included in the analysis.\n')
+    difM        = matrix(0, ncol=short.ly, nrow=ly)
+    difM[, 1]   = 1
+    for(i in 2:short.ly){
+      difM[, i] = c(rep(0, i-1), rep(1, ly-i+1))
+    }
+    resSigPro     = msgps(X = difM, as.vector(deTimeY-mean(deTimeY)), intercept = FALSE)
+    changePoints  = round(coef(resSigPro),6)
+    plot(deTimeY, type='l', ylab=TargetResponse0, xlab='Index',...)
+    NonZeroCP     = sort(which(changePoints[, 1]!=0),decreasing = TRUE)[1:5]#We choose the max of 5 CP
+    lNonZeroCP    = length(NonZeroCP)
+    abline(v      = NonZeroCP, col=3, lty=3,
+           lwd    = pmin(rank(NonZeroCP),5)
+    )
+    abline(v      =              length(index), lwd=2, col=2, lty=2)
+    abline(h      = mean(deTimeY[     1:length(index)] ), col=4, lty=4)
+    abline(h      = mean(deTimeY[  -c(1:length(index))]), col=5, lty=5)
+    legend('topright', legend =
+             c('True border', 'Estimated borders',
+               paste('mean of',Test.Gene),
+               paste('mean of',Control.Gene)),
+           fill = 2:5, col = 2:5, lwd = 2,
+           lty=2:5, cex=cex, bg='white')
+  }
+  split.screen(c(2, 1))
+  screen      (1)
+  CPD.function(data=data,main=paste('Change point detection (CPD) on response'),cex.main=.7)
+  if(SexProc){
+    split.screen(c(1,2),screen = 2)
+    screen      (3)
+    CPD.function(data=data[data[,Sex0]==MaleLabel,  ],
+                 index=data[data[,Sex0]==MaleLabel & data[, Group0] ==Test.Gene,]  ,
+                 main=paste('CPD for',MaleLabel),cex=.45,cex.main=.7)
+    screen      (4)
+    CPD.function(data=data[data[,Sex0]==FemaleLabel,],
+                 index=data[data[,Sex0]==FemaleLabel & data[, Group0] ==Test.Gene,],
+                 main=paste('CPD for',FemaleLabel),cex=.45,cex.main=.7)
+  }
+  close.screen(all = TRUE)    # exit split-screen mode
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+
+\textbf{Reference:}
+\bibentry{tartakovsky2014sequential}
+\bibentry{brodsky2013nonparametric}
+\bibentry{bleakley2011group}
+
+
+
+<<>>==
+T53 = paste('Change point detection after removing the ',gsub('_', '.', paste(Batch0,sep=',')),' effect - Sec Id: ',sectionID[53],sep = '')
+@
+\subsubsection{\Sexpr{T53}}
+<<fig.cap=paste('(Results)', T53) >>==
+if(varType == 'continuous'){
+  split.screen(c(2, 1))
+  screen(1)
+  CPD.function(data=data,reg=1,
+               main=paste('Change point detection (CPD) on after removing',Batch0, 'effect'),
+               cex.main=.8)
+  if(SexProc){
+    split.screen(c(1,2),screen = 2)
+    screen(3)
+    CPD.function(data=data[data[,Sex0]==MaleLabel,  ],reg=1,
+                 index=data[data[,Sex0]==MaleLabel & data[, Group0] ==Test.Gene,]  ,
+                 main=paste('CPD on',MaleLabel,' minus',Batch0,' effect'),cex=.45,cex.main=.8)
+    screen(4)
+    CPD.function(data=data[data[,Sex0]==FemaleLabel,],reg=1,
+                 index=data[data[,Sex0]==FemaleLabel & data[, Group0] ==Test.Gene,],
+                 main=paste('CPD on',FemaleLabel,'minus',Batch0,' effect'),cex=.45,cex.main=.8)
+  }
+  close.screen(all = TRUE)    # exit split-screen mode
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+\textbf{Reference:}
+\bibentry{tartakovsky2014sequential}
+\bibentry{brodsky2013nonparametric}
+\bibentry{bleakley2011group}
+
+<<>>==
+T54 = paste(
+  'Change point detection after removing (',gsub('_', '.', paste(Weight0,Batch0,sep=',')),') effect - Sec Id: ',sectionID[54],sep='')
+@
+\subsubsection{\Sexpr{T54}}
+<<fig.cap=paste('(Results)',T54) >>==
+if(varType == 'continuous'){
+  split.screen(c(2, 1))
+  screen(1)
+  CPD.function(data=data,reg=2,
+               main=
+                 paste('Change point detection (CPD) after removing',Batch0,'and', Weight0,'effect'),
+               cex.main=.8,cex=.45)
+  if(SexProc){
+    split.screen(c(1,2),screen = 2)
+    screen(3)
+    CPD.function(data=data[data[,Sex0]==MaleLabel,  ],
+                 reg=2,index=data[data[,Sex0]==MaleLabel & data[, Group0] ==Test.Gene,]  ,
+                 main=paste('CPD on',MaleLabel,'minus',Batch0,'&',Weight0,'effect'),cex=.45,cex.main=.8)
+    screen(4)
+    CPD.function(data=data [data[,Sex0]==FemaleLabel,],
+                 reg=2,
+                 index=data[data[,Sex0]==FemaleLabel & data[, Group0] ==Test.Gene,],
+                 main=paste('CPD on',FemaleLabel,'minus',Batch0, '&',Weight0,'effect'),cex=.45,cex.main=.8)
+  }
+  close.screen(all = TRUE)    # exit split-screen mode
+}else{
+  cat('\n Not applicable. \n')
+}
+@
+
+\textbf{Reference:}
+\bibentry{tartakovsky2014sequential}
+\bibentry{brodsky2013nonparametric}
+\bibentry{bleakley2011group}
+
+
+% \section{Others - Sec Id: \Sexpr{sectionID[55]}}
+% << results='hide'>>==
+% ### glmmPQL
+% if(varType=='categorical'){
+%   resglmm=glmmPQL(fixed =
+%                     reformulate(c(Weight0,paste(Sex0,Group0,sep = '*')),response = TargetResponse0),
+%                   random = reformulate(paste(1,Batch0,sep = '|'),response = NULL),
+%                   family = 'poisson',
+%                   data = data)
+%
+%   summary(resglmm)
+%   ### AIC and BIC ###
+%   kable1(
+%     cbind(
+%       AIC=AIC(resglmm),BIC= BIC(resglmm)
+%     )
+%   )
+% }else{
+%   print('Not applicable.')
+% }
+@
+\newpage
+\section{How to cite this report? - Sec Id: \Sexpr{sectionID[53]}}
+In order to cite this report in your publication, you can follow the following structure:\\\\
+{
+Haselimashhadi, H., Meehan, T. F, Mason, J. (\Sexpr{ReprtDate}). International Mouse Phynotyping Consortium (IMPC) genomic report for
+\verb!\Sexpr{Test.Gene}!. Cambridge, UK. Report version \Sexpr{ReportVersion}. \\
+}
+
+
+Alternatively you can cite a section in this report by adding section id (sid) to the citation,\\\\
+{
+%Author Surname, Author Initial. (Year Published). Title. Series Number. [online] City: Publisher, p.Pages Used. Available at: http://Website URL [Accessed Date Accessed].
+Haselimashhadi, H., Meehan, T. F, Mason, J. (\Sexpr{ReprtDate}). International Mouse Phynotyping Consortium (IMPC) genomic report for colony id
+\verb!\Sexpr{Test.Gene}!, section id ({\color{red}{XXXXXXX}}), Cambridge, UK. Report version \Sexpr{ReportVersion}. \\
+}
+
+
+\section{List of contributor - Sec Id: \Sexpr{sectionID[57]}}
+<<>>==
+Contribute.List =c(
+  'Hamed Haselimashhadi (creator)' ,'hamedhm@ebi.ac.uk' ,
+  'Terry Meehan'                   ,'tmeehan@ebi.ac.uk' ,
+  'Jeremy Mason'                   ,'jmason@ebi.ac.uk'
+)
+@
+<<>>==
+Contribute.List = matrix((Contribute.List),ncol=2,byrow=TRUE)
+colnames(Contribute.List) = c('Name','Email')
+kable1(Contribute.List,
+       caption = 'List of contributor'
+)
+@
+\section{Your method is not listed? - Sec Id: \Sexpr{sectionID[55]}}
+To add your recommanded method, we strongly suggest you to contact us with your code, and we would adpt your code to this report under your name and contribution. Please contact us on \href{mailto:hamedhm@ebi.ac.uk}{hamedhm@ebi.ac.uk} or visit \href{https://www.mousephenotype.org/phenstat-report}{IMPC PhenStatReport page}.
+
+
+% \section{Appendix A : list of R objects in this report}
+% <<>>==
+% ls(all.names = FALSE, sorted = TRUE)
+% @
+% \else
+% \begin{center}
+% \textbf{
+% Report is not available or there is an error in analysis for this dataset!\\
+% please contact hamedhm@eb.ac.uk or visit the following page :\\
+% \url{www.google.com}
+% }
+% \end{center}
+%\fi
+%Weave2knit("compare.Rnw")
+
+
+\newpage
+\bibliography{maina}
+\bibliographystyle{plain}
+%\listoftables
+\end{document}
