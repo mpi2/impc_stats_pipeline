@@ -199,6 +199,34 @@ PhenStatWindow = function (phenlistObject                                ,
           var(we, na.rm = TRUE) < threshold) {
         we2  = NULL
         windowingNote$windowing_extra = 'There is no variation in the weights then the standard model is applied.'
+      }else{
+        ####################
+        MeanVarOverTime = function(mm, tt, data = phenlistObject@datasetPL) {
+          if (length(tt) < 1 || length(mm) < 1)
+            return(1)
+          v = sapply(unique(tt[mm]), function(i) {
+            if (sum(tt %in% i) > 1) {
+              sd(data[tt == i],na.rm = TRUE)
+            } else{
+              NA
+            }
+          })
+          if (length(v[!is.na(v)]) > 0) {
+            return(mean(v, na.rm = TRUE))
+          } else{
+            return(1)
+          }
+        }
+        ####################
+        vMutants  = MeanVarOverTime(mm = (1:length(tt))[mm.bck],
+                                    tt = tt,
+                                    data = phenlistObject@datasetPL[, depVariable])
+        VControls = MeanVarOverTime(mm = (1:length(tt))[-mm.bck],
+                                    tt = tt,
+                                    data = phenlistObject@datasetPL[, depVariable])
+        message0('Mutant sd = ', vMutants, ', Control sd = ', VControls)
+        we2[mm]  = we2[mm] * vMutants
+        we2[-mm] = we2[-mm] * VControls
       }
       message0('Fitting the windowing weights into the optimized PhenStat model ...')
       objectf = ModeWithErrorsAndMessages(
@@ -214,7 +242,6 @@ PhenStatWindow = function (phenlistObject                                ,
         name = 'windowing_analysis'
       )
       windowingNote$windowing_analysis$final_model = objectf$note
-
       # Full model windowing
       message0('Fitting the windowing weights into the full PhenStat model ...')
       objectfulw = ModeWithErrorsAndMessages(
@@ -240,10 +267,10 @@ PhenStatWindow = function (phenlistObject                                ,
       # Plotting
       args = list(
         # for output
-        r = r       ,
-        tt = tt     ,
+        r = r           ,
+        tt = tt         ,
         mm = mm.bck     ,
-        we = we     ,
+        we = we         ,
         threshold         = threshold         ,
         maxPeaks          = maxPeaks          ,
         ## for plot
