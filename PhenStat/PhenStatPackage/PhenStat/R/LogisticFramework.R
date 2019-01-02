@@ -134,6 +134,7 @@ startLRModel <-
     dimorphismIncluded = TRUE,
     IncludeBatch = "No"
   )
+  equalvar_pvalue = batch_pvalue = NA #HAMED 2/1/2019
   suppressWarnings(try(## Goal of this section is to assess whether batch is significant or not in explaining variation
     {
       if (batchIn(phenList)) {
@@ -175,7 +176,8 @@ startLRModel <-
             logLik(L_model_withBatch) - logLik(L_model_withoutbatch)
           ),
           1, lower.tail = FALSE)[1]
-        keep_batch <- p.value.batch < pThreshold
+        keep_batch   <- p.value.batch < pThreshold
+        batch_pvalue <- p.value.batch #HAMED 2/1/2019
 
       }
     },
@@ -270,6 +272,7 @@ startLRModel <-
         model.output = finalModel,
         equation = equation,
         model.effect.batch = keep_batch,
+        model.batch.pvalue = batch_pvalue, #HAMED 2/1/2019
         model.effect.interaction = keep_interaction,
         model.output.interaction = interactionTest,
         model.effect.sex = keep_sex,

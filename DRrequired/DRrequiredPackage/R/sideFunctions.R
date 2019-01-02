@@ -1916,7 +1916,7 @@ relativePath = function(path, reference) {
 
 # Closest points for the mutants
 closest.time.value  = function(x, time1, y, time2, yind) {
-  library(abind)
+  requireNamespace(abind)
   message0('Resampling. Creating the index ...')
   x.df = data.frame(x.val = x, x.time = time1)
   y.df = data.frame(y.val = y,

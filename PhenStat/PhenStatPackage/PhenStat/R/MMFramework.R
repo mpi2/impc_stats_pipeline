@@ -71,7 +71,7 @@ startModel <- function(phenList,
 		FixV  = NULL
 		CombV = nlme::varIdent(form =  ~ 1 | Genotype)
 	}
-
+	equalvar_pvalue = batch_pvalue = NA #HAMED 2/1/2019
 	numberofsexes <- length(levels(x$Sex))
 	mean_list <- NULL
 	if (!is.null(keepList)) {
@@ -156,7 +156,8 @@ startModel <- function(phenList,
 				(anova(model_MM, model_withoutbatch)$"p-value"[2]) / 2
 			## The result of the test for Hypothesis 1 will help to select
 			## the structure for random effects
-			keep_batch <- p.value.batch < pThreshold
+			keep_batch   <- p.value.batch < pThreshold
+			batch_pvalue <- p.value.batch #HAMED 2/1/2019
 
 			## MM fit of model formula with heterogeneous residual variances for
 			## genotype groups
@@ -190,7 +191,8 @@ startModel <- function(phenList,
 					(anova(model_MM, model_hetvariance)$"p-value"[2])
 				## The result of the test for Hypothesis 2 will help to select a
 				## covariance structure for the residuals
-				keep_equalvar <- p.value.variance > pThreshold
+				keep_equalvar   <- p.value.variance > pThreshold
+				equalvar_pvalue <- p.value.variance #HAMED 2/1/2019
 			}
 		} else {
 			## No Batch effects
@@ -431,7 +433,9 @@ startModel <- function(phenList,
 			model.output = model,
 			equation = equation,
 			model.effect.batch = keep_batch,
+			model.batch.pvalue = batch_pvalue, #HAMED 2/1/2019
 			model.effect.variance = keep_equalvar,
+			model.variance.pvalue = equalvar_pvalue, #HAMED 2/1/2019
 			model.effect.interaction = keep_interaction,
 			model.output.interaction = interactionTest,
 			model.effect.sex = keep_sex,

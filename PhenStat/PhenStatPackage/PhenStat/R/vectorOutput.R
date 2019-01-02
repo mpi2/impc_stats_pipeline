@@ -230,7 +230,9 @@ vectorOutput <-
 					paste(framework, ", ", fittingMethod, equation, sep = ""),
 					as.character0(depVariable),
 					as.character0(analysisResults$model.effect.batch),
+					as.character0(analysisResults$model.batch.pvalue),    #HAMED 2/1/2019
 					as.character0(analysisResults$model.effect.variance),
+					as.character0(analysisResults$model.variance.pvalue), #HAMED 2/1/2019
 					as.character0(analysisResults$model.output.genotype.nulltest.pVal),
 					as.character0(analysisResults$model.output.summary["genotype_estimate"]),
 					as.character0(analysisResults$model.output.summary["genotype_estimate_SE"]),
@@ -262,7 +264,9 @@ vectorOutput <-
 				"Method",
 				"Dependent variable",
 				"Batch included",
+				"Batch p-val",  #HAMED 2/1/2019
 				"Residual variances homogeneity",
+				"Residual variances homogeneity p-val",  #HAMED 2/1/2019
 				"Genotype contribution",
 				"Genotype estimate",
 				"Genotype standard error",
@@ -508,7 +512,9 @@ vectorOutput <-
 								 RR = "Reference Ranges Plus framework"),
 					as.character0(depVariable),
 					"NA",
+					"NA", #HAMED 2/1/2019
 					"NA",
+					"NA", #HAMED 2/1/2019
 					"NA",
 					ES_all,
 					"NA",
@@ -549,7 +555,9 @@ vectorOutput <-
 				"Method",
 				"Dependent variable",
 				"Batch included",
+				"Batch p-val",  #HAMED 2/1/2019
 				"Residual variances homogeneity",
+				"Residual variances homogeneity p-val",  #HAMED 2/1/2019
 				"Genotype contribution",
 				"Genotype estimate",
 				"Genotype standard error",
@@ -615,7 +623,9 @@ vectorOutput <-
 				"Logistic Regression framework",
 				as.character0(depVariable),
 				as.character0(analysisResults$model.effect.batch),
+				as.character0(analysisResults$model.batch.pvalue),    #HAMED 2/1/2019
 				"NA",
+				"NA", #HAMED 2/1/2019
 				as.character0(analysisResults$model.output.genotype.nulltest.pVal),
 				as.character0(analysisResults$model.output.summary["genotype_estimate"]),
 				as.character0(analysisResults$model.output.summary["genotype_estimate_SE"]),
@@ -647,7 +657,9 @@ vectorOutput <-
 				"Method",
 				"Dependent variable",
 				"Batch included",
+				"Batch p-val",  #HAMED 2/1/2019
 				"Residual variances homogeneity",
+				"Residual variances homogeneity p-val",  #HAMED 2/1/2019
 				"Genotype contribution",
 				"Genotype estimate",
 				"Genotype standard error",
