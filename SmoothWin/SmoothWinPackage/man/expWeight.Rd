@@ -12,6 +12,7 @@
       k                        ,
       l                        ,
       m = 0                    ,
+      direction = c(1, 1)      ,
       plot = FALSE             ,
       zeroCompensation = 0     ,
       cdf   = plogis           ,
@@ -32,6 +33,9 @@
   \item{m}{
     Vector. The location of the modes on t (modes are the peak of the windows)
   }  
+  \item{direction}{
+  Vector of two values. A vector of the form on (Left,right). The first element specifies the speed of expansion of the window(s) from the left and the second value for the right expansion. Setting to (0,1) and (1,0) lead to right and left expansions of the windows respectively. Default (1,1) that is the window(s) expand from both sides. 
+  }
   \item{plot}{
     Logical flag. Set to true shows a plot of the weights
   }

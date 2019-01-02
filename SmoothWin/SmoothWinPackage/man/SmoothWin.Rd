@@ -13,9 +13,12 @@ SmoothWin(object                                          ,
          m                                                ,
          l = function(ignore.me.in.default) {
            r = SmoothWin:::lseq(
-             from = 1                                          ,
-             to = max(abs(t[m] - min(t)), abs(t[m] - max(t)),1),
-             length.out = min(500, max(1,diff(range(t))))
+             from = 1                                     ,
+             to = max(abs(t[m] - min(t, na.rm = TRUE))    , 
+             abs(t[m] - max(t, na.rm = TRUE)), 1)         ,
+             length.out = min(500, max(1, diff(range(
+               t,na.rm = TRUE
+             ))))
            )
            r = unique(round(r))
            return(r)
@@ -27,31 +30,32 @@ SmoothWin(object                                          ,
            lutm = length(unique(t[m]))
            r = ifelse(lutm > 1, 35, max(pi * sqrt(length(t)), 35))
            r = max(r * lutm, length(m), na.rm = TRUE)
-           r = min(r, length(t), na.rm = TRUE)
+           r = min(r       , length(t), na.rm = TRUE)
            return(r)
          }                                                ,
+         direction = c(1, 1)                              ,
          weightFUN = function(x) {
            x
          }                                                ,
          residFun = function(x) {
-                       resid(x)
-                     }                                    ,
+           resid(x)
+         }                                                ,
          predictFun = function(x) {
-                       predict(x)
-                   }                                      ,
+           predict(x)
+         }                                                ,
          weightORthreshold = 'weight'                     ,
          cdf = plogis                                     ,
          check = 2                                        ,
-         sensitivity = c(1, 1, 1)                         ,
-         pvalThreshold = c(0,0,0)                         ,
-         threshold = sqrt(.Machine$double.eps)*10         ,
+         sensitivity   = c(1, 1, 1)                       ,
+         pvalThreshold = c(0, 0, 0)                       ,
+         threshold     = sqrt(.Machine$double.eps) * 10   ,
          zeroCompensation = 0                             ,
-         messages  = TRUE                                 ,
-         seed      = NULL                                 ,
+         messages      = TRUE                             ,
+         seed          = NULL                             ,
          simple.output = FALSE                            ,
          debug         = FALSE                            ,
-         ...)
-    }
+         ...) 
+   }
 \arguments{
   \item{object}{
   The fitted model. The object must support "update(weights =)". See examples
@@ -78,6 +82,9 @@ SmoothWin(object                                          ,
   * min.obs must not be less than the number of observations on the mode times\cr
   ** min.obs must be less than the total observations
 }
+  \item{direction}{
+  Vector of two values. A vector of the form on (Left,right). The first element specifies the speed of expansion of the window(s) from the left and the second value for the right expansion. Setting to (0,1) and (1,0) lead to right and left expansions of the windows respectively. Default (1,1) that is the window(s) expand from both sides. 
+  }
   \item{weightFUN}{
   Weight function. By default, a vector of weights call "ModelWeight" is passed to this function. See the examples. 
 }

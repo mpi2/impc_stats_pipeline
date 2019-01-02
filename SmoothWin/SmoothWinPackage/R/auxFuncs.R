@@ -13,13 +13,13 @@
   )
 }
 ###########
-expF = function(x, k, l, m, cdf) {
+expF = function(x, k, l, m, cdf, direction = c(1, 1)) {
   m  = unique(m)
   r = cdf(x,
-          m - l,
+          m - l * direction[1],
           1 / k) *
     (1 - (cdf(x,
-              m + l,
+              m + l * direction[2],
               1 / k)))
   r = r / ifelse(!is.null(r) &&
                    max(r, na.rm = TRUE) != 0, max(r, na.rm = TRUE), 1)
@@ -30,6 +30,7 @@ expWeight = function(t                         ,
                      k                         ,
                      l                         ,
                      m                = 0      ,
+                     direction        = c(1, 1),
                      plot             = FALSE  ,
                      zeroCompensation = 0      ,
                      cdf              = plogis ,
@@ -49,42 +50,47 @@ expWeight = function(t                         ,
     )
   ############################################################
   r = sapply(X = 1:lm, function(i) {
-    SmoothWin:::expF(
-      x = t,
-      k = k,
-      l = l,
-      m = m[i],
-      cdf = cdf
+    expF(
+      x = t                 ,
+      k = k                 ,
+      l = l                 ,
+      m = m[i]              ,
+      cdf = cdf             ,
+      direction = direction
     )
   })
   ############################################################
-  # Begin. Just process the rows that are not zero! 
-  FinalS = rowSums(r)
-  r = r[FinalS != 0, , drop = FALSE]
+  # Begin. Just process the rows that are not zero!
+  FinalS = rowsums(r)
+  r = r[FinalS > zeroCompensation, , drop = FALSE]
   ############################################################
   s = 0
   for (j in 1:lm) {
     val = sapply(
       X = combn(lm, j, simplify = FALSE),
       FUN = function(i) {
-        val = (-1) ^ (j + 1)  * rowprods(r[, i, drop = FALSE])
+        return( rowprods(r[, i, drop = FALSE]))
       }
     )
-    s = s + rowSums(val)
+    s = s + (-1) ^ (j + 1) * rowsums(val)
     if (progress)
       setTxtProgressBar(pb, j)
+    if ( sum(s) == length(s)) {
+      break
+    }
   }
   ############################################################
-  # End. Just process the rows that are not zero! 
-  FinalS[FinalS != 0] = s
+  # End. Just process the rows that are not zero!
+  FinalS[FinalS > zeroCompensation] = s
   s = FinalS
   ############################################################
   if (progress) {
+    setTxtProgressBar(pb, lm)
     close(pb)
     message('# Zero rows = ',
-            sum(FinalS == 0),
+            sum(FinalS <= zeroCompensation),
             ' [',
-            round(sum(FinalS == 0) / length(FinalS) * 100,1),
+            round(sum(FinalS <= zeroCompensation) / length(FinalS) * 100, 1),
             '%]')
   }
   ############################################################

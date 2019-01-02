@@ -31,6 +31,7 @@ PhenStatWindow = function (phenlistObject                                ,
                            residFunction = residFunction                 ,
                            weightORthreshold = 'weight'                  ,
                            maxPeaks = 15                                 ,
+                           direction = direction                         ,
                            ...)
 {
   requireNamespace('PhenStat')
@@ -175,22 +176,23 @@ PhenStatWindow = function (phenlistObject                                ,
       ###
       message0('Windowing algorithm in progress ...')
       r = SmoothWin(
-        object = obj,
-        data = phenlistObject@datasetPL,
-        t = tt,
-        m = mm,
-        weightFUN = weightFUN,
-        messages = messages,
-        check = check,
-        seed = seed,
-        threshold = threshold,
-        simple.output = TRUE,
-        sensitivity = sensitivity,
-        pvalThreshold = pvalThreshold,
-        debug = superDebug,
-        residFun = residFunction,
-        predictFun = predFunction,
-        weightORthreshold = weightORthreshold
+        object = obj                            ,
+        data = phenlistObject@datasetPL         ,
+        t = tt                                  ,
+        m = mm                                  ,
+        weightFUN = weightFUN                   ,
+        messages = messages                     ,
+        check = check                           ,
+        seed = seed                             ,
+        threshold = threshold                   ,
+        simple.output = TRUE                    ,
+        sensitivity = sensitivity               ,
+        pvalThreshold = pvalThreshold           ,
+        debug = superDebug                      ,
+        residFun = residFunction                ,
+        predictFun = predFunction               ,
+        weightORthreshold = weightORthreshold   ,
+        direction = direction
       )
       ##############################
       phenlistObject@datasetPL$AllModelWeights = we = we2 =  r$finalModel$FullWeight
@@ -205,8 +207,10 @@ PhenStatWindow = function (phenlistObject                                ,
           if (length(tt) < 1 || length(mm) < 1)
             return(1)
           v = sapply(unique(tt[mm]), function(i) {
-            if (sum(tt %in% i) > 1) {
-              sd(data[tt == i],na.rm = TRUE)
+            ind      = 1:length(tt)
+            CriTeria = (tt %in% i) & (ind %in% mm)
+            if (sum(CriTeria) > 1) {
+              sd(data[CriTeria],na.rm = TRUE)
             } else{
               NA
             }
@@ -224,9 +228,9 @@ PhenStatWindow = function (phenlistObject                                ,
         VControls = MeanVarOverTime(mm = (1:length(tt))[-mm.bck],
                                     tt = tt,
                                     data = phenlistObject@datasetPL[, depVariable])
-        message0('Mutant sd = ', vMutants, ', Control sd = ', VControls)
-        we2[mm]  = we2[mm] * vMutants
-        we2[-mm] = we2[-mm] * VControls
+        message0('Disabled but: Mutant sd = ', vMutants, ', Control sd = ', VControls)
+        #we2[mm]  = we2[mm] * vMutants
+        #we2[-mm] = we2[-mm] * VControls
       }
       message0('Fitting the windowing weights into the optimized PhenStat model ...')
       objectf = ModeWithErrorsAndMessages(

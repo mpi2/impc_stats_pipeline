@@ -5,9 +5,9 @@ SmoothWin = function(object                                           ,
                      l = function(ignore.me.in.default) {
                        r = SmoothWin:::lseq(
                          from = 1                                          ,
-                         to = max(abs(t[m] - min(t)), abs(t[m] - max(t)), 1),
+                         to = max(abs(t[m] - min(t, na.rm = TRUE)), abs(t[m] - max(t, na.rm = TRUE)), 1),
                          length.out = min(500, max(1, diff(range(
-                           t
+                           t,na.rm = TRUE
                          ))))
                        )
                        r = unique(round(r))
@@ -23,6 +23,7 @@ SmoothWin = function(object                                           ,
                        r = min(r       , length(t), na.rm = TRUE)
                        return(r)
                      }                                                ,
+                     direction = c(1, 1)                              ,
                      weightFUN = function(x) {
                        x
                      }                                                ,
@@ -75,6 +76,7 @@ SmoothWin = function(object                                           ,
     cdf      = cdf                        ,
     zeroCompensation = zeroCompensation   ,
     weightOrthreshold = weightORthreshold ,
+    direction = direction                 , 
     ...
   )
   finall = tv.test(
@@ -106,6 +108,7 @@ SmoothWin = function(object                                           ,
     cdf      = cdf                        ,
     zeroCompensation = zeroCompensation   ,
     weightOrthreshold = weightORthreshold ,
+    direction = direction                 ,
     ...
   )
   finalk = tv.test(
@@ -138,6 +141,7 @@ SmoothWin = function(object                                           ,
     cdf      = cdf                        ,
     zeroCompensation = zeroCompensation   ,
     weightOrthreshold = weightORthreshold ,
+    direction = direction                 ,
     ...
   )
   if (simple.output) {

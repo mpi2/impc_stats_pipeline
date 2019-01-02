@@ -924,9 +924,19 @@ SummaryStatisticsOriginal = function(x,
       c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
       m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE), NA)
       sd = ifelse(length(na.omit(xx)) > 1, sd(xx, na.rm = TRUE)  , NA)
-      r = list(count = c,
-               mean = m,
-               sd = sd)
+      r = list(
+        count = c                       ,
+        mean = m                        ,
+        sd = sd                         ,
+        normality_test = ifelse(
+          length(xx)           > 3    &&
+            length(unique(xx)) > 3    &&
+            length(xx)         < 5000 &&
+            var(xx)            != 0,
+          shapiro.test(xx)$p.value,
+          'Not possible(Possible causes: <3 or >5000 unique data points'
+        )
+      )
     } else{
       c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
       r = list(count = c)

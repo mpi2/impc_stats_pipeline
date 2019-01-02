@@ -24,6 +24,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 sensitivity = c(1, 1, 1)             ,
                 pvalThreshold = c(0, 0, 0)           ,
                 check = 2                            ,
+                direction = c(1, 1)                  ,
                 weightORthreshold = 'weight'         ,
                 predFunction = function(m) {
                   predict(m)
@@ -660,7 +661,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         superDebug = superDebug,
                         predFunction = predFunction,
                         residFunction = residFunction,
-                        weightORthreshold = weightORthreshold
+                        weightORthreshold = weightORthreshold,
+                        direction  = direction
                       )
                       note = c(
                         note                               ,
