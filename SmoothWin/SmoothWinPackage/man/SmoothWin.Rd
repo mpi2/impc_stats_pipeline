@@ -46,8 +46,8 @@ SmoothWin(object                                          ,
          weightORthreshold = 'weight'                     ,
          cdf = plogis                                     ,
          check = 2                                        ,
-         sensitivity   = c(1, 1, 1)                       ,
-         pvalThreshold = c(0, 0, 0)                       ,
+         sensitivity   = c(1, 1, 1, 0)                    ,
+         pvalThreshold = c(0, 0, 0, 0)                    ,
          threshold     = sqrt(.Machine$double.eps) * 10   ,
          zeroCompensation = 0                             ,
          messages      = TRUE                             ,
@@ -64,29 +64,31 @@ SmoothWin(object                                          ,
   data.frame. Input data that is used to fit the initial model
 }
   \item{t}{
-  Vector of (continues) time values.
+  Vector of (numeric) time values.
 }
   \item{m}{
   Vector of integers (peaks). Mode indices on the time component. For example 10, 11, 12. Note that it is different from t[10], t[11], t[12]
 }
   \item{l}{
-  Vector of continues values. Bandwidth parameter. The default uses the maximum distance of the modes (t[m]) from the time boundaries, max(max(t)-t[m],t[m]-min(t)) split on 500 points on the logarithmic scale.
+  Vector of numeric values for the bandwidth parameter, l. The default uses the maximum distance of the modes (t[m]) from the time boundaries, max(max(t)-t[m],t[m]-min(t)) split on 500 points on the logarithmic scale.
 }
   \item{k}{
-  Vector of continues values. Shape parameter. The default uses 50 split of the values from 0.5 to 10 on the logarithmic scale.
+  Vector of numeric values for the shape parameter, k. The default uses 50 split of the values from 0.5 to 10 on the logarithmic scale.
 }
   \item{min.obs}{
-  Single value. The minimum observations that must be in the window. The default uses the following steps.\cr
-    1. If there are more than one modes in the data, then: 35*(the number of modes)\cr
+  Single value. The minimum observations that must be in the total window(s). The default uses the following steps.\cr
+    1. If there are more than one modes in the data, then: 35*(the number of the unique modes)\cr
     2. If there is a single mode in the data, then: max(pi * sqrt(length(t)), 35)\cr
-  * min.obs must not be less than the number of observations on the mode times\cr
-  ** min.obs must be less than the total observations
+  * min.obs must not be less than the total number of observations on the mode time(s)\cr
+  ** to function properly, min.obs must be less than the total number of observations\cr
+  *** min.obs is applied on the total number of observations on all windows NOT each single ones\cr
+  **** if weightORthreshold='weight' then min.obs would be evaluated against ASS\cr
 }
   \item{direction}{
-  Vector of two values. A vector of the form on (Left,right). The first element specifies the speed of expansion of the window(s) from the left and the second value for the right expansion. Setting to (0,1) and (1,0) lead to right and left expansions of the windows respectively. Default (1,1) that is the window(s) expand from both sides. 
+  Vector of two values. A vector of the form c(Left,right). The first element specifies the speed of expansion of the window(s) from the left and the second value for the right expansion. Setting to (0,1) and (1,0) lead to right and left expansions of the window(s) respectively. Default (1,1) that is the window(s) expand from both sides. 
   }
   \item{weightFUN}{
-  Weight function. By default, a vector of weights call "ModelWeight" is passed to this function. See the examples. 
+  Weight function. By default, a vector of weights named "ModelWeight" is passed to this function. See the examples. 
 }
   \item{residFun}{
   Residual computation function. The default is resid(). However, the the user can define its own function. Note that the input of the function is the model object. The default is residFun = function(object)\{resid(object)\}
@@ -95,16 +97,17 @@ SmoothWin(object                                          ,
    Similar to residFun but instead defines the predict() function. The default is predictFun = function(object)\{predict(object)\}
   }
   \item{weightORthreshold}{
-  select between 'weight' (default) or 'threshold'. If set to 'weight' then the sum of weights (active sample score (ASS)) would be used as the total number of (active) observations in the window, otherwise, total weights that are greater than the threshold (count weights>=threshold) would be used for the total number of samples in the window (see `threshold`).
+  select between 'weight' (default) or 'threshold'. If set to 'weight' then the sum of weights (active sample score (ASS)) would be used as the total number of (active) observations in the window, otherwise, total number of weights (count of weights) that are greater than a threshold (see threshold below) (count weights>=threshold) would be used for the total number of samples in the window (see `threshold`).
   }
   \item{cdf}{
   A cdf function preferably symmetric. The cdf function is used for the (window) weight generating function. The function must have two parameters precisely a location such as mean and a scale. Standard cdf functions such as pnorm, pcauchy and plogis (default) can be used. For an example of custom made function we define uniform function as below:\cr\cr
-  punif0 = function(x,mean=.5,sd=sqrt(1/12))\{\cr
-         a = mean - sqrt(3) *sd\cr
-         b = mean + sqrt(3) *sd\cr
-      r =  punif(q = x,min = a,max = b) \cr
-      return(r)\cr
-    \}
+   \eqn{punif0 = function(x,mean=.5,sd=sqrt(1/12)){
+         a = mean - sqrt(3) *sd; 
+         b = mean + sqrt(3) *sd; 
+      r =  punif(q = x,min = a,max = b);  
+      return(r)
+    }
+    }
   }
   \item{check}{
   Single integer in \{0,1,2\}. \cr
@@ -113,10 +116,10 @@ SmoothWin(object                                          ,
   check=0, disables all checks
 }
   \item{sensitivity}{
-  Vector of three values (m,v,m*v). For example (default) c(1,1,1) specifies the same weights for mean, variance and mean*variance interaction in determining the optimal (final) window. We should stress that the window size is calculated by detecting the changes in mean and variance of predictFun() and residFun() respectively.
+  (Default window selection criteria) Vector of four values (m, v, m*v, normality_test). For example (default) c(1,1,1,0) specifies the same weights for mean, variance, mean*variance interaction and zero weight for the test of normality (shapiro.test) in determining the optimal (final) window. We should stress that the window size is calculated by detecting the changes amongst the consecutive means (two sample t.test) and variances (two sample var.test) (as well as the normality of the first set) from each of predictFun() and residFun() combined together. For example, (m, v, m*v, normality_test) is calculated for predictFun() and the same for residFun(), then two means are combined under the sensitivity[1]; and the same for variance, interactions and the normality.
   }  
   \item{pvalThreshold}{
-  Vector of three values. It would be used as the significant level for the mean and variation tests. If all zero (default) or negative (<= 0) then the internal adaptive method (sensitivity - see above) would be used.
+  Vector of four values. It would be used as the significant level for the mean, variation and normality tests (for more details see "sensitivity" above). If all zero (default) or (all) negative (<= 0) then the internal adaptive method (sensitivity - see above) would be used.
   }
   \item{threshold}{
   Single positive value. The minimum value for weights before removing the corresponded samples, given check=1 or check=2 and also in weightORthreshold. Default sqrt(.Machine$double.eps)*10 ~ 10^-7
@@ -125,7 +128,7 @@ SmoothWin(object                                          ,
    Single non-negative value. Setting to any non-negative value would replace all (weights =< zeroCompensation) with zeroCompensation. Useful for algorithms that have difficulties with zero. Default 0.
   }
   \item{messages}{
-  Logical value. Set to TRUE (default) to see the messages and errors 
+  Logical value. Set to TRUE (default) to see the errors and warnings
 }
   \item{seed}{
   seed. Default NULL
@@ -221,7 +224,7 @@ plot(r, main = 'Estimated weights from WGF')
 
 
 #################### Other examples
-# All examples use the Orthodont dataset in the nlme package
+# All examples import the Orthodont dataset from the nlme package
 library(nlme)
 # Sort the data on the time component (age)
 Orthodont =  Orthodont[order(Orthodont$age), ]

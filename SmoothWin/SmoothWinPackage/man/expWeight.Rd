@@ -4,7 +4,7 @@
   This function computes the smooth windowing weights
 }
 \description{
-  The weight generating function (WGF). This function computes the exponential weights (smooth windowing function) for different shapes (k)  and bandwidth (l) and plots the weights
+  The weight generating function (WGF). This function computes the exponential weights (soft windowing weights) for different shapes (k)  and bandwidth (l) and plots the weights
 }
 \usage{
   expWeight(
@@ -22,22 +22,22 @@
 }
 \arguments{
   \item{t}{
-    Vector. a vector of positive continuous values for time 
+    Vector of numeric time. a vector of positive continuous values for time 
   }
   \item{k}{
-    A single value for sharpness
+    A single positive value for sharpness
   }
   \item{l}{
-    A single value for bandwidth
+    A single non-negative value for bandwidth
   }
   \item{m}{
-    Vector. The location of the modes on t (modes are the peak of the windows)
+    Vector. The index of the modes on t (modes are the peak of the windows)
   }  
   \item{direction}{
-  Vector of two values. A vector of the form on (Left,right). The first element specifies the speed of expansion of the window(s) from the left and the second value for the right expansion. Setting to (0,1) and (1,0) lead to right and left expansions of the windows respectively. Default (1,1) that is the window(s) expand from both sides. 
+  Vector of two numeric values. A vector of the form on (Left,right). The first element specifies the speed of expansion of the window(s) from the left and the second value for the right expansion. Setting to (0,1) and (1,0) lead to right and left expansions of the windows respectively. Default (1,1) that is the window(s) expand from both sides. 
   }
   \item{plot}{
-    Logical flag. Set to true shows a plot of the weights
+    Logical flag. Setting to true shows a plot of the weights
   }
   \item{zeroCompensation}{
    Single non-negative value. Setting to any non-negative value would replace all (weights =< zeroCompensation) with zeroCompensation. Default 0
@@ -55,11 +55,11 @@
   Logical flag. Setting to TRUE shows the progress.
   }
   \item{\dots}{
-    The parameters that can be passed to the plot() function
+    Other parameters that can be passed to the plot() function
   }
 }
 \value{
-  A vector of weights
+  A numeric vector of weights
 }
 
 \author{

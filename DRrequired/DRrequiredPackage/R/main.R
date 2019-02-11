@@ -21,8 +21,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 Simulation.iteration    = 1          ,
                 # Only for windowing
                 activeWindowing = TRUE               ,
-                sensitivity = c(1, 1, 1)             ,
-                pvalThreshold = c(0, 0, 0)           ,
+                sensitivity = c(1, 1, 1, 0)          ,
+                pvalThreshold = c(0, 0, 0, 0)        ,
                 check = 2                            ,
                 direction = c(1, 1)                  ,
                 weightORthreshold = 'weight'         ,

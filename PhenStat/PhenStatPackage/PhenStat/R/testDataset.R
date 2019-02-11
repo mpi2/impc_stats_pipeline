@@ -41,9 +41,11 @@ testDataset <-  function(phenList = NULL,
                          transformValues = FALSE,
                          useUnfiltered = FALSE,
                          threshold = 10 ^ -18,
-												 check     = 1)
+												 check     = 1,
+												 upper     = 5)
 {
   stop_message <- ""
+  upper   = max(upper, 2) # HAMED 1st Feb 2019
   transformationRequired <- FALSE
   lambdaValue <- NA
   scaleShift <- NA
@@ -465,11 +467,13 @@ testDataset <-  function(phenList = NULL,
       # Lists possible combinations
       Genotype_levels <- levels(factor(x$Genotype))
       Batch_levels <- levels(factor(x$Batch))
-      if (length(Batch_levels) < 2 || length(Batch_levels) > 5) {
+      # upper: HAMED 1st Feb 2019
+      if (length(Batch_levels) < 2 || length(Batch_levels) > upper) {
         stop_message <-
+        	# upper: HAMED 1st Feb 2019
           paste(
             stop_message,
-            "Error:\n'TF' framework requires from 2 to 5 batch levels. ",
+            "Error:\n'TF' framework requires from 2 to ",upper," batch levels. ",
             "There is/are '",
             length(Batch_levels),
             "' batch level(s) in the dataset.\n",
@@ -914,12 +918,15 @@ columnChecks <-
   }
 
 ##------------------------------------------------------------------------------
-recommendMethod <- function(phenList = NULL,
-                            depVariable = NULL,
-                            outputMessages = TRUE)
+recommendMethod <- function(phenList       = NULL,
+                            depVariable    = NULL,
+                            outputMessages = TRUE,
+														upper          = 5)
 {
   # evaluate    dataPointsThreshold, RR_controlPointsThreshold
   stop_message <- ""
+  # upper: HAMED 1st Feb 2019
+  upper = max(upper,2)
   dataPointsThreshold <- 4
   RR_controlPointsThreshold <- 40
   suggestedFramework <- "NO"
@@ -1030,14 +1037,16 @@ recommendMethod <- function(phenList = NULL,
         TFDataset(
           phenList,
           depVariable,
-          outputMessages = FALSE,
-          forDecisionTree = FALSE
+          outputMessages  = FALSE,
+          forDecisionTree = FALSE,
+          upper           = upper
         )
       xTF <- getDataset(phenListTF)
 
-      # check for batches - shoud be from 2 to 5 batches
+      # check for batches - shoud be from 2 to upper (see the input parameters) batches
+      # upper: HAMED 1st Feb 2019
       if (length(levels(factor(xTF$Batch))) >= 2 &&
-          length(levels(factor(xTF$Batch))) <= 5) {
+          length(levels(factor(xTF$Batch))) <= upper) {
         TF <- TRUE
         Genotype_levels <- levels(factor(x$Genotype))
         Batch_levels <- levels(factor(x$Batch))

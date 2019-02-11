@@ -1,9 +1,15 @@
-rndProce = function(procedure) {
-	if (length(procedure) < 1 ||	is.null(procedure) ||
-			!(procedure %in% lop()) || length(procedure) > 1)
-		stop ('\n=> Error in inputing the procedure symbol \n  => Current input : ',
-					procedure,
-					'\n')
+rndProce = function(procedure = NULL ) {
+	if (length(procedure) < 1   ||
+			is.null(procedure)      ||
+			!(procedure %in% lop()) ||
+			length(procedure) > 1) {
+		message (
+			'Error in inputing the procedure symbol. Current input: ',
+			ifelse(is.null(procedure),'NULL',procedure)              ,
+			'. The default random effect, (1 |  Batch), is selected.'
+		)
+		return(reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE))
+	}
 	##############################################################
 	if (procedure == 'TYPICAL') {
 		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
@@ -81,6 +87,8 @@ rndProce = function(procedure) {
 		random = reformulate  (' 1 |  Batch / Age', response = NULL, intercept = TRUE)
 	} else if (procedure == 'XRY') {
 		random = reformulate  (' 1 |  Batch / Age', response = NULL, intercept = TRUE)
+	}else{
+		random = reformulate  (' 1 |  Batch'      , response = NULL, intercept = TRUE)
 	}
 	
 	return(random)

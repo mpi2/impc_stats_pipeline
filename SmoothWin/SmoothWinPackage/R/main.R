@@ -36,8 +36,8 @@ SmoothWin = function(object                                           ,
                      weightORthreshold = 'weight'                     ,
                      cdf = plogis                                     ,
                      check = 2                                        ,
-                     sensitivity   = c(1, 1, 1)                       ,
-                     pvalThreshold = c(0, 0, 0)                       ,
+                     sensitivity   = c(1, 1, 1, 0)                    ,
+                     pvalThreshold = c(0, 0, 0, 0)                    ,
                      threshold     = sqrt(.Machine$double.eps) * 10   ,
                      zeroCompensation = 0                             ,
                      messages      = TRUE                             ,
@@ -89,8 +89,10 @@ SmoothWin = function(object                                           ,
     predictFun = predictFun               ,
     debug = debug
   )
-  if (is.null(finall))
-    finall = max(l)
+  if (is.null(finall$value)){
+    finall$value = max(l)
+  }
+    
   ### 2. Determining k
   message('\n 2|3 Searching for k ...\n')
   rk = gridSearchModel(
@@ -100,7 +102,7 @@ SmoothWin = function(object                                           ,
     check = check                         ,
     t = t                                 ,
     m = t[m]                              ,
-    l = finall                            ,
+    l = finall$value                      ,
     k = k                                 ,
     threshold = threshold                 ,
     messages = messages                   ,
@@ -121,8 +123,8 @@ SmoothWin = function(object                                           ,
     pvalThreshold = pvalThreshold         ,
     debug = debug
   )
-  if (is.null(finalk))
-    finalk = max(k)
+  if (is.null(finalk$value))
+    finalk$value = max(k)
   
   ##### final model
   message('\n 3|3 Forming the final model ...\n')
@@ -133,8 +135,8 @@ SmoothWin = function(object                                           ,
     check = check                         ,
     t = t                                 ,
     m = t[m]                              ,
-    l = finall                            ,
-    k = finalk                            ,
+    l = finall$value                      ,
+    k = finalk$value                      ,
     threshold = threshold                 ,
     messages = messages                   ,
     onlyOne  = TRUE                       ,
@@ -188,9 +190,9 @@ plot.SmoothWin = function(x, ylab = 'Response', col = NULL ,   ...) {
       ylab = ylab,
       sub = paste(
         'l='                                                      ,
-        round(x$final.l, 2)                                       ,
+        round(x$final.l$value, 2)                                       ,
         ', k='                                                    ,
-        round(x$final.k, 2)                                       ,
+        round(x$final.k$value, 2)                                       ,
         ', '                                                      ,
         ifelse(x$input$weightORthreshold == 'weight', 'ASS=', '#'),
         round(x$finalModel$output$ObsInInterval, 3)               ,

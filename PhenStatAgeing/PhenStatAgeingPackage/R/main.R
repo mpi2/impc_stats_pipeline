@@ -1,25 +1,24 @@
 testDatasetAgeing = function(procedure = 'TYPICAL',
-							 phenListAgeing = NULL,
-							 depVariable = NULL   ,
-							 withWeight = FALSE,
-							 Sex = TRUE,
-							 LifeStage = TRUE,
-							 fixed = TypicalModel(
-								 depVariable,
-								 withWeight  ,
-								 Sex,
-								 LifeStage
-							 ),
-							 random = rndProce (procedure),
-							 weight = if (LifeStage)
-								varIdent(form =  ~ 1 |
-													LifeStage)
-							 else
-								varIdent(form =  ~ 1 |	Genotype),
-							 conversion.threshold = Inf,
-							 family = poisson(link = "log"),
-							 direction = 'both',
-							 rep = 10 ^ 5) {
+														 phenListAgeing = NULL,
+														 depVariable = NULL   ,
+														 withWeight = FALSE,
+														 Sex = TRUE,
+														 LifeStage = TRUE,
+														 fixed = TypicalModel(depVariable,
+														 										 withWeight  ,
+														 										 Sex,
+														 										 LifeStage,
+														 										 data = phenListAgeing@datasetPL),
+														 random = rndProce (procedure),
+														 weight = if (LifeStage)
+														 	varIdent(form =  ~ 1 |
+														 					 	LifeStage)
+														 else
+														 	varIdent(form =  ~ 1 |	Genotype),
+														 conversion.threshold = Inf,
+														 family = poisson(link = "log"),
+														 direction = 'both',
+														 rep = 10 ^ 5) {
 	r = tryCatch(
 		expr = {
 			testDatasetAgeing0(
@@ -35,15 +34,15 @@ testDatasetAgeing = function(procedure = 'TYPICAL',
 				family = family,
 				direction = direction,
 				rep = rep,
-				weight=weight
+				weight = weight
 			)
 		},
 		warning = function(war) {
-			warning('\n => Warning : ', war, '\n')
+			warning('\n ~> Warning : ', war, '\n')
 			return(NULL)
 		},
 		error = function(err) {
-			warning('\n => error : ', err, '\n')
+			warning('\n ~> error : ', err, '\n')
 			return(NULL)
 		}
 	)
@@ -52,50 +51,40 @@ testDatasetAgeing = function(procedure = 'TYPICAL',
 
 # Core
 testDatasetAgeing0 = function(procedure = 'TYPICAL',
-							phenListAgeing = NULL,
-							depVariable = NULL   ,
-							withWeight = FALSE,
-							Sex = TRUE,
-							LifeStage = TRUE,
-							fixed ,
-							random ,
-							weight ,
-							direction = 'both',
-							conversion.threshold = Inf,
-							family = poisson(link = "log"),
-							rep = 10 ^ 5) {
-	
-	if (class(phenListAgeing)!='PhenListAgeing')
-		stop('\n => function requires a "PhenListAgeing" object \n')
+															phenListAgeing = NULL,
+															depVariable = NULL   ,
+															withWeight = FALSE,
+															Sex = TRUE,
+															LifeStage = TRUE,
+															fixed ,
+															random ,
+															weight ,
+															direction = 'both',
+															conversion.threshold = Inf,
+															family = poisson(link = "log"),
+															rep = 10 ^ 5) {
+	if (!is(phenListAgeing, 'PhenListAgeing'))
+		stop('\n ~> function requires a "PhenListAgeing" object \n')
 	if (noVariation(data = phenListAgeing@datasetPL))
-		stop('\n => There is no variation on Genotype.\n')
+		stop('\n ~> There is no variation on Genotype.\n')
 	if (LifeStage &&
-			noVariation(data = phenListAgeing@datasetPL, f = '~Genotype+LifeStage'))
-		stop('\n => There is no variation on a cell in the Genotype-LifeStage table\n')
+			noVariation(data = phenListAgeing@datasetPL, f = '~ Genotype+LifeStage'))
+		stop('\n ~> There is no variation on a cell in the Genotype*LifeStage table\n')
 	
-	chklist = PhenStat:::columnChecks(
+	chklist = columnChecks0(
 		dataset = phenListAgeing@datasetPL,
 		columnName = depVariable,
 		dataPointsThreshold = 4
 	)
 	categorical = IsCategorical(phenListAgeing@datasetPL[, depVariable], max.consider = conversion.threshold) # Automatic type detection
-		if (all(chklist[1:2])) {
-		# if (is.null(fixed))
-		# 	fixed  = TypicalModel(
-		# 		depVariable = depVariable,
-		# 		withWeight = withWeight  ,
-		# 		Sex = Sex,
-		# 		LifeStage = LifeStage
-		# 	)
-		# if (is.null(random))
-		# 	random  = rndProce (procedure)
+	if (all(chklist[1:2])) {
 		# Important to remove missings
 		Obj =  CheckMissing(phenListAgeing@datasetPL, fixed)
 		data = Obj$new.data
 		# All combination of the variables
-		AllCombinations = all.tables(dframe = data[, all.vars(fixed)],
-																 response.name = depVariable,
-																 shrink = FALSE)
+		AllCombinations = AllTables(dframe = data[, all.vars(fixed)],
+																response.name = depVariable,
+																shrink = FALSE)
 		o.Model = M.opt(
 			fixed  = fixed,
 			random = random,
@@ -104,12 +93,12 @@ testDatasetAgeing0 = function(procedure = 'TYPICAL',
 			family = family,
 			categorical = categorical$cat,
 			LifeStage = LifeStage,
-			weight = weight
+			weight = weight,
+			trace = FALSE
 		)
 		if (LifeStage) {
 			effA = eff.size(
 				object = o.Model$Final.Model,
-				#data = data,
 				depVariable = depVariable,
 				effOfInd = 'LifeStage'
 			)
@@ -128,15 +117,15 @@ testDatasetAgeing0 = function(procedure = 'TYPICAL',
 									LifeStage = effA)
 		} else{
 			effs = eff.size(object = o.Model$Final.Model,
-											#data = data,
 											depVariable = depVariable)
 		}
 		####
 		output =    list(
 			initial.model   = o.Model$Initial.Model,
-			final.model     = o.Model$Final.Model,
-			fixed           = fixed,
-			random          = random,
+			final.model     = o.Model$Final.Model  ,
+			split.models    = o.Model$SplitModels  ,
+			fixed           = fixed                ,
+			random          = random               ,
 			fin.fixed       = formula(o.Model$Final.Model),
 			fin.random      = if (is.null(o.Model$Final.Model$call$random)) {
 				NULL
@@ -173,7 +162,7 @@ testDatasetAgeing0 = function(procedure = 'TYPICAL',
 		class(output) = 'PhenlistCategoricalAgeingModel'
 	} else{
 		stop(
-			'\n => dependent variable must be (1) numeric/nominal (2) exist in the data frame (3) at least 4 datapoints length \n'
+			'\n ~> dependent variable must be (1) numeric/nominal (2) exist in the data frame (3) at least 4 datapoints length \n'
 		)
 	}
 	return(output)

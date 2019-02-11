@@ -1,6 +1,9 @@
 import(nlme)
 import(MASS)
+import(methods)
+import(Hmisc)
 import(jsonlite)
+import(PhenStat)
 
 importFrom("graphics", "abline", "hist", "par", "plot")
 importFrom("stats", "AIC", "aggregate", "as.formula", "complete.cases",
@@ -11,7 +14,10 @@ importFrom("utils", "combn")
 importFrom("methods", "setClass")
 #importFrom("PhenStat","columnChecks","testGenotype","refGenotype")
 importFrom("Hmisc","describe")
-#exportPattern("^[^\\.]")
+importFrom("methods", "is")
+importFrom("methods", "formalArgs")
+importFrom("nlme", "lme","gls","getData","lmeControl","glsControl")
+importFrom("stats", "qqline")
 
 S3method(summary, PhenListAgeing)
 S3method(summary, PhenListAgeingModel)
@@ -22,10 +28,13 @@ S3method(plot   , PhenListAgeingModel)
 S3method(plot   , PhenlistCategoricalAgeingModel)
 
 
-export(
-	PhenListAgeing,
-	testDatasetAgeing#,
-	#vectorOutput,
-	#vectorOutputMatrices
-)
+
+
+exportPattern("^[^\\.]")
+#export(
+#	PhenListAgeing,
+#	testDatasetAgeing#,
+#	#vectorOutput,
+#	#vectorOutputMatrices
+#)
 

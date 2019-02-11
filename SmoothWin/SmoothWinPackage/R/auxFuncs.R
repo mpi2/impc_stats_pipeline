@@ -199,7 +199,9 @@ msg = function(args, ...) {
         '\n\t variance = ',
         args$sensitivity[2],
         '\n\t mean*variance = ',
-        args$sensitivity[3]
+        args$sensitivity[3],
+        '\n\t normality test = ',
+        args$sensitivity[4]
       )
     } else{
       paste0(
@@ -209,7 +211,9 @@ msg = function(args, ...) {
         '\n\t variance = ',
         args$pvalThreshold[2],
         '\n\t mean*variance = ',
-        args$pvalThreshold[3]
+        args$pvalThreshold[3],
+        '\n\t normality test = ',
+        args$pvalThreshold[4]
       )
     }
   )
@@ -255,12 +259,24 @@ checkWeightsN <- function(w             ,
     NoZeWe = sum(w >= threshold)
   ))
 }
+
+shapiro.test0 =function(x){
+  x  = na.omit(x)
+  lx = length(x) 
+  
+  if(lx>3 && lx<5000 && is.numeric(x)){
+    r = shapiro.test(x)$p.value
+  }else{
+    r = 1
+  }
+  return(r)
+}
 ###########
 tv.test = function(obj                           ,
                    args                          ,
                    name          = 'parameter'   ,
-                   sensitivity   = c(1, 1, 1)    ,
-                   pvalThreshold = c(0, 0, 0)    ,
+                   sensitivity   = c(1, 1, 1, 0) ,
+                   pvalThreshold = c(0, 0, 0, 0) ,
                    residFun      = function(m) {
                      resid(m)
                    }                             ,
@@ -284,9 +300,13 @@ tv.test = function(obj                           ,
       # Means
       ttl  = t.test  (dfv[[i]][oi >= thresh], dfv[[i - 1]][oim >= thresh])$p.value
       ttlp = t.test  (dfp[[i]][oi >= thresh], dfp[[i - 1]][oim >= thresh])$p.value
+      # Normality
+      nntp  = shapiro.test0(dfp[[i]][oi >= thresh])
+      nntl  = shapiro.test0(dfv[[i]][oi >= thresh])
       
       if (sum(pvalThreshold) <= 0) {
         tt[i - 1] =
+          sensitivity[4] * (nntl + nntp) +
           sensitivity[3] * ((vtl * ttl) + (vtlp * ttl) + (vtl * ttlp) + (vtlp * ttlp) +
                               (vtl * vtlp * ttl) + (vtl * vtlp * ttlp) +
                               (vtl * ttl * ttlp) + (vtlp * ttl * ttlp) +
@@ -299,6 +319,8 @@ tv.test = function(obj                           ,
           (x > thresh) + (x <= thresh) * x
         }
         tt[i - 1] =
+          sensitivity[4] * (f01(nntp , pvalThreshold[4])  + 
+                            f01(nntl , pvalThreshold[4])) +
           sensitivity[3] * (
             f01(vtl * ttl     , pvalThreshold[3]) +
               f01(vtlp * ttl  , pvalThreshold[3]) +
@@ -394,7 +416,7 @@ tv.test = function(obj                           ,
   } else{
     final = NULL
   }
-  return(final)
+  return(list(value = final, score = pmin))
 }
 ###########
 is.function0 = function(FUN          ,
@@ -412,3 +434,5 @@ is.function0 = function(FUN          ,
     r = sort(r, ...)
   return(r)
 }
+
+

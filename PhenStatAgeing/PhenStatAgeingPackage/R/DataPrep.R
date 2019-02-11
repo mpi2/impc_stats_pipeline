@@ -12,18 +12,19 @@ PhenListAgeing = function(object,
 	object@datasetPL$LifeStage = as.factor (object@datasetPL$LifeStage)
 	object@datasetPL           = object@datasetPL[object@datasetPL$Age > 0,]
 	
+	message ('~> Age range: ',paste0(range(age.in.day),collapse = '-'))
 	
 	if (length(levels(object@datasetPL$LifeStage)) < 2)
-		message('=> There is only one level in the LifeStage')
+		message('~> There is only one level in the LifeStage')
 	
 	if (length(levels(object@datasetPL$Sex)) < 2)
-		message('=> There is only one level in Sex')
+		message('~> There is only one level in Sex')
 	
 	if('Weight' %in% names(object@datasetPL) && sum(is.na(object@datasetPL[,'Weight']))>0)
-		message('=> There are ',sum(is.na(object@datasetPL[,'Weight'])),' NAs in body weights.')
+		message('~> There are ',sum(is.na(object@datasetPL[,'Weight'])),' NAs in body weights.')
 		
 	if (length(levels(object@datasetPL$Genotype)) < 2)
-		stop('=> Genotype must have two levels')
+		stop('~> Genotype must have two levels')
 	
 	object        = unclass(object)
 	class(object) = 'PhenListAgeing'
@@ -60,7 +61,7 @@ plot.PhenListAgeing = function(x,
 															 vars = NULL,
 															 ...) {
 	data = x@datasetPL
-	if ('LifeStage' %in% names(x@datasetPL))
+	if ('LifeStage' %in% names(data))
 		cnames = c('Batch',
 							 'Genotype',
 							 'Sex',

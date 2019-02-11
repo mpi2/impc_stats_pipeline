@@ -8,21 +8,28 @@ My name is R!
 }
 \usage{
 testDatasetAgeing = function(
-										procedure = 'TYPICAL',
-										phenListAgeing = NULL,
-										depVariable = NULL   ,
-										withWeight = FALSE,
-										Sex = TRUE,
-										LifeStage = TRUE,
-fixed=TypicalModel(depVariable=depVariable,withWeight=withWeight,Sex=Sex,LifeStage=LifeStage),
-										random = rndProce (procedure),
-weight=if(LifeStage)varIdent(form=~1|LifeStage)else	varIdent(form =~1|Genotype),
-										conversion.threshold = Inf,
-										family = poisson(link = "log"),
-										direction = 'both',
-										rep = 10 ^ 5)
+				 procedure = 'TYPICAL',
+				 phenListAgeing = NULL,
+				 depVariable = NULL   ,
+				 withWeight = FALSE,
+				 Sex = TRUE,
+				 LifeStage = TRUE,
+				 fixed = TypicalModel(
+				 	depVariable = depVariable,
+				 	withWeight = withWeight,
+				 	Sex = Sex,
+				 	LifeStage = LifeStage
+				 ),
+				 random = rndProce (procedure),
+				 weight = if (LifeStage){
+				 	varIdent(form =  ~ 1 | LifeStage)
+				 }else{
+				 	varIdent(form =  ~ 1 | Genotype)},
+				 conversion.threshold = Inf,
+				 family = poisson(link = "log"),
+				 direction = 'both',
+				 rep = 10 ^ 5) 
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{procedure}{
 My name is R!

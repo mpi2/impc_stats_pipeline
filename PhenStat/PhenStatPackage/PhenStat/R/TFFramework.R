@@ -18,12 +18,14 @@
 ## Cleans dataset to make it suitable for the TF framework -
 ## data points in all genotype/batch level combinations at least for one sex
 TFDataset <-
-  function(phenList = NULL,
-           depVariable = NULL,
-           outputMessages = TRUE,
-           forDecisionTree = FALSE)
+  function(phenList         = NULL,
+           depVariable      = NULL,
+           outputMessages   = TRUE,
+           forDecisionTree  = FALSE,
+  				 upper            = 5)
   {
 	digit = 100
+	upper = max(upper, 2)
     stop_message <- ""
     ## START CHECK ARGUMENTS
     # 1
@@ -201,7 +203,7 @@ TFDataset <-
 
 
       if (length(levels(factor(x$Batch))) >= 2 &&
-          length(levels(factor(x$Batch))) <= 5) {
+          length(levels(factor(x$Batch))) <= upper) {
         new_phenList <- new(
           "PhenList",
           datasetPL = x,

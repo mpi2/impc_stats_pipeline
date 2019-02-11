@@ -2,36 +2,29 @@ vectorOutput <- function(object, phenotypeThreshold = 0.01)
 {
 	if (is.null(object))
 		return (NULL)
-	
-	o1          = summary(object)
-	depVariable = o1$object$depVariable
 	# MM
-	if (o1$object$method %in% c("MM", 'GLM')) {
-		equation       = paste('Formula: ',format(formula(o1$object$final.model)),sep = '')
-		framework      = switch(object$method,
-														MM  = "Linear Mixed Model framework",
-														GLM = "Generalized Linear Model framework")
-		fittingMethod    = "Maximum Likelihood using the Generalised least squares, "
-		x                = nlme::getData(o1$object$final.model)
+	if (object$output$Final.Model.Tag %in% c('glm', 'gls','lme')) {
+		depVariable = all.vars(formula(object$output$Final.Model))[1]
+		equation       = paste('final model: ',format(formula(object$output$Final.Model)),sep = '')
+		framework      = switch(object$output$Final.Model.Tag,
+														lme  = "Linear Mixed Model framework",
+														gls  = "Linear Model Using Generalized Least Squares framework",
+														glm  = "Generalized Linear Model framework")
+		fittingMethod    = toupper(object$output$Final.Model.Tag)
+		x                = object$input$data
 		columnOfInterest = x[, c(depVariable)]
-		variability      = paste('variability:',
-														 length(unique(columnOfInterest)) / length(columnOfInterest),
-														 sep = "")
-		DSsize           = paste(ConvDf2Flat(xtabs(
-			formula        = reformulate(
-				termlabels   = c('Genotype', 'Sex', 'LifeStage'),
-				response     = NULL
-			),
-			data           = x
-		)), collapse     = '; ')
-		addInfo           = paste("{", DSsize, variability,equation, "}", sep = 	";")
+		variability      = paste0('variability: ',
+														 length(unique(columnOfInterest)) / length(columnOfInterest))
+		DSsize            = SummaryStats(x = x,formula = object$input$Fullfixed$initial,label = 'summary_statistics',lower = TRUE,drop = TRUE)
+		addInfo           = NULL
 		percentageChanges = NA
+		o1                = summary(object$output$Final.Model)
 		vectorOutput      = list(
-			'Method'                               = 	paste(framework, ", ", fittingMethod, format(equation), sep = ""),		
+			'Method'                               = 	paste(framework, ", ", fittingMethod, ', ', format(equation), sep = ""),		
 			'Dependent variable'                   =	depVariable,		
-			'Batch included'                       =	any(grepl('Batch', x = c(o1$RandoEffect, o1$Final.Terms))),		
-			'Residual variances homogeneity'       =	o1$object$VarHomo,		
-			'Genotype contribution'                =	ifelse ('Genotype' %in% o1$Final.Terms, TRUE, FALSE),		
+			'Batch included'                       =	object$output$BatchIn,		
+			'Residual variances homogeneity'       =	object$output$VarHomoIn,		#modelSummaryPvalueExtract
+			'Genotype contribution'                =	ifelse ('Genotype' %in% all.vars0(object$output$Final.Model), TRUE, FALSE),		
 			'Genotype estimate'                    =	ifelse ('Genotype' %in% o1$Final.Terms, o1$Summary$tTable[which(o1$Final.Terms =='Genotype') + 1, 1], NA),		
 			'Genotype standard error'              =	ifelse ('Genotype' %in% o1$Final.Terms, o1$Summary$tTable[which(o1$Final.Terms =='Genotype') + 1, 2], NA),		
 			'Genotype p-Val'                       =	ifelse ('Genotype' %in% o1$Final.Terms, o1$Summary$tTable[which(o1$Final.Terms =='Genotype') + 1, 5], NA),		

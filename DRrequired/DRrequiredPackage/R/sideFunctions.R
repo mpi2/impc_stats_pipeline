@@ -1855,7 +1855,7 @@ FinalJsonBobectCreator = function(FinalList,
 
 
 
-UnzipAndfilePath = function(file, quiet = TRUE) {
+UnzipAndfilePath = function(file, quiet = TRUE, order = TRUE) {
   message0('Unziping file ...')
   # get the file url
   forecasturl = file
@@ -1884,6 +1884,9 @@ UnzipAndfilePath = function(file, quiet = TRUE) {
         overwrite = TRUE)
   # fpath is the full path to the extracted file
   fpath = file.path(td, fname)
+  if(order){
+    fpath = fpath[order(nchar(fpath), fpath)]
+  }
   message0(
     'Successfully unziped. List of files:\n',
     paste0('\t\t', 1:length(fpath), ' ==> ', fpath, collapse = '\n')
@@ -1914,19 +1917,26 @@ relativePath = function(path, reference) {
 
 
 
+
 # Closest points for the mutants
-closest.time.value  = function(x, time1, y, time2, yind) {
-  requireNamespace(abind)
+closest.time.value  = function(x,
+                               time1,
+                               y,
+                               time2,
+                               yind,
+                               TimeOnly = TRUE,
+                               maxIter  = 200) {
+  requireNamespace('abind')
   message0('Resampling. Creating the index ...')
   x.df = data.frame(x.val = x, x.time = time1)
   y.df = data.frame(y.val = y,
-                    y.time = time2,
+                    y.time  = time2,
                     y.index = yind)
   message0('Resampling. Finding the distance of values from the mutants ...')
   output2  = ol = lapply(1:nrow(x.df), function(i) {
     tt <-
-      cbind(x.df[i, ],
-            lapply(x.df[i, ]$x.val, function(v) {
+      cbind(x.df[i,],
+            lapply(x.df[i,]$x.val, function(v) {
               diff <- abs(y.df$y.val - v)
               y.df$dist.V = diff
               out <- y.df
@@ -1935,26 +1945,30 @@ closest.time.value  = function(x, time1, y, time2, yind) {
             row.names = NULL)
     tt$dist.T <- abs(tt$x.time - tt$y.time)
     tt$totalD  = tt$dist.V + tt$dist.T
-    tt = tt[order(tt$totalD), ]
-    tt = tt[order(tt$dist.V), ]
-    tt = tt[order(tt$dist.T), ]
+    if (TimeOnly) {
+      tt = tt[sample(1:nrow(tt)),]
+    } else{
+      tt = tt[order(tt$totalD)  ,]
+      tt = tt[order(tt$dist.V)  ,]
+    }
+    tt   = tt[order(tt$dist.T)  ,]
   })
   dol = 1
   message0('Resampling. Refining ...')
   counter = 1
-  while (sum(dol) > 0 && counter < 200) {
+  while (sum(dol) > 0 && counter < maxIter) {
     ol  = lapply(
       X = output2,
       FUN = function(x) {
         if (!is.null(x)  && nrow(x) > 0) {
-          x[1, ]
+          x[1,]
         } else{
           NULL
         }
       }
     )
     ol2  = abind(ol, along = 1)
-    dol  = duplicated(ol2[,'y.index'])
+    dol  = duplicated(ol2[, 'y.index'])
     if (sum(dol)) {
       output2[dol] = lapply(
         output2[dol],
@@ -2003,7 +2017,8 @@ mimicControls = function(df                             ,
                          minSampRequired                ,
                          SexGenResLevels                ,
                          indicator       = NULL         ,
-                         plot = FALSE) {
+                         plot            = FALSE        ,
+                         CutIfLongerThanMutants = TRUE) {
   if (!is.null(indicator))
     set.seed(indicator)
   requireNamespace('stringi')
@@ -2063,6 +2078,7 @@ mimicControls = function(df                             ,
     time2 = df[conIndSex, 'cTime']
     yid   = df[conIndSex, 'id_d']
     x     = df[mutIndSex, depVariable]
+    lx    = length(x)
     if (is.null(shift)) {
       message0(l,', Generating new SHIFT in progress ...')
       shift = ifelse(resample, round(runif(
@@ -2081,6 +2097,10 @@ mimicControls = function(df                             ,
       time2 = time2  ,
       yind  = yid
     )
+    if (!is.null(ctv) && CutIfLongerThanMutants && nrow(ctv) > lx) {
+      message0 ('The length of the simulated data is longer than the input. Cutting in progress ....')
+      ctv = ctv[1:lx, ]
+    }
     Indices = c(Indices, ctv$y.index)
   }
   Ind                            =  df$id_d %in% Indices
