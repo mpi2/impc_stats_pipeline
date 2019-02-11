@@ -90,7 +90,9 @@ citecolor    = brown
 
 
 \begin{document}
-
+<<setup, include=FALSE>>=
+library(knitr)
+@
 <<>>==
 #rm(list = ls(all.names = TRUE))
 # Install necessary packages
