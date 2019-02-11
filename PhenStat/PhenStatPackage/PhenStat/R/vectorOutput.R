@@ -23,9 +23,13 @@ vectorOutput <-
 					 othercolumns = NULL,
 					 quote  = '"' )
 	{
-		as.character0 = function(x,...){
-			if(!is.numeric(x) ){
-				x = as.character(x)
+		as.character0 = function(x, ...) {
+			if (!is.null(x)) {
+				if (!is.numeric(x)) {
+					x = as.character(x)
+				}
+			} else{
+				x = "NA" #HAMED 11/02/2019
 			}
 			return(x)
 		}
@@ -79,7 +83,6 @@ vectorOutput <-
 			'"multibatch_in_analysis":"Data contains multi batches"',
 			'"multibatch_in_analysis":"Data contains single batch"'
 		)
-
 		if (method(phenTestResult) %in% c("MM", "TF")) {
 			equation <- switch(analysisResults$equation,
 												 withoutWeight = {
