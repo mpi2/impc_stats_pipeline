@@ -19,7 +19,7 @@
         default value TRUE}
     \item{forDecisionTree}{flag: "FALSE" value for normal procedure;
         "TRUE" value to indicate that is called form decisionTree function; default value FALSE}
-    \item{upper}{Single integer: maximum allowed number of levels for the Batch in the TF framework}
+    \item{upper}{Single integer: maximum allowed number of levels for the Batch in the TF framework. Default 5.}
 }
 \value{
     Returns dataset suitable for TF framework or original dataset if data removal was not successful.

@@ -6,6 +6,7 @@ WhatIsNew = function() {
 		see https://github.com/cran/SmoothWin for the new implementation of the method\n
 	2. VectorOutput now lets user defined variables in the output\n
 	3. Several improvements on VectorOutput including summary statistics and so on\n
+	4. A new parameter "upper" is added to the testDataset and other related function to cope with the upper limit in TF model\n
 	4. Bug fixed and minor improvements\n
 	'
 	)

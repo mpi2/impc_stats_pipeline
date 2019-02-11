@@ -64,7 +64,7 @@ testDataset(
         default value FALSE}
     \item{threshold}{The threshold for the model weights to be considered as zero. It only works when method="MM" and modelWeight is not null. Default is 10^-18.}
     \item{check}{Only useful when modelWeight is included. Select between 0, 1, 2 to impose different weighting strategies on the Linear Mixed model. check=1 (default) selects the weights that are greater than the threshold (above) and keeps the batches that include more than one single sample. check=2 keeps only the weights that are greater than the threshold but ignores the single sample batches. check=0 to disable the function.}
-    \item{upper}{Single integer: maximum allowed number of levels for the Batch in the TF framework.}
+    \item{upper}{Single integer: maximum allowed number of levels for the Batch in the TF framework. Default 5}
 }
 \value{
     Returns results stored in instance of the \code{\linkS4class{PhenTestResult}} class
