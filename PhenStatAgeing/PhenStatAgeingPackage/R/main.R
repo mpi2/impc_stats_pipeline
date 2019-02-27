@@ -1,169 +1,139 @@
-testDatasetAgeing = function(procedure = 'TYPICAL',
-														 phenListAgeing = NULL,
-														 depVariable = NULL   ,
-														 withWeight = FALSE,
-														 Sex = TRUE,
-														 LifeStage = TRUE,
-														 fixed = TypicalModel(depVariable,
-														 										 withWeight  ,
-														 										 Sex,
-														 										 LifeStage,
-														 										 data = phenListAgeing@datasetPL),
-														 random = rndProce (procedure),
-														 weight = if (LifeStage)
+testDatasetAgeing = function(phenListAgeing = NULL                        ,
+														 method         = NULL                        ,
+														 ### MM
+														 MM_fixed = TypicalModel(
+														 	depVariable = 'data_point'           ,
+														 	withWeight = MM_BodyWeightIncluded   ,
+														 	Sex = TRUE                           ,
+														 	LifeStage = TRUE                     ,
+														 	data = phenListAgeing@datasetPL      ,
+														 	others = NULL                        ,
+														 	debug = debug
+														 )                                     ,
+														 MM_random = rndProce ('TYPICAL')      ,
+														 MM_BodyWeightIncluded = TRUE          ,
+														 MM_lower  =  ~ Genotype + 1           ,
+														 MM_weight = if (TermInModelAndnLevels(model = MM_fixed,
+														 																			data = phenListAgeing@datasetPL))
 														 	varIdent(form =  ~ 1 |
 														 					 	LifeStage)
 														 else
 														 	varIdent(form =  ~ 1 |	Genotype),
-														 conversion.threshold = Inf,
-														 family = poisson(link = "log"),
-														 direction = 'both',
-														 rep = 10 ^ 5) {
+														 MM_direction = 'both',
+														 MM_checks    = c(1, 1, 1),
+														 ### FE or RR
+														 FE_formula = category ~  Genotype + Sex + LifeStage,
+														 RR_formula = data_point~ Genotype + Sex + LifeStage,
+														 RR_prop    = 0.95,
+														 FERR_rep   = 1500,
+														 ##### Others
+														 debug      = TRUE,
+														 ...) {
 	r = tryCatch(
 		expr = {
-			testDatasetAgeing0(
-				procedure = procedure,
-				phenListAgeing = phenListAgeing,
-				depVariable = depVariable   ,
-				withWeight = withWeight,
-				Sex = Sex,
-				LifeStage = LifeStage,
-				fixed = fixed,
-				random = random,
-				conversion.threshold = conversion.threshold,
-				family = family,
-				direction = direction,
-				rep = rep,
-				weight = weight
+			suppressMessagesANDErrors(
+				testDatasetAgeing0(
+					phenListAgeing = phenListAgeing,
+					method = method ,
+					#### MM
+					MM_fixed = MM_fixed,
+					MM_random = MM_random,
+					MM_lower = MM_lower,
+					MM_weight = MM_weight,
+					MM_direction = MM_direction,
+					MM_checks   = MM_checks,
+					#### FE
+					FE_formula = FE_formula,
+					RR_formula = RR_formula,
+					RR_prop = RR_prop,
+					FERR_rep = FERR_rep,
+					debug = debug
+				),
+				debug = debug
 			)
 		},
 		warning = function(war) {
-			warning('\n ~> Warning : ', war, '\n')
+			message0('The functions failed with a warning (see below): ')
+			warning(war)
 			return(NULL)
 		},
 		error = function(err) {
-			warning('\n ~> error : ', err, '\n')
+			message0('The functions failed with an error (see below): ')
+			warning(err)
 			return(NULL)
 		}
 	)
 	return(r)
 }
 
-# Core
-testDatasetAgeing0 = function(procedure = 'TYPICAL',
-															phenListAgeing = NULL,
-															depVariable = NULL   ,
-															withWeight = FALSE,
-															Sex = TRUE,
-															LifeStage = TRUE,
-															fixed ,
-															random ,
-															weight ,
-															direction = 'both',
-															conversion.threshold = Inf,
-															family = poisson(link = "log"),
-															rep = 10 ^ 5) {
+
+
+testDatasetAgeing0 = function(phenListAgeing = NULL ,
+															method                ,
+															#### MM
+															MM_fixed               ,
+															MM_random              ,
+															MM_lower               ,
+															MM_weight              ,
+															MM_direction = 'both'  ,
+															MM_checks              ,
+															##### FE or RR
+															FE_formula,
+															RR_formula,
+															RR_prop,
+															FERR_rep,
+															##### Others
+															debug) {
 	if (!is(phenListAgeing, 'PhenListAgeing'))
 		stop('\n ~> function requires a "PhenListAgeing" object \n')
 	if (noVariation(data = phenListAgeing@datasetPL))
 		stop('\n ~> There is no variation on Genotype.\n')
-	if (LifeStage &&
-			noVariation(data = phenListAgeing@datasetPL, f = '~ Genotype+LifeStage'))
-		stop('\n ~> There is no variation on a cell in the Genotype*LifeStage table\n')
 	
-	chklist = columnChecks0(
-		dataset = phenListAgeing@datasetPL,
-		columnName = depVariable,
-		dataPointsThreshold = 4
-	)
-	categorical = IsCategorical(phenListAgeing@datasetPL[, depVariable], max.consider = conversion.threshold) # Automatic type detection
-	if (all(chklist[1:2])) {
-		# Important to remove missings
-		Obj =  CheckMissing(phenListAgeing@datasetPL, fixed)
-		data = Obj$new.data
-		# All combination of the variables
-		AllCombinations = AllTables(dframe = data[, all.vars(fixed)],
-																response.name = depVariable,
-																shrink = FALSE)
-		o.Model = M.opt(
-			fixed  = fixed,
-			random = random,
-			data   = data,
-			direction = direction,
-			family = family,
-			categorical = categorical$cat,
-			LifeStage = LifeStage,
-			weight = weight,
-			trace = FALSE
+	
+	if (method %in% 'MM') {
+		output = M.opt(
+			fixed = MM_fixed ,
+			random = MM_random,
+			object = phenListAgeing,
+			lower = MM_lower,
+			direction = MM_direction,
+			weight = MM_weight,
+			checks = MM_checks,
+			trace = debug,
+			method = 'MM'
 		)
-		if (LifeStage) {
-			effA = eff.size(
-				object = o.Model$Final.Model,
-				depVariable = depVariable,
-				effOfInd = 'LifeStage'
-			)
-			effE = eff.size(
-				object = o.Model$Final.Model,
-				data = subset(data, LifeStage == 'Early'),
-				depVariable = depVariable
-			)
-			effL = eff.size(
-				object = o.Model$Final.Model,
-				data = subset(data, LifeStage == 'Late'),
-				depVariable = depVariable
-			)
-			effs = list(Early = effE,
-									Late = effL,
-									LifeStage = effA)
-		} else{
-			effs = eff.size(object = o.Model$Final.Model,
-											depVariable = depVariable)
-		}
-		####
-		output =    list(
-			initial.model   = o.Model$Initial.Model,
-			final.model     = o.Model$Final.Model  ,
-			split.models    = o.Model$SplitModels  ,
-			fixed           = fixed                ,
-			random          = random               ,
-			fin.fixed       = formula(o.Model$Final.Model),
-			fin.random      = if (is.null(o.Model$Final.Model$call$random)) {
-				NULL
-			} else{
-				o.Model$Final.Model$call$random
-			},
-			VarHomo         = o.Model$VarHomo,
-			weight          = weight,
-			effect          = effs,
-			data            = phenListAgeing,
-			OriginalDataSet = Obj$org.data,
-			depVariable     = depVariable,
-			procedure       = procedure,
-			Sex             = Sex,
-			LifeStage       = LifeStage,
-			categorical     = categorical$cat,
-			method          = categorical$method,
-			direction       = direction,
-			missings        = Obj$missings,
-			AllCombinations   = AllCombinations
-		)
-		class(output) = 'PhenListAgeingModel'
+		# Important!
+		if (!is.null(output))
+			output$input$fixed = MM_fixed
 		
-	} else if (chklist[1] && !chklist[2]) {
+	} else if (method %in% 'FE') {
 		output = crunner(
 			object = phenListAgeing,
-			Sex = Sex,
-			LifeStage = LifeStage,
-			depVariable = depVariable,
-			rep = rep,
-			categorical = categorical$cat,
-			method      = categorical$method
+			formula = MoveResponseToRightOfTheFormula(FE_formula),
+			#expandDottedFormula(formula = FE_formula, data = phenListAgeing@datasetPL),
+			rep = FERR_rep,
+			method = 'FE',
+			fullComparisions = TRUE
 		)
-		class(output) = 'PhenlistCategoricalAgeingModel'
+		# Important!
+		if (!is.null(output))
+			output$input$formula = FE_formula
+		
+	} else if (method %in% 'RR') {
+		output = RRrunner(
+			object = phenListAgeing,
+			formula = MoveResponseToRightOfTheFormula(RR_formula),
+			#expandDottedFormula(formula = RR_formula, data = phenListAgeing@datasetPL),
+			rep = FERR_rep,
+			method = 'RR',
+			RRprop = RR_prop
+		)
+		# Important!
+		if (!is.null(output))
+			output$input$formula = RR_formula
 	} else{
-		stop(
-			'\n ~> dependent variable must be (1) numeric/nominal (2) exist in the data frame (3) at least 4 datapoints length \n'
-		)
+		message0('No "method" is specified. ')
+		output = NULL
 	}
 	return(output)
 }

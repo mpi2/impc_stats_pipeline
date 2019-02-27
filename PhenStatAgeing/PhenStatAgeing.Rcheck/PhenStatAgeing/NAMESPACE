@@ -1,0 +1,40 @@
+import(nlme)
+import(MASS)
+import(methods)
+import(Hmisc)
+import(jsonlite)
+import(PhenStat)
+
+importFrom("graphics", "abline", "hist", "par", "plot")
+importFrom("stats", "AIC", "aggregate", "as.formula", "complete.cases",
+					 "density", "fisher.test", "formula", "poisson", "predict",
+					 "qqnorm", "resid", "sd", "terms", "xtabs")
+importFrom("stats", "na.omit", "reformulate", "update")
+importFrom("utils", "combn")
+importFrom("methods", "setClass")
+#importFrom("PhenStat","columnChecks","testGenotype","refGenotype")
+importFrom("Hmisc","describe")
+importFrom("methods", "is")
+importFrom("methods", "formalArgs")
+importFrom("nlme", "lme","gls","getData","lmeControl","glsControl")
+importFrom("stats", "qqline")
+
+S3method(summary, PhenListAgeing)
+S3method(summary, PhenListAgeingModel)
+S3method(summary, PhenlistCategoricalAgeingModel)
+
+S3method(plot   , PhenListAgeing)
+S3method(plot   , PhenListAgeingModel)
+S3method(plot   , PhenlistCategoricalAgeingModel)
+
+
+
+
+exportPattern("^[^\\.]")
+#export(
+#	PhenListAgeing,
+#	testDatasetAgeing#,
+#	#vectorOutput,
+#	#vectorOutputMatrices
+#)
+

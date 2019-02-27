@@ -1,24 +1,50 @@
-# Continues OPT core
-M.opt = function(fixed  = NULL,
-								 random = NULL,
-								 data   = NULL,
-								 lower  = ~ Genotype + 1 ,
-								 direction   = 'both',
-								 family      = poisson(link = "log"),
-								 trace       = TRUE ,
-								 categorical = FALSE ,
-								 weight              ,
-								 PhenListAgeing      ,
+# Continuous OPT core
+M.opt = function(object = NULL            ,
+								 fixed  = NULL            ,
+								 random = NULL            ,
+								 lower  = ~ Genotype + 1  ,
+								 direction   = 'both'     ,
+								 trace       = TRUE       ,
+								 weight                   ,
+								 checks      = c(1, 1, 1) ,
+								 method      = 'MM'       ,
 								 ...) {
+	
+	if (!method %in% c('MM')        ||
+			is.null(all.vars0(fixed))   ||
+			is.null(object)) {
+		#####
+		message0 ('Improper method (',
+							method,
+							') for the type of data, or the "formula" is left blank')
+		return(NULL)
+	}
+	message0('MM framework in progress ...')
+	# Future devs
+	family      = poisson(link = "log")
+	categorical = FALSE
+	# Start from here
 	sta.time    = Sys.time()
 	lCont       = lmeControl (opt  = 'optim')
 	gCont       = glsControl (opt  = 'optim', singular.ok = TRUE)
-	glCont      = glm.control(epsilon = 10 ^ -22)
+	glCont      = glm.control(epsilon = 10 ^ -36)
 	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = NULL
 	VarHomo     = TRUE
-	Inifixed    = fixed
-	if (!is.null(fixed$correctd))
-		fixed      = fixed$correctd
+	data        = object@datasetPL
+	# Inifixed    = fixed
+	# if (!is.null(fixed$correctd))
+	# 	fixed      = fixed$correctd
+	if (any(checks > 0)) {
+		if (checks[1])
+			fixed  = checkModelTermsInData(formula = fixed,
+																		 data = data,
+																		 responseIsTheFirst = TRUE)
+		if (checks[2])
+			fixed = removeSingleLevelFactors(formula = fixed, data = data)
+		if (checks[3])
+			fixed = ComplementaryFeasibleTermsInContFormula(formula = fixed, data = data)
+		message0('Checked model: ', printformula(fixed))
+	}
 	allVars     = all.vars(fixed)
 	LifeStage   = 'LifeStage' %in% allVars
 	Batch_exist = !categorical &&
@@ -57,6 +83,7 @@ M.opt = function(fixed  = NULL,
 											FUN = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls')),
 											debug = TRUE
 										))
+	message0('The lower selected model: ', printformula(lower))
 	lower = ModelInReference(model = lower, reference = fixed)
 	if (!is.null(lower)) {
 		message0('Optimising the model ... ')
@@ -113,10 +140,19 @@ M.opt = function(fixed  = NULL,
 		effOfInd    = allVars[-1],
 		data = data
 	))
+	message0(
+		'Total effect sizes estimated: ',
+		ifelse(
+			!is.null(EffectSizes),
+			length(EffectSizes),
+			'Not possible because of errors!'
+		)
+	)
 	message0('Quality tests in progress ... ')
 	ResidualNormalityTest = QuyalityTests(F.Model, levels = allVars[-1])
-	message0('Finished (', round(Sys.time() - sta.time, 4), ' seconds )')
-	return(list(
+	message0('MM framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
+	####
+	OutR = list(
 		output = list(
 			Final.Model         = F.Model                  ,
 			Initial.Model       = I.Model                  ,
@@ -141,21 +177,25 @@ M.opt = function(fixed  = NULL,
 			)
 		)                                                              ,
 		input = list(
+			PhenListAgeing      = object                                 ,
 			fixed               = fixed                                  ,
 			random              = random                                 ,
 			data                = data                                   ,
+			depVariable         = allVars[1]                             ,
 			lower               = lower                                  ,
 			direction           = direction                              ,
-			family              = family                                 ,
-			trace               = trace                                  ,
-			categorical         = categorical                            ,
+			#family              = family                                ,
+			#trace               = trace                                 ,
+			#categorical         = categorical                           ,
 			LifeStage           = LifeStage                              ,
 			weight              = weight                                 ,
-			Fullfixed           = Inifixed                               ,
-			PhenListAgeing      = PhenListAgeing
+			checks              = checks
+			#Fullfixed           = Inifixed
 		),
-		extra = list()
-	))
+		extra = list(Cleanedformula  = fixed)
+	)
+	class(OutR) <- 'PhenStatAgeingMM'
+	return(OutR)
 }
 
 
@@ -166,8 +206,9 @@ summary.PhenListAgeingModel = function(object, ...) {
 	if (is.null(object))
 		stop('\n ~> NULL object\n')
 	tmpobject  = object
-	ai = attr(terms(formula(object$initial.model)), "term.labels")
-	af = attr(terms(formula(object$final.model)),   "term.labels")
+	
+	ai = formulaTerms(object$initial.model)
+	af = formulaTerms(object$final.model)
 	if (is.null(object$final.model$call$random)) {
 		ar = NULL
 	} else{
@@ -282,7 +323,7 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 						for (lvl in levels(interact)) {
 							olstTmp = eff.size(
 								object = object,
-								data = data[interact %in% lvl,],
+								data = data[interact %in% lvl, ],
 								depVariable = depVariable,
 								errorReturn = NULL,
 								effOfInd = eff

@@ -1,0 +1,12 @@
+* installing *source* package 'PhenStatAgeing' ...
+** R
+** byte-compile and prepare package for lazy loading
+Note: possible error in 'crunner(object = phenListAgeing, ': unused arguments (Sex = Sex, LifeStage = LifeStage, depVariable = depVariable, categorical = categorical$cat) 
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded
+*** arch - i386
+*** arch - x64
+* DONE (PhenStatAgeing)
+In R CMD INSTALL

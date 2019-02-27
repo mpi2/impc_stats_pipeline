@@ -213,7 +213,17 @@ msg = function(args, ...) {
         '\n\t mean*variance = ',
         args$pvalThreshold[3],
         '\n\t normality test = ',
-        args$pvalThreshold[4]
+        args$pvalThreshold[4],
+        ###################################
+        '\n Sensitivity: ',
+        '\n\t mean = ',
+        args$sensitivity[1],
+        '\n\t variance = ',
+        args$sensitivity[2],
+        '\n\t mean*variance = ',
+        args$sensitivity[3],
+        '\n\t normality test = ',
+        args$sensitivity[4]
       )
     }
   )
@@ -368,8 +378,8 @@ tv.test = function(obj                           ,
       # ##### Debug
       if (debug) {
         plot(
-          al0$l                               ,
-          al0$tp.pval                         ,
+          al0$l[is.finite(al0$tp.pval)]       ,
+          al0$tp.pval[is.finite(al0$tp.pval)] ,
           type = 'b'                          ,
           ylab = 'Residual/Predict test pvals',
           xlab = name,
@@ -387,8 +397,8 @@ tv.test = function(obj                           ,
           legend = paste0('Final ', name, ' = ', round(final, 4))
         )
         plot(
-          al0$l                              ,
-          al0$ol                             ,
+          al0$l[is.finite(al0$tp.pval)]      ,
+          al0$ol[is.finite(al0$tp.pval)]     ,
           type = 'b'                         ,
           ylab = paste0(
             'Sum(weight), MinSumRequiredIncludingTreatment = ' ,

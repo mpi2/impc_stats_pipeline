@@ -1,0 +1,296 @@
+* using log directory 'C:/Users/hamedhm/Google Drive/At work/Publications Shared with Terry and Jeremy/RPackages/impc_stats_pipeline/PhenStatAgeing/PhenStatAgeing.Rcheck'
+* using R version 3.5.2 (2018-12-20)
+* using platform: x86_64-w64-mingw32 (64-bit)
+* using session charset: ISO8859-1
+* using options '--no-manual --as-cran'
+* checking for file 'PhenStatAgeing/DESCRIPTION' ... OK
+* checking extension type ... Package
+* this is package 'PhenStatAgeing' version '1.0.0'
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking serialization versions ... OK
+* checking whether package 'PhenStatAgeing' can be installed ... WARNING
+Found the following significant warnings:
+  Note: possible error in 'crunner(object = phenListAgeing, ': unused arguments (Sex = Sex, LifeStage = LifeStage, depVariable = depVariable, categorical = categorical$cat) 
+See 'C:/Users/hamedhm/Google Drive/At work/Publications Shared with Terry and Jeremy/RPackages/impc_stats_pipeline/PhenStatAgeing/PhenStatAgeing.Rcheck/00install.out' for details.
+Information on the location(s) of code generating the 'Note's can be
+obtained by re-running with environment variable R_KEEP_PKG_SOURCE set
+to 'yes'.
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... NOTE
+Found the following apparent S3 methods exported but not registered:
+  all.vars0
+See section 'Registering S3 methods' in the 'Writing R Extensions'
+manual.
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+M.opt: no visible global function definition for 'glm.control'
+M.opt: no visible global function definition for 'unclass<-'
+QuyalityTests : <anonymous>: no visible global function definition for
+  'var'
+QuyalityTests : <anonymous>: no visible global function definition for
+  'shapiro.test'
+RRCut: no visible binding for global variable 'Genotype'
+RRCut: no visible global function definition for 'quantile'
+RRextra: no visible binding for global variable 'Genotype'
+RRextra: no visible global function definition for 'quantile'
+RRrunner: no visible global function definition for 'unclass<-'
+RandomRegardSeed: no visible global function definition for 'runif'
+SummaryStats : <anonymous>: no visible global function definition for
+  'var'
+SummaryStats : <anonymous>: no visible global function definition for
+  'shapiro.test'
+TypicalModel: no visible global function definition for
+  'update.formula'
+cat.eff.size : <anonymous>: no visible global function definition for
+  'dist'
+checkModelTermsInData: no visible global function definition for
+  'update.formula'
+crunner: no visible global function definition for 'unclass<-'
+eff.size: no visible global function definition for 'dist'
+eff.size: no visible global function definition for 'coef'
+modelSummaryPvalueExtract: no visible global function definition for
+  'coef'
+testDatasetAgeing0: possible error in crunner(object = phenListAgeing,
+  Sex = Sex, LifeStage = LifeStage, depVariable = depVariable, rep =
+  rep, categorical = categorical$cat, method = categorical$method):
+  unused arguments (Sex = Sex, LifeStage = LifeStage, depVariable =
+  depVariable, categorical = categorical$cat)
+vectorOutputCat: no visible global function definition for 'setNames'
+Undefined global functions or variables:
+  Genotype coef dist glm.control quantile runif setNames shapiro.test
+  unclass<- update.formula var
+Consider adding
+  importFrom("stats", "coef", "dist", "glm.control", "quantile", "runif",
+             "setNames", "shapiro.test", "update.formula", "var")
+to your NAMESPACE file.
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... WARNING
+Undocumented code objects:
+  'AllEffSizes' 'AllTables' 'CheckMissing' 'CombineLevels'
+  'ConvDf2Flat' 'FeasibleTermsInContFormula' 'IsCategorical' 'M.opt'
+  'ModelInReference' 'PhenListAgeingLevels' 'QuyalityTests' 'RRCut'
+  'RRNewObjectAndFormula' 'RRextra' 'RRrunner' 'RandomRegardSeed'
+  'RemoveSpecialChars' 'SplitEffect' 'SummaryStats'
+  'TermInFormulaReturn' 'TypicalModel' 'all.vars0' 'as.list0'
+  'as.numeric01' 'capitalise' 'cat.eff.size' 'checkModelTermsInData'
+  'colExists' 'columnChecks0' 'columnLevels' 'crunner' 'ctest' 'dim0'
+  'formulaTerms' 'listFun' 'lop' 'message0' 'modelSummaryPvalueExtract'
+  'multiBatch' 'noVariation' 'paste01' 'pasteComma' 'pasteUnderscore'
+  'plot.PhenListAgeingModel' 'plot.PhenlistCategoricalAgeingModel'
+  'printformula' 'reformulate0' 'replaceElementInFormula'
+  'replace_sub_dataframes' 'rndProce' 'summary.PhenListAgeingModel'
+  'summary.PhenlistCategoricalAgeingModel' 'termInTheModel'
+  'testDatasetAgeing0' 'toJSONI' 'unmatrix0' 'vectorOutput'
+  'vectorOutputCat' 'vectorOutputCont' 'vectorOutputMatrices'
+  'vectorOutputNULL'
+Undocumented S4 classes:
+  'PhenListAgeing'
+All user-level objects in a package (including S4 classes and methods)
+should have documentation entries.
+See chapter 'Writing R documentation files' in the 'Writing R
+Extensions' manual.
+* checking for code/documentation mismatches ... WARNING
+Functions or methods with usage in documentation object 'testDatasetAgeing' but not in code:
+  varIdent
+
+Codoc mismatches from documentation object 'PhenListAgeing':
+PhenListAgeing
+  Code: function(object, DOE = "Batch", DOB = "date_of_birth",
+                 d.threshold = 16 * 7, debug = TRUE)
+  Docs: function(object, DOE = "Batch", DOB = "date_of_birth",
+                 d.threshold = 16 * 7)
+  Argument names in code not in docs:
+    debug
+
+Codoc mismatches from documentation object 'eff.size':
+eff.size
+  Code: function(object, data = NULL, depVariable, effOfInd =
+                 "Genotype", errorReturn = NULL, debug = FALSE)
+  Docs: function(object, data, depVariable, effOfInd = "Genotype")
+  Argument names in code not in docs:
+    errorReturn debug
+  Mismatches in argument default values:
+    Name: 'data' Code: NULL Docs: 
+
+* checking Rd \usage sections ... WARNING
+Undocumented arguments in documentation object 'testDatasetAgeing'
+  'form'
+Objects in \usage without \alias in documentation object 'testDatasetAgeing':
+  'varIdent'
+Assignments in \usage in documentation object 'testDatasetAgeing':
+  LifeStage = LifeStage
+
+Bad \usage lines found in documentation object 'testDatasetAgeing':
+  testDatasetAgeing = function(
+  				 procedure = 'TYPICAL',
+  				 phenListAgeing = NULL,
+  				 depVariable = NULL   ,
+  				 withWeight = FALSE,
+  				 Sex = TRUE,
+  				 LifeStage = TRUE,
+  				 fixed = TypicalModel(
+  				 	depVariable = depVariable,
+  				 	withWeight = withWeight,
+  				 	Sex = Sex,
+  				 ),
+  				 random = rndProce (procedure),
+  				 weight = if (LifeStage){
+  				 }else{
+  				 	varIdent(form =  ~ 1 | Genotype)},
+  				 conversion.threshold = Inf,
+  				 family = poisson(link = "log"),
+  				 direction = 'both',
+  				 rep = 10 ^ 5) 
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter 'Writing R documentation files' in the 'Writing R
+Extensions' manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking examples ... ERROR
+Running examples in 'PhenStatAgeing-Ex.R' failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: PhenListAgeing
+> ### Title: Converting PhenList object into PhenListAgeing
+> ### Aliases: PhenListAgeing
+> 
+> ### ** Examples
+> 
+> 	example(testDatasetAgeing)
+
+tstDtA> #|--------\----------------1st example----------------/--------|#
+tstDtA> #|--------/----------------Mixed model----------------\--------|#
+tstDtA> 
+tstDtA> # 1st example ###################
+tstDtA> # Mixed Model framework
+tstDtA> file <- system.file("extdata", "test1.csv", package = "PhenStat")
+
+tstDtA> testCon <-
+tstDtA+ 	PhenStat:::PhenList(
+tstDtA+ 		dataset = read.csv(file, na.strings = '-'),
+tstDtA+ 		testGenotype = "Sparc/Sparc",
+tstDtA+ 		outputMessages = FALSE
+tstDtA+ 	)
+
+tstDtA> # Forming PhenListAgeing object and its summary
+tstDtA> PhenListAgeingObj.1 = PhenListAgeing(
+tstDtA+ 	object = testCon,
+tstDtA+ 	DOB = 'Birth.Date',
+tstDtA+ 	DOE = 'Batch',
+tstDtA+ 	d.threshold = 95
+tstDtA+ )
+2019-02-20 13:16:21. Age range: 92-102
+
+tstDtA> summary(PhenListAgeingObj.1)
+ndata 
+
+ 5  Variables      468  Observations
+--------------------------------------------------------------------------------
+Batch 
+       n  missing distinct 
+     468        0       49 
+
+lowest : 2009-05-05 2009-05-07 2009-05-08 2009-05-14 2009-05-15
+highest: 2009-11-10 2009-11-17 2009-11-23 2010-01-06 2010-03-01
+--------------------------------------------------------------------------------
+Genotype 
+       n  missing distinct 
+     468        0        2 
+                                  
+Value              +/+ Sparc/Sparc
+Frequency          452          16
+Proportion       0.966       0.034
+--------------------------------------------------------------------------------
+Sex 
+       n  missing distinct 
+     468        0        2 
+                        
+Value      Female   Male
+Frequency     236    232
+Proportion  0.504  0.496
+--------------------------------------------------------------------------------
+Age 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+     468        0       10    0.959    98.02    1.678       96       96 
+     .25      .50      .75      .90      .95 
+      97       98       99      100      101 
+                                                                      
+Value         92    94    95    96    97    98    99   100   101   102
+Frequency      1     4    10    55   103   128    89    51    23     4
+Proportion 0.002 0.009 0.021 0.118 0.220 0.274 0.190 0.109 0.049 0.009
+--------------------------------------------------------------------------------
+LifeStage 
+       n  missing distinct 
+     468        0        2 
+                      
+Value      Early  Late
+Frequency     15   453
+Proportion 0.032 0.968
+--------------------------------------------------------------------------------
+
+tstDtA> plot(PhenListAgeingObj.1)
+$Categorical
+
+$Continuous
+
+
+tstDtA> # Model estimation
+tstDtA> output.1 = testDatasetAgeing(
+tstDtA+ 	phenListAgeing = PhenListAgeingObj.1,
+tstDtA+ 	depVariable = 'Lean.Mass',
+tstDtA+ 	LifeStage = FALSE,
+tstDtA+ 	withWeight = TRUE
+tstDtA+ )
+2019-02-20 13:16:21. Initial  model: Lean.Mass ~ Genotype + Sex + Weight + Genotype:Sex
+2019-02-20 13:16:21. Polished model: Lean.Mass ~ Genotype + Sex + Weight + Genotype:Sex [any removal: FALSE]
+2019-02-20 13:16:21. 	Splitting in progress...
+Warning in value[[3L]](cond) :
+  
+ ~> error : Error in combn(cat, i): n < m
+
+
+
+tstDtA> summary(output.1)
+Length  Class   Mode 
+     0   NULL   NULL 
+
+tstDtA> plot(output.1)
+Warning in min(x) : no non-missing arguments to min; returning Inf
+Warning in max(x) : no non-missing arguments to max; returning -Inf
+Warning in min(x) : no non-missing arguments to min; returning Inf
+Warning in max(x) : no non-missing arguments to max; returning -Inf
+Error in plot.window(...) : need finite 'xlim' values
+Calls: example ... eval -> plot -> plot.default -> localWindow -> plot.window
+Execution halted
+* DONE
+Status: 1 ERROR, 4 WARNINGs, 2 NOTEs

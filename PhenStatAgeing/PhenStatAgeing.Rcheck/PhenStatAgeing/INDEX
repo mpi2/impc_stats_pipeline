@@ -1,0 +1,6 @@
+PhenListAgeing          Converting PhenList object into PhenListAgeing
+eff.size                Effect size from lme or gls object
+plot.PhenListAgeing     plot for a PhenListAgeing object
+summary.PhenListAgeing
+                        Summary for a PhenListAgeing object
+testDatasetAgeing       My name is R!

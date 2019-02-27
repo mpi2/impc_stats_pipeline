@@ -1,0 +1,23 @@
+exportPattern("^[[:alpha:]]+")
+#export(
+#  main            ,
+#  UnzipAndfilePath
+#)
+importFrom("grDevices", "graphics.off", "png")
+importFrom("graphics", "axis", "boxplot", "legend", "par", "points")
+importFrom("stats", "na.omit", "runif", "var")
+importFrom("utils", "URLencode", "head", "read.csv", "read.table", "write.csv", "write.table", "zip")
+importFrom("stats", "predict", "resid")
+importFrom("utils", "download.file", "unzip")
+importFrom("stats", "complete.cases")
+importFrom("parallel", "detectCores","makeCluster","makeForkCluster","stopCluster")
+importFrom("foreach", "registerDoSEQ", "foreach","%do%","%dopar%")
+importFrom("doParallel", "registerDoParallel")
+importFrom("PhenStat", "vectorOutput","PhenList","testDataset")
+importFrom("SmoothWin", "expWeight","SmoothWin")
+importFrom("graphics", "plot")
+importFrom("stringi", "stri_rand_strings")
+importFrom("abind", "abind")
+importFrom("stats", "sd", "shapiro.test")
+
+#importFrom("base", "subset")

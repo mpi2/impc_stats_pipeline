@@ -1,91 +1,136 @@
-# Categorical core
+# Categorical OPT core
 crunner = function(object              ,
-									 formula       = ~ category + Genotype + Sex + LifeStage,
-									 rep           = 2000,
-									 method        = NULL,
-									 categorical   = NULL)
+									 formula          = ~ category + Genotype + Sex + LifeStage,
+									 rep              = 1500,
+									 method           = NULL,
+									 fullComparisions = TRUE)
 {
-	if (method != 'FE' || categorical != TRUE) {
-		message0 ('Improper method for the type of data')
+	if (sum(method != c('FE', 'RR')) == 0 ||
+			is.null(object)                   ||
+			is.null(all.vars0(formula))) {
+		message0 ('Improper method (',
+							method,
+							') for the type of data, or the "formula" is left blank')
 		return(NULL)
 	}
-	####
-	depVariable = all.vars(formula)[1]
-	vars        = all.vars(formula)[-1]
-	l           = lcomb = names = alTbls = NULL
-	CmbiVars    = (length(vars) > 1)
-	####
-	orgobject   = object
-	object      = object@datasetPL
-	Obj         =  CheckMissing(object, reformulate(termlabels = depVariable, response = NULL))
-	object      = Obj$new.data
+	message0('FE framework in progress ...')
 	sta.time    = Sys.time()
+	message0('Top framework: ', method)
 	message0('Fisher exact test with ',
 					 ifelse(rep > 0, rep, 'No'),
 					 ' repetition in progress ...')
+	newFormula    = checkModelTermsInData(
+		formula = formula,
+		data = object@datasetPL,
+		responseIsTheFirst = TRUE
+	)
 	####
-	counter  = 1
-	for (j in 1:length(vars)) {
-		l[[counter]] = ctest(x = object,
-												 formula = reformulate(
-												 	termlabels = c(depVariable, vars[j]),
-												 	response = NULL
-												 ))
-		names = c(names, vars[j])
-		counter = counter + 1
+	allTerms    = all.vars(newFormula)
+	if (length(allTerms) < 1) {
+		message0('No variable to test.')
+		return(NULL)
 	}
-	names(l)       = names
-	if (CmbiVars) {
-		alTbls = AllTables(
-			dframe = as.data.frame(xtabs(formula = formula, data = object))  ,
-			vars   = vars                                                    ,
-			cl     = 3:(length(vars) + 2)                                    ,
-			cols   = NULL                                                    ,
-			response.name = depVariable                                      ,
-			shrink = TRUE
-		)
-		lcomb = c(lcomb, lapply(alTbls, function(x) {
-			ctest(x = x,
-						formula = Freq ~ .,
-						rep     = rep)
-		}))
-		names(lcomb) = paste(lapply(
-			names(lcomb),
-			FUN = function(nam) {
-				n1 = names(dimnames(lcomb[[nam]]$table))
-				n2 = paste0(n1[!n1 %in% depVariable], collapse = '.')
-				return(n2)
-			}
-		), names(lcomb),
-		sep = '_')
-		l = c(l, lcomb)
+	####
+	lComplete   = NULL
+	for (indx in 1:ifelse(fullComparisions, pmax(1, length(allTerms) - 1), 1)) {
+		depVariable = allTerms[indx]
+		vars        = allTerms[-c(1:indx)]
+		l           = lcomb = names = alTbls = NULL
+		CmbiVars    = (length(vars) > 1)
+		####
+		message0('Step ', indx, '. Testing for ', depVariable)
+		####
+		newObject   = object@datasetPL
+		Obj         = CheckMissing(newObject,
+															 reformulate(termlabels = depVariable, response = NULL))
+		newObject   = Obj$new.data
+		####
+		counter  = 1
+		for (j in 1:length(vars)) {
+			message0('Testing for the main effect ',
+							 pasteComma(vars[j], replaceNull = FALSE))
+			l[[counter]] = ctest(x = newObject,
+													 formula = reformulate(
+													 	termlabels = c(depVariable, vars[j]),
+													 	response = NULL
+													 ))
+			names = c(names, vars[j])
+			counter = counter + 1
+		}
+		names(l)       = names
+		if (CmbiVars) {
+			message0('Combined effects in progress ...')
+			alTbls = AllTables(
+				dframe = as.data.frame(xtabs(
+					formula = newFormula, data = newObject
+				))  ,
+				vars   = vars                                                    ,
+				cl     = 3:(length(vars) + 2)                                    ,
+				cols   = NULL                                                    ,
+				response.name = depVariable                                      ,
+				shrink = TRUE
+			)
+			message0('Testing for the combined effects ... ')
+			lcomb = c(lcomb, lapply(alTbls, function(x) {
+				ctest(x = x,
+							formula = Freq ~ .,
+							rep     = rep)
+			}))
+			names(lcomb) = paste(lapply(
+				names(lcomb),
+				FUN = function(nam) {
+					n1 = names(dimnames(lcomb[[nam]]$table))
+					n2 = paste0(n1[!n1 %in% depVariable], collapse = '.')
+					return(n2)
+				}
+			), names(lcomb),
+			sep = '_')
+			l = c(l, lcomb)
+		}
+		# fix naming issue (make them short)
+		names(l) = gsub("\\.{4}.*", "", names(l))
+		lComplete[[depVariable]] = l
 	}
-	message0('Function executed in ', (round(Sys.time() - sta.time, 2)), ' seconds')
-	return(list(
-		output = l[!duplicated(l)]         ,
+	
+	message0('Total tested categories =  ', length(lComplete))
+	message0('Total tests =  ', sum(sapply(lComplete, length)))
+	message0('FE framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
+	OutR = list(
+		output = list(SplitModels = lComplete) ,
 		input  = list(
-			PhenListAgeing  = orgobject      ,
-			depVariable     = depVariable    ,
-			rep             = rep            ,
-			method          = method         ,
-			categorical     = categorical
+			PhenListAgeing  = object   ,
+			data            = object@datasetPL   ,
+			depVariable     = allTerms[1]        ,
+			rep             = rep                ,
+			method          = method             ,
+			formula         = formula
 		),
 		extra  = list(
 			missings        = Obj$missings   ,
 			UsedData        = Obj$new.data   ,
-			OrgData         = Obj$org.data   ,
-			table           = alTbls
+			AllTable        = alTbls         ,
+			Cleanedformula  = newFormula
 		)
-	))
+	)
+	class(OutR) <- 'PhenStatAgeingFE'
+	return(OutR)
 }
+
+
+
+
+
+
+
+
 # Count summary core
 summary.PhenlistCategoricalAgeingModel = function(object, ...) {
 	if (is.null(object))
 		message0('NULL object\n')
 	
 	message0('Fisher exact test results based on ',
-			object$input$rep,
-			' iterations \n')
+					 object$input$rep,
+					 ' iterations \n')
 	
 	l = l2 = list(
 		GenPval    = object$output$Genotype$result$p.value,
@@ -155,4 +200,3 @@ plot.PhenlistCategoricalAgeingModel = function(x, ...) {
 	cat('\n ~> There is no plot available for the categorical data \n')
 	
 }
-

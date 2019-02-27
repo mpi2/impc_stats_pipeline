@@ -1,0 +1,164 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "PhenStatAgeing"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> options(pager = "console")
+> base::assign(".ExTimings", "PhenStatAgeing-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
+> library('PhenStatAgeing')
+
+ >===============================================================================<
+ PhenStatAgeing is developed by International Mouse Phenotyping Consortium (IMPC) 
+ More details on https://www.mousephenotype.org/                                            
+ Contact us on hamedhm@ebi.ac.uk                                                  
+ >===============================================================================<
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("PhenListAgeing")
+> ### * PhenListAgeing
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: PhenListAgeing
+> ### Title: Converting PhenList object into PhenListAgeing
+> ### Aliases: PhenListAgeing
+> 
+> ### ** Examples
+> 
+> 	example(testDatasetAgeing)
+
+tstDtA> #|--------\----------------1st example----------------/--------|#
+tstDtA> #|--------/----------------Mixed model----------------\--------|#
+tstDtA> 
+tstDtA> # 1st example ###################
+tstDtA> # Mixed Model framework
+tstDtA> file <- system.file("extdata", "test1.csv", package = "PhenStat")
+
+tstDtA> testCon <-
+tstDtA+ 	PhenStat:::PhenList(
+tstDtA+ 		dataset = read.csv(file, na.strings = '-'),
+tstDtA+ 		testGenotype = "Sparc/Sparc",
+tstDtA+ 		outputMessages = FALSE
+tstDtA+ 	)
+
+tstDtA> # Forming PhenListAgeing object and its summary
+tstDtA> PhenListAgeingObj.1 = PhenListAgeing(
+tstDtA+ 	object = testCon,
+tstDtA+ 	DOB = 'Birth.Date',
+tstDtA+ 	DOE = 'Batch',
+tstDtA+ 	d.threshold = 95
+tstDtA+ )
+2019-02-20 13:16:21. Age range: 92-102
+
+tstDtA> summary(PhenListAgeingObj.1)
+ndata 
+
+ 5  Variables      468  Observations
+--------------------------------------------------------------------------------
+Batch 
+       n  missing distinct 
+     468        0       49 
+
+lowest : 2009-05-05 2009-05-07 2009-05-08 2009-05-14 2009-05-15
+highest: 2009-11-10 2009-11-17 2009-11-23 2010-01-06 2010-03-01
+--------------------------------------------------------------------------------
+Genotype 
+       n  missing distinct 
+     468        0        2 
+                                  
+Value              +/+ Sparc/Sparc
+Frequency          452          16
+Proportion       0.966       0.034
+--------------------------------------------------------------------------------
+Sex 
+       n  missing distinct 
+     468        0        2 
+                        
+Value      Female   Male
+Frequency     236    232
+Proportion  0.504  0.496
+--------------------------------------------------------------------------------
+Age 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+     468        0       10    0.959    98.02    1.678       96       96 
+     .25      .50      .75      .90      .95 
+      97       98       99      100      101 
+                                                                      
+Value         92    94    95    96    97    98    99   100   101   102
+Frequency      1     4    10    55   103   128    89    51    23     4
+Proportion 0.002 0.009 0.021 0.118 0.220 0.274 0.190 0.109 0.049 0.009
+--------------------------------------------------------------------------------
+LifeStage 
+       n  missing distinct 
+     468        0        2 
+                      
+Value      Early  Late
+Frequency     15   453
+Proportion 0.032 0.968
+--------------------------------------------------------------------------------
+
+tstDtA> plot(PhenListAgeingObj.1)
+$Categorical
+
+$Continuous
+
+
+tstDtA> # Model estimation
+tstDtA> output.1 = testDatasetAgeing(
+tstDtA+ 	phenListAgeing = PhenListAgeingObj.1,
+tstDtA+ 	depVariable = 'Lean.Mass',
+tstDtA+ 	LifeStage = FALSE,
+tstDtA+ 	withWeight = TRUE
+tstDtA+ )
+2019-02-20 13:16:21. Initial  model: Lean.Mass ~ Genotype + Sex + Weight + Genotype:Sex
+2019-02-20 13:16:21. Polished model: Lean.Mass ~ Genotype + Sex + Weight + Genotype:Sex [any removal: FALSE]
+2019-02-20 13:16:21. 	Splitting in progress...
+Warning in value[[3L]](cond) :
+  
+ ~> error : Error in combn(cat, i): n < m
+
+
+
+tstDtA> summary(output.1)
+Length  Class   Mode 
+     0   NULL   NULL 
+
+tstDtA> plot(output.1)
+Warning in min(x) : no non-missing arguments to min; returning Inf
+Warning in max(x) : no non-missing arguments to max; returning -Inf
+Warning in min(x) : no non-missing arguments to min; returning Inf
+Warning in max(x) : no non-missing arguments to max; returning -Inf
+Error in plot.window(...) : need finite 'xlim' values
+Calls: example ... eval -> plot -> plot.default -> localWindow -> plot.window
+Execution halted
