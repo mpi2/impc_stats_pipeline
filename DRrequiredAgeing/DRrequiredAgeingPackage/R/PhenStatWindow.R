@@ -14,8 +14,8 @@ PhenStatWindow = function (phenlistObject                                ,
                              #                                Genotype),
                              #               nlme::varFixed(~ 1 /
                              #                                ModelWeight))
-                             nlme::varFixed( ~ 1 /
-                                               ModelWeight)
+                             nlme::varFixed(~ 1 /
+                                              ModelWeight)
                            },
                            check = 2                                     ,
                            messages = FALSE                              ,
@@ -36,6 +36,7 @@ PhenStatWindow = function (phenlistObject                                ,
 {
   requireNamespace('PhenStat')
   requireNamespace('SmoothWin')
+  requireNamespace('PhenStatAgeing')
   requireNamespace('nlme')
   set.seed(seed)
   # Do not remove line below (necessary for windowing)
@@ -44,117 +45,80 @@ PhenStatWindow = function (phenlistObject                                ,
   # Run normal (not windowed) models
   ###########################
   ## I checked the source and the messaging mechanism is written using the non-standard functioning in R
-  note = windowingNote = graphFileName = NULL
-  if (method == 'MM') {
-    message0('Mixed model in progress ....')
-    object0 = ModeWithErrorsAndMessages(
-      m2ethod = method,
-      phenList = phenlistObject,
-      method =  method,
-      depVariable = depVariable,
-      threshold = threshold,
-      check = check,
-      equation = equation,
-      dataPointsThreshold = minObs,
-      name = 'normal_analysis'
+  note = windowingNote = graphFileName = object0 = NULL
+  message0(method, '  in progress ....')
+  object0 =   testDatasetAgeing(
+    phenListAgeing = phenlistObject,
+    method = method,
+    MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+    debug = TRUE
+  )
+  note$normal_analysis_step1_1_messages = object0$messages
+  # If not possible use MM (only for ABR)
+  if (is.ABR  (x            = parameter) &&
+      !is.null (object0$messages))
+  {
+    method = 'MM'
+    message0('Running the MM (only ABR) ... ')
+    object0 =   testDatasetAgeing(
+      phenListAgeing = phenlistObject,
+      method = method,
+      MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+      debug = TRUE
     )
-    note$normal_analysis_step1_1 = object0$note
-  } else{
-    message0(method, '  in progress ....')
-    object0 =   ModeWithErrorsAndMessages(
-      m2ethod = method,
-      phenList = phenlistObject,
-      method =  method,
-      depVariable = depVariable,
-      threshold = threshold,
-      check = check,
-      equation = equation,
-      dataPointsThreshold = minObs,
-      name = 'normal_analysis'
-    )
-    note$normal_analysis_step1_1 = object0$note
-    # If not possible use MM (only for ABR)
-    if (is.ABR(x = parameter) &&
-        length(
-          grep(
-            "to allow the application of RR plus framework",
-            object0$mess$output,
-            fixed  =  TRUE
-          )
-        )
-        > 0)
-    {
-      method = 'MM'
-      message0('Running the MM (only ABR) ... ')
-      object0 =  ModeWithErrorsAndMessages(
-        m2ethod = method,
-        key = 'method_alternative1_mm_for_abr_only',
-        phenList = phenlistObject,
-        method =  method,
-        depVariable = depVariable,
-        threshold = threshold,
-        check = check,
-        equation = equation,
-        dataPointsThreshold = minObs,
-        name = 'normal_analysis'
-      )
-      note$normal_analysis_step1_2 = object0$note
-    }
-    ############## If not possible add jiter
-    if (is.ABR(x = parameter) &&
-        length(grep("jitter",
-                    object0$mess$output,
-                    fixed  =  TRUE)) > 0) {
-      message0('Running the MM+Jitter (only ABR) ... ')
-      method = 'MM'
-      phenlistObject@datasetPL[, depVariable] = jitter(phenlistObject@datasetPL[, depVariable], 0.1)
-      object0 =   ModeWithErrorsAndMessages(
-        m2ethod = method,
-        key = 'method_alternative2_mm_jitter_for_abr_only',
-        phenList = phenlistObject,
-        method =  method,
-        depVariable = depVariable,
-        threshold = threshold,
-        check = check,
-        equation = equation,
-        dataPointsThreshold = minObs,
-        name = 'normal_analysis'
-      )
-      note$normal_analysis$step1_3 = object0$note
-    }
+    note$normal_analysis_step1_2_mm_messages = object0$messages
   }
+  ############## If not possible add jiter
+  if (is.ABR(x = parameter) &&
+      !is.null (object0$messages)) {
+    message0('Running the MM+Jitter (only ABR) ... ')
+    method = 'MM'
+    phenlistObject@datasetPL[, depVariable] = jitter(phenlistObject@datasetPL[, depVariable], 0.1)
+    object0 =   testDatasetAgeing(
+      phenListAgeing = phenlistObject,
+      method = method,
+      MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+      debug = TRUE
+    )
+    note$normal_analysis$step1_3_mm_jitter_messages = object0$messages
+  }
+
+  if(!is.null(object0$messages))
+    object = NULL
   ###########################
   #### This is for windowing only
   ###########################
-  if (windowing && method %in% c('MM') &&
+  if (1 == 2 && windowing && method %in% c('MM') &&
       is.numeric(phenlistObject@datasetPL[, depVariable]))
   {
     # Full model
     message0('Running the full model before applying windowing ... ')
-    objectNorm = ModeWithErrorsAndMessages(
+    objectNorm = ModelAgeingWithErrorsAndMessages(
       m2ethod  = method,
       key = 'initial_full_model_before_appliying_windowing',
       method = method,
       phenList = phenlistObject,
-      depVariable = depVariable,
-      threshold = threshold,
-      keepList =  c(
-        keep_batch        = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Batch', checkLevels = FALSE),
-        keep_equalvar     = TRUE,
-        keep_weight       = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Weight'),
-        keep_sex          = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Sex'),
-        keep_interaction  = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Sex')
-      ),
+      #depVariable = depVariable,
+      #threshold = threshold,
+      # keepList =  c(
+      #   keep_batch        = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Batch', checkLevels = FALSE),
+      #   keep_equalvar     = TRUE,
+      #   keep_weight       = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Weight'),
+      #   keep_sex          = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Sex'),
+      #   keep_interaction  = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Sex')
+      # ),
       check = check,
       equation = equation,
       name = 'windowing_analysis'
     )
     windowingNote$windowing_analysis$fully_loaded_model = objectNorm$note
 
+
+    #######################################################
     message0('Start windowing ... ')
     #######################################################
-    if (!NullOrError(objectNorm$obj$value)) {
-      obj = objectNorm$obj$value@analysisResults$model.output
+    if (!NullOrError(objectNorm$obj)) {
+      obj = objectNorm$obj@INPUT_HAMED_GOLGOLI$analysisResults$model.output
       phenlistObject@datasetPL = nlme::getData(obj) # !important
       ###
       tt = Date2Integer(phenlistObject@datasetPL$Batch)
@@ -194,12 +158,15 @@ PhenStatWindow = function (phenlistObject                                ,
         weightORthreshold = weightORthreshold   ,
         direction = direction                   ,
         min.obs = function(ignore.me.in.default) {
-          message0('Total number of sex: ',PhenStat:::noSexes(phenlistObject))
+          message0('Total number of sex: ',
+                   PhenStat:::noSexes(phenlistObject))
           lutm = length(unique(tt[mm]))
-          r = ifelse(lutm > 1, PhenStat:::noSexes(phenlistObject)*35, max(pi * sqrt(length(tt)), 35))
+          r = ifelse(lutm > 1,
+                     PhenStat:::noSexes(phenlistObject) * 35,
+                     max(pi * sqrt(length(tt)), 35))
           r = max(r * lutm, length(mm), na.rm = TRUE)
           r = min(r       , length(tt), na.rm = TRUE)
-          message0('min.obs =  ',r)
+          message0('min.obs =  ', r)
           return(r)
         }
       )
@@ -210,7 +177,7 @@ PhenStatWindow = function (phenlistObject                                ,
           var(we, na.rm = TRUE) < threshold) {
         we2  = NULL
         windowingNote$windowing_extra = 'There is no variation in the weights then the standard model is applied.'
-      }else{
+      } else{
         ####################
         MeanVarOverTime = function(mm, tt, data = phenlistObject@datasetPL) {
           if (length(tt) < 1 || length(mm) < 1)
@@ -219,7 +186,7 @@ PhenStatWindow = function (phenlistObject                                ,
             ind      = 1:length(tt)
             CriTeria = (tt %in% i) & (ind %in% mm)
             if (sum(CriTeria) > 1) {
-              sd(data[CriTeria],na.rm = TRUE)
+              sd(data[CriTeria], na.rm = TRUE)
             } else{
               NA
             }
@@ -231,18 +198,25 @@ PhenStatWindow = function (phenlistObject                                ,
           }
         }
         ####################
-        vMutants  = MeanVarOverTime(mm = (1:length(tt))[mm.bck],
-                                    tt = tt,
-                                    data = phenlistObject@datasetPL[, depVariable])
-        VControls = MeanVarOverTime(mm = (1:length(tt))[-mm.bck],
-                                    tt = tt,
-                                    data = phenlistObject@datasetPL[, depVariable])
-        message0('Disabled but: Mutant sd = ', vMutants, ', Control sd = ', VControls)
+        vMutants  = MeanVarOverTime(
+          mm = (1:length(tt))[mm.bck],
+          tt = tt,
+          data = phenlistObject@datasetPL[, depVariable]
+        )
+        VControls = MeanVarOverTime(
+          mm = (1:length(tt))[-mm.bck],
+          tt = tt,
+          data = phenlistObject@datasetPL[, depVariable]
+        )
+        message0('Disabled but: Mutant sd = ',
+                 vMutants,
+                 ', Control sd = ',
+                 VControls)
         #we2[mm]  = we2[mm] * vMutants
         #we2[-mm] = we2[-mm] * VControls
       }
       message0('Fitting the windowing weights into the optimized PhenStat model ...')
-      objectf = ModeWithErrorsAndMessages(
+      objectf = ModelAgeingWithErrorsAndMessages(
         m2ethod = method,
         key = 'final_windowing_model',
         method = method,
@@ -257,7 +231,7 @@ PhenStatWindow = function (phenlistObject                                ,
       windowingNote$windowing_analysis$final_model = objectf$note
       # Full model windowing
       message0('Fitting the windowing weights into the full PhenStat model ...')
-      objectfulw = ModeWithErrorsAndMessages(
+      objectfulw = ModelAgeingWithErrorsAndMessages(
         m2ethod = method,
         key = 'full_model_windowing',
         method = method,
@@ -311,6 +285,22 @@ PhenStatWindow = function (phenlistObject                                ,
     r         = we         = NULL
   }
 
+  outputList = list(
+    InputObject     = phenlistObject,
+    # Full model (not windowed)
+    FullObj         = objectNorm,
+    # Optimised model (not windowed)
+    NormalObj       = object0   ,
+    # Optimized windowed model
+    WindowedObj     = objectf   ,
+    # Full model windowed
+    FullWindowedObj = objectfulw,
+    WinDetails      = r             ,
+    weight          = we            ,
+    method          = method        ,
+    graphFileName   = ifelse(is.null(graphFileName), 'NA', graphFileName),
+    note = c(note, windowingNote)
+  )
   if (superDebug) {
     message0('SuperDebug is activated. Writting the Rdata file ... ')
     SupDebFile = file.exists0(file.path(PicDir,
@@ -320,22 +310,8 @@ PhenStatWindow = function (phenlistObject                                ,
     save(agg,
          file = SupDebFile)
   }
+  message0('End of the core process ....')
   return(
-    list(
-      InputObject     = phenlistObject,
-      # Full model (not windowed)
-      FullObj         = objectNorm$obj,
-      # Optimised model (not windowed)
-      NormalObj       = object0$obj   ,
-      # Optimized windowed model
-      WindowedObj     = objectf$obj   ,
-      # Full model windowed
-      FullWindowedObj = objectfulw$obj,
-      WinDetails      = r             ,
-      weight          = we            ,
-      method          = method        ,
-      graphFileName   = ifelse(is.null(graphFileName), 'NA', graphFileName),
-      note = c(note, windowingNote)
-    )
+    outputList
   )
 }

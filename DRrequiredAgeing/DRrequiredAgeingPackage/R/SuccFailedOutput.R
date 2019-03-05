@@ -1,7 +1,7 @@
 # all in small case and separated by underscore
 SuccessfulOutput = function(args) {
   ######## 1 JSON
-  listDetails             = list(details = args$note)
+  listDetails             = list(details = sortList(args$note))
   listVectorOutput        = list(vectoroutput = args$c.ww.vec$list)
   FinalList               = list(result = c(listVectorOutput, listDetails))
   JsonObj                 = FinalJsonBobectCreator(FinalList = FinalList)
@@ -11,7 +11,7 @@ SuccessfulOutput = function(args) {
   ######## 2 CSV
   outP =   c(
     ifelse(
-      NullOrError(args$c.ww0$NormalObj$value),
+      NullOrError(args$c.ww0$NormalObj),
       'Failed',
       'Successful'
     ),

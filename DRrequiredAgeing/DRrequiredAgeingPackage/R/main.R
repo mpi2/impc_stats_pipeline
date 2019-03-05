@@ -1,62 +1,63 @@
 ## You must check the 'check' parameter
-main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/select?q=*%3A*&fq=procedure_stable_id%3AIMPC_ECG_002&rows=590000&wt=csv&indent=true'                    ,
-                sep = ','                            ,
-                na.strings = 'NA'                    ,
-                subdir = 'Results'                   ,
-                seed = 123456                        ,
-                readCategoriesFromFile  = TRUE       ,
-                OverwriteExistingFiles  = FALSE      ,
-                WhiteListMethods  = NULL             ,
-                # Carefully use this option!
-                # It can remove the entire result file (some colonies in a single output file)
-                # Only for multicore
-                activateMulticore       = TRUE       ,
-                coreRatio = 5 / 14                   ,
-                concurrentControlSelect = FALSE      ,
-                MultiCoreErrorHandling  = 'pass'     ,
-                inorder                 = FALSE      ,
-                verbose                 = TRUE       ,
-                # Only for simulations
-                simulation              = FALSE      ,
-                Simulation.iteration    = 1          ,
-                # Only for windowing
-                activeWindowing = TRUE               ,
-                sensitivity = c(1, 1, 1, 0)          ,
-                pvalThreshold = c(0, 0, 0, 0)        ,
-                check = 2                            ,
-                direction = c(1, 1)                  ,
-                weightORthreshold = 'weight'         ,
-                predFunction = function(m) {
-                  predict(m)
-                }                                    ,
-                residFunction = function(m) {
-                  resid(m)
-                }                                    ,
-                messages = TRUE                      ,
-                threshold = sqrt(.Machine$double.eps) * 10,
-                outdelim = '\t'                      ,
-                debug = TRUE                         ,
-                encode = FALSE                       ,
-                noSpaceAllowed = TRUE                ,
-                plotWindowing = TRUE                 ,
-                storeplot = TRUE                     ,
-                virtualDrive   = FALSE               ,
-                checkNamesForMissingColNames = TRUE  ,
-                # Raw data
-                storeRawData           = TRUE        ,
-                compressRawData        = TRUE        ,
-                # Only for Batch generator
-                BatchProducer          =  FALSE      ,
-                cpu = 4                              ,
-                memory = 9000                        ,
-                nMax                   = 10000       ,
-                ChunkSize              = 24          ,
-                MinColoniesInChunks    = 32          ,
-                controlSize            = 1500        ,
-                ### Just for debuging
-                superDebug             = FALSE       ,
-                extraBatchParameters   = '-m "rh7-hosts-ebi5-12 rh7-hosts-ebi5-13 rh7-hosts-ebi5-14 rh7-hosts-ebi5-15 rh7-hosts-ebi5-16 rh7-hosts-ebi5-17 rh7-hosts-ebi5-18 rh7-hosts-ebi5-19 rh7-hosts-ebi5-20 rh7-hosts-ebi5-24 rh7-hosts-ebi5-25 rh7-hosts-ebi5-26 rh7-hosts-ebi5-27 rh7-hosts-ebi6-00 rh7-hosts-ebi6-01 rh7-hosts-ebi6-02 rh7-hosts-ebi6-03 rh7-hosts-ebi6-04 rh7-hosts-ebi6-05 rh7-hosts-ebi6-06 rh7-hosts-ebi6-07 rh7-hosts-ebi6-08 rh7-hosts-ebi6-09 rh7-hosts-ebi6-10 rh7-hosts-ebi6-11 rh7-hosts-ebi6-12 rh7-hosts-ebi6-13 rh7-hosts-ebi6-14 rh7-hosts-ebi6-15 rh7-hosts-ebi6-16 rh7-hosts-ebi6-17"',
-                ...) {
+mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/select?q=*%3A*&fq=procedure_stable_id%3AIMPC_ECG_002&rows=590000&wt=csv&indent=true'                    ,
+                      sep = ','                            ,
+                      na.strings = 'NA'                    ,
+                      subdir = 'Results'                   ,
+                      seed = 123456                        ,
+                      readCategoriesFromFile  = TRUE       ,
+                      OverwriteExistingFiles  = FALSE      ,
+                      WhiteListMethods  = NULL             ,
+                      # Carefully use this option!
+                      # It can remove the entire result file (some colonies in a single output file)
+                      # Only for multicore
+                      activateMulticore       = TRUE       ,
+                      coreRatio = 5 / 14                   ,
+                      concurrentControlSelect = FALSE      ,
+                      MultiCoreErrorHandling  = 'pass'     ,
+                      inorder                 = FALSE      ,
+                      verbose                 = TRUE       ,
+                      # Only for simulations
+                      simulation              = FALSE      ,
+                      Simulation.iteration    = 1          ,
+                      # Only for windowing
+                      activeWindowing = TRUE               ,
+                      sensitivity = c(1, 1, 1, 0)          ,
+                      pvalThreshold = c(0, 0, 0, 0)        ,
+                      check = 2                            ,
+                      direction = c(1, 1)                  ,
+                      weightORthreshold = 'weight'         ,
+                      predFunction = function(m) {
+                        predict(m)
+                      }                                    ,
+                      residFunction = function(m) {
+                        resid(m)
+                      }                                    ,
+                      messages = TRUE                      ,
+                      threshold = sqrt(.Machine$double.eps) * 10,
+                      outdelim = '\t'                      ,
+                      debug = TRUE                         ,
+                      encode = FALSE                       ,
+                      noSpaceAllowed = TRUE                ,
+                      plotWindowing = TRUE                 ,
+                      storeplot = TRUE                     ,
+                      virtualDrive   = FALSE               ,
+                      checkNamesForMissingColNames = TRUE  ,
+                      # Raw data
+                      storeRawData           = TRUE        ,
+                      compressRawData        = TRUE        ,
+                      # Only for Batch generator
+                      BatchProducer          =  FALSE      ,
+                      cpu = 4                              ,
+                      memory = 9000                        ,
+                      nMax                   = 10000       ,
+                      ChunkSize              = 24          ,
+                      MinColoniesInChunks    = 32          ,
+                      controlSize            = 1500        ,
+                      ### Just for debuging
+                      superDebug             = FALSE       ,
+                      extraBatchParameters   = '-m "rh7-hosts-ebi5-12 rh7-hosts-ebi5-13 rh7-hosts-ebi5-14 rh7-hosts-ebi5-15 rh7-hosts-ebi5-16 rh7-hosts-ebi5-17 rh7-hosts-ebi5-18 rh7-hosts-ebi5-19 rh7-hosts-ebi5-20 rh7-hosts-ebi5-24 rh7-hosts-ebi5-25 rh7-hosts-ebi5-26 rh7-hosts-ebi5-27 rh7-hosts-ebi6-00 rh7-hosts-ebi6-01 rh7-hosts-ebi6-02 rh7-hosts-ebi6-03 rh7-hosts-ebi6-04 rh7-hosts-ebi6-05 rh7-hosts-ebi6-06 rh7-hosts-ebi6-07 rh7-hosts-ebi6-08 rh7-hosts-ebi6-09 rh7-hosts-ebi6-10 rh7-hosts-ebi6-11 rh7-hosts-ebi6-12 rh7-hosts-ebi6-13 rh7-hosts-ebi6-14 rh7-hosts-ebi6-15 rh7-hosts-ebi6-16 rh7-hosts-ebi6-17"',
+                      ...) {
+  message0('DRrequiredAgeing loaded')
   message0(
     Sys.time(),
     '  ############################################################\n',
@@ -82,6 +83,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   requireNamespace('SmoothWin')
   requireNamespace('nlme')
   requireNamespace('base64enc')
+  requireNamespace('PhenStatAgeing')
   # Config files
   message0('Loading configuration ...')
   methodmap                      = readConf('MethodMap.conf')
@@ -306,6 +308,15 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 } else{
                   message0('Single core processing in progress ...')
                 }
+
+                # require('PhenStat'   )
+                # require('SmoothWin'  )
+                # require('base64enc'  )
+                # require('nlme'       )
+                # require('RJSONIO'    )
+                # require('jsonlite'   )
+
+
                 MultiCoreRes = foreach::foreach (
                   i = 1:length(colonys),
                   .packages = c(
@@ -315,12 +326,14 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     'nlme'        ,
                     'RJSONIO'     ,
                     'jsonlite'    ,
-                    'DRrequired'
+                    'PhenStatAgeing',
+                    'DRrequiredAgeing'
                   ),
                   .errorhandling = c(MultiCoreErrorHandling),
                   .verbose = verbose                        ,
                   .inorder = inorder
                 ) %activemulticore% {
+                #for (i in  1:length(colonys)){
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
                     ObjectsThatMustBeRemovedInEachIteration()
@@ -331,18 +344,25 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
 
                     n3.4 = base::subset(n3.3.m_zyg,	colony_id %in% c(colony))
                     n3.5 = rbind (n3.4, n3.3.c)
+                    note = c(note,
+                             list(
+                               bodyweight_included_in_data = CheckIfNameExistInDataFrame(obj = n3.5,
+                                                                                         name = 'weight',
+                                                                                         checkLevels = FALSE)
+                             ))
 
                     # Imaginary URLs
                     note$gene_page_url        = GenePageURL       = GenePageURL(n3.5)
-                    note$body_weight_page_url = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
+                    note$bodyweight_page_url = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
 
                     ReadMeTxt       = ReadMe (obj = n3.4, URL = GenePageURL)
 
                     # Define response column [do not move me!]
                     depVariable = getResponseColumn(n3.5$observation_type)
                     depVar      = depVariable$column
+                    message0('Dependent variable: ', depVar)
                     note$response_type = paste0(depVar,
-                                                '_ofType_',
+                                                '_of_type_',
                                                 paste(depVariable$lbl, sep = '.'))
 
                     minSampRequired = ifelse(
@@ -395,12 +415,12 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     }
 
                     # Summary statistics
-                    n3.5_summary = SummaryStatisticsOriginal(x = n3.5[complete.cases(n3.5[, depVar]), ], depVar = depVar)
+                    n3.5_summary = SummaryStatisticsOriginal(x = n3.5, depVar = depVar)
                     note         = c(note, n3.5_summary)
 
                     # Remove zero frequency categories
                     n3.5.1_F_list = RemoveZeroFrequencyCategories(
-                      x = n3.5[complete.cases(n3.5[, depVar]), ],
+                      x = n3.5,
                       minSampRequired = minSampRequired,
                       depVar = depVar,
                       totalLevels = SexGenResLevels
@@ -410,7 +430,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
 
                     # Remove var categories
                     n3.5.1_v_list = RemoveZerovarCategories(
-                      x = n3.5.1[complete.cases(n3.5.1[, depVar]), ],
+                      x = n3.5.1,
                       depVar = depVar,
                       minvar = 0
                     )
@@ -434,7 +454,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         'original_biological_sample_group',
                         'original_response',
                         'original_date_of_experiment',
-                        'original_body_weight'
+                        'original_bodyweight'
                       )
                     )
                     note = c(note, OrgSpecIds)
@@ -619,7 +639,17 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         note$existence_of_weight_column =
                           'Weight column does not exist in the raw data'
                       }
+                      # Equation type
+                      equationType = ifelse(
+                        CheckIfNameExistInDataFrame(a@datasetPL, 'Weight'),
+                        getEquation(var = parameter,
+                                    equationMap = equationmap),
+                        'withoutWeight'
+                      )
                       # This is the main engine!
+                      note = c(note, list(
+                        bodyweight_initially_included_in_model = ifelse(method %in% 'MM', equationType, FALSE)
+                      ))
                       message0('Fitting the model ...')
                       c.ww0 =	PhenStatWindow(
                         phenlistObject = a,
@@ -627,14 +657,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         minObs = minSampRequired,
                         method = method,
                         depVariable = depVar,
-                        equation = ifelse(
-                          CheckIfNameExistInDataFrame(a@datasetPL, 'Weight'),
-                          getEquation(
-                            var = parameter,
-                            equationMap = equationmap
-                          ),
-                          'withoutWeight'
-                        ),
+                        equation = equationType,
                         threshold = threshold,
                         pvalThreshold = pvalThreshold,
                         sensitivity = sensitivity,
@@ -706,9 +729,9 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         )
                       )# c(as.list(environment()), ls()))
                       if ((
-                        NullOrError(c.ww0$NormalObj$value) ||
+                        NullOrError(c.ww0$NormalObj) ||
                         (
-                          NullOrError(c.ww0$WindowedObj$value) &&
+                          NullOrError(c.ww0$WindowedObj) &&
                           activeWindowing && (c.ww0$method %in% 'MM')
                         )
                       ) &&
@@ -741,7 +764,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       SucFaiFile = paste(
                         outpfile2,
                         ifelse(
-                          !NullOrError(c.ww0$NormalObj$value),
+                          !NullOrError(c.ww0$NormalObj),
                           'Successful.tsv',
                           'Failed_critical_error.tsv'
                         ),

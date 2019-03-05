@@ -1,6 +1,6 @@
 vectorOutputRR =	function(object)
 {
-	if (is.null(object))
+	if (!is.null(object$messages))
 		return (NULL)
 	#####################################################################
 	Labels         = PhenListAgeingLevels(object = object)

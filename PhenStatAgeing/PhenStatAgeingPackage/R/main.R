@@ -23,13 +23,14 @@ testDatasetAgeing = function(phenListAgeing = NULL                        ,
 														 MM_checks    = c(1, 1, 1),
 														 ### FE or RR
 														 FE_formula = category ~  Genotype + Sex + LifeStage,
-														 RR_formula = data_point~ Genotype + Sex + LifeStage,
+														 RR_formula = data_point ~ Genotype + Sex + LifeStage,
 														 RR_prop    = 0.95,
 														 FERR_rep   = 1500,
 														 ##### Others
 														 debug      = TRUE,
 														 ...) {
-	r = tryCatch(
+	r = NULL
+	s = tryCatch(
 		expr = {
 			suppressMessagesANDErrors(
 				testDatasetAgeing0(
@@ -54,16 +55,18 @@ testDatasetAgeing = function(phenListAgeing = NULL                        ,
 		},
 		warning = function(war) {
 			message0('The functions failed with a warning (see below): ')
+			r$messages$warning <<- war
 			warning(war)
 			return(NULL)
 		},
 		error = function(err) {
 			message0('The functions failed with an error (see below): ')
+			r$messages$error <<- err
 			warning(err)
 			return(NULL)
 		}
 	)
-	return(r)
+	return(c(s,r))
 }
 
 
@@ -83,9 +86,10 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 															RR_prop,
 															FERR_rep,
 															##### Others
-															debug) {
-	if (!is(phenListAgeing, 'PhenListAgeing'))
-		stop('\n ~> function requires a "PhenListAgeing" object \n')
+															debug = TRUE) {
+	if (!is(phenListAgeing, 'PhenList') &&
+			!is(phenListAgeing, 'PhenListAgeing'))
+		stop('\n ~> function expects  "PhenList" or "PhenListAgeing" object \n')
 	if (noVariation(data = phenListAgeing@datasetPL))
 		stop('\n ~> There is no variation on Genotype.\n')
 	

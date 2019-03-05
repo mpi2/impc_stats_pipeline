@@ -1,7 +1,7 @@
 vectorOutputCont =	function(object,
 														debug = FALSE)
 {
-	if (is.null(object))
+	if (!is.null(object$messages))
 		return (NULL)
 	#####################################################################
 	Labels         = PhenListAgeingLevels(object = object)
@@ -22,7 +22,7 @@ vectorOutputCont =	function(object,
 	)
 	fittingMethod    = toupper(object$output$Final.Model.Tag)
 	#####################################################################
-	x                = object$input$data
+	x                = object$input$PhenListAgeing@datasetPL
 	columnOfInterest = x[, c(depVariable)]
 	#####################################################################
 	variability      = length(unique(columnOfInterest)) / length(columnOfInterest)

@@ -1,11 +1,13 @@
 vectorOutputAgeing = function(object,
+															othercolumns = NULL,
 															JSON = FALSE,
 															debug = FALSE,
 															...) {
-	if (is.null(object)) {
+	if (!is.null(object$messages)) {
 		message0('Null object')
 		return(NULL)
 	}
+	##########
 	out  = tryCatch(
 		expr = {
 			out = NULL
@@ -21,6 +23,16 @@ vectorOutputAgeing = function(object,
 				out = vectorOutputNULL(object = NULL)
 			}, debug = debug)
 			
+			#########
+			NewNames = variablesInData(df = object$input$PhenListAgeing@datasetPL,
+																 names = othercolumns)
+			if (!is.null(out)    &&
+					!is.null(NewNames)) {
+				out$othercolumns = as.list(object$input$PhenListAgeing@datasetPL[, NewNames, drop = FALSE])
+			} else{
+				out$othercolumns = NULL
+			}
+			#########
 			# JSON engine
 			if (JSON && !is.null(out)) {
 				for (i in 1:10) {
@@ -48,5 +60,6 @@ vectorOutputAgeing = function(object,
 			return(NULL)
 		}
 	)
+	
 	return(invisible(out))
 }

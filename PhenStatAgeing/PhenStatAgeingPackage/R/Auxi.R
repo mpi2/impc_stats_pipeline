@@ -205,8 +205,19 @@ FeasibleTermsInContFormula = function(formula, data) {
 	}
 }
 
+variablesInData = function(df, names) {
+	if (is.null(df) || is.null(names) || sum(names %in%  names(df)) < 1)
+		return(NULL)
+	newNames = names[names %in%  names(df)]
+	message0('Variables that are found in data: ',pasteComma(newNames))
+	return(newNames)
+}
+
 ComplementaryFeasibleTermsInContFormula = function(formula, data) {
-	message0('Checking for the feasibility of the terms and interactions ... ')
+	message0(
+		'Checking for the feasibility of the terms and interactions. Formula: ',
+		printformula(formula)
+	)
 	fbm = FeasibleTermsInContFormula(formula = formula, data = data)
 	if (!is.null(fbm)          &&
 			(min(fbm$min.freq, na.rm = TRUE) < 1 ||
@@ -719,13 +730,24 @@ formulaTerms = function(formula) {
 	return(r)
 }
 
-ModelInReference = function(model, reference, responseIncluded = FALSE) {
+expand.formula = function(formula) {
+	reformulate(termlabels = labels(terms(formula)),
+							response =
+								if (attr(terms(formula), "response") > 0)
+									formula[[2]]
+							else
+								NULL
+	)
+}
+
+
+ModelInReference = function(model, reference, responseIncluded = FALSE,veryLower = ~Genotype+1) {
 	mo = formulaTerms(model)
 	re = formulaTerms(reference)
-	r  = mo[!mo %in% re]
-	if (length(r) > 1) {
+	r  = re[re %in% mo]
+	if (length(r) > ifelse(responseIncluded, 1, 0)) {
 		message0('Some terms in the "lower" parameter ignored. See:\n\t',
-						 paste(mo[!(mo %in% re)], sep = ' ,'))
+						 pasteComma(mo[!(mo %in% re)]))
 		if (responseIncluded)
 			out = reformulate(termlabels = r[-1],
 												response   = r[1],
@@ -735,8 +757,9 @@ ModelInReference = function(model, reference, responseIncluded = FALSE) {
 												response   = NULL,
 												intercept  = TRUE)
 	} else{
-		out = model
+		out = veryLower
 	}
+	message0('The corrected lower: ', printformula(out))
 	return(out)
 }
 

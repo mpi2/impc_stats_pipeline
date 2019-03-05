@@ -34,7 +34,7 @@ NotProcessedOutput = function(args) {
     )
   )
   ### 2 JSON
-  listDetails             = list(details = c(NotProcessedLogics, args$note))
+  listDetails             = list(details = sortList(c(NotProcessedLogics, args$note)))
   listVectorOutput        = list(vectoroutput = NULL)
   FinalList               = list(result = c(listVectorOutput, listDetails))
   JsonObj                 = FinalJsonBobectCreator(FinalList = FinalList)

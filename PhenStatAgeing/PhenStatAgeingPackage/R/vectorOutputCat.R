@@ -1,6 +1,6 @@
 vectorOutputCat =	function(object)
 {
-	if (is.null(object))
+	if (!is.null(object$messages))
 		return (NULL)
 	#####################################################################
 	Labels         = PhenListAgeingLevels(object = object)
@@ -30,7 +30,7 @@ vectorOutputCat =	function(object)
 											'Dataset contains single batch')
 	
 	
-	addInfo           = c(
+	addInfo           = list(
 		'Formula'                = list(
 			input   = printformula(object$input$formula),
 			final   = printformula(formula)

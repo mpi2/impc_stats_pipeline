@@ -84,14 +84,14 @@ M.opt = function(object = NULL            ,
 											debug = TRUE
 										))
 	message0('The lower selected model: ', printformula(lower))
-	lower = ModelInReference(model = lower, reference = fixed)
-	if (!is.null(lower)) {
+	lowerCorrected = ModelInReference(model = lower, reference = fixed)
+	if (!is.null(lowerCorrected)) {
 		message0('Optimising the model ... ')
 		F.Model = MASS::stepAIC(
 			I.Model                     ,
 			trace = trace               ,
 			direction = direction       ,
-			scope = list(lower = lower) ,
+			scope = list(lower = lowerCorrected) ,
 			na.action = na.omit
 		)
 	} else{
@@ -133,7 +133,7 @@ M.opt = function(object = NULL            ,
 		data = data,
 		depVariable = allVars[1]
 	)
-	message0('Estimate effect sizes ... ')
+	message0('Estimating effect sizes ... ')
 	EffectSizes = suppressMessages(AllEffSizes(
 		object = F.Model,
 		depVariable = allVars[1],
@@ -192,7 +192,9 @@ M.opt = function(object = NULL            ,
 			checks              = checks
 			#Fullfixed           = Inifixed
 		),
-		extra = list(Cleanedformula  = fixed)
+		extra = list(
+			Cleanedformula  = fixed,
+			lowerCorrected  = lowerCorrected)
 	)
 	class(OutR) <- 'PhenStatAgeingMM'
 	return(OutR)

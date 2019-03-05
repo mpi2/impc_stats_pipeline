@@ -226,8 +226,8 @@ concurrentContSelect = function(activate = TRUE,
   # cun_con_sel | cun_con_selection | concurrent_control_selection
   # Part 1 messages
   if (is.numeric(PhenListObj@datasetPL[, depVar])) {
-    m  =  (PhenListObj@datasetPL[PhenListObj@datasetPL[, GenotypeColName] != control, ])
-    m1 =  (PhenListObj@datasetPL[PhenListObj@datasetPL[, BatchColName] %in% m[, BatchColName], ])
+    m  =  (PhenListObj@datasetPL[PhenListObj@datasetPL[, GenotypeColName] != control,])
+    m1 =  (PhenListObj@datasetPL[PhenListObj@datasetPL[, BatchColName] %in% m[, BatchColName],])
     if (length(unique(m[, BatchColName])) == 1) {
       tb = table(m1[, sexColName], m1[, GenotypeColName])
       if (control %in% colnames(tb)) {
@@ -417,7 +417,7 @@ getEquation =  function(var,
 # Read config files
 readConf = function(file, path = NULL, ...) {
   if (is.null(path))
-    path = system.file("extdata", package = "DRrequired")
+    path = system.file("extdata", package = "DRrequiredAgeing")
 
   r   = read.dcf(file.path(path, file), all = TRUE,  ...)
   return(r)
@@ -430,7 +430,7 @@ readFile = function(file,
                     },
                     ...) {
   if (is.null(path))
-    path = system.file("extdata", package = "DRrequired")
+    path = system.file("extdata", package = "DRrequiredAgeing")
 
   r   = FUN(file.path(path, file),  ...)
   return(r)
@@ -463,135 +463,6 @@ checkGenInCol = function(x, sex = 'sex', genotype = 'biological_sample_group') {
 }
 
 
-##' Catch and save both errors and warnings, and in the case of
-##' a warning, also keep the computed result.
-##'
-##' title tryCatch both warnings (with value) and errors
-##' param expr an R expression to evaluate
-##' return a list with 'value' and 'warning', where
-##'   'value' may be an error caught.
-##' author Martin Maechler;
-##' Copyright (C) 2010-2012  The R Core Team
-tryCatch.W.E0 <- function(expr)
-{
-  W = c('No warning found')
-  E = c('No error found')
-  w.handler <- function(w) {
-    W <<- w
-  }
-  e.handler <- function(e) {
-    E <<- e
-    value = NULL
-  }
-  list(
-    value = tryCatch(
-      expr,
-      error = e.handler,
-      warning = w.handler
-    ),
-    warning = W,
-    error = E,
-    both = NULL
-  )
-}
-
-
-
-
-tryCatch.W.E <- function(expr,
-                         name,
-                         sep = '_',
-                         col = '_',
-                         ...) {
-  r = tryCatch.W.E0(expr = expr, ...)
-  if (NullOrError(r$value)) {
-    if ('call' %in% names(r$error))
-      r$error$call = NULL
-    if ('call' %in% names(r$warning))
-      r$warning$call = NULL
-
-    ### Assembling warnings and errors in one object
-    name1 =  paste(name,
-                   'functional_warnings',
-                   sep = sep,
-                   collapse = col)
-    v1 =   if (all(r$warning == '')) {
-      'No functional warning'
-    } else{
-      unlist(r$warning)
-    }
-    name2 = paste(name,
-                  'functional_errors',
-                  sep = sep,
-                  collapse = col)
-    v2 =  if (all(r$error == '')) {
-      'No functional warning'
-    } else{
-      unlist(r$error)
-    }
-
-    r$both = list(v1, v2)
-    names(r$both) = c(name1, name2)
-  }
-  return(r)
-}
-
-### Jeremy original script to read the errors/messages from the function
-capture.stderr <- function (..., file = NULL, append = FALSE) {
-  args <- substitute(list(...))[-1L]
-  rval <- NULL
-  closeit <- TRUE
-  if (is.null(file)) {
-    file <-
-      textConnection(paste("rval",
-                           #runif(1, min = 1, max = 10 ^ 5),
-                           collapse = '_',
-                           sep = '_'), "w", local = TRUE)
-  } else if (is.character(file)) {
-    file <- file(file,
-                 ifelse (append, 'a', 'w'))
-  } else if (inherits(file, "connection")) {
-    if (!isOpen(file)) {
-      open(file,
-           ifelse (append, 'a', 'w'))
-    } else{
-      closeit <- FALSE
-    }
-  } else{
-    stop("'file' must be NULL, a character string or a connection")
-  }
-
-  sink(file, type = "message")
-  on.exit({
-    sink(type = "message")
-    if (closeit)
-      close(file)
-  })
-  pf <- parent.frame()
-  evalVis <- function(expr)
-    withVisible(eval(expr, pf))
-
-  result01 <- c()
-  for (i in seq_along(args)) {
-    expr <- args[[i]]
-    tmp <- switch(
-      mode(expr),
-      expression = lapply(expr, evalVis),
-      call = ,
-      name = list(evalVis(expr)),
-      stop("bad argument")
-    )
-    result01 <- c(result01, tmp)
-  }
-  on.exit()
-  sink(type = "message")
-  if (closeit)
-    close(file)
-  if (is.null(rval))
-    invisible(list("output" = NULL, "result" = result01))
-  else
-    list("output" = trimws(na.omit(rval)), "result" = result01)
-}
 
 
 ### check for null or errorneous object
@@ -800,6 +671,7 @@ RemoveZeroFrequencyCategories = function(x,
                                          activated = TRUE) {
   note   = NULL
   if (all(dim(x) > 0)) {
+    x = x[complete.cases(x[, depVar]), ,drop=FALSE]
     if (is.numeric(x[, depVar])) {
       lvls   = interaction(x[, sexCol], x[, genotypeCol], sep = sep, drop = drop)
     } else{
@@ -808,7 +680,7 @@ RemoveZeroFrequencyCategories = function(x,
     }
     lvls   = lvls[!is.na(x[, depVar])]
     counts = table(lvls)
-    newx   = (x[lvls %in% names(counts)[counts >= minSampRequired], ])
+    newx   = (x[lvls %in% names(counts)[counts >= minSampRequired],])
     #####
     if ((length(names(counts[counts >= minSampRequired])) != totalLevels ||
          !identical(droplevels0(newx), droplevels0(x))) &&
@@ -862,6 +734,7 @@ RemoveZerovarCategories = function(x,
     return(list(x = NULL, note = note))
 
   #x      = droplevels0(x)
+  x = x[complete.cases(x[, depVar]), , drop = FALSE]
   newx   =  x
   if (is.numeric(x[, depVar])) {
     lvls   = interaction(x[, sex], x[, genotype], sep = sep, drop = drop)
@@ -876,7 +749,7 @@ RemoveZerovarCategories = function(x,
 
     if (!is.null(vars)) {
       Zvars  = names(vars)[vars <= minvar]
-      newx   = x[!lvls %in% Zvars,]
+      newx   = x[!lvls %in% Zvars, ]
       if (!identical(droplevels0(newx), droplevels0(x))) {
         note$sex_genotype_zero_variation = paste0(
           'Some categories have zero variation and then removed from the raw data. List of zero variation categories: ',
@@ -910,6 +783,8 @@ SummaryStatisticsOriginal = function(x,
   # do not move me
   if (any(dim(x) == 0))
     return('empty dataset')
+
+  x = x[complete.cases(x[, depVar]), , drop = FALSE]
 
   #x      = droplevels0(x)
   if (is.numeric(x[, depVar])) {
@@ -1010,7 +885,7 @@ min0 = function(x, ...) {
 GetPossibleCategories = function(procedure = NULL, file = TRUE) {
   requireNamespace('pingr')
   if (file) {
-    path = file.path(system.file("extdata", package = "DRrequired"),
+    path = file.path(system.file("extdata", package = "DRrequiredAgeing"),
                      'AllCts.csv')
     message0('Reading the Category levels from the file : \n\t\t ====> ',
              path)
@@ -1026,9 +901,9 @@ GetPossibleCategories = function(procedure = NULL, file = TRUE) {
       message0('Reading the Category levels from : \n\t\t ====> ',
                url)
       CatList = read.csv(file = url)
-      CatList = CatList[!duplicated(CatList), ]
+      CatList = CatList[!duplicated(CatList),]
       if (any(dim(CatList) == 0)) {
-        CatList[1,] = NA
+        CatList[1, ] = NA
       } else{
         message0(nrow(CatList),
                  ' parameter(s) found...')
@@ -1254,7 +1129,7 @@ plot_win = function(phenlistObject, r, depVariable, check, ...) {
   if (check == 1) {
     rt = table(phenlistObject@datasetPL$Batch)
     rt2 = rt[which(rt < 2)]
-    rdata2 = phenlistObject@datasetPL[phenlistObject@datasetPL$Batch %in% names(rt2), ]
+    rdata2 = phenlistObject@datasetPL[phenlistObject@datasetPL$Batch %in% names(rt2),]
     points(as.numeric(as.Date(rdata2$Batch)),
            rdata2[, depVariable],
            pch = 8,
@@ -1262,11 +1137,27 @@ plot_win = function(phenlistObject, r, depVariable, check, ...) {
   }
 }
 
+
+detach_package <- function(pkg, character.only = FALSE)
+{
+  if (!character.only)
+  {
+    pkg <- deparse(substitute(pkg))
+  }
+  search_item <- paste("package", pkg, sep = ":")
+  while (search_item %in% search())
+  {
+    detach(search_item,
+           unload = TRUE,
+           character.only = TRUE)
+  }
+}
+
 # boxplot for window
 boxplot_win = function(phenlistObject, we, threshold, ...) {
   boxplot(
     data_point ~ Genotype + Sex,
-    data = phenlistObject@datasetPL[we > threshold, ],
+    data = phenlistObject@datasetPL[we > threshold,],
     col = rep(2:3, 2),
     cex.axis = .7,
     cex.main = .7,
@@ -1316,82 +1207,6 @@ CutFileNameIfTooLong = function(fullPath,
   }
   return(ifelse(checkRoot, file.path(dir, file), file.path(file)))
 }
-
-
-
-
-# Model and test for errors/messages
-ModeWithErrorsAndMessages = function(m2ethod,
-                                     key = 'final_method',
-                                     phenList,
-                                     depVariable,
-                                     equation,
-                                     method,
-                                     modelWeight = NULL,
-                                     keepList = NULL,
-                                     threshold,
-                                     check,
-                                     sep = '_',
-                                     col = '_',
-                                     name = NULL,
-                                     ...) {
-  note = NULL
-  object0 = tryCatch.W.E(
-    expr =
-      print(
-        testDataset(
-          phenList = phenList,
-          depVariable = depVariable,
-          equation = equation,
-          method = method,
-          modelWeight = modelWeight,
-          keepList = keepList,
-          threshold = threshold,
-          check = check
-        )
-      ),
-    name = name,
-    sep = sep,
-    col = col
-  )
-  mess = capture.stderr(try(expr = testDataset(
-    phenList = phenList,
-    depVariable = depVariable,
-    equation = equation,
-    method = method,
-    modelWeight = modelWeight,
-    keepList = keepList,
-    threshold = threshold,
-    check = check
-  ),
-  silent = TRUE))
-  if (!NullOrError(object0$value))
-  {
-    note$k1 = paste0(m2ethod, ' is applied')
-    names(note)[1] = key
-  } else{
-    n1 = 'internal_errors'
-    n2 = paste(name,
-               'phenstat_errors',
-               sep = sep,
-               collapse = col)
-
-    note$internal_errors = if (length(object0$both) < 1) {
-      'No internal error found'
-    } else{
-      object0$both
-    }
-    note$phenstat_errors = if (length(mess$output) < 1 ||
-                               mess$output == '') {
-      'No PhenStat error found'
-    } else{
-      mess$output
-    }
-    names(note) = c(n1, n2)
-  }
-  return(list(obj  =  object0, mess  =  mess, note = note))
-}
-
 
 
 # plot windowing
@@ -1552,7 +1367,9 @@ outMCoreLog = function(wd, dir = 'Multicore_logs', fname = '_MulCoreLog.txt') {
 }
 
 
-
+sortList = function(x,...){
+  x[order(names(x),...)]
+}
 # A new vector output for this package only
 VectorOutput0 = function(c.ww0,
                          ExtraCols,
@@ -1560,81 +1377,36 @@ VectorOutput0 = function(c.ww0,
                          na = 'string',
                          null = 'null') {
   ####
-  # The first piece (Normal results)
-  funAux1 = function(x) {
-    r =  paste0(paste(
-      '"',
-      VectorOutPutNames(),
-      '"',
-      paste(':',
-            RemoveTwoSpecialFromOutput(x),
-            '',
-            sep = ''),
-      sep = ''
-    ),
-    collapse = ',')
-    return(r)
-  }
-  p1 = ifelse (!NullOrError(c.ww0$NormalObj$value),
-               funAux1(
-                 PhenStat::vectorOutput(c.ww0$NormalObj$value,
-                                        othercolumns = ExtraCols)
-               ),
-               '')
+  p1 = if (!NullOrError(c.ww0$NormalObj))
+    PhenStatAgeing::vectorOutputAgeing(c.ww0$NormalObj,
+                                       othercolumns = ExtraCols,
+                                       JSON = FALSE)
+  else
+    NULL
   # The second piece (Windowing results)
-  if (activeWindowing && !NullOrError(c.ww0$WindowedObj$value)) {
-    p2 =  funAux1 (PhenStat::vectorOutput(c.ww0$WindowedObj$value  ,
-                                          othercolumns = ExtraCols))
-    p3 =  funAux1 (PhenStat::vectorOutput(c.ww0$FullObj$value  ,
-                                          othercolumns = ExtraCols))
-    p4 =  funAux1 (PhenStat::vectorOutput(c.ww0$FullWindowedObj$value  ,
-                                          othercolumns = ExtraCols))
+  if (activeWindowing && !NullOrError(c.ww0$WindowedObj)) {
+    p2 =  PhenStatAgeing::vectorOutputAgeing(c.ww0$WindowedObj  ,
+                                             othercolumns = ExtraCols,
+                                             JSON = FALSE)
+    p3 =  PhenStatAgeing::vectorOutputAgeing(c.ww0$FullObj  ,
+                                             othercolumns = ExtraCols,
+                                             JSON = FALSE)
+    p4 =  PhenStatAgeing::vectorOutputAgeing(c.ww0$FullWindowedObj  ,
+                                             othercolumns = ExtraCols,
+                                             JSON = FALSE)
   } else{
-    p2 = p3 = p4 = ''
+    p2 = p3 = p4 = NULL
   }
   ###
-  output = paste(
-    '"normal_result":{',
-    p1
-    ,
-    '}, "windowed_result":{',
-    p2,
-    '}, "full_model_result":{',
-    p3,
-    '}, "full_model_windowed":{',
-    p4,
-    '}',
-    collapse = '',
-    sep      = ''
+  output = list(
+    normal_result = p1,
+    windowed_result = p2,
+    full_model_result = p3,
+    full_model_windowed = p4
   )
 
-  list = RJSONIO::fromJSON(
-    paste0('{', output, '}'),
-    stringFun = function(x) {
-      if (x %in% c('NA', 'TRUE', 'FALSE')) {
-        checkQouteNAandNaN(
-          pattern     = c('NA', 'TRUE', 'FALSE', '"TRUE"', '"FALSE"'),
-          replacement = c(NA  ,  TRUE ,  FALSE,    TRUE,     FALSE),
-          x = x
-        )
-        if (x %in% c('TRUE', 'FALSE'))
-          x = as.logical(x)
-      } else{
-        x
-      }
-    },
-    simplify = TRUE,
-    simplifyWithNames = FALSE
-  )
-  jsonF = RJSONIO::toJSON(x = list,
-                          #pretty = TRUE,
-                          na = na,
-                          null = null)
-  return(list(
-    json = jsonF,
-    Initialjson = output,
-    list = list
-  ))
+  return(list(json = NULL,
+              list = output))
 }
 
 
@@ -1705,7 +1477,7 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            byid     = 'external_sample_id'                      ,
                                            compressRawData = TRUE) {
   if (storeRawData &&
-      activeWindowing && !NullOrError(c.ww0$WindowedObj$value)
+      activeWindowing && !NullOrError(c.ww0$WindowedObj)
       && (c.ww0$method %in% 'MM')) {
     n3.5.w = merge(
       x = orgData,
@@ -1884,7 +1656,7 @@ UnzipAndfilePath = function(file, quiet = TRUE, order = TRUE) {
         overwrite = TRUE)
   # fpath is the full path to the extracted file
   fpath = file.path(td, fname)
-  if(order){
+  if (order) {
     fpath = fpath[order(nchar(fpath), fpath)]
   }
   message0(
@@ -1935,8 +1707,8 @@ closest.time.value  = function(x,
   message0('Resampling. Finding the distance of values from the mutants ...')
   output2  = ol = lapply(1:nrow(x.df), function(i) {
     tt <-
-      cbind(x.df[i,],
-            lapply(x.df[i,]$x.val, function(v) {
+      cbind(x.df[i, ],
+            lapply(x.df[i, ]$x.val, function(v) {
               diff <- abs(y.df$y.val - v)
               y.df$dist.V = diff
               out <- y.df
@@ -1946,12 +1718,12 @@ closest.time.value  = function(x,
     tt$dist.T <- abs(tt$x.time - tt$y.time)
     tt$totalD  = tt$dist.V + tt$dist.T
     if (TimeOnly) {
-      tt = tt[sample(1:nrow(tt)),]
+      tt = tt[sample(1:nrow(tt)), ]
     } else{
-      tt = tt[order(tt$totalD)  ,]
-      tt = tt[order(tt$dist.V)  ,]
+      tt = tt[order(tt$totalD)  , ]
+      tt = tt[order(tt$dist.V)  , ]
     }
-    tt   = tt[order(tt$dist.T)  ,]
+    tt   = tt[order(tt$dist.T)  , ]
   })
   dol = 1
   message0('Resampling. Refining ...')
@@ -1961,7 +1733,7 @@ closest.time.value  = function(x,
       X = output2,
       FUN = function(x) {
         if (!is.null(x)  && nrow(x) > 0) {
-          x[1,]
+          x[1, ]
         } else{
           NULL
         }
@@ -2023,12 +1795,16 @@ mimicControls = function(df                             ,
     set.seed(indicator)
   requireNamespace('stringi')
   df.bckOrg    = df
-  note         = list(shift = NULL, new_mutant_indices = NULL, original_mutant_indices = NULL)
+  note         = list(
+    shift = NULL,
+    new_mutant_indices = NULL,
+    original_mutant_indices = NULL
+  )
   shift        = Indices = NULL
   #####
   # remove zero frequency categories
   df_rzeros = RemoveZeroFrequencyCategories(
-    x = df[complete.cases(df[, depVariable]), ],
+    x = df[complete.cases(df[, depVariable]),],
     minSampRequired = minSampRequired,
     depVar = depVariable,
     totalLevels = SexGenResLevels
@@ -2080,7 +1856,7 @@ mimicControls = function(df                             ,
     x     = df[mutIndSex, depVariable]
     lx    = length(x)
     if (is.null(shift)) {
-      message0(l,', Generating new SHIFT in progress ...')
+      message0(l, ', Generating new SHIFT in progress ...')
       shift = ifelse(resample, round(runif(
         1                                             ,
         min(df$cTime)[1] - min(df$cTime[mutIndSex])[1],
@@ -2099,7 +1875,7 @@ mimicControls = function(df                             ,
     )
     if (!is.null(ctv) && CutIfLongerThanMutants && nrow(ctv) > lx) {
       message0 ('The length of the simulated data is longer than the input. Cutting in progress ....')
-      ctv = ctv[1:lx, ]
+      ctv = ctv[1:lx,]
     }
     Indices = c(Indices, ctv$y.index)
   }
@@ -2132,8 +1908,9 @@ mimicControls = function(df                             ,
     points(df$cTime     ,
            df[, depVariable],
            #col = as.integer(df$biological_sample_group) - 1,
-           col = as.integer(as.factor(interaction(df$biological_sample_group,df$sex)))
-           )
+           col = as.integer(as.factor(
+             interaction(df$biological_sample_group, df$sex)
+           )))
     points(
       df$cTime[mutInd],
       df[mutInd, depVariable],
@@ -2167,7 +1944,7 @@ mimicControls = function(df                             ,
   }
   # Must be in the end
   if (removeMutants) {
-    df = df[!mutInd,]
+    df = df[!mutInd, ]
   }
 
   df$id_d = df$cTime = NULL
