@@ -1601,6 +1601,7 @@ FinalJsonBobectCreator = function(FinalList,
       }
     }
   )
+  FinalList = LowerandRemoveSpecials(FinalList)
   for (i in 1:rep) {
     JsonObj  = jsonlite::toJSON(
       x = FinalList,
@@ -1625,6 +1626,20 @@ FinalJsonBobectCreator = function(FinalList,
   return(JsonObj)
 }
 
+
+
+LowerandRemoveSpecials <- function(x)
+{
+  cnames <- names(x)
+  if (is.null(cnames))
+    return (x)
+  x1 <- lapply(cnames, function(y)
+    LowerandRemoveSpecials(x[[y]]))
+  if (class(x) %in% "data.frame")
+    x1 <- as.data.frame(x1)
+  names(x1) <- gsub("[^[:alnum:]]", "_", tolower(cnames))
+  return(x1)
+}
 
 
 UnzipAndfilePath = function(file, quiet = TRUE, order = TRUE) {

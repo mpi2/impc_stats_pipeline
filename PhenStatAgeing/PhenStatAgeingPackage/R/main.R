@@ -93,14 +93,16 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 															FERR_rep,
 															##### Others
 															debug = TRUE) {
+	message0('PhenStatAgeing loaded.')
 	if (!is(phenListAgeing, 'PhenList') &&
 			!is(phenListAgeing, 'PhenListAgeing'))
-		stop('\n ~> function expects  "PhenList" or "PhenListAgeing" object \n')
+		stop('\n ~> function expects "PhenList" or "PhenListAgeing" object \n')
 	if (noVariation(data = phenListAgeing@datasetPL))
 		stop('\n ~> There is no variation on Genotype.\n')
 	
 	
 	if (method %in% 'MM') {
+		message0('Linear Mixed Model (MM) in progress...')
 		output = M.opt(
 			fixed = MM_fixed ,
 			random = MM_random,
@@ -109,7 +111,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			direction = MM_direction,
 			weight = MM_weight,
 			checks = MM_checks,
-			trace = debug,
+			trace = FALSE,
 			method = 'MM'
 		)
 		# Important!
@@ -117,6 +119,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			output$input$fixed = MM_fixed
 		
 	} else if (method %in% 'FE') {
+		message0('Fisher exact test (FE) in progress...')
 		output = crunner(
 			object = phenListAgeing,
 			formula = MoveResponseToRightOfTheFormula(FE_formula),
@@ -130,6 +133,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			output$input$formula = FE_formula
 		
 	} else if (method %in% 'RR') {
+		message0('REference Range plus (RR) in progress...')
 		output = RRrunner(
 			object = phenListAgeing,
 			formula = MoveResponseToRightOfTheFormula(RR_formula),

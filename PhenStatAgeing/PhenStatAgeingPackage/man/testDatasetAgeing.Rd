@@ -92,78 +92,78 @@ My name is R!
 My name is R!
 }
 \examples{
-
-#|--------\----------------1st example----------------/--------|#
-#|--------/----------------Mixed model----------------\--------|#
-
-# 1st example ###################
-# Mixed Model framework
-file <- system.file("extdata", "test1.csv", package = "PhenStat")
-testCon <-
-	PhenStat:::PhenList(
-		dataset = read.csv(file, na.strings = '-'),
-		testGenotype = "Sparc/Sparc",
-		outputMessages = FALSE
-	)
-
-# Forming PhenListAgeing object and its summary
-PhenListAgeingObj.1 = PhenListAgeing(
-	object = testCon,
-	DOB = 'Birth.Date',
-	DOE = 'Batch',
-	d.threshold = 95
-)
-summary(PhenListAgeingObj.1)
-plot(PhenListAgeingObj.1)
-
-# Model estimation
-output.1 = testDatasetAgeing(
-	phenListAgeing = PhenListAgeingObj.1,
-	depVariable = 'Lean.Mass',
-	LifeStage = FALSE,
-	withWeight = TRUE
-)
-summary(output.1)
-plot(output.1)
-
-# Vector and Matrix output just in case
-# PhenStatAgeing:::vectorOutput(output.1)
-# PhenStatAgeing:::vectorOutputMatrices(output.1)
-
-#|--------\---------------2nd example-----------------/--------|#
-#|--------/----------Fisher exact test----------------\--------|#
-
-# 2nd example ###################
-# Fisher Exact Test framework
-file =
-	system.file("extdata", "test_categorical.csv", package = "PhenStat")
-testCat =
-	PhenStat:::PhenList(
-		dataset = read.csv(file, na.strings = '-'),
-		testGenotype = "Aff3/Aff3",
-		outputMessages = FALSE
-	)
-
-# Forming PhenListAgeing object and its summary
-PhenListAgeingObj.2 = PhenListAgeing(object = testCat, DOB = 'Birth.Date')
-summary(PhenListAgeingObj.2)
-plot(PhenListAgeingObj.2)
-
-
-# Model estimation
-output.2 = testDatasetAgeing(
-	phenListAgeing = PhenListAgeingObj.2,
-	LifeStage = FALSE,
-	depVariable = "Thoracic.Processes"
-)
-
-summary(output.2)
-plot(output.2)
-
-# Vector and Matrix output just in case
-# PhenStatAgeing:::vectorOutput(output.2)
-# PhenStatAgeing:::vectorOutputMatrices(output.2)
-
+ \dontrun{
+		#|--------\----------------1st example----------------/--------|#
+		#|--------/----------------Mixed model----------------\--------|#
+		
+		# 1st example ###################
+		# Mixed Model framework
+		file <- system.file("extdata", "test1.csv", package = "PhenStat")
+		testCon <-
+			PhenStat:::PhenList(
+				dataset = read.csv(file, na.strings = '-'),
+				testGenotype = "Sparc/Sparc",
+				outputMessages = FALSE
+			)
+		
+		# Forming PhenListAgeing object and its summary
+		PhenListAgeingObj.1 = PhenListAgeing(
+			object = testCon,
+			DOB = 'Birth.Date',
+			DOE = 'Batch',
+			d.threshold = 95
+		)
+		summary(PhenListAgeingObj.1)
+		plot(PhenListAgeingObj.1)
+		
+		# Model estimation
+		output.1 = testDatasetAgeing(
+			phenListAgeing = PhenListAgeingObj.1,
+			depVariable = 'Lean.Mass',
+			LifeStage = FALSE,
+			withWeight = TRUE
+		)
+		summary(output.1)
+		plot(output.1)
+		
+		# Vector and Matrix output just in case
+		# PhenStatAgeing:::vectorOutput(output.1)
+		# PhenStatAgeing:::vectorOutputMatrices(output.1)
+		
+		#|--------\---------------2nd example-----------------/--------|#
+		#|--------/----------Fisher exact test----------------\--------|#
+		
+		# 2nd example ###################
+		# Fisher Exact Test framework
+		file =
+			system.file("extdata", "test_categorical.csv", package = "PhenStat")
+		testCat =
+			PhenStat:::PhenList(
+				dataset = read.csv(file, na.strings = '-'),
+				testGenotype = "Aff3/Aff3",
+				outputMessages = FALSE
+			)
+		
+		# Forming PhenListAgeing object and its summary
+		PhenListAgeingObj.2 = PhenListAgeing(object = testCat, DOB = 'Birth.Date')
+		summary(PhenListAgeingObj.2)
+		plot(PhenListAgeingObj.2)
+		
+		
+		# Model estimation
+		output.2 = testDatasetAgeing(
+			phenListAgeing = PhenListAgeingObj.2,
+			LifeStage = FALSE,
+			depVariable = "Thoracic.Processes"
+		)
+		
+		summary(output.2)
+		plot(output.2)
+		
+		# Vector and Matrix output just in case
+		# PhenStatAgeing:::vectorOutput(output.2)
+		# PhenStatAgeing:::vectorOutputMatrices(output.2)
+ }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

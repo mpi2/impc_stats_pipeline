@@ -4,14 +4,16 @@ vectorOutputAgeing = function(object,
 															debug = FALSE,
 															...) {
 	if (!is.null(object$messages)) {
-		message0('Null object')
+		message0('Null object. Please see the error below:')
+		print(object$messages)
 		return(NULL)
 	}
 	##########
 	out  = tryCatch(
 		expr = {
 			out = NULL
-			suppressMessagesANDErrors(if (is(object, 'PhenStatAgeingMM')) {
+			suppressMessagesANDErrors(if (is(object,
+																			 'PhenStatAgeingMM')) {
 				out = vectorOutputCont(object = object,
 															 debug = debug)
 			} else if (is(object, 'PhenStatAgeingFE')) {
@@ -34,8 +36,9 @@ vectorOutputAgeing = function(object,
 			}
 			#########
 			# JSON engine
+			n   = 5
 			if (JSON && !is.null(out)) {
-				for (i in 1:10) {
+				for (i in 1:n) {
 					out = toJSON(
 						out,
 						auto_unbox = TRUE,
@@ -43,7 +46,7 @@ vectorOutputAgeing = function(object,
 						digits = NA,
 						...
 					)
-					if (i != 10)
+					if (i != n)
 						out = fromJSON(txt = out)
 				}
 			}

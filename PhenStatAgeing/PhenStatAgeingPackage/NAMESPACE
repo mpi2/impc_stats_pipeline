@@ -23,21 +23,16 @@ importFrom("stats", "coef", "dist", "glm.control", "quantile", "runif",
 importFrom("stats", "delete.response", "terms.formula")
 
 S3method(summary, PhenListAgeing)
-S3method(summary, PhenListAgeingModel)
-S3method(summary, PhenlistCategoricalAgeingModel)
-
 S3method(plot   , PhenListAgeing)
-S3method(plot   , PhenListAgeingModel)
-S3method(plot   , PhenlistCategoricalAgeingModel)
 
 
 
 
-exportPattern("^[^\\.]")
-#export(
-#	PhenListAgeing,
-#	testDatasetAgeing#,
-#	#vectorOutput,
-#	#vectorOutputMatrices
-#)
+
+#exportPattern("^[^\\.]")
+export(
+	PhenListAgeing     ,
+	testDatasetAgeing  ,
+	vectorOutputAgeing
+)
 

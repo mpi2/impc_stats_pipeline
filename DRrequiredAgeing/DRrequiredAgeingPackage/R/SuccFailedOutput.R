@@ -5,8 +5,6 @@ SuccessfulOutput = function(args) {
   listVectorOutput        = list(vectoroutput = args$c.ww.vec$list)
   FinalList               = list(result = c(listVectorOutput, listDetails))
   JsonObj                 = FinalJsonBobectCreator(FinalList = FinalList)
-  # Sort the list based on the size of its elements
-  #JsonObj$details = JsonObj$details[order(sapply(JsonObj$details,length),decreasing=T)]
 
   ######## 2 CSV
   outP =   c(

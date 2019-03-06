@@ -22,7 +22,7 @@ RRrunner = function(object              ,
 		data = object@datasetPL,
 		responseIsTheFirst = TRUE
 	)
-	message0('Discritizing the continuous data into discrite data. The quantile = ',
+	message0('Discritizing the continuous data into discrete data. The quantile = ',
 					 RRprop)
 	message0('Stp 1. Low versus Normal/High')
 	RRobject_low = RRNewObjectAndFormula(
@@ -71,10 +71,8 @@ RRrunner = function(object              ,
 			not = TRUE
 		)
 	)
-	#names(RRresult_low$output$SplitModels)  = paste('Low' , names(RRresult_low$output$SplitModels ), sep =  '_')
-	#names(RRresult_high$output$SplitModels) = paste('High', names(RRresult_high$output$SplitModels), sep =  '_')
 	OutR = list(
-		output = list(SplitModels = SpltResult)                                  ,
+		output = list(SplitModels = SpltResult),
 		input  = list(
 			PhenListAgeing  = object           ,
 			data            = object@datasetPL ,
@@ -89,16 +87,15 @@ RRrunner = function(object              ,
 				Low  = RRresult_low$extra$missings  ,
 				High = RRresult_high$extra$missings
 			),
-			UsedData        = list(Low  = RRresult_low$input$data,
-														 High = RRresult_high$input$data),
-			#				RRresult_low$input$data[!names(RRresult_low$input$data) %in% RRobject_low$newDepVariable] ,
+			UsedData        = list(Low  = RRresult_low$input$data      ,
+														 High = RRresult_high$input$data)    ,
 			AllTable        = list(
-				Low  = RRresult_low$extra$AllTable                                                                        ,
+				Low  = RRresult_low$extra$AllTable                       ,
 				High = RRresult_high$extra$AllTable
-			)                                                                                                           ,
+			)                                                          ,
 			Cleanedformula           = cleanFormulaForOutput           ,
 			DiscritiseCleanedformula = list(
-				Low  = RRresult_low$extra$Cleanedformula ,
+				Low  = RRresult_low$extra$Cleanedformula                 ,
 				High = RRresult_high$extra$Cleanedformula
 			)
 		)

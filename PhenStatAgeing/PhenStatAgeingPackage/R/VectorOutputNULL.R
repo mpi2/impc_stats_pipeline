@@ -107,7 +107,7 @@ vectorOutputNULL = function(object) {
 		################
 		'Classification tag'                          =	NULL ,
 		'Transformation'                              =	'Legacy',
-		'Additional information'                      =	NULL
+		'Additional information'                      =	object$messages
 	)
 	return(VO)
 }

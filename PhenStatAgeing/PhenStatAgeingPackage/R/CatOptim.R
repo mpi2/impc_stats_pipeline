@@ -18,7 +18,7 @@ crunner = function(object              ,
 	message0('Top framework: ', method)
 	message0('Fisher exact test with ',
 					 ifelse(rep > 0, rep, 'No'),
-					 ' repetition in progress ...')
+					 ' repetition(s) in progress ...')
 	newFormula    = checkModelTermsInData(
 		formula = formula,
 		data = object@datasetPL,
@@ -38,7 +38,7 @@ crunner = function(object              ,
 		l           = lcomb = names = alTbls = NULL
 		CmbiVars    = (length(vars) > 1)
 		####
-		message0('Step ', indx, '. Testing for ', depVariable)
+		message0('Step ', indx, '. Testing ', depVariable)
 		####
 		newObject   = object@datasetPL
 		Obj         = CheckMissing(newObject,
@@ -47,7 +47,7 @@ crunner = function(object              ,
 		####
 		counter  = 1
 		for (j in 1:length(vars)) {
-			message0('Testing for the main effect ',
+			message0('Testing for the main effect: ',
 							 pasteComma(vars[j], replaceNull = FALSE))
 			l[[counter]] = ctest(x = newObject,
 													 formula = reformulate(
@@ -92,8 +92,11 @@ crunner = function(object              ,
 		lComplete[[depVariable]] = l
 	}
 	
-	message0('Total tested categories =  ', length(lComplete))
-	message0('Total tests =  ', sum(sapply(lComplete, length)))
+	message0('Total tested categories = ',
+					 length(lComplete),
+					 ': ',
+					 pasteComma(names(lComplete)))
+	message0('\tTotal tests =  ', sum(sapply(lComplete, length)))
 	message0('FE framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
 	OutR = list(
 		output = list(SplitModels = lComplete) ,
@@ -119,84 +122,84 @@ crunner = function(object              ,
 
 
 
-
-
-
-
-# Count summary core
-summary.PhenlistCategoricalAgeingModel = function(object, ...) {
-	if (is.null(object))
-		message0('NULL object\n')
-	
-	message0('Fisher exact test results based on ',
-					 object$input$rep,
-					 ' iterations \n')
-	
-	l = l2 = list(
-		GenPval    = object$output$Genotype$result$p.value,
-		SexPval    = object$output$Sex$result$p.value,
-		LifeStagePval      = object$output$LifeStage$result$p.value,
-		GenForLatePval     = object$output,
-		GenForEarlyPval    = object$test.early$p.value,
-		GenEsize           = object$Genotype.eff,
-		SexEsize           = object$Sex.eff,
-		LifestageEsize     = object$LifeStage.eff,
-		LateStageEsize     = object$LateGenotype.eff,
-		EarlyStageEsize    = object$EarlyGenotype.eff,
-		otherPvals         = paste(
-			names(object$AllOtherTests),
-			lapply(object$AllOtherTests, function(x) {
-				paste(x$result$p.value, collapse = '')
-			}),
-			sep = ': ',
-			collapse = ';  '
-		)
-	)
-	l = lapply(l, function(x) {
-		if (is.null(x)) {
-			x = '-'
-		} else{
-			x = x
-		}
-	})
-	cat(
-		'\nGenotype pval                       :',
-		l$GenPval,
-		'\nSex pval                            :',
-		l$SexPval,
-		'\nLifeStage pval                      :',
-		l$LifeStagePval,
-		'\nGenotype for only late stage  pval  :',
-		l$GenForLatePval,
-		'\nGenotype for only early stage pval  :',
-		l$GenForEarlyPval,
-		'\nGenotype effect size                :',
-		l$GenEsize,
-		'\nSex effect size                     :',
-		l$SexEsize,
-		'\nLifestage effect size               :',
-		l$LifestageEsize,
-		'\nEarly Stage Genotype effect size    :',
-		l$EarlyStageEsize,
-		'\nLate Stage Genotype effect size     :',
-		l$LateStageEsize,
-		'\nOther p-values                      :',
-		l$otherPvals,
-		'\n'
-	)
-	
-	outp = list(object = object     ,
-							summary = l2)
-	outp$JSON = toJSONI(outp)
-	return(invisible(outp))
-}
-
-
-# Plot
-plot.PhenlistCategoricalAgeingModel = function(x, ...) {
-	if (is.null(x))
-		stop('\n ~> NULL object\n')
-	
-	cat('\n ~> There is no plot available for the categorical data \n')
-	
-}
+# 
+# 
+# 
+# 
+# # Count summary core
+# summary.PhenlistCategoricalAgeingModel = function(object, ...) {
+# 	if (is.null(object))
+# 		message0('NULL object\n')
+# 	
+# 	message0('Fisher exact test results based on ',
+# 					 object$input$rep,
+# 					 ' iterations \n')
+# 	
+# 	l = l2 = list(
+# 		GenPval    = object$output$Genotype$result$p.value,
+# 		SexPval    = object$output$Sex$result$p.value,
+# 		LifeStagePval      = object$output$LifeStage$result$p.value,
+# 		GenForLatePval     = object$output,
+# 		GenForEarlyPval    = object$test.early$p.value,
+# 		GenEsize           = object$Genotype.eff,
+# 		SexEsize           = object$Sex.eff,
+# 		LifestageEsize     = object$LifeStage.eff,
+# 		LateStageEsize     = object$LateGenotype.eff,
+# 		EarlyStageEsize    = object$EarlyGenotype.eff,
+# 		otherPvals         = paste(
+# 			names(object$AllOtherTests),
+# 			lapply(object$AllOtherTests, function(x) {
+# 				paste(x$result$p.value, collapse = '')
+# 			}),
+# 			sep = ': ',
+# 			collapse = ';  '
+# 		)
+# 	)
+# 	l = lapply(l, function(x) {
+# 		if (is.null(x)) {
+# 			x = '-'
+# 		} else{
+# 			x = x
+# 		}
+# 	})
+# 	cat(
+# 		'\nGenotype pval                       :',
+# 		l$GenPval,
+# 		'\nSex pval                            :',
+# 		l$SexPval,
+# 		'\nLifeStage pval                      :',
+# 		l$LifeStagePval,
+# 		'\nGenotype for only late stage  pval  :',
+# 		l$GenForLatePval,
+# 		'\nGenotype for only early stage pval  :',
+# 		l$GenForEarlyPval,
+# 		'\nGenotype effect size                :',
+# 		l$GenEsize,
+# 		'\nSex effect size                     :',
+# 		l$SexEsize,
+# 		'\nLifestage effect size               :',
+# 		l$LifestageEsize,
+# 		'\nEarly Stage Genotype effect size    :',
+# 		l$EarlyStageEsize,
+# 		'\nLate Stage Genotype effect size     :',
+# 		l$LateStageEsize,
+# 		'\nOther p-values                      :',
+# 		l$otherPvals,
+# 		'\n'
+# 	)
+# 	
+# 	outp = list(object = object     ,
+# 							summary = l2)
+# 	outp$JSON = toJSONI(outp)
+# 	return(invisible(outp))
+# }
+# 
+# 
+# # Plot
+# plot.PhenlistCategoricalAgeingModel = function(x, ...) {
+# 	if (is.null(x))
+# 		stop('\n ~> NULL object\n')
+# 	
+# 	cat('\n ~> There is no plot available for the categorical data \n')
+# 	
+# }

@@ -56,7 +56,7 @@ checkModelTermsInData = function(formula,
 	In      = vars %in% names(data)
 	if (any(!In)) {
 		message0(
-			'Some parts of the model does not included in the data. See: ',
+			'Some parts of the model are not included in the data. See: ',
 			pasteComma(vars[!In], replaceNull = FALSE)
 		)
 		ft  = vars [!In]
@@ -176,7 +176,7 @@ FeasibleTermsInContFormula = function(formula, data) {
 	names = r = NULL
 	if (lvars > 0) {
 		for (i in 1:lvars) {
-			message0(i,
+			message0('\t',i,
 							 ' of ',
 							 lvars,
 							 '. Checking for the feasibility of the terms and interactions ...')
@@ -234,7 +234,7 @@ ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 		)
 		if (min(fbm$min.freq, na.rm = TRUE) < 1)
 			message0(
-				'The following term(s) removed due to No data  or no data in the interactions: ',
+				'The following term(s) removed because there is either "no data"  or "no data in the interactions": ',
 				pasteComma(fbm[fbm$min.freq <= 0, c('names')], replaceNull = FALSE)
 			)
 	}
@@ -257,55 +257,65 @@ CheckMissing = function(data, formula) {
 			missings = missings
 		)
 	))
-	
 }
-
-
 # Cohens effect size
 eff.size = function(object,
-										data = NULL,
-										depVariable,
-										effOfInd = 'Genotype',
-										errorReturn = NULL,
-										debug = FALSE) {
+										data        = NULL        ,
+										depVariable = 'data_point',
+										effOfInd    = 'Genotype'  ,
+										errorReturn = NULL        ,
+										debug       = FALSE) {
 	if (all(is.null(data)))
 		data = getData(object)
-	# if (length(levels(data[, effOfInd])) != 2) {
-	# 	message0('There must be two levels in ',
-	# 					paste(effOfInd, collapse = ' and '))
-	# 	return(NULL)
-	# }
 	f    = reformulate(termlabels = effOfInd, depVariable)
 	agr  = aggregate(f, data = data, FUN = mean)
 	if (debug) {
+		cat('\n\n')
 		print(agr)
+		print(dim(agr))
 	}
 	if (any(dim(agr) < 2)) {
 		message0(
-			' Effect size estimation: No variation in "',
-			paste(effOfInd, collapse = ' or '),
-			'"; or less than two levels in "',
-			paste0(effOfInd, collapse = ','),
-			'"'
+			' \t\tEffect size estimation: No variation or less than two levels in ',
+			pasteComma(effOfInd, collapse = ',')
 		)
 		return(errorReturn)
 	}
-	MDiff        = max(dist(agr[, depVariable]))
-	NModel       = update(object,  as.formula(paste('~', effOfInd)), data = data)
-	CoefEffSizes = sapply(data[, effOfInd], FUN = is.numeric)
+	MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
+	NModel       =
+		tryCatch(
+			expr = update(object,  as.formula(paste('~', effOfInd)), data = data),
+			error = function(e) {
+				message0('\t\tError(s) in the effect size estimation for',
+								 pasteComma(effOfInd),
+								 '. See \n',
+								 e)
+				message0('\t\t', e)
+				return(NULL)
+			} ,
+			warning = function(w) {
+				message0('\t\tWarning(s) in the effect size estimation for',
+								 pasteComma(effOfInd),
+								 '. See \n',
+								 w)
+				message0('\t\t', w)
+				return(NULL)
+			}
+		)
+	CoefEffSizes = sapply(data[, effOfInd, drop = FALSE], FUN = is.numeric)
 	if (!is.null(NModel)) {
 		if (sum(CoefEffSizes)) {
 			# For continues variables it is the coefficient
-			efSi         = list(value = as.list(coef(NModel))[[effOfInd]][1], type =
-														'coefficient')
+			efSi         = list(value = as.list(coef(NModel))[[effOfInd]][1],
+													type = 'coefficient')
 		} else{
 			# For categorical variables it is the mean difference
 			r            = resid(NModel)
-			efSi         = list(value = ifelse(sd(r) > 0, abs(MDiff) / sd(r), NA), type =
-														'Mean difference')
+			efSi         = list(value = ifelse(sd(r) > 0, abs(MDiff) / sd(r), NA),
+													type  = 'Mean difference')
 		}
 	} else{
-		efSi = NULL
+		efSi = errorReturn
 	}
 	return(efSi)
 }
@@ -478,7 +488,7 @@ SplitEffect = 	function(finalformula,
 						}
 					)
 					message0(
-						'Tested model: ',
+						'\tTested model: ',
 						printformula(newModel),
 						ifelse(!is.null(l0), ' [Successful]', ' [Failed]'),
 						breakLine = FALSE
@@ -581,7 +591,6 @@ ctest = function(x,
 		r = list(p.value = 1)
 		effect = 1
 	} else{
-		#message0('\tFisher exact test procedure in progress ...')
 		r = tryCatch(
 			fisher.test(
 				xtb,
@@ -603,7 +612,6 @@ ctest = function(x,
 		r$formula   = formula
 		r$table     = xtb
 	}
-	#message0('\tGathering the results for the fisher exact test procedure ...')
 	return(
 		list(
 			result      = r,
@@ -650,7 +658,6 @@ AllTables = function(dframe        = NULL,
 			l2   = c(l2, out)
 		}
 	}
-	
 	# Remove fixed value columns
 	message0('\tShrinking in progress ...')
 	if (shrink)
@@ -685,7 +692,7 @@ AllTables = function(dframe        = NULL,
 		) == TRUE)]
 	
 	# Split the big tables into 2x2 tables
-	message0('\tdichotomising the final tables ...')
+	message0('\tDichotomising the final tables ...')
 	oblCols = c(response.name, 'Freq')
 	l3 = lapply(
 		names(l2),
@@ -709,7 +716,7 @@ AllTables = function(dframe        = NULL,
 	)
 	names(l3)     = names(l2)
 	# Which sublists are sublevels?
-	message0('\tfinalising the tables ....')
+	message0('\tFinalising the tables ....')
 	k = unlist(lapply(l3, function(x) {
 		all(sapply(x, is.list))
 	}), recursive = FALSE)
@@ -746,7 +753,7 @@ ModelInReference = function(model, reference, responseIncluded = FALSE,veryLower
 	re = formulaTerms(reference)
 	r  = re[re %in% mo]
 	if (length(r) > ifelse(responseIncluded, 1, 0)) {
-		message0('Some terms in the "lower" parameter ignored. See:\n\t',
+		message0('Some terms in the "lower" model are ignored. See:\n\t',
 						 pasteComma(mo[!(mo %in% re)]))
 		if (responseIncluded)
 			out = reformulate(termlabels = r[-1],
@@ -759,7 +766,7 @@ ModelInReference = function(model, reference, responseIncluded = FALSE,veryLower
 	} else{
 		out = veryLower
 	}
-	message0('The corrected lower: ', printformula(out))
+	message0('The polished "lower": ', printformula(out))
 	return(out)
 }
 
@@ -874,12 +881,6 @@ as.numeric01 = function(x) {
 
 PhenListAgeingLevels = function(object, sep = '') {
 	l = NULL
-	# SexLab = ifelse(
-	# 	is.na(object$input$PhenListAgeing@dataset.colname.sex),
-	# 	'Sex',
-	# 	object$input$PhenListAgeing@dataset.colname.sex
-	# )
-	
 	SexLab    = 'Sex'
 	FemaleLab = ifelse(
 		is.na(object$input$PhenListAgeing@dataset.values.female),
@@ -897,11 +898,6 @@ PhenListAgeingLevels = function(object, sep = '') {
 	sep =	sep))
 	names(SexLevels) = unlist(SexLevels)
 	##########
-	# GenotypeLab = ifelse(
-	# 	is.na(object$input$PhenListAgeing@dataset.colname.genotype),
-	# 	'Genotype',
-	# 	object$input$PhenListAgeing@dataset.colname.genotype
-	# )
 	GenotypeLab = 'Genotype'
 	ControlLab = ifelse(
 		is.na(object$input$PhenListAgeing@refGenotype),
@@ -920,18 +916,8 @@ PhenListAgeingLevels = function(object, sep = '') {
 	names(GenotypeLevels) = unlist(GenotypeLevels)
 	
 	##########
-	# BatchLab = ifelse(
-	# 	is.na(object$input$PhenListAgeing@dataset.colname.batch),
-	# 	'Batch',
-	# 	object$input$PhenListAgeing@dataset.colname.batch
-	# )
 	BatchLab = 'Batch'
 	##########
-	# WeightLab = ifelse(
-	# 	is.na(object$input$PhenListAgeing@dataset.colname.weight),
-	# 	'Weight',
-	# 	object$input$PhenListAgeing@dataset.colname.weight
-	# )
 	WeightLab = 'Weight'
 	##########
 	l = list(
@@ -1009,8 +995,8 @@ RRCut = function(object                     ,
 	}
 	# Preparation ...
 	object@datasetPL$data_point_discretised  = NA
-	controls = subset(object@datasetPL, Genotype %in% object@refGenotype)
-	mutants  = subset(object@datasetPL, Genotype %in% object@testGenotype)
+	controls = subset(object@datasetPL, object@datasetPL$Genotype %in% object@refGenotype)
+	mutants  = subset(object@datasetPL, object@datasetPL$Genotype %in% object@testGenotype)
 	prb      = unique(c(0,  prob, 1))
 	qntl     = quantile(x = controls[, depVariable],
 											probs = prb,
@@ -1026,7 +1012,7 @@ RRCut = function(object                     ,
 																			-JitterPrecision)
 		qntl = sort(qntl)
 	}
-	message0('quantile for cutting the data = ',
+	message0('quantile(s) for cutting the data = ',
 					 pasteComma(qntl, replaceNull = FALSE))
 	controls$data_point_discretised  = cut(
 		x = controls[, depVariable],
@@ -1070,8 +1056,8 @@ RRextra = function(object,
 		return(NULL)
 	}
 	# Preparation ...
-	controls = subset(object@datasetPL, Genotype %in% object@refGenotype)
-	mutants  = subset(object@datasetPL, Genotype %in% object@testGenotype)
+	controls = subset(object@datasetPL, object@datasetPL$Genotype %in% object@refGenotype)
+	mutants  = subset(object@datasetPL, object@datasetPL$Genotype %in% object@testGenotype)
 	prb      = unique(c(0, 1 - prob, prob, 1))
 	qntl     = quantile(x = controls[, depVariable], probs = prb)
 	cutsC    = cut(x = controls[, depVariable], breaks = qntl)
@@ -1143,17 +1129,11 @@ columnChecks0 = function(dataset,
 		dataPointsSummary <- columnLevels(dataset, columnName)
 		
 		NoCombinations <- dataPointsSummary[3]
-		#message0(dataPointsSummary[3])
 		variabilityThreshold <- NoCombinations
-		#if (NoCombinations==4)
-		#variabilityThreshold <- 3
-		
 		for (i in 1:NoCombinations) {
 			if (dataPointsSummary[3 + i] >= dataPointsThreshold)
 				levelsCheck <- levelsCheck + 1
-			
 		}
-		
 	}
 	
 	values <-
@@ -1217,6 +1197,19 @@ message0 = function(...,
 	if (capitalise)
 		nmessage = capitalise(nmessage)
 	message(paste(Sys.time(), nmessage, sep = '. ', collapse = '\n'))
+}
+
+warning0 = function(...,
+										breakLine = TRUE,
+										capitalise = TRUE) {
+	x = paste0(..., collapse = '')
+	if (breakLine)
+		nmessage = unlist(strsplit(x = x, split = '\n'))
+	else
+		nmessage = x
+	if (capitalise)
+		nmessage = capitalise(nmessage)
+	warning(paste(Sys.time(), nmessage, sep = '. ', collapse = '\n'))
 }
 
 
@@ -1423,3 +1416,227 @@ RandomRegardSeed = function(n = 1,
 	}
 	return(r)
 }
+
+
+####
+rndProce = function(procedure = NULL ) {
+	if (length(procedure) < 1   ||
+			is.null(procedure)      ||
+			#!(procedure %in% lop()) ||
+			length(procedure) > 1) {
+		message0 (
+			'Error in inputing the procedure symbol. Current input: ',
+			ifelse(is.null(procedure),'NULL',procedure)              ,
+			'. The default random effect, (1 |  Batch), is selected.'
+		)
+		return(reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE))
+	}
+	##############################################################
+	if (procedure == 'TYPICAL') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'ABR') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'ACS') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'ALZ') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'BLK') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'BWT') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'CAL') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'CBC') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'CHL') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'CSD') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'DXA') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'ECG') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'ECH') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'ELZ') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'EVL') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'EVM') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'EVO') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'EVP') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'EYE') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'FER') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'GEL') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'GEM') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'GEO') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'GEP') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'GPL') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'GPM') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'GPO') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'GRS') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'HEM') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'HIS') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'HWT') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'IMM') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'INS') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'IPG') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'OFD') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'PAT') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'VIA') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	} else if (procedure == 'XRY') {
+		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
+	}else{
+		random = reformulate  (' 1 |  Batch'      , response = NULL, intercept = TRUE)
+	}
+	return(random)
+}
+
+
+QuyalityTests = function(object,
+												 levels    = c('Genotype', 'Sex', 'LifeStage'),
+												 list      = TRUE,
+												 noDataLab = 'No data',
+												 sep       = '_',
+												 collapse  = '_') {
+	if (is.null(object))
+		return(NULL)
+	r = resid(object)
+	d = getData(object)
+	levels = levels[levels %in% names(d)]
+	levels = levels[sapply(levels, function(lvs) {
+		!is.numeric(d[, lvs])
+	})]
+	counter = 1
+	flst    = NULL
+	if (length(levels) > 0) {
+		for (i in 1:length(levels)) {
+			cmb = combn(x = levels, i)
+			for (j in 1:ncol(cmb)) {
+				result = tapply(r, as.list(d[, cmb[, j], drop = FALSE]), function(x) {
+					normality_test = if (!is.null(x) && !is.na(x) &&
+															 length(x)           > 3  &&
+															 length(unique(x)) > 3    &&
+															 length(x)         < 5000 &&
+															 var(x)            != 0) {
+						shapiro.test(x)$p.value
+					} else{
+						'Not possible(Possible causes: <3 or >5000 unique data points'
+					}
+				})
+				if (!is.null(result)) {
+					flst[[counter]] = result
+					names(flst)[counter] = paste(cmb[, j], collapse = collapse, sep = sep)
+					counter = counter + 1
+				}
+			}
+		}
+		if (list) {
+			flst = as.list(lapply(flst, function(f) {
+				r = f
+				if (length(dim(f)) > 1) {
+					r = as.matrix(as.data.frame(f))
+					r = unmatrix0(r)
+				}
+				r[is.na(r)] = noDataLab
+				r = as.list(r)
+				return(r)
+			}))
+		}
+		return(flst)
+	} else{
+		return(NULL)
+	}
+}
+
+as.list0 = function(x, ...) {
+	if (!is.null(x)) {
+		return(as.list(x, ...))
+	} else{
+		return(NULL)
+	}
+}
+
+
+
+AllEffSizes = function(object, depVariable, effOfInd, data) {
+	lst       = flst = olst = NULL
+	effOfInd  = effOfInd[effOfInd %in% names(data)]
+	cats      = effOfInd[sapply(
+		effOfInd,
+		FUN = function(cl) {
+			!is.numeric(data[, cl])
+		}
+	)]
+	counter1 = counter2  = 1
+	if (length(effOfInd)) {
+		for (eff in effOfInd) {
+			message0('\tLevel:', pasteComma(unlist(eff)))
+			# 1. Main effect
+			lstTmp = eff.size(
+				object = object,
+				depVariable = depVariable,
+				effOfInd = eff,
+				errorReturn = NULL
+			)
+			if (!is.null(lstTmp)) {
+				lst[[counter1]] = lstTmp
+				names(lst)[counter1] = eff
+				counter1  = counter1  + 1
+			}
+			# 2. All subset interactions effect sizes
+			if (length(cats) > 1) {
+				for (j in 1:length(cats)) {
+					cmbn = combn(x = cats, m = j)
+					for (k in 1:ncol(cmbn)) {
+						interact = interaction(data[, cmbn[, k] , drop = FALSE], sep = '.', drop = TRUE)
+						for (lvl in levels(interact)) {
+							message0('\tLevel:', pasteComma(unlist(lvl)))
+							olstTmp = eff.size(
+								object = object,
+								data = data[interact %in% lvl, ],
+								depVariable = depVariable,
+								errorReturn = NULL,
+								effOfInd = eff
+							)
+							if (!is.null(olstTmp)) {
+								olst[[counter2]] = olstTmp
+								names(olst)[counter2] = paste(eff, lvl, sep = '_')
+								counter2 = counter2 + 1
+							}
+						}
+					}
+				}
+			}
+		}
+		flst     = as.list(c(lst, olst))
+		return(flst)
+	} else{
+		return(NULL)
+	}
+}
+
+
+
