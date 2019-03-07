@@ -1,8 +1,8 @@
-exportPattern("^[[:alpha:]]+")
-#export(
-#  main            ,
-#  UnzipAndfilePath
-#)
+#exportPattern("^[[:alpha:]]+")
+export(
+  mainAgeing            ,
+  UnzipAndfilePath
+)
 importFrom("grDevices", "graphics.off", "png")
 importFrom("graphics", "axis", "boxplot", "legend", "par", "points")
 importFrom("stats", "na.omit", "runif", "var")

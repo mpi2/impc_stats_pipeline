@@ -155,28 +155,28 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   procedures   = as.character(unique(na.omit(new.data$procedure_group)))
   for (procedure in procedures) {
     ###
-    n2.9 = base::subset(new.data,  procedure_group %in% procedures)
+    n2.9 = base::subset(new.data,  new.data$procedure_group %in% procedures)
     parameters  = as.character(unique(na.omit(n2.9$parameter_stable_id)))
     for (parameter in parameters) {
       FactorLevels = ReadFactorLevelsFromSolr(parameter = parameter, CatList = CatList)
       ### counter starts here ....
       counter   = 1
       ClRes     = outP = list()
-      n3.0 = base::subset(n2.9,  parameter_stable_id %in% parameter)
+      n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
       centers   = as.character(unique(na.omit(n3.0$phenotyping_center)))
       for (center in centers) {
-        n3.1     = base::subset(n3.0, phenotyping_center %in% center)
+        n3.1     = base::subset(n3.0, n3.0$phenotyping_center %in% center)
         strains  = as.character(unique(na.omit(n3.1$strain_accession_id)))
         for (strain in strains) {
-          n3.2  = base::subset(n3.1,  strain_accession_id %in% strain)
+          n3.2  = base::subset(n3.1,  n3.1$strain_accession_id %in% strain)
           metas = as.character(unique(na.omit(n3.2$metadata_group)))
           for (meta in metas) {
-            n3.3   = base::subset(n3.2,  metadata_group %in% meta)
-            n3.3.c = base::subset(n3.3,  biological_sample_group %in% 'control')
-            n3.3.m = base::subset(n3.3, !(biological_sample_group %in% 'control'))
+            n3.3   = base::subset(n3.2,  n3.2$metadata_group %in% meta)
+            n3.3.c = base::subset(n3.3,  n3.3$biological_sample_group %in% 'control')
+            n3.3.m = base::subset(n3.3, !(n3.3$biological_sample_group %in% 'control'))
             zygositys = as.character(unique(na.omit(n3.3.m$zygosity)))
             for (zyg in zygositys) {
-              n3.3.m_zyg = base::subset(n3.3.m, zygosity %in% zyg)
+              n3.3.m_zyg = base::subset(n3.3.m, n3.3.m$zygosity %in% zyg)
               colonys    = as.character(unique(na.omit(n3.3.m_zyg$colony_id)))
               nColonies  = length(colonys)
               if (BatchProducer && nColonies > 0) {
@@ -243,7 +243,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                 )
                 counter = 1
                 for (ChunkedColonies in ColonyChunks) {
-                  BatchData     = rbind (subset(n3.3.m_zyg, colony_id %in% ChunkedColonies),
+                  BatchData     = rbind (subset(n3.3.m_zyg, n3.3.m_zyg$colony_id %in% ChunkedColonies),
                                          n3.3.c)
                   BatchFileName = file.exists0(
                     paste0(
@@ -342,7 +342,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     colony = colonys[i]
                     message0('Current colony: ',colony)
 
-                    n3.4 = base::subset(n3.3.m_zyg,	colony_id %in% c(colony))
+                    n3.4 = base::subset(n3.3.m_zyg,	n3.3.m_zyg$colony_id %in% c(colony))
                     n3.5 = rbind (n3.4, n3.3.c)
                     note = c(note,
                              list(

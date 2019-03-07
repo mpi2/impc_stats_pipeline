@@ -554,7 +554,7 @@ CreateSubDirIfNotExist = function(x) {
 }
 
 # Unique and not NULL
-UniqueAndNNull = function(x, collapse = '_') {
+UniqueAndNNull = function(x, collapse = '~') {
   if (length(na.omit(x)) > 0)
     x = na.omit(x)
   if (length(x[!is.null(x)]) > 0)

@@ -331,7 +331,12 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
 
                     n3.4 = base::subset(n3.3.m_zyg,	colony_id %in% c(colony))
                     n3.5 = rbind (n3.4, n3.3.c)
-
+                    note = c(note,
+                             list(
+                               bodyweight_included_in_data = CheckIfNameExistInDataFrame(obj = n3.5,
+                                                                                         name = 'weight',
+                                                                                         checkLevels = FALSE)
+                             ))
                     # Imaginary URLs
                     note$gene_page_url        = GenePageURL       = GenePageURL(n3.5)
                     note$body_weight_page_url = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
@@ -619,7 +624,17 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         note$existence_of_weight_column =
                           'Weight column does not exist in the raw data'
                       }
+                      # Equation type
+                      equationType = ifelse(
+                        CheckIfNameExistInDataFrame(a@datasetPL, 'Weight'),
+                        getEquation(var = parameter,
+                                    equationMap = equationmap),
+                        'withoutWeight'
+                      )
                       # This is the main engine!
+                      note = c(note, list(
+                        bodyweight_initially_included_in_model = ifelse(method %in% 'MM', equationType, FALSE)
+                      ))
                       message0('Fitting the model ...')
                       c.ww0 =	PhenStatWindow(
                         phenlistObject = a,
@@ -627,14 +642,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         minObs = minSampRequired,
                         method = method,
                         depVariable = depVar,
-                        equation = ifelse(
-                          CheckIfNameExistInDataFrame(a@datasetPL, 'Weight'),
-                          getEquation(
-                            var = parameter,
-                            equationMap = equationmap
-                          ),
-                          'withoutWeight'
-                        ),
+                        equation = equationType,
                         threshold = threshold,
                         pvalThreshold = pvalThreshold,
                         sensitivity = sensitivity,
