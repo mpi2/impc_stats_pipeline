@@ -84,7 +84,7 @@ M.opt = function(object = NULL            ,
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
 	if (!is.null(lowerCorrected)) {
 		message0('Optimising the model ... ')
-		F.Model = MASS::stepAIC(
+		F.Model = stepAIC0(
 			I.Model                     ,
 			trace = trace               ,
 			direction = direction       ,

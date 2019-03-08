@@ -21,6 +21,10 @@ importFrom("stats", "qqline")
 importFrom("stats", "coef", "dist", "glm.control", "quantile", "runif",
                "setNames", "shapiro.test", "update.formula", "var")
 importFrom("stats", "delete.response", "terms.formula")
+importFrom("MASS", "stepAIC")
+importFrom("stats", "deviance", "extractAIC", "factor.scope", "nobs")
+importFrom("stats", "drop.scope")
+importFrom("stats", "pchisq")
 
 S3method(summary, PhenListAgeing)
 S3method(plot   , PhenListAgeing)
