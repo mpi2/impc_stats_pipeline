@@ -1,3 +1,18 @@
+# Startup message
+.onAttach <- function(lib, pkg) {
+  packageStartupMessage(
+    paste0(
+      '\n >===================================================================================<',
+      '\n "DRrequiredAgeing" is developed by International Mouse Phenotyping Consortium (IMPC) ',
+      '\n More details on https://www.mousephenotype.org/                                      ',
+      '\n Contact us on hamedhm@ebi.ac.uk                                                      ',
+      '\n >===================================================================================<'
+    ),
+    domain = NULL,
+    appendLF = TRUE
+  )
+}
+
 # Objects that must be removed at each iterations
 ObjectsThatMustBeRemovedInEachIteration = function(x = NULL, ...) {
   if (is.null(x)) {
