@@ -27,7 +27,8 @@ vectorOutputAgeing = function(object,
 			
 			#########
 			NewNames = variablesInData(df = object$input$PhenListAgeing@datasetPL,
-																 names = othercolumns)
+																 names = othercolumns,
+																 debug = debug)
 			if (!is.null(out)    &&
 					!is.null(NewNames)) {
 				out$othercolumns = as.list(object$input$PhenListAgeing@datasetPL[, NewNames, drop = FALSE])

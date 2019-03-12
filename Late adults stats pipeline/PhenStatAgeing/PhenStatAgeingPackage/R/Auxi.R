@@ -56,8 +56,9 @@ checkModelTermsInData = function(formula,
 	In      = vars %in% names(data)
 	if (any(!In)) {
 		message0(
-			'Some terms in the model are not included in the data. See: ',
-			pasteComma(vars[!In], replaceNull = FALSE)
+			'Some terms in the model are not included in the data. See: \n\t ',
+			pasteComma(vars[!In], replaceNull = FALSE),
+			'\n\t Initial  model: ',printformula(formula)
 		)
 		ft  = vars [!In]
 		formula = update.formula(formula,
@@ -67,6 +68,7 @@ checkModelTermsInData = function(formula,
 														 	intercept  = TRUE,
 														 	sep        = '-'
 														 ))
+		message0('\t Polished model: ',printformula(formula))
 	}
 	return(formula)
 }
@@ -205,11 +207,12 @@ FeasibleTermsInContFormula = function(formula, data) {
 	}
 }
 
-variablesInData = function(df, names) {
+variablesInData = function(df, names, debug = TRUE) {
 	if (is.null(df) || is.null(names) || sum(names %in%  names(df)) < 1)
 		return(NULL)
 	newNames = names[names %in%  names(df)]
-	message0('Variables that are found in data: ',pasteComma(newNames))
+	if (debug)
+		message0('Variables that being found in data: ', pasteComma(newNames))
 	return(newNames)
 }
 
@@ -234,7 +237,7 @@ ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 		)
 		if (min(fbm$min.freq, na.rm = TRUE) < 1)
 			message0(
-				'The following term(s) removed because there is either "no data"  or "no data in the interactions": ',
+				'The following term(s) removed because there is either "no data"  or "no data in the interactions":\n\t **not all terms necessarily in the initial model \n\t ',
 				pasteComma(fbm[fbm$min.freq <= 0, c('names')], replaceNull = FALSE)
 			)
 	}
@@ -430,7 +433,7 @@ ModelChecks = function(fixed, data, checks = c(0, 0, 0)) {
 			fixed = removeSingleLevelFactors(formula = fixed, data = data)
 		if (checks[3])
 			fixed = ComplementaryFeasibleTermsInContFormula(formula = fixed, data = data)
-		message0('Checked model: ', printformula(fixed))
+		message0('\tChecked model: ', printformula(fixed))
 	}
 	return(fixed)
 }
@@ -495,6 +498,11 @@ SplitEffect = 	function(finalformula,
 						),
 						intercept = TRUE
 					)
+					message0('Check the split model:\n\t', printformula(newModel))
+					# we can safely remove the line below!
+					# newModel = ModelChecks(fixed = newModel,
+					# 											 data = data,
+					# 											 checks = c(1, 1, 0))
 					
 					l0    = tryCatch(
 						update(F.Model,
@@ -1035,7 +1043,10 @@ RRCut = function(object                     ,
 																			-JitterPrecision)
 		qntl = sort(qntl)
 	}
-	message0('quantile(s) for cutting the data = ',
+	message0('quantile(s) for cutting the data '      ,
+					 '[probs = '                                 ,
+					 pasteComma(round(prb,3))                 ,
+					 ']: '                                    ,
 					 pasteComma(qntl, replaceNull = FALSE))
 	controls$data_point_discretised  = cut(
 		x = controls[, depVariable],
@@ -1254,7 +1265,7 @@ expandDottedFormula = function(formula, data) {
 	}
 	
 	newformula  =  formula(terms.formula(x = formula, data = data))
-	message0('Extended formula (if special characters included): ',
+	message0('Extended formula (if (*.:) characters included):\n\t ',
 					 printformula(newformula))
 	return(newformula)
 }

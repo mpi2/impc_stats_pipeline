@@ -104,7 +104,7 @@ M.opt = function(object = NULL            ,
 			break
 		}
 	}
-	message0('The specified "lower" model: ', printformula(lower))
+	message0('The specified "lower" model: \n\t', printformula(lower))
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
 	if (!is.null(lowerCorrected)) {
 		message0('Optimising the model ... ')

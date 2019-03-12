@@ -133,7 +133,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			output$input$formula = FE_formula
 		
 	} else if (method %in% 'RR') {
-		message0('REference Range plus (RR) in progress ...')
+		message0('Reference Range plus (RR) in progress ...')
 		output = RRrunner(
 			object = phenListAgeing,
 			formula = MoveResponseToRightOfTheFormula(RR_formula),

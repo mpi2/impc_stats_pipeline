@@ -7,7 +7,6 @@ plotFERR = function(x, l1, l2, main, ...) {
 						 '-',
 						 l2,
 						 ' table')
-	print(x$output$SplitModels[[l1]][[l2]]$table)
 }
 
 ###############################################
