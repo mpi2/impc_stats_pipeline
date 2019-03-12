@@ -25,9 +25,12 @@ importFrom("MASS", "stepAIC")
 importFrom("stats", "deviance", "extractAIC", "factor.scope", "nobs")
 importFrom("stats", "drop.scope")
 importFrom("stats", "pchisq")
+importFrom("graphics", "mosaicplot")
 
 S3method(summary, PhenListAgeing)
-S3method(plot   , PhenListAgeing)
+S3method(plot   , PhenStatAgeingMM)
+S3method(plot   , PhenStatAgeingRR)
+S3method(plot   , PhenStatAgeingFE)
 
 
 

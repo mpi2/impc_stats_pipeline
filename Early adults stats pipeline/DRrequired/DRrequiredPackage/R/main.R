@@ -812,7 +812,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
 
                   message0(
                     'Finished in ',
-                    Sys.time() - Strtime,
+                    round(difftime(Sys.time() , Strtime, units = 'sec'), 2),
                     '(s).\n
                   -----------------------------------
                   \n\n '

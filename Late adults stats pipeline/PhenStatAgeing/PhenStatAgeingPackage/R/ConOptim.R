@@ -31,55 +31,79 @@ M.opt = function(object = NULL            ,
 	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = NULL
 	VarHomo     = TRUE
 	data        = object@datasetPL
-	if (any(checks > 0)) {
-		if (checks[1])
-			fixed  = checkModelTermsInData(formula = fixed,
-																		 data = data,
-																		 responseIsTheFirst = TRUE)
-		if (checks[2])
-			fixed = removeSingleLevelFactors(formula = fixed, data = data)
-		if (checks[3])
-			fixed = ComplementaryFeasibleTermsInContFormula(formula = fixed, data = data)
-		message0('Checked model: ', printformula(fixed))
-	}
+	fixed = ModelChecks(fixed = fixed,
+											data = data,
+											checks = checks)
 	allVars     = all.vars(fixed)
 	LifeStage   = 'LifeStage' %in% allVars
 	Batch_exist = !categorical &&
 		colExists(name = 'Batch', data = data)
 	mdl         = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls'))
 	message0(mdl, ': Fitting the full model ... ')
-	I.Model = do.call(mdl,
-										listFun(
-											list = list(
-												model     = if (mdl == 'glm') {
-													TRUE
-												} else{
-													fixed
-												},
-												fixed     = fixed  ,
-												formula   = fixed  ,
-												family    = family ,
-												random    = random ,
-												data      = data   ,
-												na.action = na.omit,
-												method    = ifelse(mdl == 'glm', 'glm.fit', 'ML'),
-												weights   = if (mdl != 'glm') {
-													weight
-												} else{
-													NULL
-												},
-												control   = if (Batch_exist) {
-													lCont
-												} else{
-													if (categorical)
-														glCont
-													else
-														gCont
-												}
-											),
-											FUN = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls')),
-											debug = TRUE
-										))
+	# Just for rounding the full model errors
+	initialFixed = fixed
+	fixedTerms   = formulaTerms(initialFixed)
+	#message0('Initial model terms: ',pasteComma(fixedTerms))
+	for (i in 1:length(fixedTerms)) {
+		I.Model    = tryCatch(
+			expr     = do.call(mdl,
+												 listFun(
+												 	list = list(
+												 		model     = if (mdl == 'glm') {
+												 			TRUE
+												 		} else{
+												 			fixed
+												 		},
+												 		fixed     = fixed  ,
+												 		formula   = fixed  ,
+												 		family    = family ,
+												 		random    = random ,
+												 		data      = data   ,
+												 		na.action = na.omit,
+												 		method    = ifelse(mdl == 'glm', 'glm.fit', 'ML'),
+												 		weights   = if (mdl != 'glm') {
+												 			weight
+												 		} else{
+												 			NULL
+												 		},
+												 		control   = if (Batch_exist) {
+												 			lCont
+												 		} else{
+												 			if (categorical)
+												 				glCont
+												 			else
+												 				gCont
+												 		}
+												 	),
+												 	FUN = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls')),
+												 	debug = TRUE
+												 )),
+			warning = function(war) {
+				message0('* The functions failed with a warning (see below): ')
+				message0('\t', war)
+				return(NULL)
+			},
+			error = function(err) {
+				message0('* The functions failed with an error (see below): ')
+				message0('\t', err)
+				return(NULL)
+			}
+		)
+		if (is.null(I.Model)) {
+			removedTerm = fixedTerms[length(fixedTerms) -	(i - 1)]
+			fixed = update.formula(old = initialFixed, new = paste0('.~.-', removedTerm))
+			message0(
+				'Round ',
+				i,
+				' of fixing the error. The followeing term will be removed: ',
+				removedTerm,
+				'\n\tNew formula: ',
+				printformula(fixed)
+			)
+		} else{
+			break
+		}
+	}
 	message0('The specified "lower" model: ', printformula(lower))
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
 	if (!is.null(lowerCorrected)) {
@@ -175,7 +199,7 @@ M.opt = function(object = NULL            ,
 		)                                                              ,
 		input = list(
 			PhenListAgeing      = object                                 ,
-			fixed               = fixed                                  ,
+			fixed               = initialFixed                           ,
 			random              = random                                 ,
 			data                = data                                   ,
 			depVariable         = allVars[1]                             ,
@@ -253,32 +277,3 @@ M.opt = function(object = NULL            ,
 # 	return(invisible(outp))
 # }
 # 
-# # Plot for PhenListAgeingModel object
-# plot.PhenListAgeingModel = function (x,
-# 																		 ask = FALSE,
-# 																		 mfrow = c(2, 2),
-# 																		 ...) {
-# 	if (is.null(x))
-# 		stop('\n ~> NULL object\n')
-# 	p = par()
-# 	par(ask = ask, mfrow = mfrow)
-# 	
-# 	predR  = 	predict(x$final.model)
-# 	residR = resid(x$final.model)
-# 	plot(predR ,
-# 			 residR,
-# 			 xlab = 'Fitted values',
-# 			 ylab = 'Residuals',
-# 			 ...)
-# 	abline(h = 0)
-# 	hist(residR,
-# 			 xlab = 'Residuals',
-# 			 main = 'Histogram of residuals',
-# 			 probability = TRUE,
-# 			 ...)
-# 	qqnorm(residR, main = 'Normal Q-Q plot of residuals', ...)
-# 	qqline(residR, ...)
-# 	plot(density(getData(x$final.model)[, x$depVariable]), main = 'Density of the response', ...)
-# 	par(ask = p$ask, mfrow = p$mfrow)
-# }
-

@@ -38,7 +38,7 @@ crunner = function(object              ,
 		l           = lcomb = names = alTbls = NULL
 		CmbiVars    = (length(vars) > 1)
 		####
-		message0('Step ', indx, '. Testing ', depVariable)
+		message0('Step ', indx, '. Testing "', depVariable,'"')
 		####
 		newObject   = object@datasetPL
 		Obj         = CheckMissing(newObject,
@@ -195,11 +195,3 @@ crunner = function(object              ,
 # }
 # 
 # 
-# # Plot
-# plot.PhenlistCategoricalAgeingModel = function(x, ...) {
-# 	if (is.null(x))
-# 		stop('\n ~> NULL object\n')
-# 	
-# 	cat('\n ~> There is no plot available for the categorical data \n')
-# 	
-# }

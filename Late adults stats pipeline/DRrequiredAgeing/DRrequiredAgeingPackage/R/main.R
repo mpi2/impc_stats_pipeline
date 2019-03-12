@@ -651,6 +651,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         bodyweight_initially_included_in_model = ifelse(method %in% 'MM', equationType, FALSE)
                       ))
                       message0('Fitting the model ...')
+                      message0('Method: ', method, '\n\t Equation:', equationType)
                       c.ww0 =	PhenStatWindow(
                         phenlistObject = a,
                         parameter = parameter,
@@ -827,7 +828,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
 
                   message0(
                     'Finished in ',
-                    Sys.time() - Strtime,
+                    round(difftime(Sys.time() , Strtime, units = 'sec'), 2),
                     '(s).\n
                   -----------------------------------
                   \n\n '

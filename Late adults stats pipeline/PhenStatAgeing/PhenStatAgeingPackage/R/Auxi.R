@@ -56,7 +56,7 @@ checkModelTermsInData = function(formula,
 	In      = vars %in% names(data)
 	if (any(!In)) {
 		message0(
-			'Some parts of the model are not included in the data. See: ',
+			'Some terms in the model are not included in the data. See: ',
 			pasteComma(vars[!In], replaceNull = FALSE)
 		)
 		ft  = vars [!In]
@@ -215,7 +215,7 @@ variablesInData = function(df, names) {
 
 ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 	message0(
-		'Checking for the feasibility of the terms and interactions. Formula: ',
+		'Checking for the feasibility of the terms and interactions. Formula:\n\t ',
 		printformula(formula)
 	)
 	fbm = FeasibleTermsInContFormula(formula = formula, data = data)
@@ -414,6 +414,27 @@ listFun = function(list, FUN, debug = FALSE) {
 	l     = list[names(list)[fArgs]]
 	return(l)
 }
+
+
+ModelChecks = function(fixed, data, checks = c(0, 0, 0)) {
+	if (length(checks) != 3) {
+		message0('"checks" must be a vector of 3 values. Example c(1,1,1) or c(1,1,0) or c(0,0,0)')
+		return(fixed)
+	}
+	if (any(checks > 0)) {
+		if (checks[1])
+			fixed  = checkModelTermsInData(formula = fixed,
+																		 data = data,
+																		 responseIsTheFirst = TRUE)
+		if (checks[2])
+			fixed = removeSingleLevelFactors(formula = fixed, data = data)
+		if (checks[3])
+			fixed = ComplementaryFeasibleTermsInContFormula(formula = fixed, data = data)
+		message0('Checked model: ', printformula(fixed))
+	}
+	return(fixed)
+}
+
 
 
 termInTheModel = function(model, term, message = FALSE) {
@@ -648,7 +669,7 @@ AllTables = function(dframe        = NULL,
 	lcat = length(cat)
 	# Make all tables
 	l2     = list()
-	message0('\tSplitting in progress...')
+	message0('\tSplitting in progress ...')
 	for (i in unique(pmax(1, 1:(lcat - 1)))) {
 		cb = combn(cat, i)
 		for (j in 1:ncol(cb)) {
@@ -752,7 +773,8 @@ ModelInReference = function(model, reference, responseIncluded = FALSE,veryLower
 	mo = formulaTerms(model)
 	re = formulaTerms(reference)
 	r  = re[re %in% mo]
-	if (length(r) > ifelse(responseIncluded, 1, 0)) {
+	if (length(r) > ifelse(responseIncluded, 1, 0) &&
+			length(mo[!(mo %in% re)]) > 0) {
 		message0('Some terms in the "lower" model are ignored. See:\n\t',
 						 pasteComma(mo[!(mo %in% re)]))
 		if (responseIncluded)
@@ -763,10 +785,10 @@ ModelInReference = function(model, reference, responseIncluded = FALSE,veryLower
 			out = reformulate(termlabels = r,
 												response   = NULL,
 												intercept  = TRUE)
+		message0('The polished "lower": ', printformula(out))
 	} else{
 		out = veryLower
 	}
-	message0('The polished "lower": ', printformula(out))
 	return(out)
 }
 
@@ -921,10 +943,11 @@ PhenListAgeingLevels = function(object, sep = '') {
 	WeightLab = 'Weight'
 	##########
 	l = list(
+		response  = object$input$depVariable	,
 		LifeStage = list(
-			LifeStage    = 'LifeStage'   ,
-			Early        = 'Early',
-			Late         = 'Late'  ,
+			LifeStage    = 'LifeStage'          ,
+			Early        = 'Early'              ,
+			Late         = 'Late'               ,
 			Levels = list(LifeStageEarly = 'LifeStageEarly', LifeStageLate = 'LifeStageLate')
 		),
 		Sex = list(

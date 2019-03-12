@@ -1643,6 +1643,13 @@ LowerandRemoveSpecials <- function(x)
 
 
 UnzipAndfilePath = function(file, quiet = TRUE, order = TRUE) {
+  if (!grepl(x = basename(file),
+            pattern = '.zip',
+            fixed = TRUE)) {
+    message0('It is not a zip file:')
+    message0('\t', file)
+    return(file)
+  }
   message0('Unziping file ...')
   # get the file url
   forecasturl = file
@@ -1660,8 +1667,14 @@ UnzipAndfilePath = function(file, quiet = TRUE, order = TRUE) {
     tmpdir = td,
     fileext = ".zip"
   )
-  # download into the placeholder file
-  download.file(forecasturl, tf, quiet = quiet)
+  if (file.exists(forecasturl)) {
+    file.copy(from = forecasturl,
+              to =  tf,
+              overwrite = TRUE)
+  } else{
+    # download into the placeholder file
+    download.file(forecasturl, tf, quiet = quiet)
+  }
   # get the name of the first file in the zip archive
   fname = unzip(tf, list = TRUE)$Name
   # unzip the file to the temporary directory
