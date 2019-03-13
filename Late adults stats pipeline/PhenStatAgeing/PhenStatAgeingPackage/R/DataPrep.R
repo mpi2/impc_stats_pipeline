@@ -8,16 +8,18 @@ PhenListAgeing = function(PhenListobject,
 	PhenListobject@datasetPL           = droplevels(PhenListobject@datasetPL)
 	
 	Ageing = !is.null(DOE) &&
-		       !is.null(DOB) &&
-		       all(c(DOE, DOB) %in% names(PhenListobject@datasetPL))
+		!is.null(DOB) &&
+		all(c(DOE, DOB) %in% names(PhenListobject@datasetPL))
 	
 	if (Ageing) {
 		age.in.day = as.Date(PhenListobject@datasetPL[, DOE]) - as.Date(PhenListobject@datasetPL[, DOB])
 		PhenListobject@datasetPL$Age       = as.numeric(age.in.day)
 		PhenListobject@datasetPL$LifeStage = ifelse    (age.in.day > d.threshold, 'Late', 'Early')
 		PhenListobject@datasetPL$LifeStage = as.factor (PhenListobject@datasetPL$LifeStage)
-		PhenListobject@datasetPL           = PhenListobject@datasetPL[PhenListobject@datasetPL$Age > 0, ]
+		PhenListobject@datasetPL           = PhenListobject@datasetPL[PhenListobject@datasetPL$Age > 0,]
 		message0 ('Age range: ', paste0(range(age.in.day), collapse = '-'))
+	} else{
+		message0('DOE and DOB are not specified. Then PhenList is returned.')
 	}
 	
 	LL = levels(PhenListobject@datasetPL$LifeStage)
@@ -52,9 +54,10 @@ PhenListAgeing = function(PhenListobject,
 }
 
 
-summary.PhenListAgeing = function(PhenListobject,
+summary.PhenListAgeing = function(object,
 																	vars = NULL,
 																	...) {
+	PhenListobject = object
 	data = PhenListobject@datasetPL
 	if ('LifeStage' %in% names(PhenListobject@datasetPL))
 		cnames = c('Batch',
@@ -91,13 +94,24 @@ plot.PhenListAgeing = function(x,
 		cnames = c('Batch',
 							 'Genotype',
 							 'Sex')
+	
+	###################
+	cnamesF = cnames[cnames %in% names(data)]
+	if (length(cnamesF) < 1) {
+		message0(
+			'Non of the specified variables exist in the data. See the list below:\n\t',
+			pasteComma(cnames)
+		)
+		return(NULL)
+	}
+	##################
 	ndata = data[, if (is.null(vars)) {
-		cnames
+		cnamesF
 	} else{
 		vars
 	}]
 	r = describe(ndata, ...)
 	
-	plot = plot(r, ...)
+	plot = suppressWarnings(plot(r, ...))
 	return(plot)
 }
