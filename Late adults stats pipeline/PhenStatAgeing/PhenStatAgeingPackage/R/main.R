@@ -67,12 +67,11 @@ testDatasetAgeing = function(phenListAgeing = NULL                        ,
 		}
 	)
 	
-	
-	if(is.null(s))
+	if (is.null(s))
 		return(r)
 	else
 		return(s)
-
+	
 }
 
 

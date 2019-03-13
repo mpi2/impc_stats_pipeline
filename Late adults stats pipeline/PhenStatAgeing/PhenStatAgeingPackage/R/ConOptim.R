@@ -42,7 +42,6 @@ M.opt = function(object = NULL            ,
 	# Just for rounding the full model errors
 	initialFixed = fixed
 	fixedTerms   = formulaTerms(initialFixed)
-	#message0('Initial model terms: ',pasteComma(fixedTerms))
 	for (i in 1:length(fixedTerms)) {
 		I.Model    = tryCatch(
 			expr     = do.call(mdl,
@@ -90,7 +89,7 @@ M.opt = function(object = NULL            ,
 		)
 		if (is.null(I.Model)) {
 			removedTerm = fixedTerms[length(fixedTerms) -	(i - 1)]
-			fixed = update.formula(old = initialFixed, new = paste0('.~.-', removedTerm))
+			fixed       = update.formula(old = initialFixed, new = paste0('.~.-', removedTerm))
 			message0(
 				'Round ',
 				i,
@@ -105,7 +104,7 @@ M.opt = function(object = NULL            ,
 	}
 	message0('The specified "lower" model: \n\t', printformula(lower))
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
-	if (!is.null(lowerCorrected)) {
+	if (!is.null(lowerCorrected) && !is.null(I.Model)) {
 		message0('Optimising the model ... ')
 		F.Model = tryCatch(
 			expr = stepAIC0(
@@ -127,7 +126,7 @@ M.opt = function(object = NULL            ,
 			}
 		)
 		if (is.null(F.Model)) {
-			message0('Optimisation is not applied')
+			message0('Optimisation did not apply')
 			F.Model = I.Model
 		} else{
 			optimised = TRUE
@@ -135,59 +134,65 @@ M.opt = function(object = NULL            ,
 	} else{
 		F.Model = I.Model
 	}
-	if (!is.null(weight) && !(mdl %in% 'glm')) {
-		message0('Testing varHom ... ')
-		FV.Model = update(F.Model, weights = NULL)
-		if (AIC(FV.Model) <= AIC(F.Model)) {
-			# = is important
-			F.Model = FV.Model
-			VarHomo = FALSE
-			message0('VarHom checked out ... ')
+	if (!is.null(F.Model)) {
+		if (!is.null(weight) && !(mdl %in% 'glm')) {
+			message0('Testing varHom ... ')
+			FV.Model = update(F.Model, weights = NULL)
+			if (AIC(FV.Model) <= AIC(F.Model)) {
+				# = is important
+				F.Model = FV.Model
+				VarHomo = FALSE
+				message0('VarHom checked out ... ')
+			}
 		}
-	}
-	# Batch test
-	if (Batch_exist && !(mdl %in% 'glm')) {
-		message0('Testing Batch ... ')
-		G.Model = do.call(
-			'gls',
-			args        = list(
-				model     = formula(F.Model)    ,
-				data      = data                ,
-				na.action = na.omit             ,
-				method    = "ML"                ,
-				weights   = F.Model$call$weights,
-				control   = gCont
+		# Batch test
+		if (Batch_exist && !(mdl %in% 'glm')) {
+			message0('Testing Batch ... ')
+			G.Model = do.call(
+				'gls',
+				args        = list(
+					model     = formula(F.Model)    ,
+					data      = data                ,
+					na.action = na.omit             ,
+					method    = "ML"                ,
+					weights   = F.Model$call$weights,
+					control   = gCont
+				)
+			)
+			if (AIC(G.Model) <= AIC(F.Model)) {
+				F.Model = G.Model
+				message0('Batch checked out ... ')
+			}
+		}
+		SplitModels = SplitEffect(
+			finalformula = formula(F.Model),
+			fullModelFormula = fixed,
+			F.Model = F.Model,
+			data = data,
+			depVariable = allVars[1]
+		)
+		message0('Estimating effect sizes ... ')
+		EffectSizes = suppressMessages(
+			AllEffSizes(
+				object = F.Model,
+				depVariable = allVars[1],
+				effOfInd    = allVars[-1],
+				data = data
 			)
 		)
-		if (AIC(G.Model) <= AIC(F.Model)) {
-			F.Model = G.Model
-			message0('Batch checked out ... ')
-		}
-	}
-	SplitModels = SplitEffect(
-		finalformula = formula(F.Model),
-		fullModelFormula = fixed,
-		F.Model = F.Model,
-		data = data,
-		depVariable = allVars[1]
-	)
-	message0('Estimating effect sizes ... ')
-	EffectSizes = suppressMessages(AllEffSizes(
-		object = F.Model,
-		depVariable = allVars[1],
-		effOfInd    = allVars[-1],
-		data = data
-	))
-	message0(
-		'\tTotal effect sizes estimated: ',
-		ifelse(
-			!is.null(EffectSizes),
-			length(EffectSizes),
-			'Not possible because of errors!'
+		message0(
+			'\tTotal effect sizes estimated: ',
+			ifelse(
+				!is.null(EffectSizes),
+				length(EffectSizes),
+				'Not possible because of errors!'
+			)
 		)
-	)
-	message0('Quality tests in progress ... ')
-	ResidualNormalityTest = QuyalityTests(F.Model, levels = allVars[-1])
+		message0('Quality tests in progress ... ')
+		ResidualNormalityTest = QuyalityTests(F.Model, levels = allVars[-1])
+	} else{
+		return(NULL)
+	}
 	message0('MM framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
 	####
 	OutR = list(
@@ -233,64 +238,3 @@ M.opt = function(object = NULL            ,
 	class(OutR) <- 'PhenStatAgeingMM'
 	return(OutR)
 }
-
-
-# #### Summary core for continues data
-# summary.PhenListAgeingModel = function(object, ...) {
-# 	if (is.null(object))
-# 		stop('\n ~> NULL object\n')
-# 	tmpobject  = object
-#
-# 	ai = formulaTerms(object$initial.model)
-# 	af = formulaTerms(object$final.model)
-# 	if (is.null(object$final.model$call$random)) {
-# 		ar = NULL
-# 	} else{
-# 		ar = object$final.model$call$random
-# 	}
-# 	#notSigVars = ai[!(ai %in% af)]	#SigVars    = ai[(ai %in% af)]
-# 	tmpobject$final.model$call$data = tmpobject$final.model$call$family = NULL
-# 	F.Sum = summary(tmpobject$final.model) #main
-# 	message0(
-# 		'~> Final model: ',
-# 		'\n\t Fixed: ' ,
-# 		ifelse(is.null(af), '-', paste(af, collapse = ', ')),
-# 		'\n\t Random: ' ,
-# 		ifelse(is.null(ar), '-', format(ar)),
-# 		'\n\t ----- ' ,
-# 		'\n\t Removed term(s): ',
-# 		ifelse(length(ai[!(ai %in% af)]) < 1, '-', paste(ai[!(ai %in% af)], collapse = ', ')),
-# 		'\n\t ----- ' ,
-# 		'\n\t Genotype effect size: ',
-# 		ifelse(
-# 			object$LifeStage,
-# 			paste(
-# 				c(
-# 					'\n\t  Genotype for Early ~>',
-# 					'\n\t  Genotype for Late ~>' ,
-# 					'\n\t  LifeStage ~>'
-# 				),
-# 				object$effect,
-# 				collapse = ', '
-# 			),
-# 			object$effect
-# 		),
-# 		'\n\t ----- ' ,
-# 		'\n\t Variance homogeneity: ',
-# 		ifelse(!is.null(object$VarHomo), object$VarHomo, 'Not specified'),
-# 		'\n\t ----- ' ,
-# 		'\n\n~> Model summary:\n'
-# 	)
-# 	print(F.Sum)
-# 	outp = list(
-# 		Initial.Terms = ai   ,
-# 		Final.Terms = af     ,
-# 		RandoEffect = ar     ,
-# 		removed.terms = ifelse(length(ai[!(ai %in% af)]) < 1, '-', paste(ai[!(ai %in% af)], collapse = ', ')),
-# 		object  = object     ,
-# 		Summary = summary(object$final.model)
-# 	)
-# 	outp$JSON = toJSONI(outp$Summary)
-# 	return(invisible(outp))
-# }
-#

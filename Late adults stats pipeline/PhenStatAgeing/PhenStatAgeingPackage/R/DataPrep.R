@@ -16,7 +16,7 @@ PhenListAgeing = function(PhenListobject,
 		PhenListobject@datasetPL$Age       = as.numeric(age.in.day)
 		PhenListobject@datasetPL$LifeStage = ifelse    (age.in.day > d.threshold, 'Late', 'Early')
 		PhenListobject@datasetPL$LifeStage = as.factor (PhenListobject@datasetPL$LifeStage)
-		PhenListobject@datasetPL           = PhenListobject@datasetPL[PhenListobject@datasetPL$Age > 0,]
+		PhenListobject@datasetPL           = PhenListobject@datasetPL[PhenListobject@datasetPL$Age > 0, ]
 		message0 ('Age range: ', paste0(range(age.in.day), collapse = '-'))
 	} else{
 		message0('DOE and DOB are not specified. Then PhenList is returned.')
