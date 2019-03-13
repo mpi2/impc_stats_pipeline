@@ -400,12 +400,12 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     }
 
                     # Summary statistics
-                    n3.5_summary = SummaryStatisticsOriginal(x = n3.5[complete.cases(n3.5[, depVar]), ], depVar = depVar)
+                    n3.5_summary = SummaryStatisticsOriginal(x = n3.5, depVar = depVar)
                     note         = c(note, n3.5_summary)
 
                     # Remove zero frequency categories
                     n3.5.1_F_list = RemoveZeroFrequencyCategories(
-                      x = n3.5[complete.cases(n3.5[, depVar]), ],
+                      x = n3.5,
                       minSampRequired = minSampRequired,
                       depVar = depVar,
                       totalLevels = SexGenResLevels
@@ -415,7 +415,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
 
                     # Remove var categories
                     n3.5.1_v_list = RemoveZerovarCategories(
-                      x = n3.5.1[complete.cases(n3.5.1[, depVar]), ],
+                      x = n3.5.1,
                       depVar = depVar,
                       minvar = 0
                     )
@@ -831,6 +831,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   stopCluster(cl)
   closeAllConnections()
   registerDoSEQ()
+  stopImplicitCluster()
   message0('Finished.')
   setwd(cwd)
 }

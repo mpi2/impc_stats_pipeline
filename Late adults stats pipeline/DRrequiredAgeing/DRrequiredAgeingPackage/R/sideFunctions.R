@@ -673,7 +673,17 @@ RandomRegardSeed = function(n = 1,
   return(r)
 }
 
-
+complete.cases0 = function(x, ...) {
+  if (!is.null(x) && length(x) > 0) {
+    r = complete.cases(x)
+    if (is.null(r))
+      r = NULL
+  } else{
+    message0('Null input in the "complete.case". Null retured!')
+    r = NULL
+  }
+  return(r)
+}
 # remove zero count categories (filter on sex and genotype)
 RemoveZeroFrequencyCategories = function(x,
                                          minSampRequired,
@@ -685,8 +695,8 @@ RemoveZeroFrequencyCategories = function(x,
                                          sep = '_',
                                          activated = TRUE) {
   note   = NULL
-  if (all(dim(x) > 0)) {
-    x = x[complete.cases(x[, depVar]), ,drop=FALSE]
+  if (all(dim(x) > 0) && !is.null(complete.cases0(x[, depVar]))) {
+    x = x[complete.cases0(x[, depVar]), ,drop=FALSE]
     if (is.numeric(x[, depVar])) {
       lvls   = interaction(x[, sexCol], x[, genotypeCol], sep = sep, drop = drop)
     } else{
@@ -745,7 +755,7 @@ RemoveZerovarCategories = function(x,
                                    drop = TRUE) {
   note   = NULL
   # do not move me
-  if (any(dim(x) == 0))
+  if (any(dim(x) == 0) || is.null(complete.cases0(x[, depVar])))
     return(list(x = NULL, note = note))
 
   #x      = droplevels0(x)
@@ -796,10 +806,10 @@ SummaryStatisticsOriginal = function(x,
                                      replace = '_') {
   r   = NULL
   # do not move me
-  if (any(dim(x) == 0))
+  if (any(dim(x) == 0) || is.null(complete.cases0(x[, depVar])))
     return('empty dataset')
 
-  x = x[complete.cases(x[, depVar]), , drop = FALSE]
+  x = x[complete.cases0(x[, depVar]), , drop = FALSE]
 
   #x      = droplevels0(x)
   if (is.numeric(x[, depVar])) {
@@ -1847,7 +1857,7 @@ mimicControls = function(df                             ,
   #####
   # remove zero frequency categories
   df_rzeros = RemoveZeroFrequencyCategories(
-    x = df[complete.cases(df[, depVariable]),],
+    x = df,
     minSampRequired = minSampRequired,
     depVar = depVariable,
     totalLevels = SexGenResLevels

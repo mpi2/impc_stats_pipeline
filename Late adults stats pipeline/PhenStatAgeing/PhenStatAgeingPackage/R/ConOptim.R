@@ -9,7 +9,6 @@ M.opt = function(object = NULL            ,
 								 checks      = c(1, 1, 1) ,
 								 method      = 'MM'       ,
 								 ...) {
-	
 	if (!method %in% c('MM')        ||
 			is.null(all.vars0(fixed))   ||
 			is.null(object)) {
@@ -22,7 +21,7 @@ M.opt = function(object = NULL            ,
 	message0('MM framework in progress ...')
 	# Future devs
 	family      = poisson(link = "log")
-	categorical = FALSE
+	categorical = optimised = FALSE
 	# Start from here
 	sta.time    = Sys.time()
 	lCont       = lmeControl (opt  = 'optim')
@@ -108,13 +107,31 @@ M.opt = function(object = NULL            ,
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
 	if (!is.null(lowerCorrected)) {
 		message0('Optimising the model ... ')
-		F.Model = stepAIC0(
-			I.Model                     ,
-			trace = trace               ,
-			direction = direction       ,
-			scope = list(lower = lowerCorrected) ,
-			na.action = na.omit
+		F.Model = tryCatch(
+			expr = stepAIC0(
+				I.Model                     ,
+				trace = trace               ,
+				direction = direction       ,
+				scope = list(lower = lowerCorrected) ,
+				na.action = na.omit
+			),
+			warning = function(war) {
+				message0('* The optimisation failed with a warning (see below): ')
+				message0('\t', war)
+				return(NULL)
+			},
+			error = function(err) {
+				message0('* The optimisation failed with an error (see below): ')
+				message0('\t', err)
+				return(NULL)
+			}
 		)
+		if (is.null(F.Model)) {
+			message0('Optimisation did not applied')
+			F.Model = I.Model
+		} else{
+			optimised = TRUE
+		}
 	} else{
 		F.Model = I.Model
 	}
@@ -195,7 +212,8 @@ M.opt = function(object = NULL            ,
 				model = formula(F.Model)                                   ,
 				term = 'LifeStage'                                         ,
 				message = FALSE
-			)
+			)                                                            ,
+			optimised = optimised
 		)                                                              ,
 		input = list(
 			PhenListAgeing      = object                                 ,
@@ -209,9 +227,8 @@ M.opt = function(object = NULL            ,
 			weight              = weight                                 ,
 			checks              = checks
 		),
-		extra = list(
-			Cleanedformula  = fixed,
-			lowerCorrected  = lowerCorrected)
+		extra = list(Cleanedformula  = fixed,
+								 lowerCorrected  = lowerCorrected)
 	)
 	class(OutR) <- 'PhenStatAgeingMM'
 	return(OutR)
@@ -223,7 +240,7 @@ M.opt = function(object = NULL            ,
 # 	if (is.null(object))
 # 		stop('\n ~> NULL object\n')
 # 	tmpobject  = object
-# 	
+#
 # 	ai = formulaTerms(object$initial.model)
 # 	af = formulaTerms(object$final.model)
 # 	if (is.null(object$final.model$call$random)) {
@@ -276,4 +293,4 @@ M.opt = function(object = NULL            ,
 # 	outp$JSON = toJSONI(outp$Summary)
 # 	return(invisible(outp))
 # }
-# 
+#

@@ -1,6 +1,6 @@
 Package: DRrequiredAgeing
 Type: Package
-Title: The required package for IMPC ageing pipeline
+Title: The required package for IMPC ageing pipeline (PhenStatAgeing version).
 Version: 1.0.0
 Author: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 Maintainer: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>

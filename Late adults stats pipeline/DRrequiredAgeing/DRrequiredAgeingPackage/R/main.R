@@ -315,6 +315,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                 # require('nlme'       )
                 # require('RJSONIO'    )
                 # require('jsonlite'   )
+                # require('PhenStatAgeing'   )
+                # require('DRrequiredAgeing'   )
 
 
                 MultiCoreRes = foreach::foreach (
@@ -333,7 +335,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   .verbose = verbose                        ,
                   .inorder = inorder
                 ) %activemulticore% {
-                #for (i in  1:length(colonys)){
+                  #for (i in  1:length(colonys)){
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
                     ObjectsThatMustBeRemovedInEachIteration()
@@ -845,8 +847,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   }
   message0('Closing Connections ...')
   stopCluster(cl)
-  closeAllConnections()
   registerDoSEQ()
+  closeAllConnections()
+  stopImplicitCluster()
   message0('Finished.')
   setwd(cwd)
 }
