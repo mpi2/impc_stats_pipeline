@@ -127,7 +127,7 @@ M.opt = function(object = NULL            ,
 			}
 		)
 		if (is.null(F.Model)) {
-			message0('Optimisation did not applied')
+			message0('Optimisation is not applied')
 			F.Model = I.Model
 		} else{
 			optimised = TRUE

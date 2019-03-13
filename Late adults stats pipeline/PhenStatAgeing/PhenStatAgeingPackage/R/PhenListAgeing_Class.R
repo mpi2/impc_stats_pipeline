@@ -13,9 +13,9 @@ setClass(
 		dataset.values.male      = 'character'     ,
 		dataset.values.female    = 'character'     ,
 		dataset.clean = 'logical'             ,
-		datasetUNF = 'data.frame'             ,
-		reserve1   = 'list'                   ,
-		reserve2   = 'data.frame',
-		reserve3   = 'character'
+		datasetUNF = 'data.frame'            # ,
+		# reserve1   = 'list'                   ,
+		# reserve2   = 'data.frame',
+		# reserve3   = 'character'
 	)
 )

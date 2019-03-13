@@ -47,14 +47,15 @@ vectorOutputCont =	function(object,
 			input   = printformula(object$input$fixed),
 			final   =	printformula(formula)
 		),
-		'Variability'            = variability,
-		'Multibatch in analysis' = MultiBatch,
+		'Variability'            = variability             ,
+		'Multibatch in analysis' = MultiBatch              ,
 		'Gender included in analysis' = ifelse(
-			nlevels(x$Sex) > 1,
-			'Both sexes included',
+			nlevels(x$Sex) > 1                               ,
+			'Both sexes included'                            ,
 			'Only one sex included in the analysis'
-		),
-		'Summary statistics'  = DSsize,
+		)                                                  ,
+		'Is model optimised'  = object$output$optimised    ,
+		'Summary statistics'  = DSsize                     ,
 		'Further models' = lapply(object$output$SplitModels, function(v) {
 			if (class(v) %in% c('lme', 'gls', 'glm')) {
 				as.list(unmatrix0(summary(v)$tTable))

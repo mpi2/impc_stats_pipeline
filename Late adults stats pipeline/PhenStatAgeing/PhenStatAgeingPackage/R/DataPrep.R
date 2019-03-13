@@ -1,53 +1,62 @@
-PhenListAgeing = function(object,
-													DOE = 'Batch',
-													DOB = 'date_of_birth',
+PhenListAgeing = function(PhenListobject,
+													DOE = NULL,
+													DOB = NULL,
 													d.threshold = 16 * 7,
 													debug       = TRUE) {
 	#### Function to add age and LifeStage to the data
 	#### Negative age will be removed
-	object@datasetPL           = droplevels(object@datasetPL)
-	age.in.day = as.Date(object@datasetPL[, DOE]) - as.Date(object@datasetPL[, DOB])
+	PhenListobject@datasetPL           = droplevels(PhenListobject@datasetPL)
 	
-	object@datasetPL$Age       = as.numeric(age.in.day)
-	object@datasetPL$LifeStage = ifelse    (age.in.day > d.threshold, 'Late', 'Early')
-	object@datasetPL$LifeStage = as.factor (object@datasetPL$LifeStage)
-	object@datasetPL           = object@datasetPL[object@datasetPL$Age > 0, ]
+	Ageing = !is.null(DOE) &&
+		       !is.null(DOB) &&
+		       all(c(DOE, DOB) %in% names(PhenListobject@datasetPL))
 	
-	LL = levels(object@datasetPL$LifeStage)
-	LS = levels(object@datasetPL$Sex)
-	LG = levels(object@datasetPL$Genotype)
+	if (Ageing) {
+		age.in.day = as.Date(PhenListobject@datasetPL[, DOE]) - as.Date(PhenListobject@datasetPL[, DOB])
+		PhenListobject@datasetPL$Age       = as.numeric(age.in.day)
+		PhenListobject@datasetPL$LifeStage = ifelse    (age.in.day > d.threshold, 'Late', 'Early')
+		PhenListobject@datasetPL$LifeStage = as.factor (PhenListobject@datasetPL$LifeStage)
+		PhenListobject@datasetPL           = PhenListobject@datasetPL[PhenListobject@datasetPL$Age > 0, ]
+		message0 ('Age range: ', paste0(range(age.in.day), collapse = '-'))
+	}
 	
-	message0 ('Age range: ', paste0(range(age.in.day), collapse = '-'))
+	LL = levels(PhenListobject@datasetPL$LifeStage)
+	LS = levels(PhenListobject@datasetPL$Sex)
+	LG = levels(PhenListobject@datasetPL$Genotype)
 	
-	if (length(LL) != 2 && debug) {
-		message0('Ageing pipeline requires two levels in the LifeStage. Levels: ',
-						 pasteComma(LL,replaceNull = FALSE),
-						 '\nNormal pipeline would apply to this data')
+	if (length(LL) != 2 && debug && Ageing) {
+		message0(
+			'Ageing pipeline requires two levels in the LifeStage. Levels: ',
+			pasteComma(LL, replaceNull = FALSE),
+			'\nNormal pipeline will apply to this data'
+		)
 		#return(NULL)
 	}
 	if (length(LS) != 2 && debug) {
-		message0('There should be two levels in Sex. Levels: ', pasteComma(LS,replaceNull = FALSE))
+		message0('There should be two levels in Sex. Levels: ',
+						 pasteComma(LS, replaceNull = FALSE))
 		#return(NULL)
 	}
-	if ('Weight' %in% names(object@datasetPL) &&
-			sum(is.na(object@datasetPL[, 'Weight'])) > 0 && debug)
-		message0('There are ', sum(is.na(object@datasetPL[, 'Weight'])), ' NAs in body weights.')
+	if ('Weight' %in% names(PhenListobject@datasetPL) &&
+			sum(is.na(PhenListobject@datasetPL[, 'Weight'])) > 0 && debug)
+		message0('There are ', sum(is.na(PhenListobject@datasetPL[, 'Weight'])), ' NAs in body weights.')
 	
 	if (length(LG) < 2 && debug) {
-		message0('Genotype must have two levels. Levels: ', pasteComma(LG,replaceNull = FALSE))
+		message0('Genotype must have two levels. Levels: ',
+						 pasteComma(LG, replaceNull = FALSE))
 		return(NULL)
 	}
-	object        = unclass(object)
-	class(object) = 'PhenListAgeing'
-	return(object)
+	PhenListobject        = unclass(PhenListobject)
+	class(PhenListobject) = 'PhenListAgeing'
+	return(PhenListobject)
 }
 
 
-summary.PhenListAgeing = function(object,
+summary.PhenListAgeing = function(PhenListobject,
 																	vars = NULL,
 																	...) {
-	data = object@datasetPL
-	if ('LifeStage' %in% names(object@datasetPL))
+	data = PhenListobject@datasetPL
+	if ('LifeStage' %in% names(PhenListobject@datasetPL))
 		cnames = c('Batch',
 							 'Genotype',
 							 'Sex',
