@@ -33,32 +33,42 @@ NotProcessedOutput = function(args) {
       colonies        = RepBlank(unique(args$n3.5.2$colony_id), match = c('', NA, 'NA'))
     )
   )
-  ### 2 JSON
-  listDetails             = list(details = sortList(c(NotProcessedLogics, args$note)))
+
+  ### 2 Experiment detail
+  experiment_detail       = list(
+    ####
+    status                = 'NotProcessed'                                  , #1
+    procedure_group       = args$procedure                                  , #2
+    procedure_stable_id   = UniqueAndNNull(args$n3.5$procedure_stable_id)   , #3
+    procedure_name        = UniqueAndNNull(args$n3.5$procedure_name)        , #4
+    parameter_stable_id   = args$parameter                                  , #5
+    parameter_name        = UniqueAndNNull(args$n3.5$parameter_name)        , #6
+    phenotyping_center    = args$center                                     , #7
+    allele_symbol         = UniqueAndNNull(args$n3.5$allele_symbol)         , #8
+    gene_symbol           = UniqueAndNNull(args$n3.5$gene_symbol)           , #9
+    gene_accession_id     = UniqueAndNNull(args$n3.5$gene_accession_id)     , #10
+    pipeline_name         = UniqueAndNNull(args$n3.5$pipeline_name)         , #11
+    pipeline_stable_id    = UniqueAndNNull(args$n3.5$pipeline_stable_id)    , #12
+    strain_accession_id   = args$strain               , #13
+    metadata_group        = args$meta                 , #14
+    zygosity              = args$zyg                  , #15
+    colony_id             = args$colony               , #16
+    reserved              = 'NA'                        #17
+  )
+
+  ### 3 JSON
+  message0('Forming the list before applying JSON transformation ...')
+  args$note$experiment_detail = experiment_detail
+  listDetails                 = list(details = sortList(c(
+    NotProcessedLogics,
+    args$note
+  )))
   listVectorOutput        = list(vectoroutput = NULL)
   FinalList               = list(result = c(listVectorOutput, listDetails))
   JsonObj                 = FinalJsonBobectCreator(FinalList = FinalList)
-
   ######## 3 CSV
   optFail =   c(
-    ####
-    'NotProcessed'                                  , #1
-    args$procedure                                  , #2
-    UniqueAndNNull(args$n3.5$procedure_stable_id)   , #3
-    UniqueAndNNull(args$n3.5$procedure_name)        , #4
-    args$parameter                                  , #5
-    UniqueAndNNull(args$n3.5$parameter_name)        , #6
-    args$center                                     , #7
-    UniqueAndNNull(args$n3.5$allele_symbol)         , #8
-    UniqueAndNNull(args$n3.5$gene_symbol)           , #9
-    UniqueAndNNull(args$n3.5$gene_accession_id)     , #10
-    UniqueAndNNull(args$n3.5$pipeline_name)         , #11
-    UniqueAndNNull(args$n3.5$pipeline_stable_id)    , #12
-    args$strain               , #13
-    args$meta                 , #14
-    args$zyg                  , #15
-    args$colony               , #16
-    'NA'                      , #17
+    unlist(experiment_detail),
     base64(x =
              JsonObj,
            active = args$encode)

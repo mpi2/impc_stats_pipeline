@@ -309,14 +309,14 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   message0('Single core processing in progress ...')
                 }
 
-                require('PhenStat'   )
-                require('SmoothWin'  )
-                require('base64enc'  )
-                require('nlme'       )
-                require('RJSONIO'    )
-                require('jsonlite'   )
-                require('PhenStatAgeing'   )
-                require('DRrequiredAgeing'   )
+                requireNamespace('PhenStat'   )
+                requireNamespace('SmoothWin'  )
+                requireNamespace('base64enc'  )
+                requireNamespace('nlme'       )
+                requireNamespace('RJSONIO'    )
+                requireNamespace('jsonlite'   )
+                requireNamespace('PhenStatAgeing'     )
+                requireNamespace('DRrequiredAgeing'   )
 
 
                 # MultiCoreRes = foreach::foreach (
@@ -732,7 +732,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         )
                       )# c(as.list(environment()), ls()))
                       if ((
-                        NullOrError(c.ww0$NormalObj) ||
+                         NullOrError(c.ww0$NormalObj)          ||
+                        !NullOrError(c.ww0$NormalObj$messages) ||
                         (
                           NullOrError(c.ww0$WindowedObj) &&
                           activeWindowing && (c.ww0$method %in% 'MM')
@@ -767,7 +768,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       SucFaiFile = paste(
                         outpfile2,
                         ifelse(
-                          !NullOrError(c.ww0$NormalObj),
+                          !NullOrError(c.ww0$NormalObj) && NullOrError(c.ww0$NormalObj$messages),
                           'Successful.tsv',
                           'Failed_critical_error.tsv'
                         ),
