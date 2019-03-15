@@ -97,7 +97,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			!is(phenListAgeing, 'PhenListAgeing'))
 		stop('\n ~> function expects "PhenList" or "PhenListAgeing" object \n')
 	if (noVariation(data = phenListAgeing@datasetPL))
-		stop('\n ~> There is no variation on Genotype.\n')
+		stop('\n ~> There is no variation in Genotype.\n')
 	
 	
 	if (method %in% 'MM') {

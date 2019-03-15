@@ -1405,20 +1405,24 @@ VectorOutput0 = function(c.ww0,
   p1 = if (!NullOrError(c.ww0$NormalObj))
     PhenStatAgeing::vectorOutputAgeing(c.ww0$NormalObj,
                                        othercolumns = ExtraCols,
-                                       JSON = FALSE)
+                                       JSON = FALSE,
+                                       Null = TRUE)
   else
     NULL
   # The second piece (Windowing results)
   if (activeWindowing && !NullOrError(c.ww0$WindowedObj)) {
     p2 =  PhenStatAgeing::vectorOutputAgeing(c.ww0$WindowedObj  ,
                                              othercolumns = ExtraCols,
-                                             JSON = FALSE)
+                                             JSON = FALSE,
+                                             Null = TRUE)
     p3 =  PhenStatAgeing::vectorOutputAgeing(c.ww0$FullObj  ,
                                              othercolumns = ExtraCols,
-                                             JSON = FALSE)
+                                             JSON = FALSE,
+                                             Null = TRUE)
     p4 =  PhenStatAgeing::vectorOutputAgeing(c.ww0$FullWindowedObj  ,
                                              othercolumns = ExtraCols,
-                                             JSON = FALSE)
+                                             JSON = FALSE,
+                                             Null = TRUE)
   } else{
     p2 = p3 = p4 = NULL
   }
@@ -1660,7 +1664,7 @@ LowerandRemoveSpecials <- function(x)
     return (x)
   x1 <- lapply(cnames, function(y)
     LowerandRemoveSpecials(x[[y]]))
-  if (class(x) %in% "data.frame")
+  if ("data.frame" %in% class(x))
     x1 <- as.data.frame(x1)
   names(x1) <- gsub("[^[:alnum:]]", "_", tolower(cnames))
   return(x1)

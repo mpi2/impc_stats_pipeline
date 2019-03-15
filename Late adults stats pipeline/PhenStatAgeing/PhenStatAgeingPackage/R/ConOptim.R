@@ -25,7 +25,8 @@ M.opt = function(object = NULL            ,
 	# Start from here
 	sta.time    = Sys.time()
 	lCont       = lmeControl (opt  = 'optim')
-	gCont       = glsControl (opt  = 'optim', singular.ok = TRUE)
+	gCont       = glsControl (opt  = 'optim',
+														singular.ok = TRUE)
 	glCont      = glm.control(epsilon = 10 ^ -36)
 	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = NULL
 	VarHomo     = TRUE
@@ -77,18 +78,32 @@ M.opt = function(object = NULL            ,
 												 	debug = TRUE
 												 )),
 			warning = function(war) {
-				message0('* The functions failed with a warning (see below): ')
-				message0('\t', war)
+				message0('* The full model failed with the warning (see below): ')
+				message0('\t', war, breakLine = FALSE)
 				return(NULL)
 			},
 			error = function(err) {
-				message0('* The functions failed with an error (see below): ')
-				message0('\t', err)
+				message0('* The full model failed with the error (see below): ')
+				message0('\t', err, breakLine = FALSE)
 				return(NULL)
 			}
 		)
+		###########
 		if (is.null(I.Model)) {
 			removedTerm = fixedTerms[length(fixedTerms) -	(i - 1)]
+			ltemp = ModelInReference(model = lower, reference = fixed)
+			if (!is.null(lower) &&
+					!is.null(fixed) &&
+					!is.null(ltemp) &&
+					removedTerm %in% formulaTerms(ltemp)) {
+				message0(
+					'The following term did not removed: ',
+					removedTerm,
+					'\n\t the terms below will not remove from the model:\n\t ',
+					printformula(formulaTerms(ltemp))
+				)
+				next
+			}
 			fixed       = update.formula(old = initialFixed, new = paste0('.~.-', removedTerm))
 			message0(
 				'Round ',
@@ -102,9 +117,14 @@ M.opt = function(object = NULL            ,
 			break
 		}
 	}
+	###########
+	if (is.null(I.Model))
+		message0('Full model failed ...')
+	###########
 	message0('The specified "lower" model: \n\t', printformula(lower))
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
-	if (!is.null(lowerCorrected) && !is.null(I.Model)) {
+	###########
+	if (!is.null(I.Model) && !is.null(lowerCorrected)) {
 		message0('Optimising the model ... ')
 		F.Model = tryCatch(
 			expr = stepAIC0(
@@ -115,16 +135,17 @@ M.opt = function(object = NULL            ,
 				na.action = na.omit
 			),
 			warning = function(war) {
-				message0('* The optimisation failed with a warning (see below): ')
-				message0('\t', war)
+				message0('* The optimisation failed with the warning (see below): ')
+				message0('\t', war, breakLine = FALSE)
 				return(NULL)
 			},
 			error = function(err) {
-				message0('* The optimisation failed with an error (see below): ')
-				message0('\t', err)
+				message0('* The optimisation failed with the error (see below): ')
+				message0('\t', err, breakLine = FALSE)
 				return(NULL)
 			}
 		)
+		###########
 		if (is.null(F.Model)) {
 			message0('Optimisation did not apply')
 			F.Model = I.Model
@@ -134,34 +155,64 @@ M.opt = function(object = NULL            ,
 	} else{
 		F.Model = I.Model
 	}
+	###########
 	if (!is.null(F.Model)) {
 		if (!is.null(weight) && !(mdl %in% 'glm')) {
 			message0('Testing varHom ... ')
-			FV.Model = update(F.Model, weights = NULL)
-			if (AIC(FV.Model) <= AIC(F.Model)) {
+			FV.Model = tryCatch(
+				expr  = update(F.Model, weights = NULL),
+				warning = function(war) {
+					message0('* Testing VarHom failed with the warning (see below): ')
+					message0('\t', war, breakLine = FALSE)
+					return(NULL)
+				},
+				error = function(err) {
+					message0('* Testing VarHom failed with the error (see below): ')
+					message0('\t', err, breakLine = FALSE)
+					return(NULL)
+				}
+			)
+			if (!is.null(F.Model) &&
+					!is.null(FV.Model) &&
+					AIC(FV.Model) <= AIC(F.Model)) {
 				# = is important
 				F.Model = FV.Model
 				VarHomo = FALSE
-				message0('VarHom checked out ... ')
+				message0('\tVarHom checked out ... ')
 			}
 		}
 		# Batch test
 		if (Batch_exist && !(mdl %in% 'glm')) {
 			message0('Testing Batch ... ')
-			G.Model = do.call(
-				'gls',
-				args        = list(
-					model     = formula(F.Model)    ,
-					data      = data                ,
-					na.action = na.omit             ,
-					method    = "ML"                ,
-					weights   = F.Model$call$weights,
-					control   = gCont
-				)
+			G.Model =  tryCatch(
+				expr = do.call(
+					'gls',
+					args        = list(
+						model     = formula(F.Model)    ,
+						data      = data                ,
+						na.action = na.omit             ,
+						method    = "ML"                ,
+						weights   = F.Model$call$weights,
+						control   = gCont
+					)
+				),
+				
+				warning = function(war) {
+					message0('* Testing Batch failed with the warning (see below): ')
+					message0('\t', war, breakLine = FALSE)
+					return(NULL)
+				},
+				error = function(err) {
+					message0('* Testing Batch failed with the error (see below): ')
+					message0('\t', err, breakLine = FALSE)
+					return(NULL)
+				}
 			)
-			if (AIC(G.Model) <= AIC(F.Model)) {
+			if (!is.null(G.Model) &&
+					!is.null(F.Model) &&
+					AIC(G.Model) <= AIC(F.Model)) {
 				F.Model = G.Model
-				message0('Batch checked out ... ')
+				message0('\tBatch checked out ... ')
 			}
 		}
 		SplitModels = SplitEffect(
@@ -191,7 +242,9 @@ M.opt = function(object = NULL            ,
 		message0('Quality tests in progress ... ')
 		ResidualNormalityTest = QuyalityTests(F.Model, levels = allVars[-1])
 	} else{
-		return(NULL)
+		message0('This process fully terminated.')
+		stop('This process fully terminated. No success in recovering the initial model.',
+				 call. = FALSE)
 	}
 	message0('MM framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
 	####

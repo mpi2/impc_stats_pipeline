@@ -74,26 +74,26 @@ checkModelTermsInData = function(formula,
 }
 
 # Test type (decimal [Continues]/not decimal [Categorical])
-IsCategorical = function(num = NA, max.consider = Inf) {
-	if (length(num) < 1 ||
-			is.null(num) || length(na.omit(num)) < 1)
-		# do not change the order
-		stop('\n ~> Null vector or all NAs \n')
-	
-	num = na.omit(num)
-	if (!is.numeric(num)) {
-		cat = TRUE
-		method = 'FE'
-	} else if (all(num %% 1 == 0) &&
-						 length(unique(num)) < max.consider) {
-		cat = TRUE
-		method = 'GLM'
-	} else{
-		cat = FALSE
-		method = 'MM'
-	}
-	return(list(cat = cat, method = method))
-}
+# IsCategorical = function(num = NA, max.consider = Inf) {
+# 	if (length(num) < 1 ||
+# 			is.null(num) || length(na.omit(num)) < 1)
+# 		# do not change the order
+# 		stop('\n ~> Null vector or all NAs \n')
+# 	
+# 	num = na.omit(num)
+# 	if (!is.numeric(num)) {
+# 		cat = TRUE
+# 		method = 'FE'
+# 	} else if (all(num %% 1 == 0) &&
+# 						 length(unique(num)) < max.consider) {
+# 		cat = TRUE
+# 		method = 'GLM'
+# 	} else{
+# 		cat = FALSE
+# 		method = 'MM'
+# 	}
+# 	return(list(cat = cat, method = method))
+# }
 
 reformulate0 = function (termlabels,
 												 response = NULL,
@@ -237,7 +237,7 @@ ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 		)
 		if (min(fbm$min.freq, na.rm = TRUE) < 1)
 			message0(
-				'The following term(s) removed because there is either "no data"  or "no data in the interactions":\n\t **not all terms necessarily in the initial model \n\t ',
+				'The following term(s) removed because there is either "no data" or "no data in the interactions":\n\t **not all terms necessarily in the initial model \n\t ',
 				pasteComma(fbm[fbm$min.freq <= 0, c('names')], replaceNull = FALSE)
 			)
 	}
@@ -291,17 +291,16 @@ eff.size = function(object,
 			error = function(e) {
 				message0('\t\tError(s) in the effect size estimation for',
 								 pasteComma(effOfInd),
-								 '. See \n',
+								 '. See: ',
 								 e)
-				message0('\t\t', e)
+				message0('\t\t', e,breakLine=FALSE)
 				return(NULL)
 			} ,
 			warning = function(w) {
 				message0('\t\tWarning(s) in the effect size estimation for',
 								 pasteComma(effOfInd),
-								 '. See \n',
-								 w)
-				message0('\t\t', w)
+								 '. See: ',)
+				message0('\t\t', w,breakLine=FALSE)
 				return(NULL)
 			}
 		)
@@ -508,11 +507,11 @@ SplitEffect = 	function(finalformula,
 						update(F.Model,
 									 newModel),
 						error = function(e) {
-							message0(e)
+							message0(e,breakLine=FALSE)
 							return(NULL)
 						} ,
 						warning = function(w) {
-							message0(w)
+							message0(w,breakLine=FALSE)
 							return(NULL)
 						}
 					)
@@ -629,11 +628,11 @@ ctest = function(x,
 				...
 			),
 			error = function(e) {
-				message0(e)
+				message0(e,breakLine=FALSE)
 				return(NULL)
 			} ,
 			warning = function(w) {
-				message0(w)
+				message0(w,breakLine=FALSE)
 				return(NULL)
 			}
 		)
@@ -762,7 +761,10 @@ AllTables = function(dframe        = NULL,
 }
 
 formulaTerms = function(formula) {
-	r = attr(terms(as.formula(formula))    , which = 'term.labels')
+	if (!is.null(formula))
+		r = attr(terms(as.formula(formula))    , which = 'term.labels')
+	else
+		r = NULL
 	return(r)
 }
 
@@ -776,6 +778,16 @@ expand.formula = function(formula) {
 	)
 }
 
+unclassFocused <- function(x)
+{
+	cnames <- names(x)
+	if (is.null(cnames))
+		return (x)
+	x1 <- lapply(cnames, function(y)
+		unclassFocused(x[[y]]))
+	x1 <- unclass(x1)
+	return(x1)
+}
 
 ModelInReference = function(model, reference, responseIncluded = FALSE,veryLower = ~Genotype+1) {
 	mo = formulaTerms(model)

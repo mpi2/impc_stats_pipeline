@@ -2,8 +2,9 @@ vectorOutputAgeing = function(object,
 															othercolumns = NULL,
 															JSON = FALSE,
 															debug = FALSE,
+															Null = FALSE,
 															...) {
-	if (!is.null(object$messages)) {
+	if ((is.null(object) || !is.null(object$messages)) && !Null) {
 		message0('Null object. Please see the error below:')
 		print(object$messages)
 		return(NULL)
@@ -21,19 +22,23 @@ vectorOutputAgeing = function(object,
 			} else if (is(object, 'PhenStatAgeingRR')) {
 				out = vectorOutputRR(object = object)
 			} else{
-				message0('The input object is not of a proper class of PhenStatAgeing')
 				out = vectorOutputNULL(object = NULL)
+				out$`Additional information`$messages = unclassFocused(object$messages)
 			}, debug = debug)
 			
 			#########
-			NewNames = variablesInData(df = object$input$PhenListAgeing@datasetPL,
-																 names = othercolumns,
-																 debug = debug)
-			if (!is.null(out)    &&
-					!is.null(NewNames)) {
-				out$othercolumns = as.list(object$input$PhenListAgeing@datasetPL[, NewNames, drop = FALSE])
-			} else{
-				out$othercolumns = NULL
+			if (!is.null(object$input$PhenListAgeing)) {
+				NewNames = variablesInData(
+					df = object$input$PhenListAgeing@datasetPL,
+					names = othercolumns,
+					debug = debug
+				)
+				if (!is.null(out)    &&
+						!is.null(NewNames)) {
+					out$othercolumns = as.list(object$input$PhenListAgeing@datasetPL[, NewNames, drop = FALSE])
+				} else{
+					out$othercolumns = NULL
+				}
 			}
 			#########
 			# JSON engine
