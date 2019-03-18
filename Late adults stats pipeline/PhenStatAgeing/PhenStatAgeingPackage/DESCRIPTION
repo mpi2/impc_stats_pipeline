@@ -7,7 +7,7 @@ Maintainer: Hamed Haselimashhadi <hamedhm@ebi.ac.uk>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: GPL (>= 2)
-Imports: nlme, MASS, jsonlite, Hmisc, PhenStat, methods
+Imports: nlme, MASS, jsonlite, Hmisc, PhenStat, methods, knitr
 Encoding: UTF-8
 LazyData: true
 Repository: CRAN

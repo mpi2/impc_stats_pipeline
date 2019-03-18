@@ -114,7 +114,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			method = 'MM'
 		)
 		# Important!
-		if (!is.null(output))
+		if (!is.null(output$input))
 			output$input$fixed = MM_fixed
 		
 	} else if (method %in% 'FE') {
@@ -128,7 +128,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			fullComparisions = TRUE
 		)
 		# Important!
-		if (!is.null(output))
+		if (!is.null(output$input))
 			output$input$formula = FE_formula
 		
 	} else if (method %in% 'RR') {
@@ -142,7 +142,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			RRprop = RR_prop
 		)
 		# Important!
-		if (!is.null(output))
+		if (!is.null(output$input))
 			output$input$formula = RR_formula
 	} else{
 		message0('No "method" is specified. ')

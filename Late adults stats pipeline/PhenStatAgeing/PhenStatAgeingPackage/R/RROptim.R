@@ -17,6 +17,14 @@ RRrunner = function(object              ,
 		return(NULL)
 	}
 	message0('RR+ framework in progress ...')
+	if (is.null(RRprop)     ||
+			!is.numeric(RRprop) ||
+			RRprop <= 0.5       ||
+			RRprop >= 1.0) {
+		message0('"RRprop" must be a value greater than 0.5 and less than 1')
+		warnings('Improper value for "RRprop"')
+		return(NULL)
+	}
 	cleanFormulaForOutput   = checkModelTermsInData(
 		formula = formula,
 		data = object@datasetPL,

@@ -77,13 +77,15 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   message0('Machine info:  ', paste(Sys.info(), collapse = ', '))
   message0('Loading dependent packages ...')
   requireNamespace('PhenStat')
+  requireNamespace('PhenStatAgeing'     )
   requireNamespace('doParallel')
   requireNamespace('parallel')
   requireNamespace('foreach')
   requireNamespace('SmoothWin')
   requireNamespace('nlme')
   requireNamespace('base64enc')
-  requireNamespace('PhenStatAgeing')
+  requireNamespace('RJSONIO'    )
+  requireNamespace('jsonlite'   )
   # Config files
   message0('Loading configuration ...')
   methodmap                      = readConf('MethodMap.conf')
@@ -309,33 +311,23 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   message0('Single core processing in progress ...')
                 }
 
-                requireNamespace('PhenStat'   )
-                requireNamespace('SmoothWin'  )
-                requireNamespace('base64enc'  )
-                requireNamespace('nlme'       )
-                requireNamespace('RJSONIO'    )
-                requireNamespace('jsonlite'   )
-                requireNamespace('PhenStatAgeing'     )
-                requireNamespace('DRrequiredAgeing'   )
-
-
-                # MultiCoreRes = foreach::foreach (
-                #   i = 1:length(colonys),
-                #   .packages = c(
-                #     'PhenStat'    ,
-                #     'SmoothWin'   ,
-                #     'base64enc'   ,
-                #     'nlme'        ,
-                #     'RJSONIO'     ,
-                #     'jsonlite'    ,
-                #     'PhenStatAgeing',
-                #     'DRrequiredAgeing'
-                #   ),
-                #   .errorhandling = c(MultiCoreErrorHandling),
-                #   .verbose = verbose                        ,
-                #   .inorder = inorder
-                # ) %activemulticore% {
-                for (i in  1:length(colonys)){
+                MultiCoreRes = foreach::foreach (
+                  i = 1:length(colonys),
+                  .packages = c(
+                    'PhenStat'    ,
+                    'SmoothWin'   ,
+                    'base64enc'   ,
+                    'nlme'        ,
+                    'RJSONIO'     ,
+                    'jsonlite'    ,
+                    'PhenStatAgeing',
+                    'DRrequiredAgeing'
+                  ),
+                  .errorhandling = c(MultiCoreErrorHandling),
+                  .verbose = verbose                        ,
+                  .inorder = inorder
+                ) %activemulticore% {
+                  # for (i in  1:length(colonys)){
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
                     ObjectsThatMustBeRemovedInEachIteration()
@@ -732,7 +724,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         )
                       )# c(as.list(environment()), ls()))
                       if ((
-                         NullOrError(c.ww0$NormalObj)          ||
+                        NullOrError(c.ww0$NormalObj)          ||
                         !NullOrError(c.ww0$NormalObj$messages) ||
                         (
                           NullOrError(c.ww0$WindowedObj) &&

@@ -291,16 +291,15 @@ eff.size = function(object,
 			error = function(e) {
 				message0('\t\tError(s) in the effect size estimation for',
 								 pasteComma(effOfInd),
-								 '. See: ',
-								 e)
-				message0('\t\t', e,breakLine=FALSE)
+								 '. See: ')
+				message0('\t\t', e, breakLine = FALSE)
 				return(NULL)
 			} ,
 			warning = function(w) {
 				message0('\t\tWarning(s) in the effect size estimation for',
 								 pasteComma(effOfInd),
-								 '. See: ',)
-				message0('\t\t', w,breakLine=FALSE)
+								 '. See: ')
+				message0('\t\t', w, breakLine = FALSE)
 				return(NULL)
 			}
 		)
@@ -1027,6 +1026,25 @@ RRNewObjectAndFormula = function(object,
 	)
 }
 
+jitter0 = function(x,
+									 factor = 1,
+									 amount = NULL,
+									 upper = 1,
+									 lower = .5,
+									 maxtry = 1500) {
+	for (i in 1:maxtry) {
+		if(i == maxtry)
+			message0('No solusion found for the RR_prop. You may want to revise the RR_prop?')
+		xx = jitter(x = x,
+							 amount = amount,
+							 factor = factor)
+		if (min(xx,na.rm = TRUE) > lower && max(xx,na.rm = TRUE) < upper)
+			break
+	}
+	return(xx)
+}
+
+
 RRCut = function(object                     ,
 								 prob         = .95         ,
 								 depVariable  = 'data_point',
@@ -1051,8 +1069,12 @@ RRCut = function(object                     ,
 		)
 		JitterPrecision = 1 + decimalplaces(min(controls[, depVariable], na.rm = TRUE))
 		message0('Jitter precision (decimal) = ', JitterPrecision)
-		qntl[duplicated(qntl)] = jitter(x = qntl[duplicated(qntl)], amount = 10 ^
-																			-JitterPrecision)
+		qntl[duplicated(qntl)] = jitter0(
+			x = qntl[duplicated(qntl)],
+			amount = 10 ^	-JitterPrecision,
+			upper = 1,
+			lower = .5
+		)
 		qntl = sort(qntl)
 	}
 	message0('quantile(s) for cutting the data '      ,

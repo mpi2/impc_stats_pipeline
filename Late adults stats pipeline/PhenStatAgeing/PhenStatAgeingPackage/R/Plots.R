@@ -2,11 +2,11 @@ plotFERR = function(x, l1, l2, main, ...) {
 	if (!is.null(x$output$SplitModels[[l1]][[l2]]$table))
 		mosaicplot(x$output$SplitModels[[l1]][[l2]]$table, main = main, ...)
 	else
-		message0('Cannot find ',
+		message0('Cannot find [',
 						 l1,
-						 '-',
+						 ' X ',
 						 l2,
-						 ' table')
+						 '] table')
 }
 
 ###############################################
@@ -17,7 +17,7 @@ plot.PhenStatAgeingRR = function(x,
 																 ask = FALSE         ,
 																 mfrow = c(2, 2)     ,
 																 ...) {
-	if (!is.null(x$messages)) {
+	if (!is.null(x$messages) || is.null(x)) {
 		message0('Due to error(s), no plot available')
 		message0(x$messages)
 		stop()
@@ -69,7 +69,7 @@ plot.PhenStatAgeingFE = function(x,
 																 ask = FALSE         ,
 																 mfrow = c(2, 2)     ,
 																 ...) {
-	if (!is.null(x$messages)) {
+	if (!is.null(x$messages) || is.null(x)) {
 		message0('Due to error(s), no plot available')
 		message0(x$messages)
 		stop()
@@ -117,7 +117,7 @@ plot.PhenStatAgeingMM = function (x                   ,
 																	ask = FALSE         ,
 																	mfrow = c(2, 2)     ,
 																	...) {
-	if (!is.null(x$messages)) {
+	if (!is.null(x$messages) || is.null(x)) {
 		message0('Due to error(s), no plot available')
 		message0(x$messages)
 		stop()

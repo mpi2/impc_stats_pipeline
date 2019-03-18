@@ -11,13 +11,12 @@
 	\method{plot}{PhenListAgeing}(x, vars = NULL, ...)
 }
 
-
 \arguments{
 	\item{x}{
 		PhenListAgeing object 
 	}
 	\item{vars}{
-		Variable(s) of interest
+		Variable(s) of interest. The default is Batch', 'Genotype', 'Sex and 'LifeStage' if exists in the data
 	}
 	\item{\dots}{
 		Optional parameters that can be passed to Hmisc::plot.describe()
@@ -26,7 +25,7 @@
 
 
 \author{
-	Hamed Haseli <hamedhm@ebi.ac.uk>
+	Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 }
 
 \seealso{

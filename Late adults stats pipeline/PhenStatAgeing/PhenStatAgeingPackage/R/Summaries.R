@@ -1,59 +1,58 @@
-# #### Summary core for continues data
-# summary.PhenListAgeingModel = function(object, ...) {
-# 	if (is.null(object))
-# 		stop('\n ~> NULL object\n')
-# 	tmpobject  = object
-#
-# 	ai = formulaTerms(object$initial.model)
-# 	af = formulaTerms(object$final.model)
-# 	if (is.null(object$final.model$call$random)) {
-# 		ar = NULL
-# 	} else{
-# 		ar = object$final.model$call$random
-# 	}
-# 	#notSigVars = ai[!(ai %in% af)]	#SigVars    = ai[(ai %in% af)]
-# 	tmpobject$final.model$call$data = tmpobject$final.model$call$family = NULL
-# 	F.Sum = summary(tmpobject$final.model) #main
-# 	message0(
-# 		'~> Final model: ',
-# 		'\n\t Fixed: ' ,
-# 		ifelse(is.null(af), '-', paste(af, collapse = ', ')),
-# 		'\n\t Random: ' ,
-# 		ifelse(is.null(ar), '-', format(ar)),
-# 		'\n\t ----- ' ,
-# 		'\n\t Removed term(s): ',
-# 		ifelse(length(ai[!(ai %in% af)]) < 1, '-', paste(ai[!(ai %in% af)], collapse = ', ')),
-# 		'\n\t ----- ' ,
-# 		'\n\t Genotype effect size: ',
-# 		ifelse(
-# 			object$LifeStage,
-# 			paste(
-# 				c(
-# 					'\n\t  Genotype for Early ~>',
-# 					'\n\t  Genotype for Late ~>' ,
-# 					'\n\t  LifeStage ~>'
-# 				),
-# 				object$effect,
-# 				collapse = ', '
-# 			),
-# 			object$effect
-# 		),
-# 		'\n\t ----- ' ,
-# 		'\n\t Variance homogeneity: ',
-# 		ifelse(!is.null(object$VarHomo), object$VarHomo, 'Not specified'),
-# 		'\n\t ----- ' ,
-# 		'\n\n~> Model summary:\n'
-# 	)
-# 	print(F.Sum)
-# 	outp = list(
-# 		Initial.Terms = ai   ,
-# 		Final.Terms = af     ,
-# 		RandoEffect = ar     ,
-# 		removed.terms = ifelse(length(ai[!(ai %in% af)]) < 1, '-', paste(ai[!(ai %in% af)], collapse = ', ')),
-# 		object  = object     ,
-# 		Summary = summary(object$final.model)
-# 	)
-# 	outp$JSON = toJSONI(outp$Summary)
-# 	return(invisible(outp))
-# }
-#
+summary.PhenStatAgeingRR = function(object, ...) {
+	if (!is.null(object$messages) || is.null(object)) {
+		message0('Due to error(s), no plot available')
+		message0(object$messages)
+		stop()
+	}
+	summaryCore(object, ...)
+}
+
+summary.PhenStatAgeingFE = function(object, ...) {
+	if (!is.null(object$messages) || is.null(object)) {
+		message0('Due to error(s), no plot available')
+		message0(object$messages)
+		stop()
+	}
+	summaryCore(object, ...)
+}
+
+summary.PhenStatAgeingMM = function(object, ...) {
+	if (!is.null(object$messages) || is.null(object)) {
+		message0('Due to error(s), no plot available')
+		message0(object$messages)
+		stop()
+	}
+	summaryCore(object, ...)
+}
+
+
+summaryCore = function(x, ...) {
+	vo = vectorOutputAgeing(object = x,
+													JSON = FALSE,
+													Null = FALSE)
+	out = list(
+		'Method'                        = vo$Method,
+		'Formula'                       = vo$`Additional information`$Formula$input,
+		#'Dependent variable'           = vo$`Dependent variable`,
+		'Tested Gene'                   = vo$`Gp2 genotype`,
+		'Reference Gene'                = vo$`Gp1 genotype`,
+		'Genotype contribution overal'  = vo$`Genotype contribution`$Overal,
+		'Genotype contribution Females' = vo$`Genotype contribution`$`Sex FvKO p-val`,
+		'Genotype contribution Males'   = vo$`Genotype contribution`$`Sex MvKO p-val`,
+		'Sexual dimorphism detected?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
+		'Sex pvalue'                    = vo$`Sex p-val`,
+		'Body weight p-value'            = vo$`Weight p-val`,
+		'LifeStage p-value'              = vo$`LifeStage p-val`
+	)
+	outT = as.matrix(out)
+	outT = as.matrix(cbind(rownames(outT), outT))
+	rownames(outT) = NULL
+	print(kable(
+		outT,
+		format = 'rst',
+		col.names = c('Statistics', 'Value'),
+		...
+	))
+	return(invisible(outT))
+}
+

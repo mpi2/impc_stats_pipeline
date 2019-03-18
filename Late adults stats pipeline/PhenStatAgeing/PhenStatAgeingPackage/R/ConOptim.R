@@ -28,7 +28,7 @@ M.opt = function(object = NULL            ,
 	gCont       = glsControl (opt  = 'optim',
 														singular.ok = TRUE)
 	glCont      = glm.control(epsilon = 10 ^ -36)
-	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = NULL
+	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = OutR =NULL
 	VarHomo     = TRUE
 	data        = object@datasetPL
 	fixed = ModelChecks(fixed = fixed,
@@ -242,9 +242,9 @@ M.opt = function(object = NULL            ,
 		message0('Quality tests in progress ... ')
 		ResidualNormalityTest = QuyalityTests(F.Model, levels = allVars[-1])
 	} else{
-		message0('This process fully terminated.')
-		stop('This process fully terminated. No success in recovering the initial model.',
-				 call. = FALSE)
+		message0('This process fully terminated. No success in recovering the initial model.')
+		OutR$messages  = 'This process fully terminated. No success in recovering the initial model.'
+		return(OutR)
 	}
 	message0('MM framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
 	####

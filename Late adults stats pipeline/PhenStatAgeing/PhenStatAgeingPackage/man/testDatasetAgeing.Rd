@@ -1,171 +1,178 @@
 \name{testDatasetAgeing}
 \alias{testDatasetAgeing}
+%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-My name is R!
+Method "testDatasetAgeing"
 }
 \description{
-My name is R!
+The driver function in the PhenStatAgeing package. \cr
+
+It performs several checks on the data and the input model before running the analysis. This function supports three main analysis frameworks precisely, Linear Mix model (MM), Fisher Exact test (FE) and Reference Range plus (RR).\cr 
+
+It further monitors the process for failures and errors and applies some runtime patches/fixes.\cr 
+
+The inputs of the function are designed to be human-friendly by initialising the inputs by the model that will be applied to the data.
+
 }
 \usage{
-testDatasetAgeing = function(
-				 procedure = 'TYPICAL',
-				 phenListAgeing = NULL,
-				 depVariable = NULL   ,
-				 withWeight = FALSE,
-				 Sex = TRUE,
-				 LifeStage = TRUE,
-				 fixed = TypicalModel(
-				 	depVariable = depVariable,
-				 	withWeight = withWeight,
-				 	Sex = Sex,
-				 	LifeStage = LifeStage
-				 ),
-				 random = rndProce (procedure),
-				 weight = if (LifeStage){
-				 	varIdent(form =  ~ 1 | LifeStage)
-				 }else{
-				 	varIdent(form =  ~ 1 | Genotype)},
-				 conversion.threshold = Inf,
-				 family = poisson(link = "log"),
-				 direction = 'both',
-				 rep = 10 ^ 5) 
+testDatasetAgeing(
+	phenListAgeing = NULL,
+	method         = NULL,
+	MM_fixed       = TypicalModel(
+		depVariable = "data_point",
+		withWeight  = MM_BodyWeightIncluded,
+		Sex         = TRUE,
+		LifeStage   = TRUE,
+		data   = phenListAgeing@datasetPL,
+		others = NULL,
+		debug  = debug
+	),
+	MM_random             = rndProce("TYPICAL"),
+	MM_BodyWeightIncluded = TRUE,
+	MM_lower              = ~ Genotype + 1,
+	MM_weight = if (TermInModelAndnLevels(
+		model = MM_fixed, 
+		data = phenListAgeing@datasetPL))
+		varIdent(form = ~ 1 |
+						 	LifeStage)
+	else
+		varIdent(form = ~ 1 |
+						 	Genotype),
+	MM_direction = "both",
+	MM_checks    = c(1, 1, 1),
+	FE_formula   = category ~ Genotype + Sex + LifeStage,
+	RR_formula   = data_point ~ Genotype + Sex + LifeStage,
+	RR_prop      = 0.95,
+	FERR_rep     = 1500,
+	debug        = TRUE,
+	...
+)
 }
 \arguments{
-  \item{procedure}{
-My name is R!
-}
   \item{phenListAgeing}{
-My name is R!
+	 An instance of the PhenListAgeing or PhenList class; mandatory argument.
 }
-  \item{depVariable}{
-My name is R!
+  \item{method}{
+		A character string ("MM", "FE" or "RR") defining the method to use for model building.
 }
-  \item{withWeight}{
-My name is R!
+  \item{MM_fixed}{
+  Only applies to the "MM" framework. A formula that specifies the fixed effect in the linear mix model. The default is data_point~Genotype+Sex+LifeStage +/- BodyWeight. Note that the algorithm checks and removes the formula terms that do not exist in data. 
 }
-  \item{Sex}{
-My name is R!
+  \item{MM_random}{
+  Only applies to the "MM" framework. The random effect in the linear mixed model. See the lme() function for more details about the formula. The default is ~1|Batch.
 }
-  \item{LifeStage}{
-My name is R!
+  \item{MM_BodyWeightIncluded}{
+  Only applies to the default MM_fixed in the "MM" framework. If TRUE then the default model includes the body weight and the model would be: data_point~Genotype+Sex+LifeStage + BodyWeight.
 }
-  \item{fixed}{
-My name is R!
+  \item{MM_lower}{
+  Only applies to the "MM" framework. A right-sided formula, for example ~Genotype+1 or ~Sex+Genotype+1 or ~Sex+Genotype+Sex:Genotype. The lowest model that must not be included in the model optimisation. In other words, the terms in this model won't be removed during the optimisation process. The default is ~ Genotype + 1 that is the genotype effect and the intercept will be kept in the model during the optimisation process.
 }
-  \item{random}{
-My name is R!
+  \item{MM_weight}{
+  Only applies to the "MM" framework. From weight in the lme() manual: \cr
+  "an optional varFunc object or one-sided formula describing the within-group heteroscedasticity structure. If given as a formula, it is used as the argument to varFixed, corresponding to fixed variance weights. See the documentation on varClasses for a description of the available varFunc classes. Defaults to NULL, corresponding to homoscedastic within-group errors". \cr\cr
+  The default is varIdent(form = ~ 1 |	LifeStage) if the LifeStage includes in the data. Otherwise	varIdent(form = ~ 1 |	Genotype).
 }
-  \item{weight}{
-My name is R!
+  \item{MM_direction}{
+	Only applies to the "MM" framework. Select between  "both" (for stepwise optimisation), "backward" (for backward elimination) or "forward" (for forward selection) for the optimisation algorithm. The default is "both".
+	}
+  \item{MM_checks}{
+	Only applies to the "MM" framework. A vector of three 0/1 values such as c(1,1,1). The first element of the vector activates checking the model terms (See MM_fixed) to be existed in data. The second term removes any single level factor from the model (in MM_fixed). The third element checks the interaction term to make sure all interactions have some data attached to them. Caution is needed for the third element of the check as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(1, 1, 1).
 }
-  \item{conversion.threshold}{
-My name is R!
+  \item{FE_formula}{
+  Only applied to the "FE" framework. The model for analysing the categorical data. The default is: category ~ Genotype + Sex + LifeStage. \cr
+  Note that similar to MM_fixed, the terms that do not exist in data or the interaction terms will be dismissed from the model. 
 }
-  \item{family}{
-My name is R!
+  \item{RR_formula}{
+	Only applied to the "RR" framework. The model for analysing the RR+ compatible  data. The default is: data_point ~ Genotype + Sex + LifeStage. \cr
+  Note that similar to MM_fixed,  the terms that do not exist in data or the interaction terms will be dismissed from the model. 
 }
-  \item{direction}{
-My name is R!
+  \item{RR_prop}{
+	Only applied to the "RR" framework. A single value between (0.5,1) not including the boundaries. The threshold for the variation ranges in the RR framework. default value is 0.95. 
 }
-  \item{rep}{
-My name is R!
+  \item{FERR_rep}{
+  Only applied to the "RR" or "FE" framework. The number of repetition for the Bayesian  fisher exact test. See "B" parameter in fisher.test() function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
+}
+  \item{debug}{
+	A logical flag. Set to TRUE to see more details about the progress of the function. Default TRUE
+}
+  \item{\dots}{
+  Not used
 }
 }
-\details{
-My name is R!
-}
+
 \value{
-My name is R!
-}
-\references{
-My name is R!
+A successful execution of the function will return a list of three elements:
+ \item{input }{This contains the list of inputs}
+ \item{output }{A list of outputs}
+ \item{extra }{A placeholder for extra information if exists}
+ \item{messages}{A placeholder for the errors/warnings in the case of failure}
 }
 \author{
-My name is R!
+Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 }
-\note{
-My name is R!
-}
-
-
 \seealso{
-My name is R!
+\code{\link{PhenListAgeing}}, \code{\link{plot}}
 }
 \examples{
- \dontrun{
-		#|--------\----------------1st example----------------/--------|#
-		#|--------/----------------Mixed model----------------\--------|#
+		library(PhenStat)
+		library(nlme)
+		####################################################################
+		# 1 Data preparation
+		####################################################################
+		# 1.1 Continuous data
+		file = system.file("extdata", "test1.csv", package = "PhenStat")
+		test_Cont = PhenList(dataset = read.csv(file, na.strings = '-'), 
+		 testGenotype = "Sparc/Sparc")
+		#################
+		# 1.2 Categorical data
+		file  = system.file("extdata", "test_categorical.csv", package = "PhenStat")
+		test_Cat = PhenList(dataset = read.csv(file, na.strings = '-'), 
+		 testGenotype = "Aff3/Aff3")
 		
-		# 1st example ###################
-		# Mixed Model framework
-		file <- system.file("extdata", "test1.csv", package = "PhenStat")
-		testCon <-
-			PhenStat:::PhenList(
-				dataset = read.csv(file, na.strings = '-'),
-				testGenotype = "Sparc/Sparc",
-				outputMessages = FALSE
-			)
-		
-		# Forming PhenListAgeing object and its summary
-		PhenListAgeingObj.1 = PhenListAgeing(
-			object = testCon,
-			DOB = 'Birth.Date',
-			DOE = 'Batch',
-			d.threshold = 95
+		####################################################################
+		# 2 Testing frameworks
+		####################################################################
+		# 2.1 Mixed model framework
+		MM1_result = testDatasetAgeing(
+			phenListAgeing = test_Cont,
+			method = 'MM',
+			MM_fixed = Lean.Mass ~ Genotype + Sex + Weight
 		)
-		summary(PhenListAgeingObj.1)
-		plot(PhenListAgeingObj.1)
+		VO_MM1 = vectorOutputAgeing(MM1_result)
+		plot(MM1_result, col = 2)
+		summary(MM1_result)
+		#################
 		
-		# Model estimation
-		output.1 = testDatasetAgeing(
-			phenListAgeing = PhenListAgeingObj.1,
-			depVariable = 'Lean.Mass',
-			LifeStage = FALSE,
-			withWeight = TRUE
+		# 2.2 Mixed model with NO optimisation
+		MM2_result = testDatasetAgeing(
+			phenListAgeing = test_Cont,
+			method = 'MM',
+			MM_fixed = Lean.Mass ~ Genotype + Sex + Weight,
+			MM_lower =           ~ Genotype + Sex + Weight + 1
 		)
-		summary(output.1)
-		plot(output.1)
-		
-		# Vector and Matrix output just in case
-		# PhenStatAgeing:::vectorOutput(output.1)
-		# PhenStatAgeing:::vectorOutputMatrices(output.1)
-		
-		#|--------\---------------2nd example-----------------/--------|#
-		#|--------/----------Fisher exact test----------------\--------|#
-		
-		# 2nd example ###################
-		# Fisher Exact Test framework
-		file =
-			system.file("extdata", "test_categorical.csv", package = "PhenStat")
-		testCat =
-			PhenStat:::PhenList(
-				dataset = read.csv(file, na.strings = '-'),
-				testGenotype = "Aff3/Aff3",
-				outputMessages = FALSE
-			)
-		
-		# Forming PhenListAgeing object and its summary
-		PhenListAgeingObj.2 = PhenListAgeing(object = testCat, DOB = 'Birth.Date')
-		summary(PhenListAgeingObj.2)
-		plot(PhenListAgeingObj.2)
-		
-		
-		# Model estimation
-		output.2 = testDatasetAgeing(
-			phenListAgeing = PhenListAgeingObj.2,
-			LifeStage = FALSE,
-			depVariable = "Thoracic.Processes"
+		VO_MM2 = vectorOutputAgeing(MM2_result)
+		plot(MM2_result, col = 3)
+		summary(MM2_result)
+		#################
+		# 2.3 Reference range model
+		RR_result = testDatasetAgeing(
+			phenListAgeing = test_Cont,
+			method = 'RR',
+			RR_formula  = Lean.Mass ~ Genotype + Sex
 		)
+		VO_RR = vectorOutputAgeing(RR_result)
+		plot(RR_result, col = 2)
+		summary(RR_result)
+		#################
+		# 2.4 Fisher exact model
+		FE_result = testDatasetAgeing(
+			phenListAgeing = test_Cat,
+			method = "FE",
+			FE_formula =  Thoracic.Processes ~ Genotype + Sex + Weight
+		)
+		VO_FE = vectorOutputAgeing(FE_result)
+		plot(FE_result, col = 1)
+		summary(FE_result)
 		
-		summary(output.2)
-		plot(output.2)
-		
-		# Vector and Matrix output just in case
-		# PhenStatAgeing:::vectorOutput(output.2)
-		# PhenStatAgeing:::vectorOutputMatrices(output.2)
- }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ ~PhenStatAgeing }

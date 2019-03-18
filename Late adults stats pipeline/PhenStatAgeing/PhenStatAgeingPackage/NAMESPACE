@@ -4,6 +4,7 @@ import(methods)
 import(Hmisc)
 import(jsonlite)
 import(PhenStat)
+import(knitr)
 
 importFrom("graphics", "abline", "hist", "par", "plot")
 importFrom("stats", "AIC", "aggregate", "as.formula", "complete.cases",
@@ -27,11 +28,15 @@ importFrom("stats", "drop.scope")
 importFrom("stats", "pchisq")
 importFrom("graphics", "mosaicplot")
 
-S3method(summary, PhenListAgeing)
-S3method(plot   , PhenListAgeing)
-S3method(plot   , PhenStatAgeingMM)
-S3method(plot   , PhenStatAgeingRR)
-S3method(plot   , PhenStatAgeingFE)
+S3method(summary   , PhenListAgeing)
+S3method(summary   , PhenStatAgeingMM)
+S3method(summary   , PhenStatAgeingRR)
+S3method(summary   , PhenStatAgeingFE)
+
+S3method(plot      , PhenListAgeing)
+S3method(plot      , PhenStatAgeingMM)
+S3method(plot      , PhenStatAgeingRR)
+S3method(plot      , PhenStatAgeingFE)
 
 
 
