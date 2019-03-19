@@ -67,7 +67,7 @@ vectorOutputCont =	function(object,
 		'Other residual normality tests' = object$output$ResidualNormalityTests
 	)
 	#####################################################################
-	percentageChanges = NA
+	percentageChanges = NULL
 	#####################################################################
 	vectorOutput      = list(
 		'Method'                               = 	paste0(framework, ", ", fittingMethod, ', ', format(equation)),
@@ -82,7 +82,7 @@ vectorOutputCont =	function(object,
 				active = TRUE,
 				formula = frm,
 				term = Labels$Sex$Sex,
-				return = NA,
+				return = NULL,
 				not = modelSummaryPvalueExtract(
 					x = Fmodel,
 					variable = Labels$Genotype$Genotype,
@@ -95,7 +95,7 @@ vectorOutputCont =	function(object,
 				active = TRUE,
 				formula = frm,
 				term = Labels$Sex$Sex,
-				not = NA,
+				not = NULL,
 				return = modelSummaryPvalueExtract(
 					x = object$output$SplitModels$Genotype_Sex,
 					# SexFemale:Genotypeexperimental
@@ -113,7 +113,7 @@ vectorOutputCont =	function(object,
 				active = TRUE,
 				formula = frm,
 				term = Labels$Sex$Sex,
-				not = NA,
+				not = NULL,
 				return = modelSummaryPvalueExtract(
 					x = object$output$SplitModels$Genotype_Sex,
 					variable = CombineLevels(
@@ -622,7 +622,7 @@ vectorOutputCont =	function(object,
 		),
 		'LifeStageSexGenotype MvLvKO effect size'        = object$output$EffectSizes$Genotype_Male.Late ,
 		################
-		'Classification tag'                   =	NA,
+		'Classification tag'                   =	NULL,
 		'Transformation'                       =	'Legacy',
 		'Additional information'               =	addInfo
 	)

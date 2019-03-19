@@ -35,7 +35,7 @@ RRrunner = function(object              ,
 	message0('Stp 1. Low versus Normal/High')
 	RRobject_low = RRNewObjectAndFormula(
 		object = object                   ,
-		RRprop = RRprop                   ,
+		RRprop = 1-RRprop                 ,
 		formula = formula                 ,
 		labels = c('Low', 'NormalHigh')   ,
 		depVarPrefix = 'Low'
@@ -51,7 +51,7 @@ RRrunner = function(object              ,
 	message0('Stp 2. Low/Normal versus High')
 	RRobject_high = RRNewObjectAndFormula(
 		object = object                    ,
-		RRprop = 1 - RRprop                ,
+		RRprop = RRprop                    ,
 		formula = formula                  ,
 		labels = c('LowNormal', 'High')    ,
 		depVarPrefix = 'High'

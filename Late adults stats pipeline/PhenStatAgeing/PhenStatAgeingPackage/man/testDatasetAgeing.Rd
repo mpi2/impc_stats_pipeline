@@ -139,7 +139,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 			MM_fixed = Lean.Mass ~ Genotype + Sex + Weight
 		)
 		VO_MM1 = vectorOutputAgeing(MM1_result)
-		plot(MM1_result, col = 2)
+		plot(MM1_result, col = 2,main = 'Optimised model')
 		summary(MM1_result)
 		#################
 		
@@ -151,7 +151,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 			MM_lower =           ~ Genotype + Sex + Weight + 1
 		)
 		VO_MM2 = vectorOutputAgeing(MM2_result)
-		plot(MM2_result, col = 3)
+		plot(MM2_result, col = 4,main = 'Not optimised model')
 		summary(MM2_result)
 		#################
 		# 2.3 Reference range model
@@ -161,7 +161,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 			RR_formula  = Lean.Mass ~ Genotype + Sex
 		)
 		VO_RR = vectorOutputAgeing(RR_result)
-		plot(RR_result, col = 2)
+		plot(RR_result, col = 3:4)
 		summary(RR_result)
 		#################
 		# 2.4 Fisher exact model
@@ -171,7 +171,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 			FE_formula =  Thoracic.Processes ~ Genotype + Sex + Weight
 		)
 		VO_FE = vectorOutputAgeing(FE_result)
-		plot(FE_result, col = 1)
+		plot(FE_result, col = 1:2)
 		summary(FE_result)
 		
 }
