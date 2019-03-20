@@ -40,17 +40,17 @@ summaryCore = function(x,
 		'Tested Gene'                    = vo$`Gp2 genotype`,
 		'Reference Gene'                 = vo$`Gp1 genotype`,
 		'----------------------------'   = '----------------------------',
-		'Sexual dimorphism detected?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
+		'Sex in the optimised model?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
 		'----------------------------'   = ifelse(
 			procedure == 'RR',
 			'~ Separate p-values for (Low vs NormalHigh) and (LowNormal vs High) ~',
 			'----------------------------'
 		),
-		'Genotype contribution overal'   = vo$`Genotype contribution`$Overal,
-		'Genotype contribution Females'  = vo$`Genotype contribution`$`Sex FvKO p-val`,
-		'Genotype contribution Males'    = vo$`Genotype contribution`$`Sex MvKO p-val`,
+		'Genotype contribution overal'   = vo$`Genotype p-val`,
+		'Genotype contribution Females'  = vo$`Sex FvKO p-val`,
+		'Genotype contribution Males'    = vo$`Sex MvKO p-val`,
 		'----------------------------'   = '----------------------------',
-		'LifeStage contribution'              = vo$`LifeStage p-val`,
+		'LifeStage contribution'         = vo$`LifeStage p-val`,
 		'Genotype contribution Early'    = vo$`LifeStage EvKO p-val`,
 		'Genotype contribution Late'     = vo$`LifeStage LvKO p-val`,
 		'----------------------------'   = '----------------------------',
@@ -61,7 +61,7 @@ summaryCore = function(x,
 	print(kable(
 		outT,
 		format = format,
-		col.names = c('Statistics', 'Value'),
+		col.names = c('Statistic', 'Value'),
 		...
 	))
 	return(invisible(outT))

@@ -766,23 +766,31 @@ unclassFocused <- function(x)
 	return(x1)
 }
 
-ModelInReference = function(model, reference, responseIncluded = FALSE,veryLower = ~Genotype+1) {
+ModelInReference = function(model,
+														reference,
+														responseIncluded = FALSE,
+														veryLower = ~ Genotype + 1) {
 	mo = formulaTerms(model)
 	re = formulaTerms(reference)
 	r  = re[re %in% mo]
-	if (length(r) > ifelse(responseIncluded, 1, 0) &&
-			length(mo[!(mo %in% re)]) > 0) {
-		message0('Some terms in the "lower" model are ignored. See:\n\t',
-						 pasteComma(mo[!(mo %in% re)]))
-		if (responseIncluded)
-			out = reformulate(termlabels = r[-1],
-												response   = r[1],
-												intercept  = TRUE)
-		else
-			out = reformulate(termlabels = r,
-												response   = NULL,
-												intercept  = TRUE)
-		message0('The polished "lower": ', printformula(out))
+	if (length(r) > ifelse(responseIncluded, 1, 0)) {
+		if (length(mo[!(mo %in% re)]) > 0) {
+			message0('Some terms in the "lower" model are ignored. See:\n\t',
+							 pasteComma(mo[!(mo %in% re)]))
+			if (responseIncluded)
+				out = reformulate(
+					termlabels = r[-1],
+					response   = r[1],
+					intercept  = TRUE
+				)
+			else
+				out = reformulate(termlabels = r,
+													response   = NULL,
+													intercept  = TRUE)
+			message0('The polished "lower": ', printformula(out))
+		} else{
+			out = model
+		}
 	} else{
 		out = veryLower
 	}
