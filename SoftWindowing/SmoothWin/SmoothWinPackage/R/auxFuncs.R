@@ -2,7 +2,7 @@
   packageStartupMessage(
     paste0(
       '\n ========================================================================',
-      '\n ~> If you have any question about this package contact me by            ',
+      '\n ~> If you have any question about this package contact us               ',
       '\n ~> hamedhm@ebi.ac.uk                                                    ',
       '\n ~> This project is supported by European Bioinformatic Institute (EBI)  ',
       '\n ~> https://www.mousephenotype.org/                                      ',
@@ -15,13 +15,13 @@
 ###########
 expF = function(x, k, l, m, cdf, direction = c(1, 1)) {
   m  = unique(m)
-  r = cdf(x,
+  r  = cdf(x,
           m - l * direction[1],
           1 / k) *
     (1 - (cdf(x,
               m + l * direction[2],
               1 / k)))
-  r = r / ifelse(!is.null(r) &&
+  r  = r / ifelse(!is.null(r) &&
                    max(r, na.rm = TRUE) != 0, max(r, na.rm = TRUE), 1)
   return(r)
 }
@@ -67,7 +67,7 @@ expWeight = function(t                         ,
   s = 0
   for (j in 1:lm) {
     val = sapply(
-      X = combn(lm, j, simplify = FALSE),
+      X = comb_n(lm,  j, simplify = FALSE), 
       FUN = function(i) {
         return( rowprods(r[, i, drop = FALSE]))
       }
