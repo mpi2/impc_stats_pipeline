@@ -67,27 +67,7 @@ summaryCore = function(x,
 	return(invisible(outT))
 }
 
-
 prepareSummaryOutput = function(out, nullMessage = 'Not applicable') {
-	# out = lapply(out, function(x) {
-	# 	if (length(x) < 1 ||
-	# 			is.null(x) ||
-	# 			is.character(x)) {
-	# 		if (is.character(x) && nchar(x) > 3) {
-	# 			x = gsub(
-	# 				x = x,
-	# 				pattern = 'NULL',
-	# 				replacement =  nullMessage,
-	# 				fixed = TRUE
-	# 			)
-	# 		}
-	# 	} else if (is.null(x)) {
-	# 		x = nullMessage
-	# 	}else{
-	# 		x = x
-	# 	}
-	# 	return(x)
-	# })
 	outT = as.matrix(out)
 	outT = as.matrix(cbind(rownames(outT), outT))
 	rownames(outT) = NULL

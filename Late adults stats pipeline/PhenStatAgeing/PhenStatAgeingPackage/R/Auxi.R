@@ -73,27 +73,6 @@ checkModelTermsInData = function(formula,
 	return(formula)
 }
 
-# Test type (decimal [Continues]/not decimal [Categorical])
-# IsCategorical = function(num = NA, max.consider = Inf) {
-# 	if (length(num) < 1 ||
-# 			is.null(num) || length(na.omit(num)) < 1)
-# 		# do not change the order
-# 		stop('\n ~> Null vector or all NAs \n')
-# 	
-# 	num = na.omit(num)
-# 	if (!is.numeric(num)) {
-# 		cat = TRUE
-# 		method = 'FE'
-# 	} else if (all(num %% 1 == 0) &&
-# 						 length(unique(num)) < max.consider) {
-# 		cat = TRUE
-# 		method = 'GLM'
-# 	} else{
-# 		cat = FALSE
-# 		method = 'MM'
-# 	}
-# 	return(list(cat = cat, method = method))
-# }
 
 reformulate0 = function (termlabels,
 												 response = NULL,
@@ -243,7 +222,7 @@ ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 	}
 	return(formula)
 }
-# check for missings
+
 CheckMissing = function(data, formula) {
 	org.data = data
 	new.data = data[complete.cases(data[, all.vars(formula)]),]
@@ -261,7 +240,7 @@ CheckMissing = function(data, formula) {
 		)
 	))
 }
-# Cohens effect size
+
 eff.size = function(object,
 										data        = NULL        ,
 										depVariable = 'data_point',
@@ -321,7 +300,7 @@ eff.size = function(object,
 	return(efSi)
 }
 
-# Check whether there is any variation in the data for a certain variables
+
 noVariation = function(data, f = '~Genotype') {
 	xtb = xtabs(formula =  f,
 							drop.unused.levels = TRUE,
@@ -333,7 +312,7 @@ noVariation = function(data, f = '~Genotype') {
 	}
 }
 
-# Flatting a table
+
 ConvDf2Flat = function(dframe,
 											 ch1 = '*',
 											 ch2 = ':',
@@ -573,7 +552,6 @@ ctest = function(x,
 								 rep = 1500,
 								 ...) {
 	message = c()
-	#message0('\tForming the cross table ...')
 	xtb = xtabs(
 		formula = formula,
 		data = x,

@@ -3,7 +3,6 @@ PhenListAgeing = function(PhenListobject,
 													DOB = NULL,
 													d.threshold = 16 * 7,
 													debug       = TRUE) {
-	#### Function to add age and LifeStage to the data
 	#### Negative age will be removed
 	PhenListobject@datasetPL           = droplevels(PhenListobject@datasetPL)
 	
