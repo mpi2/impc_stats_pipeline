@@ -149,12 +149,16 @@ TypicalModel = function(depVariable,
 }
 
 
+
 FeasibleTermsInContFormula = function(formula, data) {
 	Allvars = all.vars(formula)[all.vars(formula) %in% names(data)]
 	isCat = !sapply(data[, Allvars, drop = FALSE], is.numeric)
 	vars  = Allvars[isCat]
 	lvars = length(vars)#min(length(vars), sapply(strsplit(formulaTerms(formula = formula), split = ':'), length), na.rm = TRUE)
 	names = r = NULL
+	if(getResponseFromFormula(formula = formula) %in% vars){
+		message0('\tResponse is included in the checks ....')
+	}
 	if (lvars > 0) {
 		for (i in 1:lvars) {
 			message0('\t',i,
@@ -163,6 +167,7 @@ FeasibleTermsInContFormula = function(formula, data) {
 							 '. Checking for the feasibility of the terms and interactions ...')
 			cmb = combn(vars, i)
 			for (j in 1:ncol(cmb)) {
+				message0('\t\t Checking ', pasteComma(cmb[, j]))
 				xtb = xtabs(
 					formula = paste0('~', paste0(cmb[, j], collapse = '+')),
 					data = data,
@@ -737,11 +742,48 @@ AllTables = function(dframe        = NULL,
 	return(l3)
 }
 
-formulaTerms = function(formula) {
-	if (!is.null(formula))
-		r = attr(terms(as.formula(formula))    , which = 'term.labels')
+
+FormulaHasIntercept = function(formula) {
+	if (is.null(formula))
+		return(NULL)
+	attr(terms(as.formula(formula))    , which = 'intercept') > 0
+}
+
+FormulaHasResponse = function(formula) {
+	if (is.null(formula))
+		return(NULL)
+	attr(terms(as.formula(formula))    , which = 'response') > 0
+}
+getResponseFromFormula = function(formula) {
+	if (is.null(formula))
+		return(NULL)
+	if (attr(terms(as.formula(formula))    , which = 'response'))
+		all.vars(formula)[1]
 	else
+		NULL
+}
+
+
+formulaTerms = function(formula,
+												response  = FALSE,
+												intercept = FALSE) {
+	if (!is.null(formula)) {
+		r = c(
+			if (response && FormulaHasResponse(formula))
+				getResponseFromFormula(formula)
+			else
+				NULL,
+			attr(terms(as.formula(formula))        , which = 'term.labels'),
+			if (intercept &&
+					FormulaHasIntercept(formula))
+				1
+			else
+				NULL
+		)
+	}
+	else{
 		r = NULL
+	}
 	return(r)
 }
 
@@ -770,28 +812,25 @@ ModelInReference = function(model,
 														reference,
 														responseIncluded = FALSE,
 														veryLower = ~ Genotype + 1) {
-	mo = formulaTerms(model)
-	re = formulaTerms(reference)
-	r  = re[re %in% mo]
-	if (length(r) > ifelse(responseIncluded, 1, 0)) {
+	mo  = formulaTerms(formula = model, intercept = TRUE)
+	re  = formulaTerms(formula = reference, intercept = TRUE)
+	r   = re[re %in% mo]
+	if (length(r) > 0) {
+		out = reformulate(
+			termlabels = r,
+			response   = if (responseIncluded && FormulaHasResponse(model))
+				all.vars(model)[1]
+			else
+				NULL	,
+			intercept  = TRUE
+		)
 		if (length(mo[!(mo %in% re)]) > 0) {
 			message0('Some terms in the "lower" model are ignored. See:\n\t',
 							 pasteComma(mo[!(mo %in% re)]))
-			if (responseIncluded)
-				out = reformulate(
-					termlabels = r[-1],
-					response   = r[1],
-					intercept  = TRUE
-				)
-			else
-				out = reformulate(termlabels = r,
-													response   = NULL,
-													intercept  = TRUE)
 			message0('The polished "lower": ', printformula(out))
-		} else{
-			out = model
 		}
 	} else{
+		message0('An invalid "lower". It is set to: ', printformula(veryLower))
 		out = veryLower
 	}
 	return(out)
@@ -1022,8 +1061,8 @@ jitter0 = function(x,
 		if(i == maxtry)
 			message0('No solusion found for the RR_prop. You may want to revise the RR_prop?')
 		xx = jitter(x = x,
-							 amount = amount,
-							 factor = factor)
+								amount = amount,
+								factor = factor)
 		if (min(xx,na.rm = TRUE) > lower && max(xx,na.rm = TRUE) < upper)
 			break
 	}

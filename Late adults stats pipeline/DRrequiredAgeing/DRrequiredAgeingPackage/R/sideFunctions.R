@@ -294,6 +294,7 @@ concurrentContSelect = function(activate = TRUE,
   # Part 2 extra checks
   if (activate && is.numeric(PhenListObj@datasetPL[, depVar])) {
     ### Check whether there is any variation in data
+    # No worries it only applies to MM framework
     checkNoZeroVar = RemoveZerovarCategories(
       x = PhenListObj@datasetPL,
       depVar = depVar,
@@ -752,7 +753,8 @@ RemoveZerovarCategories = function(x,
                                    sex = 'sex',
                                    genotype = 'biological_sample_group',
                                    sep = '_',
-                                   drop = TRUE) {
+                                   drop = TRUE,
+                                   method = 'MM') {
   note   = NULL
   # do not move me
   if (any(dim(x) == 0) || is.null(complete.cases0(x[, depVar])))
@@ -761,7 +763,7 @@ RemoveZerovarCategories = function(x,
   #x      = droplevels0(x)
   x = x[complete.cases(x[, depVar]), , drop = FALSE]
   newx   =  x
-  if (is.numeric(x[, depVar])) {
+  if (is.numeric(x[, depVar]) && (method %in% 'MM')) {
     lvls   = interaction(x[, sex], x[, genotype], sep = sep, drop = drop)
     vars   = tapply(x[, depVar], INDEX = lvls, function(xx) {
       if (is.numeric(xx) && length(na.omit(xx)) > 1) {
@@ -783,6 +785,9 @@ RemoveZerovarCategories = function(x,
         )
       }
     }
+  }else{
+    message0('Checking variation only applied to the MM method. The input mmethod: ',
+             method)
   }
   if (is.null(x) ||
       is.null(newx) || any(dim(newx) == 0) || any(dim(x) == 0))

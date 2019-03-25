@@ -417,7 +417,16 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     n3.5.1_v_list = RemoveZerovarCategories(
                       x = n3.5.1,
                       depVar = depVar,
-                      minvar = 0
+                      minvar = 0,
+					  method = getMethodi(
+                        var = parameter,
+                        type = ifelse(
+                          is.numeric(n3.5.1[, depVar]),
+                          'numeric',
+                          'charachter'
+                        ),
+                        methodMap = methodmap
+                      )
                     )
                     n3.5.1 = n3.5.1_v_list$x
                     note   = c(note, n3.5.1_v_list$note)

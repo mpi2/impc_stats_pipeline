@@ -45,7 +45,8 @@ RRrunner = function(object              ,
 		formula = RRobject_low$newFormula ,
 		rep = rep                         ,
 		method = 'RR'                     ,
-		fullComparisions = TRUE
+		fullComparisions = TRUE           ,
+		noteToFinish = 'in step 1'
 	)
 	
 	message0('Stp 2. Low/Normal versus High')
@@ -61,7 +62,8 @@ RRrunner = function(object              ,
 		formula = RRobject_high$newFormula ,
 		rep = rep                          ,
 		method = 'RR'                      ,
-		fullComparisions = TRUE
+		fullComparisions = TRUE            ,
+		noteToFinish = 'in step 2'
 	)
 	message0('RR framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
 	#####

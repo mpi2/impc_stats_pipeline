@@ -3,7 +3,8 @@ crunner = function(object              ,
 									 formula          = ~ category + Genotype + Sex + LifeStage,
 									 rep              = 1500,
 									 method           = NULL,
-									 fullComparisions = TRUE)
+									 fullComparisions = TRUE,
+									 noteToFinish     = NULL )
 {
 	if (sum(method != c('FE', 'RR')) == 0 ||
 			is.null(object)                   ||
@@ -47,7 +48,7 @@ crunner = function(object              ,
 		####
 		counter  = 1
 		for (j in 1:length(vars)) {
-			message0('Testing for the main effect: ',
+			message0('\tTesting for the main effect: ',
 							 pasteComma(vars[j], replaceNull = FALSE))
 			l[[counter]] = ctest(x = newObject,
 													 formula = reformulate(
@@ -97,7 +98,11 @@ crunner = function(object              ,
 					 ': ',
 					 pasteComma(names(lComplete)))
 	message0('\tTotal tests =  ', sum(sapply(lComplete, length)))
-	message0('FE framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
+	message0('FE framework ',
+					 noteToFinish,
+					 ' executed in ',
+					 round(difftime(Sys.time() , sta.time, units = 'sec'), 2),
+					 ' seconds')
 	OutR = list(
 		output = list(SplitModels = lComplete) ,
 		input  = list(
