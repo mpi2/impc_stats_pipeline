@@ -228,6 +228,28 @@ ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 	return(formula)
 }
 
+sign0 = function(x) {
+	if (is.null(x))
+		return(NULL)
+	if (sign(x) > 0)
+		return('positive')
+	else if (sign(x) == 0)
+		return('neutral')
+	else if (sign(x) < 0)
+		return('negative')
+	else
+		return(NULL)
+}
+
+dist0 = function(x, func = lower.tri) {
+	if (is.null(x))
+		return(NULL)
+	out = outer (x, x, `-`)
+	r   = out[func(out)]
+	return(r)
+}
+
+
 CheckMissing = function(data, formula) {
 	org.data = data
 	new.data = data[complete.cases(data[, all.vars(formula)]),]
@@ -268,7 +290,7 @@ eff.size = function(object,
 		)
 		return(errorReturn)
 	}
-	MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
+	
 	NModel       =
 		tryCatch(
 			expr = update(object,  as.formula(paste('~', effOfInd)), data = data),
@@ -287,14 +309,15 @@ eff.size = function(object,
 				return(NULL)
 			}
 		)
-	CoefEffSizes = sapply(data[, effOfInd, drop = FALSE], FUN = is.numeric)
 	if (!is.null(NModel)) {
+		CoefEffSizes = sapply(data[, effOfInd, drop = FALSE], FUN = is.numeric)
 		if (sum(CoefEffSizes)) {
 			# For continues variables it is the coefficient
 			efSi         = list(value = as.list(coef(NModel))[[effOfInd]][1],
 													type = 'coefficient')
 		} else{
 			# For categorical variables it is the mean difference
+			MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
 			r            = resid(NModel)
 			efSi         = list(value = ifelse(sd(r) > 0, abs(MDiff) / sd(r), NA),
 													type  = 'Mean difference')
