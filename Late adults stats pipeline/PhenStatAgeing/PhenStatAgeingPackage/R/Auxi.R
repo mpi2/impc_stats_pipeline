@@ -268,6 +268,55 @@ CheckMissing = function(data, formula) {
 	))
 }
 
+range0 = function(x, ...) {
+	ran = range(x, na.rm = TRUE)
+	if (length(ran) == 2) {
+		return(diff(ran))
+	} else{
+		return(NULL)
+	}
+}
+
+order0 = function(x, levels = FALSE) {
+	if (levels) {
+		r = x[order(levels(x))]
+	} else{
+		r = x[order(x)]
+	}
+	return(r)
+}
+
+percentageChangeCont = function(model, data, variable, depVar) {
+	if (is.null(data) ||
+			is.null(variable) ||
+			is.null(model) ||
+			is.null(range0(data[, depVar])) ||
+			range0(data[, depVar]) == 0) {
+		return(NULL)
+	}
+	####
+	out = sapply(variable, function(x) {
+		coefs = as.vector(unlist(summary(model)$tTable[, 1]))
+		ran  = range0(data[, depVar])
+		if (is.numeric(data[, x])) {
+			if (!is.null(ran) &&
+					!is.na(ran)   &&
+					ran != 0) {
+				r = coefs[-1] / ran
+				names(r) = x
+			} else{
+				r = NULL
+			}
+			return(r)
+		} else{
+			r = coefs / ran
+			names(r) = order0(levels(data[, x]))
+			return(r)
+		}
+	})
+	return(out)
+}
+
 eff.size = function(object,
 										data        = NULL        ,
 										depVariable = 'data_point',
@@ -311,16 +360,26 @@ eff.size = function(object,
 		)
 	if (!is.null(NModel)) {
 		CoefEffSizes = sapply(data[, effOfInd, drop = FALSE], FUN = is.numeric)
+		PerChange = percentageChangeCont(
+			model = NModel,
+			data = data,
+			variable = effOfInd,
+			depVar = depVariable
+		)
 		if (sum(CoefEffSizes)) {
 			# For continues variables it is the coefficient
-			efSi         = list(value = as.list(coef(NModel))[[effOfInd]][1],
-													type = 'coefficient')
+			efSi         = list(value            = as.list(coef(NModel))[[effOfInd]][1],
+													percentageChange = PerChange,
+													variable         = effOfInd,
+													type             = 'coefficient')
 		} else{
 			# For categorical variables it is the mean difference
 			MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
 			r            = resid(NModel)
-			efSi         = list(value = ifelse(sd(r) > 0, abs(MDiff) / sd(r), NA),
-													type  = 'Mean difference')
+			efSi         = list(value            = ifelse(sd(r) > 0, abs(MDiff) / sd(r), NA),
+													percentageChange = PerChange,
+													variable         = effOfInd,
+													type             = 'Mean difference')
 		}
 	} else{
 		efSi = errorReturn

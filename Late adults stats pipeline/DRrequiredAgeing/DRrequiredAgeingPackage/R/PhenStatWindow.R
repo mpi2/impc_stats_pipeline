@@ -47,7 +47,7 @@ PhenStatWindow = function (phenlistObject                                ,
   ## I checked the source and the messaging mechanism is written using the non-standard functioning in R
   note = windowingNote = graphFileName = object0 = NULL
   message0(method, '  in progress ....')
-  object0 =   testDatasetAgeing(
+  object0 =   PhenStatAgeing::testDatasetAgeing(
     phenListAgeing = phenlistObject,
     method = method,
     MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
@@ -60,7 +60,7 @@ PhenStatWindow = function (phenlistObject                                ,
   {
     method = 'MM'
     message0('Running the MM (only ABR) ... ')
-    object0 =   testDatasetAgeing(
+    object0 =   PhenStatAgeing::testDatasetAgeing(
       phenListAgeing = phenlistObject,
       method = method,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
@@ -74,7 +74,7 @@ PhenStatWindow = function (phenlistObject                                ,
     message0('Running the MM+Jitter (only ABR) ... ')
     method = 'MM'
     phenlistObject@datasetPL[, depVariable] = jitter(phenlistObject@datasetPL[, depVariable], 0.1)
-    object0 =   testDatasetAgeing(
+    object0 =   PhenStatAgeing::testDatasetAgeing(
       phenListAgeing = phenlistObject,
       method = method,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
