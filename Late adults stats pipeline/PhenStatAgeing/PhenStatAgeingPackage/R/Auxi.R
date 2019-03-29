@@ -32,6 +32,7 @@ pasteComma = function(..., replaceNull = TRUE) {
 		paste(..., sep = ', ', collapse = ', ')
 }
 
+
 pasteUnderscore = function(...) {
 	paste(..., sep = '_', collapse = '_')
 }
@@ -286,35 +287,82 @@ order0 = function(x, levels = FALSE) {
 	return(r)
 }
 
-percentageChangeCont = function(model, data, variable, depVar) {
-	if (is.null(data) ||
-			is.null(variable) ||
-			is.null(model) ||
-			is.null(range0(data[, depVar])) ||
-			range0(data[, depVar]) == 0) {
+
+
+
+percentageChangeCont = function(model                ,
+																data                 ,
+																variable             ,
+																depVar               ,
+																individual = TRUE    ,
+																mainEffsOnlyWhenIndivi = 'Sex',
+																FUN = range0) {
+	if (!is.null(data)                                           &&
+			(!is.null(variable) || !is.null(mainEffsOnlyWhenIndivi)) &&
+			!is.null(model)                                          &&
+			!is.null(FUN(data[, depVar]))        &&
+			FUN(data[, depVar]) != 0) {
+		####
+		coefs = unlist(summary(model)$tTable[, 1])
+		ran   = FUN(data[, depVar])
+		if (individual) {
+			out   = sapply(variable, function(x) {
+				message0('\tCalculating the percentage change for: ',
+																	pasteComma(x))
+				if (is.numeric(data[, x])) {
+					r = coefs[-1]
+					names(r) = x
+				} else{
+					r = coefs
+					names(r) = order0(levels(data[, x]))
+				}
+				return( r / ran * 100)
+			})
+		} else{
+			out = extractCoefOfInterest(coefs = coefs,
+																									 main = mainEffsOnlyWhenIndivi,
+																									 data = data)
+			return(
+				list(
+					value = out,
+					percentageChange = out / ran * 100,
+					variable = mainEffsOnlyWhenIndivi,
+					type = 'interaction coefficients '
+				)
+			)
+		}
+		
+	} else{
 		return(NULL)
 	}
-	####
-	out = sapply(variable, function(x) {
-		coefs = as.vector(unlist(summary(model)$tTable[, 1]))
-		ran  = range0(data[, depVar])
-		if (is.numeric(data[, x])) {
-			if (!is.null(ran) &&
-					!is.na(ran)   &&
-					ran != 0) {
-				r = coefs[-1] / ran
-				names(r) = x
+}
+
+extractCoefOfInterest = function(coefs, main = 'Sex',data) {
+	lvls = lapply(
+		main,
+		FUN = function(x) {
+			if (!is.numeric(data[, x])) {
+				r = paste(x, levels(data[, x]), sep = '')
+				r = c(paste0(r, ':'), paste0(':', r))
 			} else{
-				r = NULL
+				r = x
 			}
 			return(r)
-		} else{
-			r = coefs / ran
-			names(r) = order0(levels(data[, x]))
-			return(r)
 		}
-	})
-	return(out)
+	)
+	
+	Cnames = names(coefs)
+	r = coefs[grepl(pattern = pasteBracket( unlist(lvls),left = '',right = '',col = '|'), x = Cnames)]
+	return(r)
+}
+
+pasteBracket = function(..., replaceNull = TRUE,col='|',right=']:',left='[') {
+	if (replaceNull)
+		paste(left,replaceNull(list(...), replaceBy = 'NULL'),right,
+					sep = '',
+					collapse = col)
+	else
+		paste(left,...,right, sep = ' ', collapse = col)
 }
 
 eff.size = function(object,
@@ -342,7 +390,7 @@ eff.size = function(object,
 	
 	NModel       =
 		tryCatch(
-			expr = update(object,  as.formula(paste('~', effOfInd)), data = data),
+			expr = update(object,  reformulate(termlabels = effOfInd,response = NULL,intercept = TRUE), data = data),
 			error = function(e) {
 				message0('\t\tError(s) in the effect size estimation for',
 								 pasteComma(effOfInd),
@@ -553,7 +601,7 @@ SplitEffect = 	function(finalformula,
 						termlabels = c(
 							arg,
 							paste(
-								'Genotype',
+								mandatoryVar,
 								arg,
 								collapse = ':',
 								sep = ':'
@@ -587,6 +635,7 @@ SplitEffect = 	function(finalformula,
 						breakLine = FALSE
 					)
 					if (!is.null(l0)) {
+						l0$MainEffect = arg
 						l[[counter]]   = l0
 						names[counter] = paste(
 							paste0(mandatoryVar, collapse = '_'),
@@ -618,7 +667,12 @@ dim0 <- function(...) {
 }
 
 printformula = function(formula) {
-	paste01(format(formula, trim = TRUE, width = 0), collapse = '')
+	if (!is.null(formula)) {
+		r = paste01(format(formula, trim = TRUE, width = 0), collapse = '')
+	} else{
+		r = NULL
+	}
+	return(r)
 }
 # Categorical effect size
 # https://github.com/mpi2/stats_working_group/raw/master/PhenStatUserGuide/PhenStatUsersGuide.pdf p122
@@ -2032,7 +2086,7 @@ stepAIC0 = function (object,
 		fit <- eval.parent(fit)
 		nnew <- nobs(fit, use.fallback = TRUE)
 		if (all(is.finite(c(n, nnew))) && nnew != n)
-			message0("Warning! number of rows in use has changed: remove missing values ...")
+			message0("\t Warning! number of rows in use has changed: remove missing values ...")
 		Terms <- terms(fit)
 		bAIC <- extractAIC(fit, scale, k = k, ...)
 		edf <- bAIC[1L]
@@ -2108,7 +2162,7 @@ dropterm0 =
 			ans[i + 1, ] <- extractAIC(nfit, scale, k = k, ...)
 			nnew <- nobs(nfit, use.fallback = TRUE)
 			if (all(is.finite(c(n0, nnew))) && nnew != n0)
-				message0("Warning! number of rows in use has changed: remove missing values ...")
+				message0("\t Warning! number of rows in use has changed: remove missing values ...")
 		}
 		dfs <- ans[1L, 1L] - ans[, 1L]
 		dfs[1L] <- NA

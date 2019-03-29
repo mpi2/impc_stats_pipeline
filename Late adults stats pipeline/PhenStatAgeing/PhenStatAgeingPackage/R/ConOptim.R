@@ -135,21 +135,22 @@ M.opt = function(object = NULL            ,
 				na.action = na.omit
 			),
 			warning = function(war) {
-				message0('* The optimisation failed with the warning (see below): ')
+				message0('\t * The optimisation failed with the warning (see below): ')
 				message0('\t', war, breakLine = FALSE)
 				return(NULL)
 			},
 			error = function(err) {
-				message0('* The optimisation failed with the error (see below): ')
+				message0('\t * The optimisation failed with the error (see below): ')
 				message0('\t', err, breakLine = FALSE)
 				return(NULL)
 			}
 		)
 		###########
 		if (is.null(F.Model)) {
-			message0('Optimisation did not apply')
+			message0('\t Optimisation did not apply')
 			F.Model = I.Model
 		} else{
+			message0('\t Optimised model: ', printformula(formula(F.Model)))
 			optimised = TRUE
 		}
 	} else{
@@ -223,14 +224,24 @@ M.opt = function(object = NULL            ,
 			depVariable = allVars[1]
 		)
 		message0('Estimating effect sizes ... ')
-		EffectSizes = suppressMessages(
+		EffectSizes = c(suppressMessages(
 			AllEffSizes(
 				object = F.Model,
 				depVariable = allVars[1],
 				effOfInd    = allVars[-1],
 				data = data
 			)
-		)
+		),
+		CombinedEffectSizes = lapply(SplitModels, function(x) {
+			percentageChangeCont(
+				model = x,
+				data = getData(x),
+				variable = NULL,
+				depVar = allVars[1],
+				individual = FALSE,
+				mainEffsOnlyWhenIndivi = x$MainEffect
+			)
+		}))
 		message0(
 			'\tTotal effect sizes estimated: ',
 			ifelse(
