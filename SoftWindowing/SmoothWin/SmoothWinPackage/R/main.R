@@ -194,7 +194,7 @@ plot.SmoothWin = function(x, ylab = 'Response', col = NULL ,   ...) {
         ', k='                                                    ,
         round(x$final.k$value, 2)                                       ,
         ', '                                                      ,
-        ifelse(x$input$weightORthreshold == 'weight', 'ASS=', '#'),
+        ifelse(x$input$weightORthreshold == 'weight', 'SWS=', '#'),
         round(x$finalModel$output$ObsInInterval, 3)               ,
         ' [~'                                                     ,
         round(x$finalModel$output$ObsInInterval / ly * 100)       ,

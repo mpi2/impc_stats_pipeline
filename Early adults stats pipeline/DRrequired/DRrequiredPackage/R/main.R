@@ -346,9 +346,25 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     # Define response column [do not move me!]
                     depVariable = getResponseColumn(n3.5$observation_type)
                     depVar      = depVariable$column
-                    note$response_type = paste0(depVar,
+                    note$response_type       = paste0(depVar,
                                                 '_ofType_',
                                                 paste(depVariable$lbl, sep = '.'))
+                    note$observation_type    =
+                      if (!is.null(unique(n3.5$observation_type))) {
+                        paste(unique(n3.5$observation_type),
+                              sep = '~',
+                              collapse = '~')
+                      } else{
+                        NULL
+                      }
+                    note$data_type           =
+                      if (!is.null(unique(n3.5$data_type))) {
+                        paste(unique(n3.5$data_type),
+                              sep = '~',
+                              collapse = '~')
+                      } else{
+                        NULL
+                      }
 
                     minSampRequired = ifelse(
                       is.ABR(x = parameter),

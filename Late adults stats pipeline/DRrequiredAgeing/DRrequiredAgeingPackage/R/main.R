@@ -355,9 +355,25 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     depVariable = getResponseColumn(n3.5$observation_type)
                     depVar      = depVariable$column
                     message0('Dependent variable: ', depVar)
-                    note$response_type = paste0(depVar,
+                    note$response_type       = paste0(depVar,
                                                 '_of_type_',
                                                 paste(depVariable$lbl, sep = '.'))
+                    note$observation_type    =
+                      if (!is.null(unique(n3.5$observation_type))) {
+                        paste(unique(n3.5$observation_type),
+                              sep = '~',
+                              collapse = '~')
+                      } else{
+                        NULL
+                      }
+                    note$data_type           =
+                      if (!is.null(unique(n3.5$data_type))) {
+                        paste(unique(n3.5$data_type),
+                              sep = '~',
+                              collapse = '~')
+                      } else{
+                        NULL
+                      }
 
                     minSampRequired = ifelse(
                       is.ABR(x = parameter),
