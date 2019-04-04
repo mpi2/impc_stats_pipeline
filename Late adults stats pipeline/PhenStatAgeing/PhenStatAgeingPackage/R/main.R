@@ -101,7 +101,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 	
 	
 	if (method %in% 'MM') {
-		message0('Linear Mixed Model (MM) in progress ...')
+		message0('Linear Mixed Model (MM framework) in progress ...')
 		output = M.opt(
 			fixed = MM_fixed ,
 			random = MM_random,
@@ -118,7 +118,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			output$input$fixed = MM_fixed
 		
 	} else if (method %in% 'FE') {
-		message0('Fisher exact test (FE) in progress ...')
+		message0('Fisher Exact Test (FE framework) in progress ...')
 		output = crunner(
 			object = phenListAgeing,
 			formula = MoveResponseToRightOfTheFormula(FE_formula),
@@ -132,7 +132,7 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			output$input$formula = FE_formula
 		
 	} else if (method %in% 'RR') {
-		message0('Reference Range plus (RR) in progress ...')
+		message0('Reference Range Plus (RR framework) in progress ...')
 		output = RRrunner(
 			object = phenListAgeing,
 			formula = MoveResponseToRightOfTheFormula(RR_formula),

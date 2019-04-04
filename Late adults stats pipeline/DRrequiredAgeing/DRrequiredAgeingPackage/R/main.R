@@ -609,7 +609,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       PhenListSpecIds = OtherExtraColumns (
                         obj = a@datasetPL,
                         ColNames = 'external_sample_id',
-                        names = 'phenlist_data_spec_Ids'
+                        names = 'phenlist_data_spec_ids'
                       )
                       note = c(note, PhenListSpecIds)
                       ### Get method of analysis

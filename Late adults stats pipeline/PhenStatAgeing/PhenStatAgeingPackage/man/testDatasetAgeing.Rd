@@ -119,10 +119,13 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		####################################################################
 		# 1 Data preparation
 		####################################################################
+		
+		#################
 		# 1.1 Continuous data
 		file = system.file("extdata", "test1.csv", package = "PhenStat")
 		test_Cont = PhenList(dataset = read.csv(file, na.strings = '-'), 
 		 testGenotype = "Sparc/Sparc")
+		
 		#################
 		# 1.2 Categorical data
 		file  = system.file("extdata", "test_categorical.csv", package = "PhenStat")
@@ -132,6 +135,8 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		####################################################################
 		# 2 Testing frameworks
 		####################################################################
+		
+		#################
 		# 2.1 Mixed model framework
 		MM1_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
@@ -141,8 +146,9 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		VO_MM1 = vectorOutputAgeing(MM1_result)
 		plot(MM1_result, col = 2,main = 'Optimised model')
 		summary(MM1_result)
-		#################
 		
+		
+		#################
 		# 2.2 Mixed model with NO optimisation
 		MM2_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
@@ -153,6 +159,8 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		VO_MM2 = vectorOutputAgeing(MM2_result)
 		plot(MM2_result, col = 4,main = 'Not optimised model')
 		summary(MM2_result)
+		
+		
 		#################
 		# 2.3 Reference range model
 		RR_result = testDatasetAgeing(
@@ -163,6 +171,8 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		VO_RR = vectorOutputAgeing(RR_result)
 		plot(RR_result, col = 3:4)
 		summary(RR_result)
+		
+		
 		#################
 		# 2.4 Fisher exact model
 		FE_result = testDatasetAgeing(

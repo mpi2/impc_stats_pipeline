@@ -67,7 +67,13 @@ vectorOutputCont =	function(object,
 		'Other residual normality tests' = object$output$ResidualNormalityTests
 	)
 	#####################################################################
-	percentageChanges = NULL
+	pcS = object$output$EffectSizes$CombinedEffectSizes.Genotype_Sex$percentageChange
+	pcO = object$output$EffectSizes$Genotype$percentageChange
+	percentageChanges = if (!is.null(pcS)) {
+		pcS
+	} else{
+		pcO
+	}
 	#####################################################################
 	vectorOutput      = list(
 		'Method'                               = 	paste0(framework, ", ", fittingMethod, ', ', format(equation)),

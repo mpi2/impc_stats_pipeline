@@ -23,15 +23,23 @@ replaceNull = function(x, replaceBy = 'NULL') {
 	})
 	return(unlist(x))
 }
-pasteComma = function(..., replaceNull = TRUE) {
+pasteComma = function(...,
+											replaceNull = TRUE,
+											truncate = TRUE   ,
+											width = 100) {
 	if (replaceNull)
-		paste(replaceNull(list(...), replaceBy = 'NULL'),
-					sep = ', ',
-					collapse = ', ')
+		r = paste(replaceNull(list(...), replaceBy = 'NULL'),
+							sep = ', ',
+							collapse = ', ')
 	else
-		paste(..., sep = ', ', collapse = ', ')
+		r = paste(..., sep = ', ', collapse = ', ')
+	if (truncate)
+		r = truncate_text(r,width)
 }
 
+truncate_text = function(x,width){
+	ifelse(nchar(x) > width, paste0(strtrim(x, width), '...'), x)
+}
 
 pasteUnderscore = function(...) {
 	paste(..., sep = '_', collapse = '_')
@@ -165,7 +173,7 @@ FeasibleTermsInContFormula = function(formula, data) {
 			message0('\t',i,
 							 ' of ',
 							 lvars,
-							 '. Checking for the feasibility of the terms and interactions ...')
+							 '. Checking for the feasibility of terms and interactions ...')
 			cmb = combn(vars, i)
 			for (j in 1:ncol(cmb)) {
 				message0('\t\t Checking ', pasteComma(cmb[, j]))
@@ -203,7 +211,7 @@ variablesInData = function(df, names, debug = TRUE) {
 
 ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 	message0(
-		'Checking for the feasibility of the terms and interactions. Formula:\n\t ',
+		'Checking for the feasibility of terms and interactions. Formula:\n\t ',
 		printformula(formula)
 	)
 	fbm = FeasibleTermsInContFormula(formula = formula, data = data)
@@ -257,9 +265,13 @@ CheckMissing = function(data, formula) {
 	missings = ifelse(all(dim(org.data) == dim(new.data)),	0, dim(org.data)[1] -
 											dim(new.data)[1])
 	if (missings)
-		message0('The data contain ',
-						 missings,
-						 ' missing(s).\nMissing data removed. \n ')
+		message0(
+			'The data (variable(s) = ',
+			pasteComma(all.vars(formula)),
+			') contain ',
+			missings,
+			' missing(s)...\n\tMissing data removed.'
+		)
 	return(invisible(
 		list(
 			org.data = org.data,
@@ -287,9 +299,6 @@ order0 = function(x, levels = FALSE) {
 	return(r)
 }
 
-
-
-
 percentageChangeCont = function(model                ,
 																data                 ,
 																variable             ,
@@ -308,7 +317,7 @@ percentageChangeCont = function(model                ,
 		if (individual) {
 			out   = sapply(variable, function(x) {
 				message0('\tCalculating the percentage change for: ',
-																	pasteComma(x))
+								 pasteComma(x))
 				if (is.numeric(data[, x])) {
 					r = coefs[-1]
 					names(r) = x
@@ -316,17 +325,17 @@ percentageChangeCont = function(model                ,
 					r = coefs
 					names(r) = order0(levels(data[, x]))
 				}
-				return( r / ran * 100)
+				return(r / ran * 100)
 			})
 		} else{
 			out = extractCoefOfInterest(coefs = coefs,
-																									 main = mainEffsOnlyWhenIndivi,
-																									 data = data)
+																	main = mainEffsOnlyWhenIndivi,
+																	data = data)
 			return(
 				list(
-					value = out,
-					percentageChange = out / ran * 100,
-					variable = mainEffsOnlyWhenIndivi,
+					value = out                                   ,
+					percentageChange = out / ran * 100            ,
+					variable = mainEffsOnlyWhenIndivi             ,
 					type = 'interaction coefficients '
 				)
 			)
@@ -415,13 +424,13 @@ eff.size = function(object,
 			depVar = depVariable
 		)
 		if (sum(CoefEffSizes)) {
-			# For continues variables it is the coefficient
+			# For continues covariates it is the coefficient
 			efSi         = list(value            = as.list(coef(NModel))[[effOfInd]][1],
 													percentageChange = PerChange,
 													variable         = effOfInd,
 													type             = 'coefficient')
 		} else{
-			# For categorical variables it is the mean difference
+			# For categorical covariates it is the mean difference
 			MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
 			r            = resid(NModel)
 			efSi         = list(value            = ifelse(sd(r) > 0, abs(MDiff) / sd(r), NA),
@@ -676,7 +685,7 @@ printformula = function(formula) {
 }
 # Categorical effect size
 # https://github.com/mpi2/stats_working_group/raw/master/PhenStatUserGuide/PhenStatUsersGuide.pdf p122
-cat.eff.size = function(xtb) {
+cat.eff.size = function(xtb,varName = NULL) {
 	if (any(dim(xtb) < 1)) {
 		r = NULL
 	} else{
@@ -684,7 +693,16 @@ cat.eff.size = function(xtb) {
 			max(dist(x, method = 'maximum', diag = TRUE), na.rm = TRUE)
 		}), na.rm = TRUE)
 	}
-	return(r)
+	
+	out = list(
+		value = r                                         ,
+		percentageChange = NULL                           ,
+		variable         = ifelse(!is.null(varName)       ,
+															varName                 , 
+															'Variable does not exist'),
+		type = 'Proportion change'
+	)
+	return(out)
 }
 # Test engine
 ctest = function(x,
@@ -754,16 +772,16 @@ ctest = function(x,
 				return(NULL)
 			}
 		)
-		effect     = cat.eff.size(xtb)
+		effect     = cat.eff.size(xtb, varName = pasteComma(all.vars0(formula)[-1]))
 		r$formula   = formula
 		r$table     = xtb
 	}
 	return(
 		list(
-			result      = r,
-			effectSize  = list(value = effect, type = 'Proportion change'),
+			result      = r      ,
+			effectSize  = effect ,
 			note        = message,
-			table       = xtb,
+			table       = xtb    ,
 			input       = 'Only have values when the function fails',
 			formula     = formula
 		)
@@ -817,7 +835,7 @@ AllTables = function(dframe        = NULL,
 			return(r)
 		})
 	
-	message0('\tKeep variables of interest ...')
+	message0('\tKeeping variables of interest ...')
 	if (!is.null(cols))
 		l2 = l2[as.logical(lapply(
 			# keep certain columns
@@ -1016,6 +1034,9 @@ multiBatch = function(data) {
 
 unmatrix0 = function (x, byrow = FALSE, sep = ' ')
 {
+	if(is.null(x))
+		return(NULL)
+	
 	rnames <- rownames(x)
 	cnames <- colnames(x)
 	if (is.null(rnames))

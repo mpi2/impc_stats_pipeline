@@ -43,7 +43,7 @@ summaryCore = function(x,
 		'Sex in the optimised model?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
 		'----------------------------'   = ifelse(
 			procedure == 'RR',
-			'~ Separate p-values for (Low vs NormalHigh) and (LowNormal vs High) ~',
+			'- Separate p-values for (Low vs NormalHigh) and (LowNormal vs High) -',
 			'----------------------------'
 		),
 		'Genotype contribution overal'   = vo$`Genotype p-val`,
