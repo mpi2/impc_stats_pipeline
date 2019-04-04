@@ -41,8 +41,7 @@ testDataset <-  function(phenList = NULL,
                          transformValues = FALSE,
                          useUnfiltered = FALSE,
                          threshold = 10 ^ -18,
-												 check     = 1,
-												 upper     = 5)
+						 upper     = 5)
 {
   stop_message <- ""
   upper   = max(upper, 2) # HAMED 1st Feb 2019
