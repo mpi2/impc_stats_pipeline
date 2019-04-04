@@ -271,7 +271,7 @@ concurrentContSelect = function(activate = TRUE,
         } else{
           note$concurrent_control_selection = paste0(
             LogicalToNote(activate),
-            '. There are not enough controls in the dataset (min=',
+            '. There are not enough controls in the dataset at the mutant dates  (min = ',
             minSmp,
             ' but there are ',
             min0(tb[, which(colnames(tb) == control)]),
