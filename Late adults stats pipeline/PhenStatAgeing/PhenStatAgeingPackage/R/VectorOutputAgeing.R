@@ -23,7 +23,7 @@ vectorOutputAgeing = function(object,
 				out = vectorOutputRR(object = object)
 			} else{
 				out = vectorOutputNULL(object = NULL)
-				out$`Additional information`$messages = unclassFocused(object$messages)
+				out$`Additional information`$messages = ListOperation(object$messages)
 			}, debug = debug)
 			
 			#########

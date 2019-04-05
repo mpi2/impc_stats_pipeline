@@ -56,13 +56,17 @@ vectorOutputCont =	function(object,
 		)                                                  ,
 		'Is model optimised'  = object$output$optimised    ,
 		'Summary statistics'  = DSsize                     ,
-		'Further models' = lapply(object$output$SplitModels, function(v) {
-			if (class(v) %in% c('lme', 'gls', 'glm')) {
-				as.list(unmatrix0(summary(v)$tTable))
-			} else{
-				v
-			}
-		}),
+		'Further models' = if (!is.null(object$output$SplitModels)) {
+			lapply(object$output$SplitModels, function(v) {
+				if (class(v) %in% c('lme', 'gls', 'glm')) {
+					as.list(unmatrix0(summary(v)$tTable))
+				} else{
+					v
+				}
+			})
+		} else{
+			NULL
+		},
 		'Effect sizes'                   = object$output$EffectSizes,
 		'Other residual normality tests' = object$output$ResidualNormalityTests
 	)

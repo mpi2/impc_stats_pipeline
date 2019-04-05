@@ -43,8 +43,8 @@ vectorOutputCat =	function(object)
 			'Only one sex included in the analysis'
 		),
 		'Summary statistics' = DSsize,
-		'Further models' = setNames(
-			sapply(object$output$SplitModels, function(v) {
+		'Further models' = if (!is.null(object$output$SplitModels)) {
+			setNames(sapply(object$output$SplitModels, function(v) {
 				lapply(
 					v,
 					FUN = function(v2) {
@@ -53,8 +53,10 @@ vectorOutputCat =	function(object)
 					}
 				)
 			}),
-			nm = names(object$output$SplitModels)
-		),
+			nm = names(object$output$SplitModels))
+		} else{
+			NULL
+		},
 		'Other residual normality tests' = NULL
 	)
 	#####################################################################

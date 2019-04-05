@@ -13,6 +13,21 @@
 	)
 }
 
+Matrix2List = function(x, ...) {
+	if (is.null(x))
+		return(NULL)
+	
+	if (length(x) == 1) {
+		return(as.list(x))
+	}
+	
+	if (!is(x, 'matrix'))
+		x = as.matrix(x)
+	
+	r = as.list(unmatrix0(x, ...))
+	return(r)
+}
+
 replaceNull = function(x, replaceBy = 'NULL') {
 	x = sapply(x, function(xx) {
 		if (is.null(xx)) {
@@ -305,7 +320,8 @@ percentageChangeCont = function(model                ,
 																depVar               ,
 																individual = TRUE    ,
 																mainEffsOnlyWhenIndivi = 'Sex',
-																FUN = range0) {
+																FUN = range0,
+																sep = '.') {
 	if (!is.null(data)                                           &&
 			(!is.null(variable) || !is.null(mainEffsOnlyWhenIndivi)) &&
 			!is.null(model)                                          &&
@@ -320,27 +336,27 @@ percentageChangeCont = function(model                ,
 								 pasteComma(x))
 				if (is.numeric(data[, x])) {
 					r = coefs[-1]
-					names(r) = x
+					names(r) = NULL
 				} else{
 					r = coefs
 					names(r) = order0(levels(data[, x]))
 				}
 				return(r / ran * 100)
-			})
+			}, USE.NAMES = TRUE)
+			return(Matrix2List(out, sep = sep))
 		} else{
 			out = extractCoefOfInterest(coefs = coefs,
 																	main = mainEffsOnlyWhenIndivi,
 																	data = data)
 			return(
 				list(
-					value = out                                   ,
-					percentageChange = out / ran * 100            ,
-					variable = mainEffsOnlyWhenIndivi             ,
+					value = out                                            ,
+					percentageChange = Matrix2List(out / ran * 100, sep = sep),
+					variable = mainEffsOnlyWhenIndivi                      ,
 					type = 'interaction coefficients '
 				)
 			)
 		}
-		
 	} else{
 		return(NULL)
 	}
@@ -951,16 +967,30 @@ expand.formula = function(formula) {
 	)
 }
 
-unclassFocused <- function(x)
+ListOperation <- function(x,FUN = unclass)
 {
 	cnames <- names(x)
 	if (is.null(cnames))
 		return (x)
 	x1 <- lapply(cnames, function(y)
-		unclassFocused(x[[y]]))
-	x1 <- unclass(x1)
+		ListOperation(x[[y]]))
+	x1 <- FUN(x1)
 	return(x1)
 }
+
+# You may want to use list.clean from rlist package
+prunelist = function(x) {
+	message0('Pruning list in progress ...')
+	r = lapply(x, function(y) {
+		if (is.null(y) || length(y) < 1) {
+			NULL
+		} else{
+			y
+		}
+	})
+	return(r)
+}
+
 
 ModelInReference = function(model,
 														reference,

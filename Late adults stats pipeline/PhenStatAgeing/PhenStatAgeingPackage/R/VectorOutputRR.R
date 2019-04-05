@@ -50,15 +50,19 @@ vectorOutputRR =	function(object)
 			'Only one sex included in the analysis'
 		),
 		'Summary statistics' = DSsize,
-		'Further models' = setNames(sapply(Vsplit, function(v) {
-			lapply(
-				v,
-				FUN = function(v2) {
-					list('p-value' = v2$result$p.value,
-							 'effect size' = v2$effectSize)
-				}
-			)
-		}), nm = names(Vsplit)),
+		'Further models' = if (is.null(Vsplit)) {
+			setNames(sapply(Vsplit, function(v) {
+				lapply(
+					v,
+					FUN = function(v2) {
+						list('p-value' = v2$result$p.value,
+								 'effect size' = v2$effectSize)
+					}
+				)
+			}), nm = names(Vsplit))
+		} else{
+			NULL
+		},
 		'Other residual normality tests' = NULL
 	)
 	#####################################################################
