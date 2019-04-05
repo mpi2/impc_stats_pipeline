@@ -721,6 +721,7 @@ UniqueAndNNull = function(x, collapse = '~') {
   if (length(x) > 0) {
     x = as.character(unique(x))
     x = paste0(x, collapse = collapse)
+    x = RemoveSpecialChars(x = x,replaceBy = ' ')
   } else{
     x = 'NotSpecified'
   }

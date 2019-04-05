@@ -27,22 +27,22 @@
 ## count matrix (matrices) and perform test(s).
 ##------------------------------------------------------------------------------
 testDataset <-  function(phenList = NULL,
-                         depVariable = NULL,
-                         equation = "withWeight",
-                         outputMessages = TRUE,
-                         pThreshold = 0.05,
-                         method = "MM",
-                         modelWeight = NULL,
-                         callAll = TRUE,
-                         keepList = NULL,
-                         dataPointsThreshold = 4,
-                         RR_naturalVariation = 95,
-                         RR_controlPointsThreshold = 60,
-                         transformValues = FALSE,
-                         useUnfiltered = FALSE,
-                         threshold = 10 ^ -18,
-						 check     = 1,
-						 upper     = 5)
+												 depVariable = NULL,
+												 equation = "withWeight",
+												 outputMessages = TRUE,
+												 pThreshold = 0.05,
+												 method = "MM",
+												 modelWeight = NULL,
+												 callAll = TRUE,
+												 keepList = NULL,
+												 dataPointsThreshold = 4,
+												 RR_naturalVariation = 95,
+												 RR_controlPointsThreshold = 60,
+												 transformValues = FALSE,
+												 useUnfiltered = FALSE,
+												 threshold = 10 ^ -18,
+												 check     = 1,
+												 upper     = 5)
 {
   stop_message <- ""
   upper   = max(upper, 2) # HAMED 1st Feb 2019

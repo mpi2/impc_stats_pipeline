@@ -28,9 +28,10 @@ M.opt = function(object = NULL            ,
 	gCont       = glsControl (opt  = 'optim',
 														singular.ok = TRUE)
 	glCont      = glm.control(epsilon = 10 ^ -36)
-	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = OutR =NULL
+	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = OutR = NULL
 	VarHomo     = TRUE
 	data        = object@datasetPL
+	n           = nrow(data)
 	fixed = ModelChecks(fixed = fixed,
 											data = data,
 											checks = checks)
@@ -132,7 +133,8 @@ M.opt = function(object = NULL            ,
 				trace = trace               ,
 				direction = direction       ,
 				scope = list(lower = lowerCorrected) ,
-				na.action = na.omit
+				na.action = na.omit                  ,
+				k = log(n)
 			),
 			warning = function(war) {
 				message0('\t * The optimisation failed with the warning (see below): ')
@@ -175,7 +177,7 @@ M.opt = function(object = NULL            ,
 			)
 			if (!is.null(F.Model) &&
 					!is.null(FV.Model) &&
-					AIC(FV.Model) <= AIC(F.Model)) {
+					AIC(FV.Model, k = log(n)) <= AIC(F.Model, k = log(n))) {
 				# = is important
 				F.Model = FV.Model
 				VarHomo = FALSE
@@ -211,7 +213,7 @@ M.opt = function(object = NULL            ,
 			)
 			if (!is.null(G.Model) &&
 					!is.null(F.Model) &&
-					AIC(G.Model) <= AIC(F.Model)) {
+					AIC(G.Model, k = log(n)) <= AIC(F.Model, k = log(n))) {
 				F.Model = G.Model
 				message0('\tBatch checked out ... ')
 			}
@@ -224,24 +226,26 @@ M.opt = function(object = NULL            ,
 			depVariable = allVars[1]
 		)
 		message0('Estimating effect sizes ... ')
-		EffectSizes = c(suppressMessages(
-			AllEffSizes(
-				object = F.Model,
-				depVariable = allVars[1],
-				effOfInd    = allVars[-1],
-				data = data
-			)
-		),
-		CombinedEffectSizes = lapply(SplitModels, function(x) {
-			percentageChangeCont(
-				model = x,
-				data = getData(x),
-				variable = NULL,
-				depVar = allVars[1],
-				individual = FALSE,
-				mainEffsOnlyWhenIndivi = x$MainEffect
-			)
-		}))
+		EffectSizes = c(
+			suppressMessages(
+				AllEffSizes(
+					object = F.Model,
+					depVariable = allVars[1],
+					effOfInd    = allVars[-1],
+					data = data
+				)
+			),
+			CombinedEffectSizes = lapply(SplitModels, function(x) {
+				percentageChangeCont(
+					model = x,
+					data = getData(x),
+					variable = NULL,
+					depVar = allVars[1],
+					individual = FALSE,
+					mainEffsOnlyWhenIndivi = x$MainEffect
+				)
+			})
+		)
 		message0(
 			'\tTotal effect sizes estimated: ',
 			ifelse(
