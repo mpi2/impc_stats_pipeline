@@ -32,7 +32,7 @@ testDatasetAgeing = function(phenListAgeing = NULL                        ,
 	r = NULL
 	s = tryCatch(
 		expr = {
-			suppressMessagesANDErrors(
+			suppressMessagesANDWarnings(
 				testDatasetAgeing0(
 					phenListAgeing = phenListAgeing,
 					method = method ,
@@ -50,7 +50,8 @@ testDatasetAgeing = function(phenListAgeing = NULL                        ,
 					FERR_rep = FERR_rep,
 					debug = debug
 				),
-				debug = debug
+				sup.messages = !debug,
+				sup.warnings = TRUE
 			)
 		},
 		warning = function(war) {
@@ -66,15 +67,11 @@ testDatasetAgeing = function(phenListAgeing = NULL                        ,
 			return(NULL)
 		}
 	)
-	
 	if (is.null(s))
 		return(r)
 	else
 		return(s)
-	
 }
-
-
 
 testDatasetAgeing0 = function(phenListAgeing = NULL ,
 															method                ,

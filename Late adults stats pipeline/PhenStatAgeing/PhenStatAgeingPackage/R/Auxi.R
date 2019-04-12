@@ -123,9 +123,15 @@ reformulate0 = function (termlabels,
 	rval
 }
 
-suppressMessagesANDErrors = function(exp, debug = TRUE) {
-	if (!debug) {
+suppressMessagesANDWarnings = function(exp,
+																			 sup.messages = TRUE,
+																			 sup.warnings = FALSE) {
+	if ( sup.messages && sup.warnings) {
+		suppressMessages(suppressWarnings(exp))
+	} else if ( sup.messages && !sup.warnings) {
 		suppressMessages(exp)
+	} else if ( !sup.messages && sup.warnings) {
+		suppressWarnings(exp)
 	} else{
 		exp
 	}
@@ -276,7 +282,7 @@ dist0 = function(x, func = lower.tri) {
 
 CheckMissing = function(data, formula) {
 	org.data = data
-	new.data = data[complete.cases(data[, all.vars(formula)]),]
+	new.data = data[complete.cases(data[, all.vars(formula)]), ]
 	missings = ifelse(all(dim(org.data) == dim(new.data)),	0, dim(org.data)[1] -
 											dim(new.data)[1])
 	if (missings)
@@ -314,6 +320,7 @@ order0 = function(x, levels = FALSE) {
 	return(r)
 }
 
+
 percentageChangeCont = function(model                ,
 																data                 ,
 																variable             ,
@@ -322,43 +329,53 @@ percentageChangeCont = function(model                ,
 																mainEffsOnlyWhenIndivi = 'Sex',
 																FUN = range0,
 																sep = '.') {
-	if (!is.null(data)                                           &&
-			(!is.null(variable) || !is.null(mainEffsOnlyWhenIndivi)) &&
-			!is.null(model)                                          &&
-			!is.null(FUN(data[, depVar]))        &&
-			FUN(data[, depVar]) != 0) {
-		####
-		coefs = unlist(summary(model)$tTable[, 1])
-		ran   = FUN(data[, depVar])
-		if (individual) {
-			out   = sapply(variable, function(x) {
-				message0('\tCalculating the percentage change for: ',
-								 pasteComma(x))
-				if (is.numeric(data[, x])) {
-					r = coefs[-1]
-					names(r) = NULL
-				} else{
-					r = coefs
-					names(r) = order0(levels(data[, x]))
-				}
-				return(r / ran * 100)
-			}, USE.NAMES = TRUE)
-			return(Matrix2List(out, sep = sep))
-		} else{
-			out = extractCoefOfInterest(coefs = coefs,
-																	main = mainEffsOnlyWhenIndivi,
-																	data = data)
-			return(
-				list(
-					value = out                                            ,
-					percentageChange = Matrix2List(out / ran * 100, sep = sep),
-					variable = mainEffsOnlyWhenIndivi                      ,
-					type = 'interaction coefficients '
-				)
-			)
-		}
-	} else{
+	if (!(
+		!is.null(data)                                           &&
+		(!is.null(variable) || !is.null(mainEffsOnlyWhenIndivi)) &&
+		!is.null(model)                                          &&
+		!is.null(FUN(data[, depVar]))                            &&
+		FUN(data[, depVar]) != 0
+	))
 		return(NULL)
+	####
+	coefs = unlist(
+		suppressMessagesANDWarnings(
+			summary(model, verbose = FALSE)$tTable[, 1],
+			sup.messages = TRUE,
+			sup.warnings = TRUE
+		)
+	)
+	######
+	ran   = FUN(data[, depVar])
+	if (is.null(coefs) || is.null(ran) || is.nan(ran))
+		return(NULL)
+	######
+	if (individual) {
+		out   = sapply(variable, function(x) {
+			message0('\tCalculating the percentage change for: ',
+							 pasteComma(x))
+			if (is.numeric(data[, x])) {
+				r = coefs[-1]
+				names(r) = NULL
+			} else{
+				r = coefs
+				names(r) = order0(levels(data[, x]))
+			}
+			return(r / ran * 100)
+		}, USE.NAMES = TRUE)
+		return(Matrix2List(out, sep = sep))
+	} else{
+		out = extractCoefOfInterest(coefs  = coefs,
+																main   = mainEffsOnlyWhenIndivi,
+																data   = data)
+		return(
+			list(
+				value            = out                                      ,
+				percentageChange = Matrix2List(out / ran * 100, sep = sep)  ,
+				variable         = mainEffsOnlyWhenIndivi                   ,
+				type             = 'interaction coefficients '
+			)
+		)
 	}
 }
 
@@ -535,8 +552,6 @@ lop = function() {
 	)
 }
 
-
-
 colExists = function(name, data) {
 	if ((name %in% names(data)) &&
 			length(complete.cases(data[, name])) > 0) {
@@ -554,7 +569,6 @@ listFun = function(list, FUN, debug = FALSE) {
 	l     = list[names(list)[fArgs]]
 	return(l)
 }
-
 
 ModelChecks = function(fixed, data, checks = c(0, 0, 0)) {
 	if (length(checks) != 3) {
@@ -575,8 +589,6 @@ ModelChecks = function(fixed, data, checks = c(0, 0, 0)) {
 	return(fixed)
 }
 
-
-
 termInTheModel = function(model, term, message = FALSE) {
 	if (message)
 		message0(
@@ -587,7 +599,6 @@ termInTheModel = function(model, term, message = FALSE) {
 		)
 	return(all(term %in% all.vars(formula(model))))
 }
-
 
 SplitEffect = 	function(finalformula,
 												fullModelFormula,
@@ -967,7 +978,11 @@ expand.formula = function(formula) {
 	)
 }
 
-ListOperation <- function(x,FUN = unclass)
+UnlistCall = function(x){
+	as(unlist(x),'character')
+}
+
+ListOperation <- function(x, FUN = NULL)
 {
 	cnames <- names(x)
 	if (is.null(cnames))
@@ -975,6 +990,7 @@ ListOperation <- function(x,FUN = unclass)
 	x1 <- lapply(cnames, function(y)
 		ListOperation(x[[y]]))
 	x1 <- FUN(x1)
+	
 	return(x1)
 }
 
@@ -1566,7 +1582,7 @@ modelSummaryPvalueExtract = function(x,
 	}
 	return(as.vector(unlist(mSumFiltered)))
 }
-#
+
 SummaryStats = function(x,
 												formula                              ,
 												#label = 'raw_data_summary_statistics',
@@ -1641,7 +1657,6 @@ SummaryStats = function(x,
 	r = summaryT
 	return(r)
 }
-
 
 replaceElementInFormula = function(formula,
 																	 pattern  ,
@@ -1794,7 +1809,6 @@ rndProce = function(procedure = NULL ) {
 	return(random)
 }
 
-
 QuyalityTests = function(object,
 												 levels    = c('Genotype', 'Sex', 'LifeStage'),
 												 list      = TRUE,
@@ -1859,8 +1873,6 @@ as.list0 = function(x, ...) {
 	}
 }
 
-
-
 AllEffSizes = function(object, depVariable, effOfInd, data) {
 	lst       = flst = olst = NULL
 	effOfInd  = effOfInd[effOfInd %in% names(data)]
@@ -1896,7 +1908,7 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 							message0('\tLevel:', pasteComma(unlist(lvl)))
 							olstTmp = eff.size(
 								object = object,
-								data = data[interact %in% lvl, ],
+								data = droplevels(data[interact %in% lvl, ]),
 								depVariable = depVariable,
 								errorReturn = NULL,
 								effOfInd = eff
@@ -1917,8 +1929,6 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 		return(NULL)
 	}
 }
-
-
 
 stepAIC0 = function (object,
 										 scope,
@@ -2169,9 +2179,6 @@ stepAIC0 = function (object,
 	step.results(models = models[seq(nm)], fit, object, usingCp)
 }
 
-
-
-
 dropterm0 =
 	function (object,
 						scope,
@@ -2198,7 +2205,7 @@ dropterm0 =
 						 ncol = 2L,
 						 dimnames = list(c("<none>",
 						 									scope), c("df", "AIC")))
-		ans[1, ] <- extractAIC(object, scale, k = k, ...)
+		ans[1,] <- extractAIC(object, scale, k = k, ...)
 		n0 <- nobs(object, use.fallback = TRUE)
 		env <- environment(formula(object))
 		for (i in seq_len(ns)) {
@@ -2210,7 +2217,7 @@ dropterm0 =
 			nfit <- update(object, as.formula(paste("~ . -", tt)),
 										 evaluate = FALSE)
 			nfit <- eval(nfit, envir = env)
-			ans[i + 1, ] <- extractAIC(nfit, scale, k = k, ...)
+			ans[i + 1,] <- extractAIC(nfit, scale, k = k, ...)
 			nnew <- nobs(nfit, use.fallback = TRUE)
 			if (all(is.finite(c(n0, nnew))) && nnew != n0)
 				message0("\t Warning! number of rows in use has changed: remove missing values ...")
@@ -2232,7 +2239,7 @@ dropterm0 =
 			P[nas] <- safe_pchisq0(dev[nas], dfs[nas], lower.tail = FALSE)
 			aod[, c("LRT", "Pr(Chi)")] <- list(dev, P)
 		}
-		aod <- aod[o, ]
+		aod <- aod[o,]
 		head <-
 			c("Single term deletions", "\nModel:", deparse(formula(object)))
 		if (scale > 0)

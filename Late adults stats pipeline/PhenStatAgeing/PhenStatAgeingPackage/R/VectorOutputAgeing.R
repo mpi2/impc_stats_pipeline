@@ -1,8 +1,8 @@
 vectorOutputAgeing = function(object,
 															othercolumns = NULL,
-															JSON = FALSE,
+															JSON  = FALSE,
 															debug = FALSE,
-															Null = FALSE,
+															Null  = FALSE,
 															...) {
 	if ((is.null(object) || !is.null(object$messages)) && !Null) {
 		message0('Null object. Please see the error below:')
@@ -13,8 +13,8 @@ vectorOutputAgeing = function(object,
 	out  = tryCatch(
 		expr = {
 			out = NULL
-			suppressMessagesANDErrors(if (is(object,
-																			 'PhenStatAgeingMM')) {
+			suppressMessagesANDWarnings(if (is(object,
+																				 'PhenStatAgeingMM')) {
 				out = vectorOutputCont(object = object,
 															 debug = debug)
 			} else if (is(object, 'PhenStatAgeingFE')) {
@@ -23,9 +23,10 @@ vectorOutputAgeing = function(object,
 				out = vectorOutputRR(object = object)
 			} else{
 				out = vectorOutputNULL(object = NULL)
-				out$`Additional information`$messages = ListOperation(object$messages)
-			}, debug = debug)
-			
+				out$`Additional information`$messages = UnlistCall(object$messages)
+			},
+			sup.messages = !debug,
+			sup.warnings = FALSE)
 			#########
 			if (!is.null(object$input$PhenListAgeing)) {
 				NewNames = variablesInData(
@@ -69,6 +70,5 @@ vectorOutputAgeing = function(object,
 			return(NULL)
 		}
 	)
-	
 	return(invisible(out))
 }
