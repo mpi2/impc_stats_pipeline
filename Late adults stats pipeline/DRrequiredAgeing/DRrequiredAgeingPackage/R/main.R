@@ -473,7 +473,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         'original_biological_sample_group',
                         'original_response',
                         'original_date_of_experiment',
-                        'original_bodyweight'
+                        'original_body_weight'
                       )
                     )
                     note = c(note, OrgSpecIds)
@@ -563,6 +563,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                                           listOfLevelMaps = CategoryMap)
                     n3.5.2[, depVar] = MergLev$x
                     n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]),])
+                    n3.5.2OnlyKO     = subset(n3.5.2,n3.5.2$biological_sample_group %in% 'experimental')
                     note$relabeled_levels_categorical_variables_only  = MergLev$note
                     if (!is.null(n3.5.2) &&
                         # data.frame is not zero
@@ -571,6 +572,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         length(unique(n3.5.2$biological_sample_group)) > 1 &&
                         # include mut and cont
                         min0(table(n3.5.2$biological_sample_group)) >= minSampRequired &&
+                        max0(table(n3.5.2OnlyKO$biological_sample_group, n3.5.2OnlyKO$sex)) > 1 &&
                         # include at least 4/2 of each genotype
                         #length(unique(n3.5.2$colony_id)) > 1  &&
                         length(RepBlank(

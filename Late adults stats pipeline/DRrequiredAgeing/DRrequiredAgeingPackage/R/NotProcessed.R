@@ -1,5 +1,9 @@
 # all in small case and separated by underscore
 NotProcessedOutput = function(args) {
+  bsg3.5        = args$n3.5$biological_sample_group
+  bsg3.5.2      = args$n3.5.2$biological_sample_group
+  cid3.5.2      = args$n3.5.2$colony_id
+  n3.5.2OnlyKO  = subset(args$n3.5.2,args$n3.5.2$biological_sample_group %in% 'experimental')
   ######## 1 LIST
   NotProcessedLogics = list(
     is_exception   =  args$isException,
@@ -11,26 +15,32 @@ NotProcessedOutput = function(args) {
       'Not numeric or factor response'
     ),
     both_mut_and_control_after_preprocess = list(
-      criteria_result = length(unique(args$n3.5.2$biological_sample_group)) > 1 ,
-      levels          = unique(args$n3.5.2$biological_sample_group)
+      criteria_result = length(unique(bsg3.5.2)) > 1 ,
+      levels          = unique(bsg3.5.2)
     ),
     min_onbs_in_each_group_raw_data_before_preprocess = list(
-      criteria_result   = min0(table(args$n3.5$biological_sample_group)) >= args$minSampRequired,
+      criteria_result   = min0(table(bsg3.5)) >= args$minSampRequired,
       threshold         = args$minSampRequired,
       stage             = 'before_preprocessing',
-      min_obs_in_data   = min0(table(args$n3.5$biological_sample_group))
+      min_obs_in_data   = min0(table(bsg3.5))
     ),
     min_onbs_in_each_group_processed_data_after_preprocess = list(
-      criteria_result   = min0(table(args$n3.5.2$biological_sample_group)) >= args$minSampRequired,
+      criteria_result   = min0(table(bsg3.5.2)) >= args$minSampRequired,
       threshold         = args$minSampRequired,
       stage             = 'after_preprocessing',
-      min_obs_in_data = min0(table(args$n3.5.2$biological_sample_group))
+      min_obs_in_data = min0(table(bsg3.5.2))
+    ),
+    max_mutants_in_genotype_sex_table_after_preprocess = list(
+      criteria_result   = max0(table(n3.5.2OnlyKO$biological_sample_group,n3.5.2OnlyKO$sex)) > 1,
+      threshold         = 1,
+      stage             = 'after_preprocessing',
+      max_mutants_in_genotype_sex_table = max0(table(n3.5.2OnlyKO$biological_sample_group,n3.5.2OnlyKO$sex))
     ),
     the_num_colonies_after_preprocess = list(
       #criteria_result = length(unique(args$n3.5.12$colony_id)) > 1,
-      criteria_result = length(RepBlank(unique(args$n3.5.2$colony_id), match = c('', NA, 'NA'))) > 1,
+      criteria_result = length(RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))) > 1,
       threshold       = 2,
-      colonies        = RepBlank(unique(args$n3.5.2$colony_id), match = c('', NA, 'NA'))
+      colonies        = RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))
     )
   )
 

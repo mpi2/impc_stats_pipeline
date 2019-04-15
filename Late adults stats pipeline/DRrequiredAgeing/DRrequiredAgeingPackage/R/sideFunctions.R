@@ -911,6 +911,14 @@ min0 = function(x, ...) {
   return(r)
 }
 
+max0 = function(x, ...) {
+  if (!is.null(x) && length(na.omit(x)) > 0)
+    r = max(x, ...)
+  else
+    r = 0
+  return(r)
+}
+
 
 # Get possible categories for the categorical variables
 GetPossibleCategories = function(procedure = NULL, file = TRUE) {

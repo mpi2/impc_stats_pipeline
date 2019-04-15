@@ -57,6 +57,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 superDebug             = FALSE       ,
                 extraBatchParameters   = '-m "rh7-hosts-ebi5-12 rh7-hosts-ebi5-13 rh7-hosts-ebi5-14 rh7-hosts-ebi5-15 rh7-hosts-ebi5-16 rh7-hosts-ebi5-17 rh7-hosts-ebi5-18 rh7-hosts-ebi5-19 rh7-hosts-ebi5-20 rh7-hosts-ebi5-24 rh7-hosts-ebi5-25 rh7-hosts-ebi5-26 rh7-hosts-ebi5-27 rh7-hosts-ebi6-00 rh7-hosts-ebi6-01 rh7-hosts-ebi6-02 rh7-hosts-ebi6-03 rh7-hosts-ebi6-04 rh7-hosts-ebi6-05 rh7-hosts-ebi6-06 rh7-hosts-ebi6-07 rh7-hosts-ebi6-08 rh7-hosts-ebi6-09 rh7-hosts-ebi6-10 rh7-hosts-ebi6-11 rh7-hosts-ebi6-12 rh7-hosts-ebi6-13 rh7-hosts-ebi6-14 rh7-hosts-ebi6-15 rh7-hosts-ebi6-16 rh7-hosts-ebi6-17"',
                 ...) {
+  message0('DRrequired loaded')
   message0(
     Sys.time(),
     '  ############################################################\n',
@@ -339,7 +340,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                              ))
                     # Imaginary URLs
                     note$gene_page_url        = GenePageURL       = GenePageURL(n3.5)
-                    note$body_weight_page_url = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
+                    note$bodyweight_page_url = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
 
                     ReadMeTxt       = ReadMe (obj = n3.4, URL = GenePageURL)
 
@@ -347,7 +348,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     depVariable = getResponseColumn(n3.5$observation_type)
                     depVar      = depVariable$column
                     note$response_type       = paste0(depVar,
-                                                '_ofType_',
+                                                '_of_Type_',
                                                 paste(depVariable$lbl, sep = '.'))
                     note$observation_type    =
                       if (!is.null(unique(n3.5$observation_type))) {
@@ -554,6 +555,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                                           listOfLevelMaps = CategoryMap)
                     n3.5.2[, depVar] = MergLev$x
                     n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]),])
+                    n3.5.2OnlyKO     = subset(n3.5.2,n3.5.2$biological_sample_group %in% 'experimental')
                     note$relabeled_levels_categorical_variables_only  = MergLev$note
                     if (!is.null(n3.5.2) &&
                         # data.frame is not zero
@@ -562,6 +564,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         length(unique(n3.5.2$biological_sample_group)) > 1 &&
                         # include mut and cont
                         min0(table(n3.5.2$biological_sample_group)) >= minSampRequired &&
+                        max0(table(n3.5.2OnlyKO$biological_sample_group, n3.5.2OnlyKO$sex)) > 1 &&
                         # include at least 4/2 of each genotype
                         #length(unique(n3.5.2$colony_id)) > 1  &&
                         length(RepBlank(
@@ -661,6 +664,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         bodyweight_initially_included_in_model = ifelse(method %in% 'MM', equationType, FALSE)
                       ))
                       message0('Fitting the model ...')
+                      message0('Method: ', method, '\n\t Equation:', equationType)
                       c.ww0 =	PhenStatWindow(
                         phenlistObject = a,
                         parameter = parameter,
@@ -854,8 +858,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   }
   message0('Closing Connections ...')
   stopCluster(cl)
-  closeAllConnections()
   registerDoSEQ()
+  closeAllConnections()
   stopImplicitCluster()
   message0('Finished.')
   setwd(cwd)
