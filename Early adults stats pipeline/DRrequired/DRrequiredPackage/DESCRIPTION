@@ -4,7 +4,7 @@ Title: The required package for the IMPC stats pipeline (PhenStat version)
 Version: 1.0.0
 Author: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 Maintainer: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
-Description: The required package for the IMPC stats pipeline (PhenStat version)
+Description: The required package for the IMPC stats pipeline (PhenStat version).
 License: LGPL (>= 2)
 Encoding: UTF-8
 LazyData: true

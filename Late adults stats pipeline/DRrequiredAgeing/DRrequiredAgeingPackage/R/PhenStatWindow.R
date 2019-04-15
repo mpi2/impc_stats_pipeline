@@ -84,7 +84,7 @@ PhenStatWindow = function (phenlistObject                                ,
   }
 
   if(!is.null(object0$messages))
-    object = NULL
+    object0 = NULL
   ###########################
   #### This is for windowing only
   ###########################

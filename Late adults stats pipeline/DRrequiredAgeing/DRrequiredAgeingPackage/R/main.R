@@ -163,7 +163,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
       FactorLevels = ReadFactorLevelsFromSolr(parameter = parameter, CatList = CatList)
       ### counter starts here ....
       counter   = 1
-      ClRes     = outP = list()
+      outP      = list()
       n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
       centers   = as.character(unique(na.omit(n3.0$phenotyping_center)))
       for (center in centers) {
@@ -310,7 +310,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                 } else{
                   message0('Single core processing in progress ...')
                 }
-
+                i = 1
                 MultiCoreRes = foreach::foreach (
                   i = 1:length(colonys),
                   .packages = c(
@@ -855,7 +855,6 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   -----------------------------------
                   \n\n '
                   )
-                  #ClRes[[counter]] = MultiCoreRes
                   counter  = counter  + 1
                 }
               }

@@ -1595,7 +1595,9 @@ outMCoreLog = function(wd, dir = 'Multicore_logs', fname = '_MulCoreLog.txt') {
   return(path)
 }
 
-
+sortList = function(x,...){
+  x[order(names(x),...)]
+}
 
 # A new vector output for this package only
 VectorOutput0 = function(c.ww0,
