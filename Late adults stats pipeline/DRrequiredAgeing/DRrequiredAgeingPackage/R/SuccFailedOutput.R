@@ -30,7 +30,6 @@ SuccessfulOutput = function(args) {
 
   ######## 2 JSON
   message0('Forming the list before applying JSON transformation ...')
-  listVectorOutput            = list(vectoroutput = args$c.ww.vec$list)
   args$note$experiment_details = experiment_details
   listDetails                  = list(details = sortList(args$note))
   listVectorOutput             = list(vectoroutput = args$c.ww.vec$list)

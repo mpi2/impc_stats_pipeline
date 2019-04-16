@@ -80,7 +80,7 @@ NotProcessedOutput = function(args) {
 
   ######## 3 CSV
   optFail =   c(
-    unlist(experiment_detail),
+    unlist(experiment_details),
     base64(x =
              JsonObj,
            active = args$encode)
