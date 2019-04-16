@@ -4,8 +4,8 @@
     paste0(
       '\n >===============================================================================<',
       '\n "DRrequired" is developed by International Mouse Phenotyping Consortium (IMPC) ',
-      '\n More details on https://www.mousephenotype.org/                                            ',
-      '\n Contact us on hamedhm@ebi.ac.uk                                                  ',
+      '\n More details https://www.mousephenotype.org/                                            ',
+      '\n Contact us hamedhm@ebi.ac.uk                                                  ',
       '\n >===============================================================================<'
     ),
     domain = NULL,

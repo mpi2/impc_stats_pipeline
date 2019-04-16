@@ -45,7 +45,7 @@ NotProcessedOutput = function(args) {
   )
 
   ### 2 Experiment detail
-  experiment_detail       = list(
+  experiment_details      = list(
     ####
     status                = 'NotProcessed'                                                         , #1
     procedure_group       = args$procedure                                                         , #2
@@ -68,8 +68,8 @@ NotProcessedOutput = function(args) {
 
   ### 3 JSON
   message0('Forming the list before applying JSON transformation ...')
-  args$note$experiment_detail = experiment_detail
-  listDetails                 = list(details = sortList(c(
+  args$note$experiment_details = experiment_details
+  listDetails                  = list(details = sortList(c(
     NotProcessedLogics,
     args$note
   )))

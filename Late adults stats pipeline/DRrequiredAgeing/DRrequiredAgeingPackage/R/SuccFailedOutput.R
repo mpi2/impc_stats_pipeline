@@ -2,7 +2,7 @@
 SuccessfulOutput = function(args) {
 
   ### 1 Experiment detail
-  experiment_detail       = list(
+  experiment_details      = list(
     ####
     status                =  ifelse(
       !NullOrError(args$c.ww0$NormalObj)      &&
@@ -30,15 +30,16 @@ SuccessfulOutput = function(args) {
 
   ######## 2 JSON
   message0('Forming the list before applying JSON transformation ...')
-  args$note$experiment_detail = experiment_detail
-  listDetails                 = list(details = sortList(args$note))
   listVectorOutput            = list(vectoroutput = args$c.ww.vec$list)
-  FinalList                   = list(result = c(listVectorOutput, listDetails))
-  JsonObj                     = FinalJsonBobectCreator(FinalList = FinalList)
+  args$note$experiment_details = experiment_details
+  listDetails                  = list(details = sortList(args$note))
+  listVectorOutput             = list(vectoroutput = args$c.ww.vec$list)
+  FinalList                    = list(result = c(listVectorOutput, listDetails))
+  JsonObj                      = FinalJsonBobectCreator(FinalList = FinalList)
 
   ######## 2 CSV
   outP =   c(
-    unlist(experiment_detail),
+    unlist(experiment_details),
     base64(x =
              JsonObj,
            active = args$encode)
