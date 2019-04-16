@@ -251,7 +251,7 @@ ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 		)
 		if (min(fbm$min.freq, na.rm = TRUE) < 1)
 			message0(
-				'The following term(s) removed because there is either "no data" or "no data in the interactions":\n\t **not all terms necessarily in the initial model \n\t ',
+				'The following term(s) removed because there is either "no data" or "no data in the interactions":\n\t ** Note. Not all terms necessarily in the initial model \n\t ',
 				pasteComma(fbm[fbm$min.freq <= 0, c('names')], replaceNull = FALSE)
 			)
 	}

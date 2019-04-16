@@ -570,7 +570,11 @@ CreateSubDirIfNotExist = function(x) {
 }
 
 # Unique and not NULL
-UniqueAndNNull = function(x, collapse = '~') {
+UniqueAndNNull = function(x,
+                          removeSpecials = TRUE,
+                          removeNewLine  = TRUE,
+                          newlineRepChar = ' ' ,
+                          collapse = '~') {
   if (length(na.omit(x)) > 0)
     x = na.omit(x)
   if (length(x[!is.null(x)]) > 0)
@@ -580,7 +584,10 @@ UniqueAndNNull = function(x, collapse = '~') {
   if (length(x) > 0) {
     x = as.character(unique(x))
     x = paste0(x, collapse = collapse)
-    x = RemoveSpecialChars(x = x,replaceBy = ' ')
+    if(removeNewLine)
+      x = gsub(pattern = '\n',x = x,replacement = newlineRepChar)
+    if (removeSpecials)
+      x = RemoveSpecialChars(x = x, replaceBy = ' ')
   } else{
     x = 'NotSpecified'
   }
@@ -1581,16 +1588,16 @@ ReadMe = function(obj, URL = NULL, skip = NULL) {
         'URL'
       ),
       c(
-        UniqueAndNNull(obj$gene_symbol),
-        UniqueAndNNull(obj$procedure_group),
-        UniqueAndNNull(obj$parameter_stable_id),
-        UniqueAndNNull(obj$phenotyping_center),
-        UniqueAndNNull(obj$strain_accession_id),
-        #UniqueAndNNull(obj$metadata),
-        UniqueAndNNull(obj$zygosity),
-        UniqueAndNNull(obj$colony_id),
-        UniqueAndNNull(obj$metadata_group),
-        UniqueAndNNull(URL)
+        UniqueAndNNull(obj$gene_symbol, removeSpecials = FALSE)          ,
+        UniqueAndNNull(obj$procedure_group, removeSpecials = FALSE)      ,
+        UniqueAndNNull(obj$parameter_stable_id, removeSpecials = FALSE)  ,
+        UniqueAndNNull(obj$phenotyping_center, removeSpecials = FALSE)   ,
+        UniqueAndNNull(obj$strain_accession_id, removeSpecials = FALSE)  ,
+        #UniqueAndNNull(obj$metadata,removeSpecials = FALSE)             ,
+        UniqueAndNNull(obj$zygosity, removeSpecials = FALSE)             ,
+        UniqueAndNNull(obj$colony_id, removeSpecials = FALSE)            ,
+        UniqueAndNNull(obj$metadata_group, removeSpecials = FALSE)       ,
+        UniqueAndNNull(URL, removeSpecials = FALSE)                      ,
       ),
       sep = ' = '
     )

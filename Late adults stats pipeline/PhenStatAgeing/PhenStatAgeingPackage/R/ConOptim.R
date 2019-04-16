@@ -25,15 +25,15 @@ M.opt = function(object = NULL            ,
 	# Start from here
 	sta.time    = Sys.time()
 	lCont       = lmeControl (opt  = 'optim',
-														maxIter = 500,
-														msMaxIter = 500)
+														maxIter = 1000,
+														msMaxIter = 1000)
 	gCont       = glsControl (
 		opt  = 'optim',
 		singular.ok = TRUE,
-		maxIter = 500,
-		msMaxIter = 500
+		maxIter = 1000,
+		msMaxIter = 1000
 	)
-	glCont      = glm.control(epsilon = 10 ^ -36, maxit = 500)
+	glCont      = glm.control(epsilon = 10 ^ -36, maxit = 1000)
 	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = OutR = NULL
 	VarHomo     = TRUE
 	data        = object@datasetPL

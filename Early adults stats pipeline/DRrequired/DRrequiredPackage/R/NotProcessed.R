@@ -47,18 +47,18 @@ NotProcessedOutput = function(args) {
   ### 2 Experiment detail
   experiment_detail       = list(
     ####
-    status                = 'NotProcessed'                                  , #1
-    procedure_group       = args$procedure                                  , #2
-    procedure_stable_id   = UniqueAndNNull(args$n3.5$procedure_stable_id)   , #3
-    procedure_name        = UniqueAndNNull(args$n3.5$procedure_name)        , #4
-    parameter_stable_id   = args$parameter                                  , #5
-    parameter_name        = UniqueAndNNull(args$n3.5$parameter_name)        , #6
-    phenotyping_center    = args$center                                     , #7
-    allele_symbol         = UniqueAndNNull(args$n3.5$allele_symbol)         , #8
-    gene_symbol           = UniqueAndNNull(args$n3.5$gene_symbol)           , #9
-    gene_accession_id     = UniqueAndNNull(args$n3.5$gene_accession_id)     , #10
-    pipeline_name         = UniqueAndNNull(args$n3.5$pipeline_name)         , #11
-    pipeline_stable_id    = UniqueAndNNull(args$n3.5$pipeline_stable_id)    , #12
+    status                = 'NotProcessed'                                                         , #1
+    procedure_group       = args$procedure                                                         , #2
+    procedure_stable_id   = UniqueAndNNull(args$n3.5$procedure_stable_id,removeSpecials = FALSE)   , #3
+    procedure_name        = UniqueAndNNull(args$n3.5$procedure_name,removeSpecials = FALSE)        , #4
+    parameter_stable_id   = args$parameter                                                         , #5
+    parameter_name        = UniqueAndNNull(args$n3.5$parameter_name,removeSpecials = FALSE)        , #6
+    phenotyping_center    = args$center                                                            , #7
+    allele_symbol         = UniqueAndNNull(args$n3.5$allele_symbol,removeSpecials = FALSE)         , #8
+    gene_symbol           = UniqueAndNNull(args$n3.5$gene_symbol,removeSpecials = FALSE)           , #9
+    gene_accession_id     = UniqueAndNNull(args$n3.5$gene_accession_id,removeSpecials = FALSE)     , #10
+    pipeline_name         = UniqueAndNNull(args$n3.5$pipeline_name,removeSpecials = FALSE)         , #11
+    pipeline_stable_id    = UniqueAndNNull(args$n3.5$pipeline_stable_id,removeSpecials = FALSE)    , #12
     strain_accession_id   = args$strain               , #13
     metadata_group        = args$meta                 , #14
     zygosity              = args$zyg                  , #15
