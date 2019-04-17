@@ -43,6 +43,7 @@ vectorOutputAgeing = function(object,
 			}
 			#########
 			# JSON engine
+			requireNamespace("jsonlite")
 			n   = 5
 			if (JSON && !is.null(out)) {
 				for (i in 1:n) {

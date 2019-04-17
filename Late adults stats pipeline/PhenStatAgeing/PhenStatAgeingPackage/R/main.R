@@ -21,6 +21,7 @@ testDatasetAgeing = function(phenListAgeing = NULL                        ,
 														 	varIdent(form =  ~ 1 |	Genotype),
 														 MM_direction = 'both',
 														 MM_checks    = c(1, 1, 1),
+														 MM_optimise  = TRUE      ,
 														 ### FE or RR
 														 FE_formula = category ~  Genotype + Sex + LifeStage,
 														 RR_formula = data_point ~ Genotype + Sex + LifeStage,
@@ -37,17 +38,18 @@ testDatasetAgeing = function(phenListAgeing = NULL                        ,
 					phenListAgeing = phenListAgeing,
 					method = method ,
 					#### MM
-					MM_fixed = MM_fixed,
-					MM_random = MM_random,
-					MM_lower = MM_lower,
-					MM_weight = MM_weight,
-					MM_direction = MM_direction,
-					MM_checks   = MM_checks,
+					MM_fixed = MM_fixed              ,
+					MM_random = MM_random            ,
+					MM_lower = MM_lower              ,
+					MM_weight = MM_weight            ,
+					MM_direction = MM_direction      ,
+					MM_checks   = MM_checks          ,
+					MM_optimise = MM_optimise        ,
 					#### FE
-					FE_formula = FE_formula,
-					RR_formula = RR_formula,
-					RR_prop = RR_prop,
-					FERR_rep = FERR_rep,
+					FE_formula = FE_formula          ,
+					RR_formula = RR_formula          ,
+					RR_prop = RR_prop                ,
+					FERR_rep = FERR_rep              ,
 					debug = debug
 				),
 				sup.messages = !debug,
@@ -82,11 +84,12 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 															MM_weight              ,
 															MM_direction = 'both'  ,
 															MM_checks              ,
+															MM_optimise            ,
 															##### FE or RR
-															FE_formula,
-															RR_formula,
-															RR_prop,
-															FERR_rep,
+															FE_formula             ,
+															RR_formula             ,
+															RR_prop                ,
+															FERR_rep               ,
 															##### Others
 															debug = TRUE) {
 	message0('PhenStatAgeing loaded.')
@@ -100,15 +103,16 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 	if (method %in% 'MM') {
 		message0('Linear Mixed Model (MM framework) in progress ...')
 		output = M.opt(
-			fixed = MM_fixed ,
-			random = MM_random,
-			object = phenListAgeing,
-			lower = MM_lower,
-			direction = MM_direction,
-			weight = MM_weight,
-			checks = MM_checks,
-			trace = FALSE,
-			method = 'MM'
+			fixed     = MM_fixed        ,
+			random    = MM_random       ,
+			object    = phenListAgeing  ,
+			lower     = MM_lower        ,
+			direction = MM_direction  ,
+			weight    = MM_weight       ,
+			checks    = MM_checks       ,
+			optimise  = MM_optimise     ,
+			trace     = FALSE           ,
+			method    = 'MM'
 		)
 		# Important!
 		if (!is.null(output$input))

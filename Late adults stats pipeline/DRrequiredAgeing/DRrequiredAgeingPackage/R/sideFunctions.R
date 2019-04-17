@@ -1597,7 +1597,7 @@ ReadMe = function(obj, URL = NULL, skip = NULL) {
         UniqueAndNNull(obj$zygosity, removeSpecials = FALSE)             ,
         UniqueAndNNull(obj$colony_id, removeSpecials = FALSE)            ,
         UniqueAndNNull(obj$metadata_group, removeSpecials = FALSE)       ,
-        UniqueAndNNull(URL, removeSpecials = FALSE)                      ,
+        UniqueAndNNull(URL, removeSpecials = FALSE)
       ),
       sep = ' = '
     )

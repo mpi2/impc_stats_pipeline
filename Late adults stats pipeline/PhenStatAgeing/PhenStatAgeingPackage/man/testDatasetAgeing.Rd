@@ -40,6 +40,7 @@ testDatasetAgeing(
 						 	Genotype),
 	MM_direction = "both",
 	MM_checks    = c(1, 1, 1),
+	MM_optimise  = TRUE,
 	FE_formula   = category ~ Genotype + Sex + LifeStage,
 	RR_formula   = data_point ~ Genotype + Sex + LifeStage,
 	RR_prop      = 0.95,
@@ -78,6 +79,9 @@ testDatasetAgeing(
   \item{MM_checks}{
 	Only applies to the "MM" framework. A vector of three 0/1 values such as c(1,1,1). The first element of the vector activates checking the model terms (See MM_fixed) to be existed in data. The second term removes any single level factor from the model (in MM_fixed). The third element checks the interaction term to make sure all interactions have some data attached to them. Caution is needed for the third element of the check as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(1, 1, 1).
 }
+	\item{MM_optimise}{
+	Only applies to the "MM" framework. Set to FALSE to deactivate the internal optimisation of the model. Default TRUE.
+	}
   \item{FE_formula}{
   Only applied to the "FE" framework. The model for analysing the categorical data. The default is: category ~ Genotype + Sex + LifeStage. \cr
   Note that similar to MM_fixed, the terms that do not exist in data or the interaction terms will be dismissed from the model. 

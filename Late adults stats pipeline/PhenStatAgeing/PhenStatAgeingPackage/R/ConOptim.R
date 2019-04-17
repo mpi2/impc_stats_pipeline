@@ -8,6 +8,7 @@ M.opt = function(object = NULL            ,
 								 weight                   ,
 								 checks      = c(1, 1, 1) ,
 								 method      = 'MM'       ,
+								 optimise    = TRUE       ,
 								 ...) {
 	if (!method %in% c('MM')        ||
 			is.null(all.vars0(fixed))   ||
@@ -131,7 +132,9 @@ M.opt = function(object = NULL            ,
 	message0('The specified "lower" model: \n\t', printformula(lower))
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
 	###########
-	if (!is.null(I.Model) && !is.null(lowerCorrected)) {
+	message0('The model optimisation is ',
+					 ifelse(optimise, 'activated', 'is not activated'))
+	if (optimise && !is.null(I.Model) && !is.null(lowerCorrected)) {
 		message0('Optimising the model ... ')
 		F.Model = tryCatch(
 			expr = stepAIC0(
@@ -166,7 +169,7 @@ M.opt = function(object = NULL            ,
 	}
 	###########
 	if (!is.null(F.Model)) {
-		if (!is.null(weight) && !(mdl %in% 'glm')) {
+		if (optimise && !is.null(weight) && !(mdl %in% 'glm')) {
 			message0('Testing varHom ... ')
 			FV.Model = tryCatch(
 				expr  = update(F.Model, weights = NULL),
@@ -191,7 +194,7 @@ M.opt = function(object = NULL            ,
 			}
 		}
 		# Batch test
-		if (Batch_exist && !(mdl %in% 'glm')) {
+		if (optimise && Batch_exist && !(mdl %in% 'glm')) {
 			message0('Testing Batch ... ')
 			G.Model =  tryCatch(
 				expr = do.call(
@@ -304,7 +307,8 @@ M.opt = function(object = NULL            ,
 			direction           = direction                              ,
 			LifeStage           = LifeStage                              ,
 			weight              = weight                                 ,
-			checks              = checks
+			checks              = checks                                 ,
+			optimise            = optimise
 		),
 		extra = list(Cleanedformula  = fixed,
 								 lowerCorrected  = lowerCorrected)

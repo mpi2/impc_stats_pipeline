@@ -30,6 +30,7 @@ summaryCore = function(x,
 											 procedure = 'MM',
 											 format = 'rst',
 											 ...) {
+	requireNamespace("knitr")
 	vo = vectorOutputAgeing(object = x,
 													JSON = FALSE,
 													Null = FALSE)
