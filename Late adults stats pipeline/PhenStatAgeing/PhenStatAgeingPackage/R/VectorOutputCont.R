@@ -14,6 +14,7 @@ vectorOutputCont =	function(object,
 		paste0('equation without', Labels$Weight)
 	)
 	formula        = printformula(frm)
+	modelContrast  = modelContrasts(formula = frm,data = ra$input$data)
 	framework      = switch(
 		object$output$Final.Model.Tag                                  ,
 		lme  = "Linear Mixed Model framework"                          ,
@@ -91,7 +92,7 @@ vectorOutputCont =	function(object,
 			Overal = TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
-				term = Labels$Sex$Sex,
+				term = paste(Labels$Genotype$Genotype,Labels$Sex$Sex,sep = ':'),
 				return = NULL,
 				not = modelSummaryPvalueExtract(
 					x = Fmodel,
@@ -139,7 +140,7 @@ vectorOutputCont =	function(object,
 			'Sexual dimorphism detected' = TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
-				term = Labels$Sex$Sex,
+				term = paste(Labels$Genotype$Genotype,Labels$Sex$Sex,sep = ':'),
 				return = TRUE,
 				not = FALSE,
 				debug = debug

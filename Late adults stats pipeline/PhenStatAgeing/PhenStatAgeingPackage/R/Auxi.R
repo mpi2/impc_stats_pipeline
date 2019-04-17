@@ -1065,6 +1065,24 @@ paste01 = function(...) {
 	return(r)
 }
 
+greplM = function(x = NULL, pattern = NULL, ...) {
+	if (is.null(x))
+		return(NULL)
+	if (is.null(pattern))
+		return(x)
+	
+	r = rep(TRUE, length(x))
+	for (p in pattern)
+		r = r & grepl(pattern = p, x = x, ...)
+	return(r)
+}
+
+modelContrasts = function(formula,data,...){
+	if(is.null(formula) || is.null(data))
+		return(NULL)
+	r = colnames(model.matrix(formula , data,...))
+	return(r)
+}
 
 multiBatch = function(data) {
 	if ('Batch' %in% colnames(data)) {

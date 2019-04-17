@@ -5,13 +5,13 @@
 Method "testDatasetAgeing"
 }
 \description{
-The driver function in the PhenStatAgeing package. \cr
+The driver function in the PhenStatAgeing package for running statisical analysis on the data. \cr
 
 It performs several checks on the data and the input model before running the analysis. This function supports three main analysis frameworks precisely, Linear Mix model (MM), Fisher Exact test (FE) and Reference Range plus (RR).\cr 
 
 It further monitors the process for failures and errors and applies some runtime patches/fixes.\cr 
 
-The inputs of the function are designed to be human-friendly by initialising the inputs by the model that will be applied to the data.
+The function parameters are designed to be human-friendly by initialising the inputs by the model that will be applied to the data.
 
 }
 \usage{
@@ -109,13 +109,13 @@ A successful execution of the function will return a list of three elements:
  \item{input }{This contains the list of inputs}
  \item{output }{A list of outputs}
  \item{extra }{A placeholder for extra information if exists}
- \item{messages}{A placeholder for the errors/warnings in the case of failure}
+ \item{* messages}{A placeholder for the errors/warnings in the case of failure}
 }
 \author{
 Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 }
 \seealso{
-\code{\link{PhenListAgeing}}, \code{\link{plot}}
+\code{\link{PhenListAgeing}}, \code{\link{plot}}, \code{\link{summary}}
 }
 \examples{
 		library(PhenStat)
@@ -141,7 +141,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		####################################################################
 		
 		#################
-		# 2.1 Mixed model framework
+		# 2.1 Mixed model (MM) framework
 		MM1_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'MM',
@@ -153,7 +153,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		
 		
 		#################
-		# 2.2 Mixed model with NO optimisation
+		# 2.2 Mixed model (MM) with NO optimisation for the fixed effects but random/weight effects
 		MM2_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'MM',
@@ -161,8 +161,20 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 			MM_lower =           ~ Genotype + Sex + Weight + 1
 		)
 		VO_MM2 = vectorOutputAgeing(MM2_result)
-		plot(MM2_result, col = 4,main = 'Not optimised model')
+		plot(MM2_result, col = 4,main = 'No optimisation on the fixed effects')
 		summary(MM2_result)
+		
+			#################
+		# 2.3 Mixed model (MM) with NO optimisation at all
+		MM3_result = testDatasetAgeing(
+			phenListAgeing = test_Cont,
+			method = 'MM',
+			MM_fixed = Lean.Mass ~ Genotype + Sex + Weight,
+			MM_optimise = FALSE
+		)
+		VO_MM3 = vectorOutputAgeing(MM3_result)
+		plot(MM3_result, col = 4,main = 'Not optimised model')
+		summary(MM3_result)
 		
 		
 		#################

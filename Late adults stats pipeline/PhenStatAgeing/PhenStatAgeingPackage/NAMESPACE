@@ -42,10 +42,10 @@ S3method(plot      , PhenStatAgeingFE)
 
 
 
-#exportPattern("^[^\\.]")
-export(
-	PhenListAgeing     ,
-	testDatasetAgeing  ,
-	vectorOutputAgeing
-)
-
+exportPattern("^[^\\.]")
+#export(
+#	PhenListAgeing     ,
+#	testDatasetAgeing  ,
+#	vectorOutputAgeing
+#)
+#
