@@ -159,20 +159,22 @@ TypicalModel = function(depVariable,
 	if (!is.null(others))
 		fixed = update(fixed,  reformulate(response = NULL,	termlabels = c('.', others)))
 	####
-	inF = fixed
-	fixed = ComplementaryFeasibleTermsInContFormula(formula = fixed, data = data)
+	#inF = fixed
+	#fixed = ComplementaryFeasibleTermsInContFormula(formula = fixed, data = data)
 	
 	
 	if (debug)
 		message0(
 			'Initial  model: ',
-			printformula(inF),
-			'\n',
-			'Polished model: ',
-			printformula(fixed),
-			' [any removal: ',
-			!identical(fixed, inF),
-			']'
+			printformula(fixed)
+			# 'Initial  model: ',
+			# printformula(inF),
+			# '\n',
+			# 'Polished model: ',
+			# printformula(fixed),
+			# ' [any removal: ',
+			# !identical(fixed, inF),
+			# ']'
 		)
 	#return(list(correctd = fixed, initial = inF))
 	return(fixed)
@@ -1410,7 +1412,7 @@ TermInModelAndnLevels = function(model,
 																 term = 'LifeStage',
 																 data,
 																 threshold = 1) {
-	if (is.null(model) || is.null(data) || is.null(term))
+	if (is.null(model) || is.null(data) || is.null(term) || !(term %in% colnames(data)))
 		return(FALSE)
 	# if (!is.null(model$correctd))
 	# 	model      = model$correctd

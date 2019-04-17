@@ -74,7 +74,7 @@ testDatasetAgeing(
   The default is varIdent(form = ~ 1 |	LifeStage) if the LifeStage includes in the data. Otherwise	varIdent(form = ~ 1 |	Genotype).
 }
   \item{MM_direction}{
-	Only applies to the "MM" framework. Select between  "both" (for stepwise optimisation), "backward" (for backward elimination) or "forward" (for forward selection) for the optimisation algorithm. The default is "both".
+	Only applies to the "MM" framework. Select from  "both" (for stepwise optimisation), "backward" (for backward elimination) or "forward" (for forward selection) for the optimisation algorithm. The default is "both".
 	}
   \item{MM_checks}{
 	Only applies to the "MM" framework. A vector of three 0/1 values such as c(1,1,1). The first element of the vector activates checking the model terms (See MM_fixed) to be existed in data. The second term removes any single level factor from the model (in MM_fixed). The third element checks the interaction term to make sure all interactions have some data attached to them. Caution is needed for the third element of the check as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(1, 1, 1).

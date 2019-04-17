@@ -44,7 +44,7 @@ M.opt = function(object = NULL            ,
 											checks = checks)
 	allVars     = all.vars(fixed)
 	LifeStage   = 'LifeStage' %in% allVars
-	Batch_exist = !categorical &&
+	Batch_exist = !categorical && !is.null(random) &&
 		colExists(name = 'Batch', data = data)
 	mdl         = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls'))
 	message0(mdl, ': Fitting the full model ... ')
@@ -122,6 +122,7 @@ M.opt = function(object = NULL            ,
 				printformula(fixed)
 			)
 		} else{
+			message0('The full model successfully applied.')
 			break
 		}
 	}
@@ -129,13 +130,15 @@ M.opt = function(object = NULL            ,
 	if (is.null(I.Model))
 		message0('Full model failed ...')
 	###########
-	message0('The specified "lower" model: \n\t', printformula(lower))
+	message0('The specified "lower" model: \n\t',
+					 ifelse(!is.null(lower), printformula(lower), 'Null lower'))
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
 	###########
 	message0('The model optimisation is ',
-					 ifelse(optimise, 'activated', 'is not activated'))
+					 ifelse(optimise, 'in progress ...', 'is not activated'))
 	if (optimise && !is.null(I.Model) && !is.null(lowerCorrected)) {
-		message0('Optimising the model ... ')
+		message0('\tOptimising the model ... ')
+		message0('\tThe direction of  the optimisation (backward, forward, both): ', direction)
 		F.Model = tryCatch(
 			expr = stepAIC0(
 				I.Model                     ,
