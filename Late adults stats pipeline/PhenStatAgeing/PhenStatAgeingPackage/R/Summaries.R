@@ -44,7 +44,7 @@ summaryCore = function(x,
 		'Tested Gene'                    = vo$`Gp2 genotype`,
 		'Reference Gene'                 = vo$`Gp1 genotype`,
 		'----------------------------'   = '----------------------------',
-		'Sex in the optimised model?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
+		'Sexual dimorphism detected?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
 		'----------------------------'   = ifelse(
 			procedure == 'RR',
 			'- Separate p-values for (Low vs NormalHigh) and (LowNormal vs High) -',
