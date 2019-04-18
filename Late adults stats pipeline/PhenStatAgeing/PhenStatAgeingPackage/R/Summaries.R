@@ -36,7 +36,10 @@ summaryCore = function(x,
 													Null = FALSE)
 	out = list(
 		'Method'                         = vo$Method,
-		'Model'                          = vo$`Additional information`$Formula$input,
+		'Input model'                    = vo$`Additional information`$Formula$input,
+		################################ = that is true x$output$Final.Model!
+		'Final model'                    = if(!is.null(x$output$Final.Model)) formula(x$output$Final.Model) else NULL,
+		
 		'----------------------------'   = '----------------------------',
 		'Tested Gene'                    = vo$`Gp2 genotype`,
 		'Reference Gene'                 = vo$`Gp1 genotype`,
