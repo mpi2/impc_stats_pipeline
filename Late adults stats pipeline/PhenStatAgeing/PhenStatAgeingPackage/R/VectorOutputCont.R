@@ -92,7 +92,7 @@ vectorOutputCont =	function(object,
 			Overal = TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
-				term = CombineLevels(Labels$Genotype$Genotype,Labels$Sex$Sex),
+				term = CombineLevels(Labels$Genotype$Genotype,Labels$Sex$Sex,debug = debug),
 				return = NULL,
 				not = modelSummaryPvalueExtract(
 					x = Fmodel,
@@ -140,7 +140,7 @@ vectorOutputCont =	function(object,
 			'Sexual dimorphism detected' = TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
-				term = CombineLevels(Labels$Genotype$Genotype,Labels$Sex$Sex),
+				term = CombineLevels(Labels$Genotype$Genotype,Labels$Sex$Sex,debug = debug),
 				return = TRUE,
 				not = FALSE,
 				debug = debug
@@ -271,7 +271,7 @@ vectorOutputCont =	function(object,
 			'Genotype Sex'  =  !is.null(
 				modelSummaryPvalueExtract(
 					x = Fmodel,
-					variable = CombineLevels(Labels$Genotype$Genotype, Labels$Sex$Sex),
+					variable = CombineLevels(Labels$Genotype$Genotype, Labels$Sex$Sex,debug = debug),
 					anova = TRUE,
 					debug = debug
 				)
@@ -279,7 +279,7 @@ vectorOutputCont =	function(object,
 			'Genotype LifeStage'  =  !is.null(
 				modelSummaryPvalueExtract(
 					x = Fmodel,
-					variable = CombineLevels(Labels$Genotype$Genotype, Labels$LifeStage$LifeStage),
+					variable = CombineLevels(Labels$Genotype$Genotype, Labels$LifeStage$LifeStage,debug = debug),
 					anova = TRUE,
 					debug = debug
 				)
@@ -287,7 +287,7 @@ vectorOutputCont =	function(object,
 			'Sex LifeStage'  =  !is.null(
 				modelSummaryPvalueExtract(
 					x = Fmodel,
-					variable = CombineLevels(Labels$Sex$Sex, Labels$LifeStage$LifeStage),
+					variable = CombineLevels(Labels$Sex$Sex, Labels$LifeStage$LifeStage,debug = debug),
 					anova = TRUE,
 					debug = debug
 				)
@@ -298,7 +298,8 @@ vectorOutputCont =	function(object,
 					variable = CombineLevels(
 						Labels$Genotype$Genotype,
 						Labels$Sex$Sex,
-						Labels$LifeStage$LifeStage
+						Labels$LifeStage$LifeStage,
+						debug = debug
 					),
 					anova = TRUE,
 					debug = debug
@@ -311,21 +312,21 @@ vectorOutputCont =	function(object,
 			'Genotype Sex'  =
 				modelSummaryPvalueExtract(
 					x = Fmodel,
-					variable =  CombineLevels(Labels$Genotype$Genotype, Labels$Sex$Sex),
+					variable =  CombineLevels(Labels$Genotype$Genotype, Labels$Sex$Sex,debug = debug),
 					anova = TRUE,
 					debug = debug
 				),
 			'Genotype LifeStage'  =
 				modelSummaryPvalueExtract(
 					x = Fmodel,
-					variable =  CombineLevels(Labels$Genotype$Genotype, Labels$LifeStage$LifeStage),
+					variable =  CombineLevels(Labels$Genotype$Genotype, Labels$LifeStage$LifeStage,debug = debug),
 					anova = TRUE,
 					debug = debug
 				),
 			'Sex LifeStage'  =
 				modelSummaryPvalueExtract(
 					x = Fmodel,
-					variable =  CombineLevels(Labels$Sex$Sex, Labels$LifeStage$LifeStage),
+					variable =  CombineLevels(Labels$Sex$Sex, Labels$LifeStage$LifeStage,debug = debug),
 					anova = TRUE,
 					debug = debug
 				),
@@ -335,7 +336,8 @@ vectorOutputCont =	function(object,
 					variable =  CombineLevels(
 						Labels$Genotype$Genotype,
 						Labels$Sex$Sex,
-						Labels$LifeStage$LifeStage
+						Labels$LifeStage$LifeStage,
+						debug = debug
 					),
 					anova = TRUE,
 					debug = debug

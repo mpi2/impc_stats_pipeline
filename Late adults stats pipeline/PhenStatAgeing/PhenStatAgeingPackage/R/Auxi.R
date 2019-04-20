@@ -314,6 +314,9 @@ range0 = function(x, ...) {
 }
 
 order0 = function(x, levels = FALSE) {
+	if(is.null(x))
+		return(NULL)
+	
 	if (levels) {
 		r = x[order(levels(x))]
 	} else{
