@@ -4,7 +4,7 @@
 		paste0(
 			'\n >===============================================================================<',
 			'\n PhenStatAgeing is developed by International Mouse Phenotyping Consortium (IMPC) ',
-			'\n More details on https://www.mousephenotype.org/                                            ',
+			'\n More details on https://www.mousephenotype.org/                                  ',
 			'\n Contact us on hamedhm@ebi.ac.uk                                                  ',
 			'\n >===============================================================================<'
 		),
