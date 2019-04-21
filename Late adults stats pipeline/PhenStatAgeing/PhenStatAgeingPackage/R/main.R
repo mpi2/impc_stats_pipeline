@@ -1,5 +1,5 @@
-testDatasetAgeing = function(phenListAgeing = NULL                        ,
-														 method         = NULL                        ,
+testDatasetAgeing = function(phenListAgeing = NULL                 ,
+														 method         = NULL                 ,
 														 ### MM
 														 MM_fixed = TypicalModel(
 														 	depVariable = 'data_point'           ,
@@ -50,7 +50,8 @@ testDatasetAgeing = function(phenListAgeing = NULL                        ,
 					RR_formula = RR_formula          ,
 					RR_prop = RR_prop                ,
 					FERR_rep = FERR_rep              ,
-					debug = debug
+					debug = debug                    ,
+					...
 				),
 				sup.messages = !debug,
 				sup.warnings = TRUE
@@ -91,7 +92,8 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 															RR_prop                ,
 															FERR_rep               ,
 															##### Others
-															debug = TRUE) {
+															debug = TRUE           ,
+															...) {
 	message0('PhenStatAgeing loaded.')
 	if (!is(phenListAgeing, 'PhenList') &&
 			!is(phenListAgeing, 'PhenListAgeing'))
@@ -112,7 +114,8 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			checks    = MM_checks       ,
 			optimise  = MM_optimise     ,
 			trace     = FALSE           ,
-			method    = 'MM'
+			method    = 'MM'            ,
+			...
 		)
 		# Important!
 		if (!is.null(output$input))
@@ -126,7 +129,8 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			#expandDottedFormula(formula = FE_formula, data = phenListAgeing@datasetPL),
 			rep = FERR_rep,
 			method = 'FE',
-			fullComparisions = TRUE
+			fullComparisions = TRUE,
+			...
 		)
 		# Important!
 		if (!is.null(output$input))
@@ -140,7 +144,8 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 			#expandDottedFormula(formula = RR_formula, data = phenListAgeing@datasetPL),
 			rep = FERR_rep,
 			method = 'RR',
-			RRprop = RR_prop
+			RRprop = RR_prop,
+			...
 		)
 		# Important!
 		if (!is.null(output$input))

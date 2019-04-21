@@ -791,7 +791,7 @@ ctest = function(x,
 			fisher.test(
 				xtb,
 				simulate.p.value = rep > 0,
-				conf.int = FALSE,
+				#conf.int = FALSE,
 				B = rep,
 				...
 			),
@@ -804,7 +804,7 @@ ctest = function(x,
 				return(NULL)
 			}
 		)
-		effect     = cat.eff.size(xtb, varName = pasteComma(all.vars0(formula)[-1]))
+		effect     = cat.eff.size(xtb, varName = pasteComma(all_vars0(formula)[-1]))
 		r$formula   = formula
 		r$table     = xtb
 	}
@@ -1250,7 +1250,7 @@ RRNewObjectAndFormula = function(object,
 																 formula,
 																 labels = NULL,
 																 depVarPrefix = NULL) {
-	allTerms         = all.vars0(formula)
+	allTerms         = all_vars0(formula)
 	newobject        = object
 	RRcutObject      = RRCut(
 		object = object          ,
@@ -1422,7 +1422,7 @@ TermInModelAndnLevels = function(model,
 	r = termInTheModel(model = model ,
 										 term = term,
 										 message = FALSE) &&
-		colLevelsSimple(data, all.vars0(model)[1]) >		threshold
+		colLevelsSimple(data, all_vars0(model)[1]) >		threshold
 	return(r)
 }
 #######################
@@ -1532,7 +1532,7 @@ warning0 = function(...,
 }
 
 
-all.vars0 = function(x, ...) {
+all_vars0 = function(x, ...) {
 	if (is.null(x))
 		return(NULL)
 	fif = all.vars(formula(x), ...)

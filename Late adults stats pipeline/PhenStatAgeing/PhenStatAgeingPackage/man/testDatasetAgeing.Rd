@@ -100,7 +100,9 @@ testDatasetAgeing(
 	A logical flag. Set to TRUE to see more details about the progress of the function. Default TRUE
 }
   \item{\dots}{
-  Not used
+  Other parameters that can be passed to:\cr
+  If the model is set to Linear Mixed Model (MM) then the parameters that can be passed to lme function. See ?lme() manual page\cr
+  If the model is either Fisher Exact test (FE) or Reference Range + (RR) then the parameters that can be passed to the fisher.test function. See ?fisher.test() manual page\cr
 }
 }
 
@@ -153,7 +155,8 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		
 		
 		#################
-		# 2.2 Mixed model (MM) with NO optimisation for the fixed effects but random/weight effects
+		# 2.2 Mixed model (MM) with NO optimisation 
+		# for the fixed effects but random/weight effects
 		MM2_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'MM',

@@ -11,7 +11,7 @@ M.opt = function(object = NULL            ,
 								 optimise    = TRUE       ,
 								 ...) {
 	if (!method %in% c('MM')        ||
-			is.null(all.vars0(fixed))   ||
+			is.null(all_vars0(fixed))   ||
 			is.null(object)) {
 		#####
 		message0 ('Improper method (',
@@ -80,7 +80,8 @@ M.opt = function(object = NULL            ,
 												 				glCont
 												 			else
 												 				gCont
-												 		}
+												 		},
+												 		...
 												 	),
 												 	FUN = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls')),
 												 	debug = TRUE
@@ -311,7 +312,8 @@ M.opt = function(object = NULL            ,
 			LifeStage           = LifeStage                              ,
 			weight              = weight                                 ,
 			checks              = checks                                 ,
-			optimise            = optimise
+			optimise            = optimise                               ,
+			others              = ...
 		),
 		extra = list(Cleanedformula  = fixed,
 								 lowerCorrected  = lowerCorrected)

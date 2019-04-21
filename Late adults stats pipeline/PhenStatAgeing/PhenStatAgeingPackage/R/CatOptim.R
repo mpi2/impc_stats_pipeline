@@ -4,11 +4,12 @@ crunner = function(object              ,
 									 rep              = 1500,
 									 method           = NULL,
 									 fullComparisions = TRUE,
-									 noteToFinish     = NULL )
+									 noteToFinish     = NULL,
+									 ...)
 {
 	if (sum(method != c('FE', 'RR')) == 0 ||
 			is.null(object)                   ||
-			is.null(all.vars0(formula))) {
+			is.null(all_vars0(formula))) {
 		message0 ('Improper method (',
 							method,
 							') for the type of data, or the "formula" is left blank')
@@ -39,7 +40,7 @@ crunner = function(object              ,
 		l           = lcomb = names = alTbls = NULL
 		CmbiVars    = (length(vars) > 1)
 		####
-		message0('Step ', indx, '. Testing "', depVariable,'"')
+		message0('Step ', indx, '. Testing "', depVariable, '"')
 		####
 		newObject   = object@datasetPL
 		Obj         = CheckMissing(newObject,
@@ -50,11 +51,15 @@ crunner = function(object              ,
 		for (j in 1:length(vars)) {
 			message0('\tTesting for the main effect: ',
 							 pasteComma(vars[j], replaceNull = FALSE))
-			l[[counter]] = ctest(x = newObject,
-													 formula = reformulate(
-													 	termlabels = c(depVariable, vars[j]),
-													 	response = NULL
-													 ))
+			l[[counter]] = ctest(
+				x = newObject,
+				formula = reformulate(
+					termlabels = c(depVariable, vars[j]),
+					response = NULL
+				),
+				rep = rep,
+				...
+			)
 			names = c(names, vars[j])
 			counter = counter + 1
 		}
@@ -75,7 +80,8 @@ crunner = function(object              ,
 			lcomb = c(lcomb, lapply(alTbls, function(x) {
 				ctest(x = x,
 							formula = Freq ~ .,
-							rep     = rep)
+							rep     = rep,
+							...)
 			}))
 			names(lcomb) = paste(lapply(
 				names(lcomb),

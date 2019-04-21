@@ -3,10 +3,11 @@ RRrunner = function(object              ,
 										formula       = ~ category + Genotype + Sex + LifeStage,
 										rep           = 1500,
 										method        = NULL,
-										RRprop        = .05)
+										RRprop        = .05,
+										...)
 {
 	sta.time    = Sys.time()
-	allTerms    = all.vars0(x = formula)
+	allTerms    = all_vars0(x = formula)
 	if (!method %in% c('RR')        ||
 			is.null(allTerms)           ||
 			is.null(object)) {
@@ -35,7 +36,7 @@ RRrunner = function(object              ,
 	message0('Stp 1. Low versus Normal/High')
 	RRobject_low = RRNewObjectAndFormula(
 		object = object                   ,
-		RRprop = 1-RRprop                 ,
+		RRprop = 1 - RRprop                 ,
 		formula = formula                 ,
 		labels = c('Low', 'NormalHigh')   ,
 		depVarPrefix = 'Low'
@@ -46,7 +47,8 @@ RRrunner = function(object              ,
 		rep = rep                         ,
 		method = 'RR'                     ,
 		fullComparisions = TRUE           ,
-		noteToFinish = 'in step 1'
+		noteToFinish = 'in step 1'        ,
+		...
 	)
 	
 	message0('Stp 2. Low/Normal versus High')
@@ -63,7 +65,8 @@ RRrunner = function(object              ,
 		rep = rep                          ,
 		method = 'RR'                      ,
 		fullComparisions = TRUE            ,
-		noteToFinish = 'in step 2'
+		noteToFinish = 'in step 2'         ,
+		...
 	)
 	message0('RR framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
 	#####
