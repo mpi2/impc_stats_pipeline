@@ -41,15 +41,26 @@ replaceNull = function(x, replaceBy = 'NULL') {
 pasteComma = function(...,
 											replaceNull = TRUE,
 											truncate = TRUE   ,
-											width = 100) {
+											width = 100,
+											trailingSpace = TRUE) {
+	sep = ifelse(trailingSpace,', ',',')
 	if (replaceNull)
-		r = paste(replaceNull(list(...), replaceBy = 'NULL'),
-							sep = ', ',
-							collapse = ', ')
+		r = paste(
+			replaceNull(list(...), replaceBy = 'NULL'),
+			sep      = sep,
+			collapse = sep
+		)
 	else
-		r = paste(..., sep = ', ', collapse = ', ')
+		r = paste(
+			...,
+			sep      = sep,
+			collapse = sep
+		)
+	
 	if (truncate)
-		r = truncate_text(r,width)
+		r = truncate_text(r, width)
+	
+	return(r)
 }
 
 truncate_text = function(x,width){
@@ -1164,6 +1175,69 @@ decimalplaces <- function(x) {
 		return(0)
 	}
 }
+
+
+
+dataCode = function(formula, data, digits = 16) {
+	a.vars = all_vars0(formula)
+	if (!is.null(formula) &&
+			!is.null(data)    &&
+			!is.null(a.vars)  &&
+			nrow(data) > 1    &&
+			sum(a.vars %in% names(data))) {
+		res0 = lapply(a.vars[a.vars %in% names(data)], function(name) {
+			d = data[, name]
+			if (is.numeric(d))
+				paste0(
+					name,
+					':[',
+					pasteComma(
+						length(d)                            ,
+						round(mean(d, na.rm = TRUE), digits) ,
+						round(sd  (d, na.rm = TRUE), digits) ,
+						truncate      = FALSE                ,
+						trailingSpace = FALSE
+					),
+					']'
+				)
+			else
+				paste0(name,
+							 ':[',
+							 pasteComma(
+							 	paste0(levels(d), '=', table(d)),
+							 	truncate           = FALSE      ,
+							 	trailingSpace      = FALSE
+							 ),
+							 ']')
+		})
+		res = pasteComma(unlist(res0)         ,
+										 truncate      = FALSE,
+										 trailingSpace = FALSE)
+	} else{
+		res = paste0(
+			'Something is wrong with the data/model. Make sure that the data is not null and the formula matches the data. [This is a random number ',
+			randRegSeed(
+				n       = 1   ,
+				decimal = TRUE,
+				round   = 10
+			),
+			']'
+		)
+	}
+	return(res)
+}
+
+randRegSeed = function(n = 1,
+											 max = .Machine$double.xmax,
+											 decimal = TRUE,
+											 round = 10) {
+	r = runif(n, 1, as.numeric(Sys.time()) * 10000) %% max
+	if (decimal)
+		r = r - (r %% 1)
+	r = round(r, digits = round)
+	return(r)
+}
+
 as.numeric01 = function(x) {
 	if (!is.null(x))
 		return(suppressWarnings(as.numeric(x)))
@@ -1556,7 +1630,7 @@ expandDottedFormula = function(formula, data) {
 }
 
 removeSingleLevelFactors = function(formula, data) {
-	cat    = all.vars(formula)[!sapply(data[, all.vars(formula)], is.numeric)]
+	cat    = all_vars0(formula)[!sapply(data[, all_vars0(formula)], is.numeric)]
 	if (length(cat)) {
 		FactsThatMustBeRemoved = cat[lapply(data[, cat, drop = FALSE], function(x) {
 			length(unique(na.omit(x)))
@@ -1853,14 +1927,16 @@ QuyalityTests = function(object,
 			cmb = combn(x = levels, i)
 			for (j in 1:ncol(cmb)) {
 				result = tapply(r, as.list(d[, cmb[, j], drop = FALSE]), function(x) {
-					normality_test = if (!is.null(x) && !is.na(x) &&
-															 length(x)           > 3  &&
-															 length(unique(x)) > 3    &&
-															 length(x)         < 5000 &&
-															 var(x)            != 0) {
-						shapiro.test(x)$p.value
+					if (!is.null(x) && !is.na(x) &&
+							length(x)           > 3  &&
+							length(unique(x)) > 3    &&
+							length(x)         < 5000 &&
+							var(x)            != 0) {
+						list('p-value' = shapiro.test(x)$p.value, 
+								 n         = length(x))
 					} else{
-						'Not possible(Possible causes: <3 or >5000 unique data points'
+						list('p-value' = 'Not possible(Possible causes: <3 or >5000 unique data points', 
+								 n         = length(x))
 					}
 				})
 				if (!is.null(result)) {

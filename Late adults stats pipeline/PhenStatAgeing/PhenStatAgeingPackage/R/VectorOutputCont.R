@@ -29,7 +29,7 @@ vectorOutputCont =	function(object,
 	variability      = length(unique(columnOfInterest)) / length(columnOfInterest)
 	#####################################################################
 	DSsize            = SummaryStats(
-		x = x,
+		x = object$input$data         ,
 		formula = checkModelTermsInData(
 			formula = object$input$fixed,
 			data = x,
@@ -56,6 +56,8 @@ vectorOutputCont =	function(object,
 			'Only one sex included in the analysis'
 		)                                                  ,
 		'Is model optimised'  = object$output$optimised    ,
+		'data code'           = dataCode(formula = object$input$fixed, 
+																		 data    = object$input$data),
 		'Summary statistics'  = DSsize                     ,
 		'Further models' = if (!is.null(object$output$SplitModels)) {
 			lapply(object$output$SplitModels, function(v) {
@@ -239,9 +241,9 @@ vectorOutputCont =	function(object,
 		'Weight effect size'                   =  object$output$EffectSizes[[Labels$Weight]],
 		#####################################################################
 		'Gp1 genotype'                         =	Labels$Genotype$Control		,
-		'Gp1 Residuals normality test'         =	as.numeric01(object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Control]),
+		'Gp1 Residuals normality test'         =	object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Control],
 		'Gp2 genotype'                         =	Labels$Genotype$Mutant				,
-		'Gp2 Residuals normality test'         =	as.numeric01(object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Mutant]),
+		'Gp2 Residuals normality test'         =	object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Mutant],
 		#####################################################################
 		'Blups test'                           =  'Legacy',
 		'Rotated residuals normality test'     =  'Legacy',

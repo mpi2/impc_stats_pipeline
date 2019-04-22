@@ -42,6 +42,8 @@ vectorOutputCat =	function(object)
 			'Both sexes included',
 			'Only one sex included in the analysis'
 		),
+		'data code'          = dataCode(formula = frm, 
+																		 data   = x),
 		'Summary statistics' = DSsize,
 		'Further models' = if (!is.null(object$output$SplitModels)) {
 			setNames(sapply(object$output$SplitModels, function(v) {
