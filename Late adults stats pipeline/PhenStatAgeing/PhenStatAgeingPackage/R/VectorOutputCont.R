@@ -55,10 +55,10 @@ vectorOutputCont =	function(object,
 			'Both sexes included'                            ,
 			'Only one sex included in the analysis'
 		)                                                  ,
-		'Is model optimised'  = object$output$optimised    ,
-		'data code'           = dataCode(formula = object$input$fixed, 
-																		 data    = object$input$data),
-		'Summary statistics'  = DSsize                     ,
+		'Is model optimised'       = object$output$optimised    ,
+		'data signature'           = dataSignature(formula = object$input$fixed,
+																							 data    = object$input$data),
+		'Summary statistics'        = DSsize                     ,
 		'Further models' = if (!is.null(object$output$SplitModels)) {
 			lapply(object$output$SplitModels, function(v) {
 				if (class(v) %in% c('lme', 'gls', 'glm')) {

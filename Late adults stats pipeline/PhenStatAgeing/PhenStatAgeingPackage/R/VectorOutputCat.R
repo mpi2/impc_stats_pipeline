@@ -28,8 +28,6 @@ vectorOutputCat =	function(object)
 	MultiBatch = ifelse(multiBatch(x),
 											'Dataset contains multi batches',
 											'Dataset contains single batch')
-	
-	
 	addInfo           = list(
 		'Formula'                = list(
 			input   = printformula(object$input$formula),
@@ -42,9 +40,9 @@ vectorOutputCat =	function(object)
 			'Both sexes included',
 			'Only one sex included in the analysis'
 		),
-		'data code'          = dataCode(formula = frm, 
-																		 data   = x),
-		'Summary statistics' = DSsize,
+		'data signature'          = dataSignature(formula = frm,
+																							data   = x),
+		'Summary statistics'      = DSsize,
 		'Further models' = if (!is.null(object$output$SplitModels)) {
 			setNames(sapply(object$output$SplitModels, function(v) {
 				lapply(

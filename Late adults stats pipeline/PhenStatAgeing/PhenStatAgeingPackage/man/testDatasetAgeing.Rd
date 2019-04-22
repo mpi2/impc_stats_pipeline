@@ -143,7 +143,8 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		####################################################################
 		
 		#################
-		# 2.1 Mixed model (MM) framework
+		# 2.1 Optimised Mixed model (MM) framework
+		#################
 		MM1_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'MM',
@@ -157,6 +158,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		#################
 		# 2.2 Mixed model (MM) with NO optimisation 
 		# for the fixed effects but random/weight effects
+		#################
 		MM2_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'MM',
@@ -167,8 +169,9 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		plot(MM2_result, col = 4,main = 'No optimisation on the fixed effects')
 		summary(MM2_result)
 		
-			#################
+		#################
 		# 2.3 Mixed model (MM) with NO optimisation at all
+		#################
 		MM3_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'MM',
@@ -182,6 +185,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		
 		#################
 		# 2.3 Reference range model
+		#################
 		RR_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'RR',
@@ -194,6 +198,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		
 		#################
 		# 2.4 Fisher exact model
+		#################
 		FE_result = testDatasetAgeing(
 			phenListAgeing = test_Cat,
 			method = "FE",

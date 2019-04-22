@@ -167,23 +167,9 @@ TypicalModel = function(depVariable,
 	if (!is.null(others))
 		fixed = update(fixed,  reformulate(response = NULL,	termlabels = c('.', others)))
 	####
-	#inF = fixed
-	#fixed = ComplementaryFeasibleTermsInContFormula(formula = fixed, data = data)
-	
-	
 	if (debug)
-		message0('Initial  model: ',
-						 printformula(fixed)
-						 # 'Initial  model: ',
-						 # printformula(inF),
-						 # '\n',
-						 # 'Polished model: ',
-						 # printformula(fixed),
-						 # ' [any removal: ',
-						 # !identical(fixed, inF),
-						 # ']')
-						 #return(list(correctd = fixed, initial = inF))
-						 return(fixed)
+		message0('Initial  model: ', printformula(fixed))
+	return(fixed)
 }
 
 
@@ -1179,9 +1165,7 @@ decimalplaces <- function(x) {
 	}
 }
 
-
-
-dataCode = function(formula, data, digits = 16) {
+dataSignature = function(formula, data, digits = 16) {
 	a.vars = all_vars0(formula)
 	if (!is.null(formula) &&
 			!is.null(data)    &&
