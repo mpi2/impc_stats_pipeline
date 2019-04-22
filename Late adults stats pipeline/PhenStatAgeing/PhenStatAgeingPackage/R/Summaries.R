@@ -38,26 +38,37 @@ summaryCore = function(x,
 		'Method'                         = vo$Method,
 		'Input model'                    = vo$`Additional information`$Formula$input,
 		################################ = that is true x$output$Final.Model!
-		'Final model'                    = if(!is.null(x$output$Final.Model)) formula(x$output$Final.Model) else NULL,
-		
-		'----------------------------'   = '----------------------------',
+		'...........................>'   = '* Optimised model for MM and right-sided formula for RR & FE frameworks',
+		'Final model'                    = if (procedure %in% 'MM') {
+			if (!is.null(x$output$Final.Model))
+				formula(x$output$Final.Model)
+			else
+				NULL
+		} else if (procedure %in% 'FE') {
+			x$extra$Cleanedformula
+		}	else if (procedure %in% 'RR') {
+			x$extra$Cleanedformula
+		} else{
+			NULL
+		},
+		'............................'   = '............................',
 		'Tested Gene'                    = vo$`Gp2 genotype`,
 		'Reference Gene'                 = vo$`Gp1 genotype`,
-		'----------------------------'   = '----------------------------',
+		'............................'   = '............................',
 		'Sexual dimorphism detected?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
-		'----------------------------'   = ifelse(
+		'............................>'   = ifelse(
 			procedure == 'RR',
-			'- Separate p-values for (Low vs NormalHigh) and (LowNormal vs High) -',
-			'----------------------------'
+			'* Separate p-values for (Low vs NormalHigh) and (LowNormal vs High) ',
+			'............................'
 		),
 		'Genotype contribution overal'   = vo$`Genotype p-val`,
 		'Genotype contribution Females'  = vo$`Sex FvKO p-val`,
 		'Genotype contribution Males'    = vo$`Sex MvKO p-val`,
-		'----------------------------'   = '----------------------------',
+		'............................'   = '............................',
 		'LifeStage contribution'         = vo$`LifeStage p-val`,
 		'Genotype contribution Early'    = vo$`LifeStage EvKO p-val`,
 		'Genotype contribution Late'     = vo$`LifeStage LvKO p-val`,
-		'----------------------------'   = '----------------------------',
+		'............................'   = '............................',
 		'Sex contribution'               = vo$`Sex p-val`,
 		'Body weight contribution'       = vo$`Weight p-val`
 	)
@@ -68,7 +79,14 @@ summaryCore = function(x,
 		col.names = c('Statistic', 'Value'),
 		...
 	))
-	return(invisible(outT))
+	outTRemoved = outT[!apply(outT, 1, function(x) {
+		any(grepl(
+			pattern = '..........',
+			x = x,
+			fixed = TRUE
+		))
+	}), ]
+	return(invisible(outTRemoved))
 }
 
 prepareSummaryOutput = function(out, nullMessage = 'Not applicable') {
