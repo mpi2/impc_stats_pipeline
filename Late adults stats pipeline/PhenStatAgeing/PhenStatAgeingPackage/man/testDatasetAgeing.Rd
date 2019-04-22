@@ -179,7 +179,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 			MM_optimise = FALSE
 		)
 		VO_MM3 = vectorOutputAgeing(MM3_result)
-		plot(MM3_result, col = 4,main = 'Not optimised model')
+		plot(MM3_result, col = 5,main = 'Not optimised model')
 		summary(MM3_result)
 		
 		
