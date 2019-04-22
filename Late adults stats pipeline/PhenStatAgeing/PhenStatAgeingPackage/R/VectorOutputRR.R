@@ -6,7 +6,7 @@ vectorOutputRR =	function(object)
 	Labels         = PhenListAgeingLevels(object = object)
 	Fmodel         = object$extra$Cleanedformula
 	frm            = formula(Fmodel)
-	depVariable    = all.vars(frm)[1]
+	depVariable    = all_vars0(frm)[1]
 	#	equation       = NULL
 	formula        = printformula(frm)
 	framework      = paste0('Reference Range Plus Test framework; quantile = ',

@@ -42,7 +42,7 @@ M.opt = function(object = NULL            ,
 	fixed = ModelChecks(fixed = fixed,
 											data = data,
 											checks = checks)
-	allVars     = all.vars(fixed)
+	allVars     = all_vars0(fixed)
 	LifeStage   = 'LifeStage' %in% allVars
 	Batch_exist = !categorical && !is.null(random) &&
 		colExists(name = 'Batch', data = data)

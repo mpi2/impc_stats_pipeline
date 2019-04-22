@@ -7,9 +7,9 @@ vectorOutputCont =	function(object,
 	Labels         = PhenListAgeingLevels(object = object)
 	Fmodel         = object$output$Final.Model
 	frm            = formula(Fmodel)
-	depVariable    = all.vars(frm)[1]
+	depVariable    = all_vars0(frm)[1]
 	equation       = ifelse(
-		Labels$Weight %in% all.vars(frm),
+		Labels$Weight %in% all_vars0(frm),
 		paste0('equation with'   , Labels$Weight),
 		paste0('equation without', Labels$Weight)
 	)
@@ -241,9 +241,9 @@ vectorOutputCont =	function(object,
 		'Weight effect size'                   =  object$output$EffectSizes[[Labels$Weight]],
 		#####################################################################
 		'Gp1 genotype'                         =	Labels$Genotype$Control		,
-		'Gp1 Residuals normality test'         =	object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Control],
+		'Gp1 Residuals normality test'         =	object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Control][[1]],
 		'Gp2 genotype'                         =	Labels$Genotype$Mutant				,
-		'Gp2 Residuals normality test'         =	object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Mutant],
+		'Gp2 Residuals normality test'         =	object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Mutant][[1]],
 		#####################################################################
 		'Blups test'                           =  'Legacy',
 		'Rotated residuals normality test'     =  'Legacy',

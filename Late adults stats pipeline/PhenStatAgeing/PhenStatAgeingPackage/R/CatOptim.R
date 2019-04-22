@@ -27,7 +27,7 @@ crunner = function(object              ,
 		responseIsTheFirst = TRUE
 	)
 	####
-	allTerms    = all.vars(newFormula)
+	allTerms    = all_vars0(newFormula)
 	if (length(allTerms) < 1) {
 		message0('No variable to test.')
 		return(NULL)

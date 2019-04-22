@@ -43,19 +43,15 @@ pasteComma = function(...,
 											truncate = TRUE   ,
 											width = 100,
 											trailingSpace = TRUE) {
-	sep = ifelse(trailingSpace,', ',',')
+	sep = ifelse(trailingSpace, ', ', ',')
 	if (replaceNull)
-		r = paste(
-			replaceNull(list(...), replaceBy = 'NULL'),
-			sep      = sep,
-			collapse = sep
-		)
+		r = paste(replaceNull(list(...), replaceBy = 'NULL'),
+							sep      = sep,
+							collapse = sep)
 	else
-		r = paste(
-			...,
-			sep      = sep,
-			collapse = sep
-		)
+		r = paste(...,
+							sep      = sep,
+							collapse = sep)
 	
 	if (truncate)
 		r = truncate_text(r, width)
@@ -63,7 +59,7 @@ pasteComma = function(...,
 	return(r)
 }
 
-truncate_text = function(x,width){
+truncate_text = function(x, width) {
 	ifelse(nchar(x) > width, paste0(strtrim(x, width), '...'), x)
 }
 
@@ -76,7 +72,7 @@ checkModelTermsInData = function(formula,
 																 responseIsTheFirst  = TRUE,
 																 pattern = '[.~+-()]') {
 	formula = as.formula(formula)
-	vars    = all.vars(formula, functions = FALSE)
+	vars    = all_vars0(formula, functions = FALSE)
 	vars    = vars[!grepl(pattern = pattern,
 												x = vars,
 												fixed = TRUE)]
@@ -93,7 +89,8 @@ checkModelTermsInData = function(formula,
 		message0(
 			'Some terms in the model are not included in the data. See: \n\t ',
 			pasteComma(vars[!In], replaceNull = FALSE),
-			'\n\t Initial  model: ',printformula(formula)
+			'\n\t Initial  model: ',
+			printformula(formula)
 		)
 		ft  = vars [!In]
 		formula = update.formula(formula,
@@ -103,7 +100,7 @@ checkModelTermsInData = function(formula,
 														 	intercept  = TRUE,
 														 	sep        = '-'
 														 ))
-		message0('\t Polished model: ',printformula(formula))
+		message0('\t Polished model: ', printformula(formula))
 	}
 	return(formula)
 }
@@ -137,11 +134,11 @@ reformulate0 = function (termlabels,
 suppressMessagesANDWarnings = function(exp,
 																			 sup.messages = TRUE,
 																			 sup.warnings = FALSE) {
-	if ( sup.messages && sup.warnings) {
+	if (sup.messages && sup.warnings) {
 		suppressMessages(suppressWarnings(exp))
-	} else if ( sup.messages && !sup.warnings) {
+	} else if (sup.messages && !sup.warnings) {
 		suppressMessages(exp)
-	} else if ( !sup.messages && sup.warnings) {
+	} else if (!sup.messages && sup.warnings) {
 		suppressWarnings(exp)
 	} else{
 		exp
@@ -175,36 +172,39 @@ TypicalModel = function(depVariable,
 	
 	
 	if (debug)
-		message0(
-			'Initial  model: ',
-			printformula(fixed)
-			# 'Initial  model: ',
-			# printformula(inF),
-			# '\n',
-			# 'Polished model: ',
-			# printformula(fixed),
-			# ' [any removal: ',
-			# !identical(fixed, inF),
-			# ']'
-		)
-	#return(list(correctd = fixed, initial = inF))
-	return(fixed)
+		message0('Initial  model: ',
+						 printformula(fixed)
+						 # 'Initial  model: ',
+						 # printformula(inF),
+						 # '\n',
+						 # 'Polished model: ',
+						 # printformula(fixed),
+						 # ' [any removal: ',
+						 # !identical(fixed, inF),
+						 # ']')
+						 #return(list(correctd = fixed, initial = inF))
+						 return(fixed)
 }
 
 
 
 FeasibleTermsInContFormula = function(formula, data) {
-	Allvars = all.vars(formula)[all.vars(formula) %in% names(data)]
+	if (is.null(formula) || is.null(data)) {
+		message0('Null data or the formula. Check the data and/or formula')
+		stop()
+	}
+	Allvars = all_vars0(formula)[all_vars0(formula) %in% names(data)]
 	isCat = !sapply(data[, Allvars, drop = FALSE], is.numeric)
 	vars  = Allvars[isCat]
 	lvars = length(vars)#min(length(vars), sapply(strsplit(formulaTerms(formula = formula), split = ':'), length), na.rm = TRUE)
 	names = r = NULL
-	if(getResponseFromFormula(formula = formula) %in% vars){
+	if (getResponseFromFormula(formula = formula) %in% vars) {
 		message0('\tResponse is included in the checks ....')
 	}
 	if (lvars > 0) {
 		for (i in 1:lvars) {
-			message0('\t',i,
+			message0('\t',
+							 i,
 							 ' of ',
 							 lvars,
 							 '. Checking for the feasibility of terms and interactions ...')
@@ -292,16 +292,19 @@ dist0 = function(x, func = lower.tri) {
 	return(r)
 }
 
-
 CheckMissing = function(data, formula) {
+	if (is.null(formula) || is.null(data)) {
+		message0('Null data or the formula. Check the data and/or formula')
+		stop()
+	}
 	org.data = data
-	new.data = data[complete.cases(data[, all.vars(formula)]), ]
+	new.data = data[complete.cases(data[, all_vars0(formula)]), ]
 	missings = ifelse(all(dim(org.data) == dim(new.data)),	0, dim(org.data)[1] -
 											dim(new.data)[1])
 	if (missings)
 		message0(
 			'The data (variable(s) = ',
-			pasteComma(all.vars(formula)),
+			pasteComma(all_vars0(formula)),
 			') contain ',
 			missings,
 			' missing(s)...\n\tMissing data removed.'
@@ -325,7 +328,7 @@ range0 = function(x, ...) {
 }
 
 order0 = function(x, levels = FALSE) {
-	if(is.null(x))
+	if (is.null(x))
 		return(NULL)
 	
 	if (levels) {
@@ -335,7 +338,6 @@ order0 = function(x, levels = FALSE) {
 	}
 	return(r)
 }
-
 
 percentageChangeCont = function(model                ,
 																data                 ,
@@ -493,7 +495,6 @@ eff.size = function(object,
 	return(efSi)
 }
 
-
 noVariation = function(data, f = '~Genotype') {
 	xtb = xtabs(formula =  f,
 							drop.unused.levels = TRUE,
@@ -504,7 +505,6 @@ noVariation = function(data, f = '~Genotype') {
 		return(FALSE)
 	}
 }
-
 
 ConvDf2Flat = function(dframe,
 											 ch1 = '*',
@@ -577,7 +577,6 @@ colExists = function(name, data) {
 	}
 }
 
-
 listFun = function(list, FUN, debug = FALSE) {
 	if (debug)
 		message0('Used model: ', FUN)
@@ -613,7 +612,7 @@ termInTheModel = function(model, term, message = FALSE) {
 			'\n\t Model: ' ,
 			paste(formula(model), collapse = ', ')
 		)
-	return(all(term %in% all.vars(formula(model))))
+	return(all(term %in% all_vars0(formula(model))))
 }
 
 SplitEffect = 	function(finalformula,
@@ -622,7 +621,7 @@ SplitEffect = 	function(finalformula,
 												data,
 												depVariable,
 												mandatoryVar = 'Genotype') {
-	Allargs  = all.vars(fullModelFormula)[!all.vars(fullModelFormula) %in% c(depVariable, mandatoryVar)]
+	Allargs  = all_vars0(fullModelFormula)[!all_vars0(fullModelFormula) %in% c(depVariable, mandatoryVar)]
 	isCat    = !sapply(data[, Allargs, drop = FALSE], is.numeric)
 	args     = Allargs[isCat]
 	argsCon  = if (length(Allargs[!isCat]) > 0) {
@@ -955,7 +954,7 @@ getResponseFromFormula = function(formula) {
 	if (is.null(formula))
 		return(NULL)
 	if (attr(terms(as.formula(formula))    , which = 'response'))
-		all.vars(formula)[1]
+		all_vars0(formula)[1]
 	else
 		NULL
 }
@@ -1035,7 +1034,7 @@ ModelInReference = function(model,
 		out = reformulate(
 			termlabels = r,
 			response   = if (responseIncluded && FormulaHasResponse(model))
-				all.vars(model)[1]
+				all_vars0(model)[1]
 			else
 				NULL	,
 			intercept  = TRUE
@@ -1136,7 +1135,11 @@ unmatrix0 = function (x, byrow = FALSE, sep = ' ')
 }
 
 MoveResponseToRightOfTheFormula = function(formula) {
-	newFormula = update.formula(old = formula, new = paste0('~', all.vars(formula)[1], '+.'))
+	newFormula = update.formula(old = formula,
+															new = reformulate(
+																response   = NULL,
+																termlabels = c(all_vars0(formula)[1], '.')
+															))
 	out = formula(delete.response(terms(newFormula)))
 	message0('The input formula: ', printformula(formula))
 	message0('The reformatted formula for the algorithm: ',
@@ -1692,12 +1695,16 @@ SummaryStats = function(x,
 	formula = checkModelTermsInData(formula = formula,
 																	data = x,
 																	responseIsTheFirst = TRUE)
-	depVar  = all.vars(formula)[1]
+	depVar  = all_vars0(formula)[1]
+	if(is.null(depVar)){
+		message0('Null response! check the formula and the data')
+		return(NULL)
+	}
 	# do not move me
 	if (any(dim(x) == 0))
 		return('empty dataset')
 	
-	cat    = all.vars(formula)[!sapply(x[, all.vars(formula)], is.numeric)]
+	cat    = all_vars0(formula)[!sapply(x[, all_vars0(formula)], is.numeric)]
 	lvls   = interaction(x[, cat], sep = sep, drop = drop)
 	isNumeric = is.numeric(x[, depVar])
 	

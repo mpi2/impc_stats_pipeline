@@ -6,7 +6,7 @@ vectorOutputCat =	function(object)
 	Labels         = PhenListAgeingLevels(object = object)
 	Fmodel         = object$extra$Cleanedformula
 	frm            = formula(Fmodel)
-	depVariable    = all.vars(frm)[1]
+	depVariable    = all_vars0(frm)[1]
 	#	equation       = NULL
 	formula        = printformula(frm)
 	framework      = 'Fisher Exact Test framework'
