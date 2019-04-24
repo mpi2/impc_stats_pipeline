@@ -164,6 +164,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 			method = 'MM',
 			MM_fixed = Lean.Mass ~ Genotype + Sex + Weight,
 			MM_lower =           ~ Genotype + Sex + Weight + 1
+			# Or simply MM_optimised = c(0, 1, 1)
 		)
 		VO_MM2 = vectorOutputAgeing(MM2_result)
 		plot(MM2_result, col = 4,main = 'No optimisation on the fixed effects')
