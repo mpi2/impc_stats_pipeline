@@ -5,7 +5,7 @@
 Method "testDatasetAgeing"
 }
 \description{
-The driver function in the PhenStatAgeing package for running statisical analysis on the data. \cr
+The driver function in the PhenStatAgeing package for running statisical analysis on phenotypic data. \cr
 
 It performs several checks on the data and the input model before running the analysis. This function supports three main analysis frameworks precisely, Linear Mix model (MM), Fisher Exact test (FE) and Reference Range plus (RR).\cr 
 
@@ -39,7 +39,7 @@ testDatasetAgeing(
 		varIdent(form = ~ 1 |
 						 	Genotype),
 	MM_direction = "both",
-	MM_checks    = c(1, 1, 1),
+	MM_checks    = c(TRUE, TRUE, TRUE),
 	MM_optimise  = c(TRUE, TRUE, TRUE),
 	FE_formula   = category ~ Genotype + Sex + LifeStage,
 	RR_formula   = data_point ~ Genotype + Sex + LifeStage,
@@ -63,7 +63,7 @@ testDatasetAgeing(
   Only applies to the "MM" framework. The random effect in the linear mixed model. See the lme() function for more details about the formula. The default is ~1|Batch.
 }
   \item{MM_BodyWeightIncluded}{
-  Only applies to the default MM_fixed in the "MM" framework. If TRUE then the default model includes the body weight and the model would be: data_point~Genotype+Sex+LifeStage + BodyWeight.
+  Only applies to the default MM_fixed in the "MM" framework. If TRUE then the default model includes the body weight and the model would be: data_point~Genotype+Sex+LifeStage + Weight.
 }
   \item{MM_lower}{
   Only applies to the "MM" framework. A right-sided formula, for example ~Genotype+1 or ~Sex+Genotype+1 or ~Sex+Genotype+Sex:Genotype. The lowest model that must not be included in the model optimisation. In other words, the terms in this model won't be removed during the optimisation process. The default is ~ Genotype + 1 that is the genotype effect and the intercept will be kept in the model during the optimisation process.
@@ -77,24 +77,24 @@ testDatasetAgeing(
 	Only applies to the "MM" framework. Select from  "both" (for stepwise optimisation), "backward" (for backward elimination) or "forward" (for forward selection) for the optimisation algorithm. The default is "both".
 	}
   \item{MM_checks}{
-	Only applies to the "MM" framework. A vector of three 0/1 values such as c(1,1,1). The first element of the vector activates checking the model terms (See MM_fixed) to be existed in data. The second term removes any single level factor from the model (in MM_fixed). The third element checks the interaction term to make sure all interactions have some data attached to them. Caution is needed for the third element of the check as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(1, 1, 1).
+	Only applies to the "MM" framework. A vector of three 1/0 or TRUE/FALSE values such as c(TRUE, TRUE, TRUE). The first element of the vector activates checking the model terms (See MM_fixed) to be existed in data. The second term removes any single level factor from the model (in MM_fixed). The third element checks the interaction term to make sure all interactions have some data attached to them. Caution is needed for the third element of the check as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(TRUE, TRUE, TRUE).
 }
 	\item{MM_optimise}{
-	Only applies to the "MM" framework. A vector of three binary values such as c(TRUE,TRUE,TRUE), default. The first element of the vector activates the fixed effect optimisation. The algorithm uses AICc to optimise the fixed effects (Check AICcmodavg package for more details about AICc). The second and third elements of the vector activates optimisation on weight and random effects respectively. The optimisation of weight and random effects refers to comparing the AICc between a model with and without those effects.
+	Only applies to the "MM" framework. A vector of three binary values such as c(1,1,1) or c(TRUE,TRUE,TRUE), default. The first element of the vector activates the fixed effect optimisation. The algorithm uses AICc to optimise the fixed effects (Check AICcmodavg package for more details about AICc). The second and third elements of the vector activate optimisation on weight and random effects respectively. The optimisation of weight and random effects refers to comparing the AICc between a model with and without those effects.
 	}
   \item{FE_formula}{
-  Only applied to the "FE" framework. The model for analysing the categorical data. The default is: category ~ Genotype + Sex + LifeStage. \cr
+  Only applies to the "FE" framework. The model for analysing the categorical data. The default is: category ~ Genotype + Sex + LifeStage. \cr
   Note that similar to MM_fixed, the terms that do not exist in data or the interaction terms will be dismissed from the model. 
 }
   \item{RR_formula}{
-	Only applied to the "RR" framework. The model for analysing the RR+ compatible data. The default is: data_point ~ Genotype + Sex + LifeStage. \cr
+	Only applies to the "RR" framework. The model for analysing the RR+ compatible data. The default is: data_point ~ Genotype + Sex + LifeStage. \cr
   Note that similar to MM_fixed,  the terms that do not exist in data or the interaction terms will be dismissed from the model. 
 }
   \item{RR_prop}{
-	Only applied to the "RR" framework. A single value between (0.5,1) not including the boundaries. The threshold for the variation ranges in the RR framework. The default value is 0.95. 
+	Only applies to the "RR" framework. A single value between (0.5,1) not including the boundaries. The threshold for the variation ranges in the RR framework. The default value is 0.95. 
 }
   \item{FERR_rep}{
-  Only applied to the "RR" or "FE" framework. The number of repetition for the Bayesian fisher exact test. See "B" parameter in fisher.test() function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
+  Only applies to the "RR" or "FE" framework. The number of repetition for the Bayesian fisher exact test. See "B" parameter in fisher.test() function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
 }
   \item{debug}{
 	A logical flag. Set to TRUE to see more details about the progress of the function. Default TRUE
@@ -177,7 +177,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 			phenListAgeing = test_Cont,
 			method = 'MM',
 			MM_fixed = Lean.Mass ~ Genotype + Sex + Weight,
-			MM_optimise = FALSE
+			MM_optimise = c(0,0,0)
 		)
 		VO_MM3 = vectorOutputAgeing(MM3_result)
 		plot(MM3_result, col = 5,main = 'Not optimised model')

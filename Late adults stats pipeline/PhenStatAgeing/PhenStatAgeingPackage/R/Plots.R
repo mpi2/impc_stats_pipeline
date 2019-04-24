@@ -119,7 +119,7 @@ plot.PhenStatAgeingMM = function (x                   ,
 																	...) {
 	fm        = x$output$Final.Model
 	formula   = formula(fm)
-	transData = PhenStatAgeing:::applyFormulaToData(formula = formula, getData(fm))
+	transData = applyFormulaToData(formula = formula, getData(fm))
 	
 	if (!is.null(x$messages) || is.null(x)) {
 		message0('Due to error(s), no plot available')

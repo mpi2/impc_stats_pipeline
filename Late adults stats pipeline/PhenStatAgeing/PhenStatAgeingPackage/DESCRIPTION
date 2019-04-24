@@ -1,16 +1,15 @@
 Package: PhenStatAgeing
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Toolbox for the analysis of phenotypic data
 Version: 1.0.0
-Author: Hamed Haselimashhadi,... 
-Maintainer: Hamed Haselimashhadi <hamedhm@ebi.ac.uk>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: Hamed Haselimashhadi
+Maintainer: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
+Description: Package contains several methods for statistical analysis of phenotypic data. This package is designed to substitute the old PhenStat package.
 License: GPL (>= 2)
 Imports: nlme, MASS, jsonlite, Hmisc, PhenStat, methods, knitr, AICcmodavg
 Encoding: UTF-8
 LazyData: true
 Repository: CRAN
 RoxygenNote: 6.0.1
-Depends: R (>= 3.4.1.0)
-Date: 2018-01-10
+Depends: R (>= 3.5.3.0)
+Date: 2019-04-31

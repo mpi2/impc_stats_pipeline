@@ -146,6 +146,7 @@ M.opt = function(object = NULL            ,
 				direction = direction       ,
 				scope = list(lower = lowerCorrected) ,
 				na.action = na.omit                  ,
+				# BIC/AIC is replaced with AICc then this parameter does not work
 				k = log(n)
 			),
 			warning = function(war) {
@@ -163,9 +164,10 @@ M.opt = function(object = NULL            ,
 		if (is.null(F.Model)) {
 			message0('\t Optimisation did not apply')
 			F.Model = I.Model
+			optimise[1] = FALSE
 		} else{
 			message0('\t Optimised model: ', printformula(formula(F.Model)))
-			optimised = TRUE
+			optimise[1] = TRUE
 		}
 	} else{
 		F.Model     = I.Model
@@ -302,7 +304,7 @@ M.opt = function(object = NULL            ,
 				term = 'LifeStage'                                         ,
 				message = FALSE
 			)                                                            ,
-			optimised = optimised
+			optimised = optimise
 		)                                                              ,
 		input = list(
 			PhenListAgeing      = object                                 ,

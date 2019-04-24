@@ -44,7 +44,7 @@
 }
 
 \author{
-	Hamed Haseli Mashhadi < hamedhm@ebi.ac.uk >
+	Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 }
 
 \seealso{
