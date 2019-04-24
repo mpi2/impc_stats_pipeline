@@ -55,7 +55,7 @@ vectorOutputCont =	function(object,
 			'Both sexes included'                            ,
 			'Only one sex included in the analysis'
 		)                                                  ,
-		'Is model optimised'       = object$output$optimised    ,
+		'Is model optimised'       = optimM(object$output$optimised)           , 
 		'data signature'           = dataSignature(formula = object$input$fixed,
 																							 data    = object$input$data),
 		'Summary statistics'        = DSsize                     ,

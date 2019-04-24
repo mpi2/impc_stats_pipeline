@@ -8,7 +8,7 @@ M.opt = function(object = NULL            ,
 								 weight                   ,
 								 checks      = c(1, 1, 1) ,
 								 method      = 'MM'       ,
-								 optimise    = TRUE       ,
+								 optimise    = c(TRUE,TRUE,TRUE) ,
 								 ...) {
 	if (!method %in% c('MM')        ||
 			is.null(all_vars0(fixed))   ||
@@ -22,7 +22,7 @@ M.opt = function(object = NULL            ,
 	message0('MM framework in progress ...')
 	# Future devs
 	family      = poisson(link = "log")
-	categorical = optimised = FALSE
+	categorical = FALSE
 	# Start from here
 	sta.time    = Sys.time()
 	lCont       = lmeControl (opt  = 'optim',
@@ -135,9 +135,8 @@ M.opt = function(object = NULL            ,
 					 ifelse(!is.null(lower), printformula(lower), 'Null lower'))
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
 	###########
-	message0('The model optimisation is ',
-					 ifelse(optimise, 'in progress ...', 'is not activated'))
-	if (optimise && !is.null(I.Model) && !is.null(lowerCorrected)) {
+	optimiseMessage (optimise)
+	if (optimise[1] && !is.null(I.Model) && !is.null(lowerCorrected)) {
 		message0('\tOptimising the model ... ')
 		message0('\tThe direction of  the optimisation (backward, forward, both): ', direction)
 		F.Model = tryCatch(
@@ -169,11 +168,12 @@ M.opt = function(object = NULL            ,
 			optimised = TRUE
 		}
 	} else{
-		F.Model = I.Model
+		F.Model     = I.Model
+		optimise[1] = FALSE
 	}
 	###########
 	if (!is.null(F.Model)) {
-		if (optimise && !is.null(weight) && !(mdl %in% 'glm')) {
+		if (optimise[2] && !is.null(weight) && !(mdl %in% 'glm')) {
 			message0('Testing varHom ... ')
 			FV.Model = tryCatch(
 				expr  = update(F.Model, weights = NULL),
@@ -190,15 +190,17 @@ M.opt = function(object = NULL            ,
 			)
 			if (!is.null(F.Model) &&
 					!is.null(FV.Model) &&
-					AIC(FV.Model, k = log(n)) <= AIC(F.Model, k = log(n))) {
+					AICc(FV.Model, k = log(n)) <= AICc(F.Model, k = log(n))) {
 				# = is important
 				F.Model = FV.Model
 				VarHomo = FALSE
 				message0('\tVarHom checked out ... ')
 			}
+		}else{
+			optimise[2] = FALSE
 		}
 		# Batch test
-		if (optimise && Batch_exist && !(mdl %in% 'glm')) {
+		if (optimise[3] && Batch_exist && !(mdl %in% 'glm')) {
 			message0('Testing Batch ... ')
 			G.Model =  tryCatch(
 				expr = do.call(
@@ -212,7 +214,6 @@ M.opt = function(object = NULL            ,
 						control   = gCont
 					)
 				),
-				
 				warning = function(war) {
 					message0('* Testing Batch failed with the warning (see below): ')
 					message0('\t', war, breakLine = FALSE)
@@ -226,10 +227,12 @@ M.opt = function(object = NULL            ,
 			)
 			if (!is.null(G.Model) &&
 					!is.null(F.Model) &&
-					AIC(G.Model, k = log(n)) <= AIC(F.Model, k = log(n))) {
+					AICc(G.Model, k = log(n)) <= AICc(F.Model, k = log(n))) {
 				F.Model = G.Model
 				message0('\tBatch checked out ... ')
 			}
+		}else{
+			optimise[3] = FALSE
 		}
 		SplitModels = SplitEffect(
 			finalformula = formula(F.Model),

@@ -5,6 +5,7 @@ import(Hmisc)
 import(jsonlite)
 import(PhenStat)
 import(knitr)
+import(AICcmodavg)
 
 importFrom("graphics", "abline", "hist", "par", "plot")
 importFrom("stats", "AIC", "aggregate", "as.formula", "complete.cases",

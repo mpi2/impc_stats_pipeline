@@ -117,6 +117,10 @@ plot.PhenStatAgeingMM = function (x                   ,
 																	ask = FALSE         ,
 																	mfrow = c(2, 2)     ,
 																	...) {
+	fm        = x$output$Final.Model
+	formula   = formula(fm)
+	transData = PhenStatAgeing:::applyFormulaToData(formula = formula, getData(fm))
+	
 	if (!is.null(x$messages) || is.null(x)) {
 		message0('Due to error(s), no plot available')
 		message0(x$messages)
@@ -125,8 +129,8 @@ plot.PhenStatAgeingMM = function (x                   ,
 	p = par()
 	par(ask = ask, mfrow = mfrow)
 	
-	predR  = predict(x$output$Final.Model)
-	residR = resid(x$output$Final.Model)
+	predR  = predict(fm)
+	residR = resid(fm)
 	plot(predR ,
 			 residR,
 			 xlab = 'Fitted values',
@@ -143,6 +147,10 @@ plot.PhenStatAgeingMM = function (x                   ,
 	)
 	qqnorm(residR, main = paste0(main, ': Normal Q-Q plot of residuals'), ...)
 	qqline(residR, ...)
-	plot(density(getData(x$output$Final.Model)[, x$input$depVariable]), main = 'Density of the response', ...)
+	
+	plot(density(transData$data[, transData$names[1]]),
+			 main = 'Density of the response',
+			 ylab = transData$names[1],
+			 ...)
 	par(ask = p$ask, mfrow = p$mfrow)
 }

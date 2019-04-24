@@ -362,8 +362,23 @@ percentageChangeCont = function(model                ,
 				r = coefs[-1]
 				names(r) = NULL
 			} else{
-				r = coefs
-				names(r) = order0(levels(data[, x]))
+				r  = coefs
+				lr = length(r)
+				ol = order0(levels(data[, x]))
+				##########
+				if (lr != nlevels(data[, x])) {
+					message0(
+						'\tCare reguired for the percentage change calculation for: ',
+						x,
+						'. Levels = ',
+						names(r),
+						'Coefficients: ',
+						r
+					)
+					names(r) = paste(ol[1:lr], '_CareRequired')
+				} else{
+					names(r) = ol
+				}
 			}
 			return(r / ran * 100)
 		}, USE.NAMES = TRUE)
@@ -381,6 +396,39 @@ percentageChangeCont = function(model                ,
 			)
 		)
 	}
+}
+
+optimM = function(optimise) {
+	paste0(c('Fixed term(s) = ', 'Weight term(s) = ', 'Random term(s) = '),
+				 optimise,collapse = ', ')
+}
+
+applyFormulaToData = function(formula = NULL, data, add = FALSE) {
+	if (is.null(formula))
+		return(data)
+	if (is.null(data))
+		return(NULL)
+	nms <-
+		trimws(scan(
+			text = sub("~", "+", format(formula)),
+			what = "",
+			sep = "+",
+			quiet = TRUE
+		))
+	m <- sapply(nms, function(x)
+		eval(parse(text = x), data))
+	if (add)
+		m = cbind(data, m)
+	return(list(data = m, names = nms))
+}
+
+optimiseMessage = function(optimise) {
+	message0('The model optimisation is ',
+					 ifelse(
+					 	all(optimise),
+					 	'in progress ...',
+					 	paste0('in the following order:\n\t', optimM(optimise))
+					 ))
 }
 
 extractCoefOfInterest = function(coefs, main = 'Sex',data) {
@@ -1197,8 +1245,8 @@ dataSignature = function(formula, data, digits = 16) {
 							 ),
 							 ']')
 		})
-		res = pasteComma(unlist(res0)         ,
-										 truncate      = FALSE,
+		res = pasteComma(sort(unlist(res0), decreasing = FALSE) ,
+										 truncate      = FALSE                  ,
 										 trailingSpace = FALSE)
 	} else{
 		res = paste0(
@@ -2020,6 +2068,22 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 	}
 }
 
+extractAICc = function(fit, scale = FALSE, k = NULL, ...) {
+	requireNamespace("AICcmodavg")
+	# k=0 is just loglikelihood or -2*logLik(fit)
+	if (k == 0)
+		extractAIC(fit = fit,
+							 scale = scale,
+							 k = 0,
+							 ...)
+	else
+		edf  = AICc(mod = fit, return.K = TRUE, ...)
+	
+	AIC  = AICc(mod = fit, return.K = FALSE, ...)
+	l    = list(edf = edf, AIC = AIC)
+	return(unlist(l))
+}
+
 stepAIC0 = function (object,
 										 scope,
 										 scale = 0,
@@ -2037,7 +2101,7 @@ stepAIC0 = function (object,
 		if (!is.null(dev))
 			dev
 		else
-			extractAIC(x, k = 0)[2L]
+			extractAICc(x, k = 0)[2L]
 	}
 	cut.string <- function(string) {
 		if (length(string) > 1L)
@@ -2132,7 +2196,7 @@ stepAIC0 = function (object,
 		keep.list <- vector("list", steps)
 	n <- nobs(object, use.fallback = TRUE)
 	fit <- object
-	bAIC <- extractAIC(fit, scale, k = k, ...)
+	bAIC <- extractAICc(fit, scale, k = k, ...)
 	edf <- bAIC[1L]
 	bAIC <- bAIC[2L]
 	if (is.na(bAIC))
@@ -2142,7 +2206,7 @@ stepAIC0 = function (object,
 	nm <- 1
 	Terms <- terms(fit)
 	if (trace) {
-		cat("Start:  AIC=",
+		cat("Start:  AICc=",
 				format(round(bAIC, 2)),
 				"\n",
 				cut.string(deparse(formula(fit))),
@@ -2239,7 +2303,7 @@ stepAIC0 = function (object,
 		if (all(is.finite(c(n, nnew))) && nnew != n)
 			message0("\t Warning! number of rows in use has changed: remove missing values ...")
 		Terms <- terms(fit)
-		bAIC <- extractAIC(fit, scale, k = k, ...)
+		bAIC <- extractAICc(fit, scale, k = k, ...)
 		edf <- bAIC[1L]
 		bAIC <- bAIC[2L]
 		if (trace) {
@@ -2295,7 +2359,7 @@ dropterm0 =
 						 ncol = 2L,
 						 dimnames = list(c("<none>",
 						 									scope), c("df", "AIC")))
-		ans[1,] <- extractAIC(object, scale, k = k, ...)
+		ans[1,] <- extractAICc(object, scale, k = k, ...)
 		n0 <- nobs(object, use.fallback = TRUE)
 		env <- environment(formula(object))
 		for (i in seq_len(ns)) {
@@ -2307,7 +2371,7 @@ dropterm0 =
 			nfit <- update(object, as.formula(paste("~ . -", tt)),
 										 evaluate = FALSE)
 			nfit <- eval(nfit, envir = env)
-			ans[i + 1,] <- extractAIC(nfit, scale, k = k, ...)
+			ans[i + 1,] <- extractAICc(nfit, scale, k = k, ...)
 			nnew <- nobs(nfit, use.fallback = TRUE)
 			if (all(is.finite(c(n0, nnew))) && nnew != n0)
 				message0("\t Warning! number of rows in use has changed: remove missing values ...")

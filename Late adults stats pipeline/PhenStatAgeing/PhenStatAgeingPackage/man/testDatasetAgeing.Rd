@@ -40,7 +40,7 @@ testDatasetAgeing(
 						 	Genotype),
 	MM_direction = "both",
 	MM_checks    = c(1, 1, 1),
-	MM_optimise  = TRUE,
+	MM_optimise  = c(TRUE, TRUE, TRUE),
 	FE_formula   = category ~ Genotype + Sex + LifeStage,
 	RR_formula   = data_point ~ Genotype + Sex + LifeStage,
 	RR_prop      = 0.95,
@@ -80,21 +80,21 @@ testDatasetAgeing(
 	Only applies to the "MM" framework. A vector of three 0/1 values such as c(1,1,1). The first element of the vector activates checking the model terms (See MM_fixed) to be existed in data. The second term removes any single level factor from the model (in MM_fixed). The third element checks the interaction term to make sure all interactions have some data attached to them. Caution is needed for the third element of the check as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(1, 1, 1).
 }
 	\item{MM_optimise}{
-	Only applies to the "MM" framework. Set to FALSE to deactivate the internal optimisation of the model. Default TRUE.
+	Only applies to the "MM" framework. A vector of three binary values such as c(TRUE,TRUE,TRUE), default. The first element of the vector activates the fixed effect optimisation. The algorithm uses AICc to optimise the fixed effects (Check AICcmodavg package for more details about AICc). The second and third elements of the vector activates optimisation on weight and random effects respectively. The optimisation of weight and random effects refers to comparing the AICc between a model with and without those effects.
 	}
   \item{FE_formula}{
   Only applied to the "FE" framework. The model for analysing the categorical data. The default is: category ~ Genotype + Sex + LifeStage. \cr
   Note that similar to MM_fixed, the terms that do not exist in data or the interaction terms will be dismissed from the model. 
 }
   \item{RR_formula}{
-	Only applied to the "RR" framework. The model for analysing the RR+ compatible  data. The default is: data_point ~ Genotype + Sex + LifeStage. \cr
+	Only applied to the "RR" framework. The model for analysing the RR+ compatible data. The default is: data_point ~ Genotype + Sex + LifeStage. \cr
   Note that similar to MM_fixed,  the terms that do not exist in data or the interaction terms will be dismissed from the model. 
 }
   \item{RR_prop}{
-	Only applied to the "RR" framework. A single value between (0.5,1) not including the boundaries. The threshold for the variation ranges in the RR framework. default value is 0.95. 
+	Only applied to the "RR" framework. A single value between (0.5,1) not including the boundaries. The threshold for the variation ranges in the RR framework. The default value is 0.95. 
 }
   \item{FERR_rep}{
-  Only applied to the "RR" or "FE" framework. The number of repetition for the Bayesian  fisher exact test. See "B" parameter in fisher.test() function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
+  Only applied to the "RR" or "FE" framework. The number of repetition for the Bayesian fisher exact test. See "B" parameter in fisher.test() function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
 }
   \item{debug}{
 	A logical flag. Set to TRUE to see more details about the progress of the function. Default TRUE

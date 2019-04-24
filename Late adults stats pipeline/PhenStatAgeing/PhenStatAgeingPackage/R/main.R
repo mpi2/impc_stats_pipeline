@@ -21,7 +21,7 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 														 	varIdent(form =  ~ 1 |	Genotype),
 														 MM_direction = 'both',
 														 MM_checks    = c(1, 1, 1),
-														 MM_optimise  = TRUE      ,
+														 MM_optimise  = c(TRUE,TRUE,TRUE),
 														 ### FE or RR
 														 FE_formula = category ~  Genotype + Sex + LifeStage,
 														 RR_formula = data_point ~ Genotype + Sex + LifeStage,
