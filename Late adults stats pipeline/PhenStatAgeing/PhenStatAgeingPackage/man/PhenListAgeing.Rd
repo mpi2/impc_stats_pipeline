@@ -46,7 +46,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{testDatasetAgeing}}
+	\code{\link{testDatasetAgeing}}
 }
 \examples{
 library(PhenStat)

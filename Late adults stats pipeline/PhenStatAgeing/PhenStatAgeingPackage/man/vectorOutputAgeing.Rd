@@ -12,7 +12,6 @@
 		object,
 		othercolumns = NULL,
 		JSON  = FALSE,
-		debug = FALSE,
 		Null  = FALSE,
 		...
 	)
@@ -27,9 +26,6 @@
 	}
 	\item{JSON}{
 		A logical flag. Setting to TRUE for the JSON output otherwise, the function returns a list
-	}
-	\item{debug}{
-		A logical flag. Set to TRUE for the debug messages
 	}
 	\item{Null}{
 		A logical flag. Setting to TRUE forces the function to return results even if the testDatasetAgeing returns a failure message

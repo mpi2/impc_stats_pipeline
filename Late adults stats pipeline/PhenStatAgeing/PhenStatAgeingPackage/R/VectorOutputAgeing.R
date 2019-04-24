@@ -1,9 +1,9 @@
 vectorOutputAgeing = function(object,
 															othercolumns = NULL,
 															JSON  = FALSE,
-															debug = FALSE,
 															Null  = FALSE,
 															...) {
+	debug = FALSE
 	if ((is.null(object) || !is.null(object$messages)) && !Null) {
 		message0('Null object. Please see the error below:')
 		print(object$messages)
