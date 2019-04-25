@@ -323,6 +323,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                   .verbose = verbose                        ,
                   .inorder = inorder
                 ) %activemulticore% {
+                  message0('*~*~*~*~*~* ', i, '|', length(colonys), ' *~*~*~*~*~*')
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
                     ObjectsThatMustBeRemovedInEachIteration()
