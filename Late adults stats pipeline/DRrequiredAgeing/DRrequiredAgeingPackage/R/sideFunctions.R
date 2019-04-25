@@ -1094,7 +1094,7 @@ base64 = function(x, active) {
 
 
 
-# rename if file exits (Danger! if overwrite==TRUE then it removes the files!)
+# rename if file exists (Danger! if overwrite==TRUE then it removes the files!)
 file.exists0 = function(file, overwrite = FALSE, ...) {
   counter = 1
   ###
