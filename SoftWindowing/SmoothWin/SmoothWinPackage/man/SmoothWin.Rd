@@ -4,7 +4,10 @@
 Implementation of the soft windowing for linear models
 }
 \description{
-  Implementation of the soft windowing on a range of methods by imposing weights on the model. The parameters k and l control the shape and bandwidth of the windowing function. 
+  Implementation of the (symmetric) soft windowing on a range of methods by imposing weights on the model.\cr\cr
+  The function accepts a model fit as the input and fits a window on it.\cr
+  The parameters "k" and "l" control the shape and bandwidth of the windowing function.\cr
+  There are several parameters to cope with the different scenarios/models/window shapes.
 }
 \usage{
 SmoothWin(object                                          ,
@@ -73,22 +76,22 @@ SmoothWin(object                                          ,
   Vector of numeric values for the bandwidth parameter, l. The default uses the maximum distance of the modes (t[m]) from the time boundaries, max(max(t)-t[m],t[m]-min(t)) split on 500 points on the logarithmic scale.
 }
   \item{k}{
-  Vector of numeric values for the shape parameter, k. The default uses 50 split of the values from 0.5 to 10 on the logarithmic scale.
+  Vector of numeric values for the shape parameter, k. The default uses 50 splits of the values from 0.5 to 10 on the logarithmic scale.
 }
   \item{min.obs}{
-  Single value. The minimum observations that must be in the total window(s). The default uses the following steps.\cr
+  Single value. The minimum observations/sum weight scores (SWS) that must be in the total window(s). The default uses the following steps.\cr
     1. If there are more than one modes in the data, then: 35*(the number of the unique modes)\cr
     2. If there is a single mode in the data, then: max(pi * sqrt(length(t)), 35)\cr
-  * min.obs must not be less than the total number of observations on the mode time(s)\cr
-  ** to function properly, min.obs must be less than the total number of observations\cr
+  * min.obs must not be less than the total number of observations at the mode time(s)\cr
+  ** to function properly, min.obs should be less than the total number of observations\cr
   *** min.obs is applied on the total number of observations on all windows NOT each single ones\cr
-  **** if weightORthreshold='weight' then min.obs would be evaluated against ASS\cr
+  **** if weightORthreshold='weight' then min.obs will be evaluated against SWS\cr
 }
   \item{direction}{
-  Vector of two values. A vector of the form c(Left,right). The first element specifies the speed of expansion of the window(s) from the left and the second value for the right expansion. Setting to (0,1) and (1,0) lead to right and left expansions of the window(s) respectively. Default (1,1) that is the window(s) expand from both sides. 
+  Vector of two non-negative values. A non-negative vector of the form c(Left,right), for example c(1,1) [default] or c(0.5,0.5) or c(0,1). The first element specifies the speed of expansion of the window(s) from the left and the second value for the right expansion. Setting to c(0,1) and c(1,0) lead to right and left expansions of the window(s) respectively. Default c(1,1) that is the window(s) expand from both sides. 
   }
   \item{weightFUN}{
-  Weight function. By default, a vector of weights named "ModelWeight" is passed to this function. See the examples. 
+  Weight function. By default, a vector of weights called "ModelWeight" is passed to this function. See the examples. 
 }
   \item{residFun}{
   Residual computation function. The default is resid(). However, the the user can define its own function. Note that the input of the function is the model object. The default is residFun = function(object)\{resid(object)\}
@@ -97,10 +100,10 @@ SmoothWin(object                                          ,
    Similar to residFun but instead defines the predict() function. The default is predictFun = function(object)\{predict(object)\}
   }
   \item{weightORthreshold}{
-  select between 'weight' (default) or 'threshold'. If set to 'weight' then the sum of weights (active sample score (ASS)) would be used as the total number of (active) observations in the window, otherwise, total number of weights (count of weights) that are greater than a threshold (see threshold below) (count weights>=threshold) would be used for the total number of samples in the window (see `threshold`).
+  select between 'weight' (default) or 'threshold'. If set to 'weight' then the sum of weights (Sum Weight score (SWS)) would be used as the total number of (active) observations in the window, otherwise, total number of weights (count of weights) that are greater than a threshold (see threshold below) (count weights>=threshold) would be used for the total number of samples in the window (see `threshold`).
   }
   \item{cdf}{
-  A cdf function preferably symmetric. The cdf function is used for the (window) weight generating function. The function must have two parameters precisely a location such as mean and a scale. Standard cdf functions such as pnorm, pcauchy and plogis (default) can be used. For an example of custom made function we define uniform function as below:\cr\cr
+  A cdf function preferably symmetric. The cdf function is used for the (window) weight generating function (WGF). The cdf function must have two parameters precisely a location such as mean and a scale. Standard cdf functions such as pnorm, pcauchy and plogis (default) can be used. For an example of custom made function we define uniform function as below:\cr\cr
    \eqn{punif0 = function(x,mean=.5,sd=sqrt(1/12)){
          a = mean - sqrt(3) *sd; 
          b = mean + sqrt(3) *sd; 
@@ -111,21 +114,21 @@ SmoothWin(object                                          ,
   }
   \item{check}{
   Single integer in \{0,1,2\}. \cr
-  check=1, the function selects the times (t) with more than one observations. Further, the function only selects the values with weights greater than the threshold parameter. Mostly useful in fitting linear mixed model\cr
+  check=1, the function selects the times (t) with more than one observations. Further, the function only selects the values with weights greater than the `threshold` (see threshold below) parameter. Mostly useful in fitting linear mixed model\cr
   check=2 (default), the function only selects the values with weights greater than the `threshold` parameter\cr 
   check=0, disables all checks
 }
   \item{sensitivity}{
-  (Default window selection criteria) Vector of four values (m, v, m*v, normality_test). For example (default) c(1,1,1,0) specifies the same weights for mean, variance, mean*variance interaction and zero weight for the test of normality (shapiro.test) in determining the optimal (final) window. We should stress that the window size is calculated by detecting the changes amongst the consecutive means (two sample t.test) and variances (two sample var.test) (as well as the normality of the first set) from each of predictFun() and residFun() combined together. For example, (m, v, m*v, normality_test) is calculated for predictFun() and the same for residFun(), then two means are combined under the sensitivity[1]; and the same for variance, interactions and the normality.
+  (Default window selection criteria) Vector of four values (m, v, m*v, normality_test). For example (default) c(1,1,1,0) specifies the same weights for mean, variance, mean*variance interaction and zero weight for the test of normality (shapiro.test) in determining the optimal (final) window. We should stress that the window size is calculated by detecting the changes amongst the consecutive means (two sample t.test) and variances (two sample var.test) (as well as the normality of the first set) from each of predictFun() and residFun() combined together. For example, (m, v, m*v, normality_test) is calculated for predictFun() and the same for residFun(), then two means are combined under the `sensitivity`[1]; and the same for variance, interactions and the normality.
   }  
   \item{pvalThreshold}{
-  Vector of four values. It would be used as the significant level for the mean, variation and normality tests (for more details see "sensitivity" above). If all zero (default) or (all) negative (<= 0) then the internal adaptive method (sensitivity - see above) would be used.
+  Vector of four values. It would be used as the significant level for the mean, variation and normality tests (for more details see `sensitivity` above). If all zero (default) or (all) negative (<= 0) then the internal adaptive method (sensitivity - see above) would be used.
   }
   \item{threshold}{
-  Single positive value. The minimum value for weights before removing the corresponded samples, given check=1 or check=2 and also in weightORthreshold. Default sqrt(.Machine$double.eps)*10 ~ 10^-7
+  Single positive value. The minimum value for weights before removing the corresponded samples, given check=1 or check=2 and also in `weightORthreshold`. Default sqrt(.Machine$double.eps)*10 ~ 10^-7
 }
   \item{zeroCompensation}{
-   Single non-negative value. Setting to any non-negative value would replace all (weights =< zeroCompensation) with zeroCompensation. Useful for algorithms that have difficulties with zero. Default 0.
+   Single non-negative value. Setting to any non-negative value would replace all (weights =< zeroCompensation) with `zeroCompensation`. Useful for algorithms that have difficulties with zero. Default 0.
   }
   \item{messages}{
   Logical value. Set to TRUE (default) to see the errors and warnings
@@ -147,12 +150,12 @@ SmoothWin(object                                          ,
 
 \value{
   \item{final.k, final.l }{Final values for k and l}
-  \item{finalModel, model.l, model.k }{List of models for l, k and the final model. }
+  \item{model.l, model.k, finalModel}{List of models for l, k and the final model. }
   \item{others}{The input parameters such as x, y, t and so on}
 }
 
 \author{
-Hamed Haselimashhadi <hamedhm@ebi.ac.uk>
+  Hamed Haselimashhadi <hamedhm@ebi.ac.uk>
 }
 
 

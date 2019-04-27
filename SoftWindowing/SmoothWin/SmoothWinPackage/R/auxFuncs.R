@@ -2,15 +2,24 @@
   packageStartupMessage(
     paste0(
       '\n ========================================================================',
-      '\n ~> If you have any question about this package contact us               ',
-      '\n ~> hamedhm@ebi.ac.uk                                                    ',
       '\n ~> This project is supported by European Bioinformatic Institute (EBI)  ',
       '\n ~> https://www.mousephenotype.org/                                      ',
+      '\n ~> If you have any question about this package contact us               ',
+      '\n ~> hamedhm@ebi.ac.uk                                                    ',
       '\n ========================================================================'
     ),
     domain   = NULL,
     appendLF = TRUE
   )
+}
+###########
+check_version = function(pkg_name, min_version) {
+  cur_version = packageVersion(pkg_name)
+  if(cur_version < min_version) {
+  sprintf("Package %s needs a newer version, 
+               found %s, need at least %s", pkg_name, cur_version, min_version)
+    stop()
+  }
 }
 ###########
 expF = function(x, k, l, m, cdf, direction = c(1, 1)) {
@@ -37,6 +46,7 @@ expWeight = function(t                         ,
                      progress         = FALSE  ,
                      ...) {
   requireNamespace('Rfast')
+  check_version(pkg_name = 'Rfast',min_version = '1.9.3')
   m  = unique(m)
   lm = length(m)
   r  = matrix(0, ncol = lm, nrow = length(t))

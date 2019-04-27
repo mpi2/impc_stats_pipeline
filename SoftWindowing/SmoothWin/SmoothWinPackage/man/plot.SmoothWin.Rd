@@ -26,7 +26,7 @@
 }
 }
 \author{
-	Hamed Haseli <hamedhm@ebi.ac.uk>
+	Hamed Haselimashhadi <hamedhm@ebi.ac.uk>
 }
 
 \seealso{
