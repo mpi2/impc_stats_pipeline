@@ -117,6 +117,7 @@ plot.PhenStatAgeingMM = function (x                   ,
 																	ask = FALSE         ,
 																	mfrow = c(2, 2)     ,
 																	...) {
+	requireNamespace("car")
 	fm        = x$output$Final.Model
 	formula   = formula(fm)
 	transData = applyFormulaToData(formula = formula, getData(fm))
@@ -145,8 +146,14 @@ plot.PhenStatAgeingMM = function (x                   ,
 		probability = TRUE,
 		...
 	)
-	qqnorm(residR, main = paste0(main, ': Normal Q-Q plot of residuals'), ...)
-	qqline(residR, ...)
+	qqPlot(
+		as.vector(residR),
+		ylab = 'Residuals',
+		main = paste0(main, ': Normal Q-Q plot of residuals'),
+		grid = FALSE,
+		...
+	)
+	#qqline(residR, ...)
 	
 	plot(density(transData$data[, transData$names[1]]),
 			 main = 'Density of the response',

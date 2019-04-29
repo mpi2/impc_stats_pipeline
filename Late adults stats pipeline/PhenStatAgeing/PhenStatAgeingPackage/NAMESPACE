@@ -28,6 +28,8 @@ importFrom("stats", "deviance", "extractAIC", "factor.scope", "nobs")
 importFrom("stats", "drop.scope","model.matrix")
 importFrom("stats", "pchisq")
 importFrom("graphics", "mosaicplot")
+importFrom("car"     , "qqPlot")
+
 
 S3method(summary   , PhenListAgeing)
 S3method(summary   , PhenStatAgeingMM)
