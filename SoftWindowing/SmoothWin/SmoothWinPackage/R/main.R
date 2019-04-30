@@ -166,8 +166,13 @@ SmoothWin = function(object                                           ,
 
 
 
+
 # Plot windowing object
-plot.SmoothWin = function(x, ylab = 'Response', col = NULL ,   ...) {
+plot.SmoothWin = function(x,
+                          ylab   = 'Response',
+                          col    = NULL      ,
+                          digits = 2         ,
+                          ...) {
   if (!is.null(x$finalModel$models)) {
     t  = x$input$t
     y  = x$data[, all.vars(formula(x$finalModel$models))[1]]
@@ -177,11 +182,9 @@ plot.SmoothWin = function(x, ylab = 'Response', col = NULL ,   ...) {
       message('To get the right plot, make sure that the dataset is sorted on time!')
     
     if (is.null(col)) {
-      col = rgb(
-        abs(.8 - x$finalModel$FullWeight),
-        1 - x$finalModel$FullWeight      ,
-        1 - x$finalModel$FullWeight
-      )
+      col = rgb(abs(1 -  x$finalModel$FullWeight) ,
+                abs(0 +  x$finalModel$FullWeight) ,
+                .5)
     }
     plot(
       t,
@@ -190,14 +193,14 @@ plot.SmoothWin = function(x, ylab = 'Response', col = NULL ,   ...) {
       ylab = ylab,
       sub = paste(
         'l='                                                      ,
-        round(x$final.l$value, 2)                                       ,
+        round(x$final.l$value, digits)                            ,
         ', k='                                                    ,
-        round(x$final.k$value, 2)                                       ,
+        round(x$final.k$value, digits)                            ,
         ', '                                                      ,
         ifelse(x$input$weightORthreshold == 'weight', 'SWS=', '#'),
-        round(x$finalModel$output$ObsInInterval, 3)               ,
+        round(x$finalModel$output$ObsInInterval, digits)          ,
         ' [~'                                                     ,
-        round(x$finalModel$output$ObsInInterval / ly * 100)       ,
+        round(x$finalModel$output$ObsInInterval / ly * 100, digits),
         '%]'       ,
         ', MaxBW=' ,
         max(x$input$l, na.rm = TRUE),
@@ -219,8 +222,8 @@ plot.SmoothWin = function(x, ylab = 'Response', col = NULL ,   ...) {
       t,
       min(y) + wp * (max(y) - min(y)),
       col = 'gray'                   ,
-      lty = 4                        ,
-      lwd = 4
+      lty = 3                        ,
+      lwd = 3
     )
     return(invisible(list(
       weight = wp   ,
