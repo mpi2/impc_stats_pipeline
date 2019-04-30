@@ -280,13 +280,14 @@ checkWeightsN <- function(w             ,
   ))
 }
 
-shapiro.test0 =function(x){
-  x  = na.omit(x)
-  lx = length(x) 
+shapiro.test0 = function(x) {
+  x   = na.omit(x)
+  lx  = length(x)
+  lqx = length(unique(x))
   
-  if(lx>3 && lx<5000 && is.numeric(x)){
+  if (lx > 3 && lx < 5000 && is.numeric(x) && lqx > 1) {
     r = shapiro.test(x)$p.value
-  }else{
+  } else{
     r = 1
   }
   return(r)
