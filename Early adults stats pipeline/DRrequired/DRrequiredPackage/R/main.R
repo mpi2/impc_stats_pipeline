@@ -502,7 +502,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         message0('File already exists then skipt!')
                         return(NULL)
                       }else{
-                        message0('Oh result does not exist!')
+                        message0('Result does not exist! Adding in progress ...')
                         write(outpfile,file = 'DoesNotExists.log',append = TRUE)
                       }
                     }
@@ -726,6 +726,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       ExtraCols = c('external_sample_id')
                       ####
                       message0('Preparing the output from VectorOutput function ...')
+                      # agg = c(as.list(environment()), list())
+                      # save(agg,file = 'HAMED.Rdata')
                       c.ww.vec       = VectorOutput0(
                         c.ww0     = c.ww0,
                         ExtraCols    = ExtraCols,
