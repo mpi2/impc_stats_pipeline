@@ -500,8 +500,10 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         outpfile, c('NotProcessed.tsv', 'Successful.tsv'), sep = '_'
                       )))) {
                         message0('File already exists then skipt!')
-                        write(outpfile,file = 'DoesNotExists.log')
                         return(NULL)
+                      }else{
+                        message0('Oh result does not exist!')
+                        write(outpfile,file = 'DoesNotExists.log',append = TRUE)
                       }
                     }
 
