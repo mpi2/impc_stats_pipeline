@@ -6,6 +6,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 seed = 123456                        ,
                 readCategoriesFromFile  = TRUE       ,
                 OverwriteExistingFiles  = FALSE      ,
+                onlyFillNotExisitingResults = FALSE  ,
                 WhiteListMethods  = NULL             ,
                 # Carefully use this option!
                 # It can remove the entire result file (some colonies in a single output file)
@@ -437,13 +438,11 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       x = n3.5.1,
                       depVar = depVar,
                       minvar = 0,
-					  method = getMethodi(
+                      method = getMethodi(
                         var = parameter,
-                        type = ifelse(
-                          is.numeric(n3.5.1[, depVar]),
-                          'numeric',
-                          'charachter'
-                        ),
+                        type = ifelse(is.numeric(n3.5.1[, depVar]),
+                                      'numeric',
+                                      'charachter'),
                         methodMap = methodmap
                       )
                     )
@@ -496,6 +495,16 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                                                   collapse = '')
                     message0('Output directory: \n \t\t =>=>=> ',
                              outpfile)
+                    if (onlyFillNotExisitingResults) {
+                      if (any(file.exists(paste(
+                        outpfile, c('NotProcessed.tsv', 'Successful.tsv'), sep = '_'
+                      )))) {
+                        message0('File already exists then skipt!')
+                        write(outpfile,file = 'DoesNotExists.log')
+                        return(NULL)
+                      }
+                    }
+
                     ####
                     if (storeRawData) {
                       # There is a second snippet for the rawdata + weights
