@@ -8,7 +8,12 @@
   This function plots a SmoothWin object
 }
 \usage{
-  \method{plot}{SmoothWin}(x, ylab = 'Response', col= NULL, digits = 2, ...)
+  \method{plot}{SmoothWin}(x, 
+                           ylab   = 'Response' , 
+                           col    = NULL       , 
+                           digits = 2          , 
+                           ...
+                           )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
