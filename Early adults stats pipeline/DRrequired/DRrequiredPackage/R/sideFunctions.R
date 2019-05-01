@@ -1776,6 +1776,7 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            byid     = 'external_sample_id'                      ,
                                            compressRawData = TRUE) {
   if (storeRawData &&
+      !isS4(c.ww0$WindowedObj$value) &&
       activeWindowing && !NullOrError(c.ww0$WindowedObj$value)
       && (c.ww0$method %in% 'MM')) {
     n3.5.w = merge(
