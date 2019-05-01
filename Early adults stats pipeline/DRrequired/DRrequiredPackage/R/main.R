@@ -502,6 +502,14 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         message0('File already exists then skipt!')
                         return(NULL)
                       }else{
+                        rmme = lapply(list.files(dirname(outpfile), full.names = TRUE), function(x) {
+                          if (!is.null(x)    &&
+                              file.exists(x) &&
+                              grepl(pattern = '.Rdata',
+                                    x = x,
+                                    fixed = TRUE))
+                            file.remove(x)
+                        })
                         message0('Result does not exist! Adding in progress ...')
                         write(outpfile,file = 'DoesNotExists.log',append = TRUE)
                       }
