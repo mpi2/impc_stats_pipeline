@@ -19,13 +19,13 @@ NotProcessedOutput = function(args) {
       levels          = unique(bsg3.5.2)
     ),
     min_onbs_in_each_group_raw_data_before_preprocess = list(
-      criteria_result   = min0(table(bsg3.5)) >= args$minSampRequired,
+      criteria_result   = min0(table(bsg3.5)) > args$minSampRequired,
       threshold         = args$minSampRequired,
       stage             = 'before_preprocessing',
       min_obs_in_data   = min0(table(bsg3.5))
     ),
     min_onbs_in_each_group_processed_data_after_preprocess = list(
-      criteria_result   = min0(table(bsg3.5.2)) >= args$minSampRequired,
+      criteria_result   = min0(table(bsg3.5.2)) > args$minSampRequired,
       threshold         = args$minSampRequired,
       stage             = 'after_preprocessing',
       min_obs_in_data = min0(table(bsg3.5.2))

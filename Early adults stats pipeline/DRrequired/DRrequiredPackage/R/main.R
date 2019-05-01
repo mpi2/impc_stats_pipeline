@@ -586,7 +586,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         # is it  really exist!
                         length(unique(n3.5.2$biological_sample_group)) > 1 &&
                         # include mut and cont
-                        min0(table(n3.5.2$biological_sample_group)) >= minSampRequired &&
+                        min0(table(n3.5.2$biological_sample_group)) >          minSampRequired &&
                         max0(table(n3.5.2OnlyKO$biological_sample_group, n3.5.2OnlyKO$sex)) > 1 &&
                         # include at least 4/2 of each genotype
                         #length(unique(n3.5.2$colony_id)) > 1  &&

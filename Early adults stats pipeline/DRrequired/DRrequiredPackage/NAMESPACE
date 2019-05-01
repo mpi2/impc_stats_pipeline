@@ -19,5 +19,6 @@ importFrom("stringi", "stri_rand_strings")
 importFrom("abind", "abind")
 importFrom("stats", "sd", "shapiro.test")
 importFrom("doParallel", "registerDoParallel", "stopImplicitCluster")
+importFrom("methods", "is")
 
 #importFrom("base", "subset")

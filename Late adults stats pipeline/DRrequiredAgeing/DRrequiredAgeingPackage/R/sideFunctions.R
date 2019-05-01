@@ -317,7 +317,7 @@ concurrentContSelect = function(activate = TRUE,
         # is it  really exist!
         length(unique(PhenListObj@datasetPL[, GenotypeColName])) > 1 &&
         # include mut and cont
-        min0(table(PhenListObj@datasetPL[, GenotypeColName])) >= minSampRequired &&
+        min0(table(PhenListObj@datasetPL[, GenotypeColName])) > minSampRequired &&
         # include at least 4/2 of each genotype
         checkGenInCol(
           PhenListObj@datasetPL,
@@ -714,9 +714,9 @@ RemoveZeroFrequencyCategories = function(x,
     }
     lvls   = lvls[!is.na(x[, depVar])]
     counts = table(lvls)
-    newx   = (x[lvls %in% names(counts)[counts >= minSampRequired],])
+    newx   = (x[lvls %in% names(counts)[counts > minSampRequired],])
     #####
-    if ((length(names(counts[counts >= minSampRequired])) != totalLevels ||
+    if ((length(names(counts[counts > minSampRequired])) != totalLevels ||
          !identical(droplevels0(newx), droplevels0(x))) &&
         length(lvls) > 0) {
       note$sex_genotype_data_included_in_analysis = c(
@@ -724,7 +724,7 @@ RemoveZeroFrequencyCategories = function(x,
           'Not all Sex*Genotype interactions exist in data. Threshold: ',
           paste0(minSampRequired),
           ' sample per group. INCLUDED categories: ',
-          paste(names(counts)[counts >= minSampRequired],
+          paste(names(counts)[counts > minSampRequired],
                 sep = ',',
                 collapse = ', '),
           '',
@@ -1096,6 +1096,7 @@ RR_thresholdCheck = function(data,
                              depVar,
                              parameter,
                              controllab = 'control',
+                             Experimentallab = 'experimental',
                              genotypeColumn = 'biological_sample_group',
                              sexColumn = 'sex',
                              threshold = 60,
@@ -1114,7 +1115,8 @@ RR_thresholdCheck = function(data,
 
     if (method %in% 'RR') {
       data = droplevels0(data[complete.cases(data[, depVar]), , drop = FALSE])
-      tbl  = table(subset(data, data[, genotypeColumn] %in% controllab)[, sexColumn])
+      lv   = levels(droplevels0(subset(data, data[, genotypeColumn] %in% Experimentallab))[, sexColumn])
+      tbl  = table(subset(data, (data[, genotypeColumn] %in% controllab) & (data[,sexColumn] %in% lv))[, sexColumn])
       if (!is.null(tbl)     &&
           sum(dim(tbl) > 0) &&
           all(tbl <= threshold)) {
@@ -1544,12 +1546,6 @@ checkQouteNAandNaN = function(pattern, replacement, x, ignoreCase = FALSE) {
   return(x)
 }
 
-
-
-
-
-
-
 # Add windowing weights and store the data again
 StoreRawDataAndWindowingWeights = function(storeRawData,
                                            activeWindowing        ,
@@ -1566,7 +1562,9 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            ### 4
                                            colnames = c('external_sample_id', 'AllModelWeights'),
                                            byid     = 'external_sample_id'                      ,
-                                           compressRawData = TRUE) {
+                                           compressRawData = TRUE,
+                                           ### 5
+                                           methodmap  ) {
   message0('Extra columns in the strored data: ', paste(colnames, sep = ', '))
   if (storeRawData    &&
       activeWindowing &&

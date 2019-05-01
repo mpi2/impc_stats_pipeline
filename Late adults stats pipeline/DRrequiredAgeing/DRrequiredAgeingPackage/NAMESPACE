@@ -19,5 +19,5 @@ importFrom("graphics", "plot")
 importFrom("stringi", "stri_rand_strings")
 importFrom("abind", "abind")
 importFrom("stats", "sd", "shapiro.test")
-
+#importFrom("methods", "is")
 #importFrom("base", "subset")
