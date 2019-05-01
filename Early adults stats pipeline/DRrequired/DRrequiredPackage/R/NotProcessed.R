@@ -41,6 +41,14 @@ NotProcessedOutput = function(args) {
       criteria_result = length(RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))) > 1,
       threshold       = 2,
       colonies        = RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))
+    ),
+    min_onbs_required_for_rr = list(
+      criteria_result = RR_thresholdCheck(
+        data = args$n3.5.2,
+        depVar = args$depVar,
+        parameter = args$parameter,
+        methodmap = args$methodmap
+      )
     )
   )
 

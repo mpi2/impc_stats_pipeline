@@ -436,6 +436,7 @@ tv.test = function(obj                           ,
     }
   } else{
     final = NULL
+    pmin  = NULL
   }
   return(list(value = final, score = pmin))
 }

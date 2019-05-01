@@ -306,7 +306,7 @@ concurrentContSelect = function(activate = TRUE,
   # Part 2 extra checks
   if (activate && is.numeric(PhenListObj@datasetPL[, depVar])) {
     ### Check whether there is any variation in data
-	### No worries it only applies to MM framework
+    ### No worries it only applies to MM framework
     checkNoZeroVar = RemoveZerovarCategories(
       x = PhenListObj@datasetPL,
       depVar = depVar,
@@ -895,7 +895,7 @@ RemoveZerovarCategories = function(x,
                                    genotype = 'biological_sample_group',
                                    sep = '_',
                                    drop = TRUE,
-								   method = 'MM') {
+                                   method = 'MM') {
   note   = NULL
   # do not move me
   if (any(dim(x) == 0) || is.null(complete.cases0(x[, depVar])))
@@ -929,7 +929,7 @@ RemoveZerovarCategories = function(x,
   }else{
     message0('Checking variation only applied to the MM method. The input mmethod: ',
              method)
-			 }
+  }
   if (is.null(x) ||
       is.null(newx) || any(dim(newx) == 0) || any(dim(x) == 0))
     newx = NULL
@@ -1754,7 +1754,43 @@ checkQouteNAandNaN = function(pattern, replacement, x, ignoreCase = FALSE) {
 
 
 
+RR_thresholdCheck = function(data,
+                             depVar,
+                             parameter,
+                             controllab = 'control',
+                             genotypeColumn = 'biological_sample_group',
+                             sexColumn = 'sex',
+                             threshold = 60,
+                             methodmap) {
+  r = list(criteria_result = TRUE           ,
+           value     = 'not applicable'     ,
+           threshold = 'not applicable')
+  if (!is.null(data) && !is.null(depVar) && !is.null(parameter)) {
+    method = getMethodi(
+      var = parameter,
+      type = ifelse(is.numeric(data[, depVar]),
+                    'numeric',
+                    'charachter'),
+      methodMap = methodmap
+    )
 
+    if (method %in% 'RR'){
+      data = droplevels0(data[complete.cases(data[, depVar]), , drop = FALSE])
+      tbl  = table(subset(data, data[, genotypeColumn] %in% controllab)[, sexColumn])
+      if(!is.null(tbl)     &&
+         sum(dim(tbl) > 0) &&
+        all(tbl <= threshold) ) {
+        message0('Not enough data for running RR, threshold = ',threshold,': ',paste(names(tbl), tbl, sep = '=', collapse = ', '))
+          r = list(
+            criteria_result = FALSE,
+            value = paste(names(tbl), tbl, sep = '=', collapse = ', '),
+            threshold = threshold
+          )
+        }
+    }
+  }
+  return(r)
+}
 
 
 
@@ -1775,10 +1811,15 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            colnames = c('external_sample_id', 'AllModelWeights'),
                                            byid     = 'external_sample_id'                      ,
                                            compressRawData = TRUE) {
-  if (storeRawData &&
-      !isS4(c.ww0$WindowedObj$value) &&
-      activeWindowing && !NullOrError(c.ww0$WindowedObj$value)
-      && (c.ww0$method %in% 'MM')) {
+  message0('Extra columns in the strored data: ',colnames)
+  if (storeRawData            &&
+      isS4(c.ww0$InputObject) &&
+      isS4(c.ww0$WindowedObj$value) &&
+      activeWindowing         &&
+      !DRrequired:::NullOrError(c.ww0$WindowedObj$value)
+      &&
+      (c.ww0$method %in% 'MM') &&
+      all(colnames %in% names(c.ww0$InputObject@datasetPL))) {
     n3.5.w = merge(
       x = orgData,
       y = c.ww0$InputObject@datasetPL[, colnames],
@@ -2217,7 +2258,7 @@ mimicControls = function(df                             ,
            df[, depVariable],
            #col = as.integer(df$biological_sample_group) - 1,
            col = as.integer(as.factor(interaction(df$biological_sample_group,df$sex)))
-           )
+    )
     points(
       df$cTime[mutInd],
       df[mutInd, depVariable],

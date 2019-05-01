@@ -91,6 +91,7 @@ SmoothWin = function(object                                           ,
   )
   if (is.null(finall$value)){
     finall$value = max(l)
+    finall$score = NA
   }
     
   ### 2. Determining k
@@ -123,9 +124,10 @@ SmoothWin = function(object                                           ,
     pvalThreshold = pvalThreshold         ,
     debug = debug
   )
-  if (is.null(finalk$value))
+  if (is.null(finalk$value)) {
     finalk$value = max(k)
-  
+    finalk$score = NA
+  }
   ##### final model
   message('\n 3|3 Forming the final model ...\n')
   finalr = gridSearchModel(

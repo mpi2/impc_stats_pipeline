@@ -570,6 +570,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]),])
                     n3.5.2OnlyKO     = subset(n3.5.2,n3.5.2$biological_sample_group %in% 'experimental')
                     note$relabeled_levels_categorical_variables_only  = MergLev$note
+
+
                     if (!is.null(n3.5.2) &&
                         # data.frame is not zero
                         min0(dim(n3.5.2)) > 0 &&
@@ -592,7 +594,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         # response is not empty!
                         # there must be variation in data
                         NonZeroVariation(n3.5.2[, depVar]) &&
-                        !isException) {
+                        !isException &&
+                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$criteria_result) {
                       message0('Analysing the dataset in progress ...')
                       message0('Creating PhenList object ...')
                       a = PhenStat::PhenList(
@@ -726,8 +729,6 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       ExtraCols = c('external_sample_id')
                       ####
                       message0('Preparing the output from VectorOutput function ...')
-                      # agg = c(as.list(environment()), list())
-                      # save(agg,file = 'HAMED.Rdata')
                       c.ww.vec       = VectorOutput0(
                         c.ww0     = c.ww0,
                         ExtraCols    = ExtraCols,
@@ -776,6 +777,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                           )
                         )
                       ##
+                       # agg = c(as.list(environment()), list())
+                       # save(agg,file = 'HAMED.Rdata')
                       StoreRawDataAndWindowingWeights(
                         storeRawData = storeRawData,
                         activeWindowing = activeWindowing,
@@ -832,7 +835,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                           GenePageURL       = GenePageURL                         ,
                           BodyWeightCurvURL = BodyWeightCurvURL                   ,
                           OrgSpecIds        = OrgSpecIds                          ,
-                          encode 			      = encode
+                          encode 			      = encode                              ,
+                          methodmap         = methodmap
                         )
                       )
                       #optFail     = NotProcessedOutput(args = c(as.list(environment()), ls()))
