@@ -1811,7 +1811,7 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            colnames = c('external_sample_id', 'AllModelWeights'),
                                            byid     = 'external_sample_id'                      ,
                                            compressRawData = TRUE) {
-  message0('Extra columns in the strored data: ',colnames)
+  message0('Extra columns in the strored data: ',paste(colnames,sep = ', '))
   if (storeRawData            &&
       isS4(c.ww0$InputObject) &&
       isS4(c.ww0$WindowedObj$value) &&
