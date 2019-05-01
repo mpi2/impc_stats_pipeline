@@ -6,6 +6,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       seed = 123456                        ,
                       readCategoriesFromFile  = TRUE       ,
                       OverwriteExistingFiles  = FALSE      ,
+                      onlyFillNotExisitingResults = FALSE  ,
                       WhiteListMethods  = NULL             ,
                       # Carefully use this option!
                       # It can remove the entire result file (some colonies in a single output file)
@@ -503,6 +504,26 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                                                   collapse = '')
                     message0('Output directory: \n \t\t =>=>=> ',
                              outpfile)
+                    if (onlyFillNotExisitingResults) {
+                      if (any(file.exists(paste(
+                        outpfile, c('NotProcessed.tsv', 'Successful.tsv'), sep = '_'
+                      )))) {
+                        message0('File already exists then skipt!')
+                        return(NULL)
+                      } else{
+                        message0('Result does not exist! Adding in progress ...')
+                        rmme = lapply(list.files(dirname(outpfile), full.names = TRUE), function(x) {
+                          if (!is.null(x)    &&
+                              file.exists(x) &&
+                              grepl(pattern = '.Rdata',
+                                    x = x,
+                                    fixed = TRUE))
+                            file.remove(x)
+                        })
+                        write(outpfile, file = 'DoesNotExists.log', append = TRUE)
+                      }
+                    }
+
                     ####
                     if (storeRawData) {
                       # There is a second snippet for the rawdata + weights
@@ -588,7 +609,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         # response is not empty!
                         # there must be variation in data
                         NonZeroVariation(n3.5.2[, depVar]) &&
-                        !isException) {
+                        !isException &&
+                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$criteria_result) {
                       message0('Analysing the dataset in progress ...')
                       message0('Creating PhenList object ...')
                       a = PhenStat::PhenList(
@@ -782,7 +804,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         dir        = dirname (RawoutputFile) ,
                         filename   = basename(RawoutputFile) ,
                         ReadMeTxt  = ReadMeTxt,
-                        ReadMeFile = ReadMeFile
+                        ReadMeFile = ReadMeFile,
+                        methodmap  = methodmap
 
                       )
                       SucFaiFile = paste(

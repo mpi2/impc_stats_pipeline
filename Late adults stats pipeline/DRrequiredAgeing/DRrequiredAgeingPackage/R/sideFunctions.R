@@ -1092,7 +1092,48 @@ base64 = function(x, active) {
   return(r)
 }
 
+RR_thresholdCheck = function(data,
+                             depVar,
+                             parameter,
+                             controllab = 'control',
+                             genotypeColumn = 'biological_sample_group',
+                             sexColumn = 'sex',
+                             threshold = 60,
+                             methodmap) {
+  r = list(criteria_result = TRUE           ,
+           value     = 'not applicable'     ,
+           threshold = 'not applicable')
+  if (!is.null(data) && !is.null(depVar) && !is.null(parameter)) {
+    method = getMethodi(
+      var = parameter,
+      type = ifelse(is.numeric(data[, depVar]),
+                    'numeric',
+                    'charachter'),
+      methodMap = methodmap
+    )
 
+    if (method %in% 'RR') {
+      data = droplevels0(data[complete.cases(data[, depVar]), , drop = FALSE])
+      tbl  = table(subset(data, data[, genotypeColumn] %in% controllab)[, sexColumn])
+      if (!is.null(tbl)     &&
+          sum(dim(tbl) > 0) &&
+          all(tbl <= threshold)) {
+        message0(
+          'Not enough data for running RR, threshold = ',
+          threshold,
+          ': ',
+          paste(names(tbl), tbl, sep = '=', collapse = ', ')
+        )
+        r = list(
+          criteria_result = FALSE,
+          value = paste(names(tbl), tbl, sep = '=', collapse = ', '),
+          threshold = threshold
+        )
+      }
+    }
+  }
+  return(r)
+}
 
 # rename if file exists (Danger! if overwrite==TRUE then it removes the files!)
 file.exists0 = function(file, overwrite = FALSE, ...) {
@@ -1526,9 +1567,12 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            colnames = c('external_sample_id', 'AllModelWeights'),
                                            byid     = 'external_sample_id'                      ,
                                            compressRawData = TRUE) {
-  if (storeRawData &&
-      activeWindowing && !NullOrError(c.ww0$WindowedObj)
-      && (c.ww0$method %in% 'MM')) {
+  message0('Extra columns in the strored data: ', paste(colnames, sep = ', '))
+  if (storeRawData    &&
+      activeWindowing &&
+      !NullOrError(c.ww0$WindowedObj) &&
+      (c.ww0$method %in% 'MM')        &&
+      all(colnames %in% names(c.ww0$InputObject@datasetPL))) {
     n3.5.w = merge(
       x = orgData,
       y = c.ww0$InputObject@datasetPL[, colnames],
