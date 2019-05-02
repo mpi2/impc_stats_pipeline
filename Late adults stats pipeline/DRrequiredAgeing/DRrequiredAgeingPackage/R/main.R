@@ -312,23 +312,23 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   message0('Single core processing in progress ...')
                 }
                 i = 1
-                MultiCoreRes = foreach::foreach (
-                  i = 1:length(colonys),
-                  .packages = c(
-                    'PhenStat'    ,
-                    'SmoothWin'   ,
-                    'base64enc'   ,
-                    'nlme'        ,
-                    'RJSONIO'     ,
-                    'jsonlite'    ,
-                    'PhenStatAgeing',
-                    'DRrequiredAgeing'
-                  ),
-                  .errorhandling = c(MultiCoreErrorHandling),
-                  .verbose = verbose                        ,
-                  .inorder = inorder
-                ) %activemulticore% {
-                  # for (i in  1:length(colonys)){
+                # MultiCoreRes = foreach::foreach (
+                #   i = 1:length(colonys),
+                #   .packages = c(
+                #     'PhenStat'    ,
+                #     'SmoothWin'   ,
+                #     'base64enc'   ,
+                #     'nlme'        ,
+                #     'RJSONIO'     ,
+                #     'jsonlite'    ,
+                #     'PhenStatAgeing',
+                #     'DRrequiredAgeing'
+                #   ),
+                #   .errorhandling = c(MultiCoreErrorHandling),
+                #   .verbose = verbose                        ,
+                #   .inorder = inorder
+                # ) %activemulticore% {
+                for (i in  1:length(colonys)){
                   message0('*~*~*~*~*~* ', i, '|', length(colonys), ' *~*~*~*~*~*')
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
@@ -358,8 +358,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     depVar      = depVariable$column
                     message0('Dependent variable: ', depVar)
                     note$response_type       = paste0(depVar,
-                                                '_of_type_',
-                                                paste(depVariable$lbl, sep = '.'))
+                                                      '_of_type_',
+                                                      paste(depVariable$lbl, sep = '.'))
                     note$observation_type    =
                       if (!is.null(unique(n3.5$observation_type))) {
                         paste(unique(n3.5$observation_type),
@@ -515,10 +515,20 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         rmme = lapply(list.files(dirname(outpfile), full.names = TRUE), function(x) {
                           if (!is.null(x)    &&
                               file.exists(x) &&
-                              grepl(pattern = '.Rdata',
-                                    x = x,
-                                    fixed = TRUE))
-                            file.remove(x)
+                              (
+                                grepl(
+                                  pattern = '.Rdata',
+                                  x = x,
+                                  fixed = TRUE
+                                ) ||
+                                grepl(
+                                  pattern = 'Failed_critical_error',
+                                  x = x,
+                                  fixed = TRUE
+                                )
+                              )
+                          )
+                          file.remove(x)
                         })
                         write(outpfile, file = 'DoesNotExists.log', append = TRUE)
                       }
@@ -610,7 +620,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         # there must be variation in data
                         NonZeroVariation(n3.5.2[, depVar]) &&
                         !isException &&
-                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$criteria_result) {
+                        columnLevelsVariationRadio(dataset = n3.5.2, columnName = depVar) > 0.005 &&
+                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$criteria_result
+                    ) {
                       message0('Analysing the dataset in progress ...')
                       message0('Creating PhenList object ...')
                       a = PhenStat::PhenList(
@@ -850,7 +862,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                           GenePageURL       = GenePageURL                         ,
                           BodyWeightCurvURL = BodyWeightCurvURL                   ,
                           OrgSpecIds        = OrgSpecIds                          ,
-                          encode 			      = encode
+                          encode 			      = encode                              ,
+                          methodmap         = methodmap
                         )
                       )
                       #optFail     = NotProcessedOutput(args = c(as.list(environment()), ls()))

@@ -505,13 +505,22 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         rmme = lapply(list.files(dirname(outpfile), full.names = TRUE), function(x) {
                           if (!is.null(x)    &&
                               file.exists(x) &&
-                              grepl(pattern = '.Rdata',
-                                    x = x,
-                                    fixed = TRUE))
-                            file.remove(x)
+                              (
+                                grepl(
+                                  pattern = '.Rdata',
+                                  x = x,
+                                  fixed = TRUE
+                                ) ||
+                                grepl(
+                                  pattern = 'Failed_critical_error',
+                                  x = x,
+                                  fixed = TRUE
+                                )
+                              ))
+                          file.remove(x)
                         })
                         message0('Result does not exist! Adding in progress ...')
-                        write(outpfile,file = 'DoesNotExists.log',append = TRUE)
+                        write(outpfile, file = 'DoesNotExists.log', append = TRUE)
                       }
                     }
 
@@ -603,6 +612,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         # there must be variation in data
                         NonZeroVariation(n3.5.2[, depVar]) &&
                         !isException &&
+                        columnLevelsVariationRadio(dataset = n3.5.2, columnName = depVar) > 0.005 &&
                         RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$criteria_result) {
                       message0('Analysing the dataset in progress ...')
                       message0('Creating PhenList object ...')

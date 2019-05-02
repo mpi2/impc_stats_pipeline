@@ -9,10 +9,19 @@ NotProcessedOutput = function(args) {
     is_exception   =  args$isException,
     empty_dataset_after_preprocess  = is.null(args$n3.5.2),
     empty_response_after_preprocess = !length(na.omit(args$n3.5.2[, args$depVar])) > 0,
-    variation_in_respone_after_preprocess =   ifelse(
-      args$depVariable$accepted,
-      NonZeroVariation(args$n3.5.2[, args$depVar]),
-      'Not numeric or factor response'
+    variation_in_respone_after_preprocess =   list(
+      criteria_result = ifelse(
+        args$depVariable$accepted,
+        NonZeroVariation(args$n3.5.2[, args$depVar]),
+        'Not numeric or factor response'
+      ),
+      threshold = 0,
+      model     ='var() function'
+    ),
+    variation_in_respone_before_preprocess =   list(
+      criteria_result = columnLevelsVariationRadio(dataset = args$n3.5.2, columnName = args$depVar) > 0.005,
+      threshold       = 0.005,
+      model           = 'PhenStat variaiton'
     ),
     both_mut_and_control_after_preprocess = list(
       criteria_result = length(unique(bsg3.5.2)) > 1 ,

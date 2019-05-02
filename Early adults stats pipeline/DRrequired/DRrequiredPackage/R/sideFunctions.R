@@ -826,6 +826,47 @@ RandomRegardSeed = function(n = 1,
 }
 
 
+#From PhenStat
+columnLevelsVariationRadio = function (dataset,
+                                       columnName,
+                                       genotypeCol = 'biological_sample_group',
+                                       sexCol = 'sex')
+{
+  message0(paste('depVar = ', columnName))
+  if (is.numeric(dataset[, c(columnName)])) {
+    columnOfInterest <- na.omit(dataset[, c(columnName)])
+    values <- c(length(columnOfInterest))
+    Genotype_levels <- levels(factor(dataset[, genotypeCol]))
+    Sex_levels <- levels(factor(dataset[, sexCol]))
+    values <- c(values, length(levels(factor(
+      columnOfInterest
+    ))))
+    values <-
+      c(values, length(Genotype_levels) * length(Sex_levels))
+    for (i in 1:length(Genotype_levels)) {
+      GenotypeSubset <- subset(dataset, dataset[, genotypeCol] ==
+                                 Genotype_levels[i])
+      for (j in 1:length(Sex_levels)) {
+        GenotypeSexSubset <-
+          subset(GenotypeSubset, GenotypeSubset[, sexCol] ==
+                   Sex_levels[j])
+        columnOfInterestSubset <- na.omit(GenotypeSexSubset[,
+                                                            c(columnName)])
+        values <- c(values, length(columnOfInterestSubset))
+      }
+    }
+    if (length(values) > 1 && values[1] != 0) {
+      ratio = values[2] / values[1]
+      message0('Variability (PhenStat function) = ', ratio)
+    } else{
+      ratio = 1
+    }
+  } else{
+    ratio = 1
+  }
+  return(as.vector(ratio))
+}
+
 # remove zero count categories (filter on sex and genotype)
 RemoveZeroFrequencyCategories = function(x,
                                          minSampRequired,
