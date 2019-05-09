@@ -404,20 +404,22 @@ optimM = function(optimise) {
 }
 
 applyFormulaToData = function(formula = NULL, data, add = FALSE) {
-	if (is.null(formula))
+	if (is.null(formula) || is.null(all_vars0(formula)))
 		return(data)
 	if (is.null(data))
 		return(NULL)
-	nms <-
+	nms =
 		trimws(scan(
-			text = sub("~", "+", format(formula)),
+			text = paste(unlist(as.list(
+				attr(terms(as.formula(formula)), "variables")
+			))[-1], sep = '+', collapse = ' + '),
 			what = "",
 			sep = "+",
 			quiet = TRUE
 		))
 	m <- sapply(nms, function(x)
-		eval(parse(text = x), data))
-	if (add)
+				eval(parse(text = x), data))
+	if (!is.null(m) && add)
 		m = cbind(data, m)
 	return(list(data = m, names = nms))
 }
@@ -1713,6 +1715,33 @@ modelSummaryPvalueExtract = function(x,
 		mSumFiltered = NULL # NA?
 	}
 	return(as.vector(unlist(mSumFiltered)))
+}
+
+normalisePhenList = function(phenlist, colnames = NULL) {
+	message0('Normalising the PhenList object in progress ...')
+	
+	if (!is.null(colnames)) {
+		colnames = colnames[colnames %in% names(phenlist@datasetPL)]
+		
+		if (length(colnames) < 1) {
+			message0('No variable name found in the data. Please check "colnames" ...')
+			return(phenlist)
+		}
+	}
+	######
+	phenlist@datasetPL[, colnames]   = as.data.frame(lapply(
+		phenlist@datasetPL[, colnames,drop=FALSE],
+		FUN = function(x) {
+			if (is.numeric(x)) {
+				r = (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+			} else{
+				r = x
+			}
+			return(r)
+		}
+	))
+	
+	return(phenlist)
 }
 
 SummaryStats = function(x,

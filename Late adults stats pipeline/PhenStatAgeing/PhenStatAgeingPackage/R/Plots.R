@@ -132,32 +132,35 @@ plot.PhenStatAgeingMM = function (x                   ,
 	
 	predR  = predict(fm)
 	residR = resid(fm)
-	plot(predR ,
-			 residR,
-			 xlab = 'Fitted values',
-			 ylab = 'Residuals'    ,
-			 main = main           ,
-			 ...)
+	plot(
+		predR ,
+		residR,
+		xlab = 'Fitted values',
+		ylab = 'Residuals'    ,
+		main = main           ,
+		#ellipse = TRUE        ,
+		#reset.par = FALSE     ,
+		...
+	)
 	abline(h = 0, lwd = 3, lty = 2)
-	hist(
+	densityPlot(
 		residR,
 		xlab = 'Residuals',
-		main = paste0(main, ': Histogram of residuals'),
-		probability = TRUE,
+		main = paste0(main, ': Density of the residuals'),
 		...
 	)
 	qqPlot(
 		as.vector(residR),
 		ylab = 'Residuals',
-		main = paste0(main, ': Normal Q-Q plot of residuals'),
+		main = paste0(main, ': Normal Q-Q of the residuals'),
 		grid = FALSE,
 		...
 	)
 	#qqline(residR, ...)
 	
-	plot(density(transData$data[, transData$names[1]]),
+	densityPlot(transData$data[, transData$names[1]],
 			 main = 'Density of the response',
-			 ylab = transData$names[1],
+			 xlab = transData$names[1],
 			 ...)
 	par(ask = p$ask, mfrow = p$mfrow)
 }
