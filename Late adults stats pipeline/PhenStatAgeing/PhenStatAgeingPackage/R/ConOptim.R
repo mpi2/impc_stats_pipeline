@@ -37,10 +37,10 @@ M.opt = function(object = NULL            ,
 	glCont      = glm.control(epsilon = 10 ^ -36, maxit = 1000)
 	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = OutR = NULL
 	VarHomo     = TRUE
-	data        = object@datasetPL
+	data        = RemoveDuplicatedColumnsFromDf(object@datasetPL)
 	n           = nrow(data)
 	fixed = ModelChecks(fixed = fixed,
-											data = data,
+											data  = data  ,
 											checks = checks)
 	allVars     = all_vars0(fixed)
 	LifeStage   = 'LifeStage' %in% allVars
@@ -248,7 +248,7 @@ M.opt = function(object = NULL            ,
 			suppressMessages(
 				AllEffSizes(
 					object = F.Model,
-					depVariable = allVars[1],
+					depVariable = allVars[ 1],
 					effOfInd    = allVars[-1],
 					data = data
 				)

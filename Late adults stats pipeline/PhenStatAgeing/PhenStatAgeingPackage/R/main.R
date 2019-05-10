@@ -104,12 +104,12 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 	
 	if (method %in% 'MM') {
 		message0('Linear Mixed Model (MM framework) in progress ...')
-		output = M.opt(
+		output =    M.opt(
 			fixed     = MM_fixed        ,
 			random    = MM_random       ,
 			object    = phenListAgeing  ,
 			lower     = MM_lower        ,
-			direction = MM_direction  ,
+			direction = MM_direction    ,
 			weight    = MM_weight       ,
 			checks    = MM_checks       ,
 			optimise  = MM_optimise     ,

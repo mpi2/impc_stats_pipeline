@@ -2,7 +2,7 @@ Package: PhenStatAgeing
 Type: Package
 Title: Toolbox for the analysis of phenotypic data
 Version: 1.0.0
-Author: Hamed Haselimashhadi
+Author: Hamed Haseli Mashhadi
 Maintainer: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 Description: Package contains several methods for statistical analysis of phenotypic data. This package is designed to substitute the old PhenStat package.
 License: GPL (>= 2)

@@ -869,7 +869,6 @@ columnLevelsVariationRadio = function (dataset,
 
 normalisePhenList =   function(phenlist, colnames = NULL) {
   message0('Normalising the PhenList object in progress ...')
-
   if (!is.null(colnames)) {
     colnames = colnames[colnames %in% names(phenlist@datasetPL)]
 
@@ -877,20 +876,23 @@ normalisePhenList =   function(phenlist, colnames = NULL) {
       message0('No variable name found in the data. Please check "colnames" ...')
       return(phenlist)
     }
+  } else{
+    message0('No variable selected for normalisation. All numerical variables will be normalised.')
+    colnames = names(phenlist@datasetPL)
   }
   ######
-  phenlist@datasetPL[, colnames]   = as.data.frame(lapply(
+  phenlist@datasetPL  [, colnames]      = as.data.frame(lapply(
     phenlist@datasetPL[, colnames, drop = FALSE],
     FUN = function(x) {
-      if (is.numeric(x)) {
-        r = (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+      if (is.numeric(x) && length(unique(x)) > 1) {
+        sdx = sd(x, na.rm = TRUE)
+        r   =   (x - mean(x, na.rm = TRUE)) / ifelse(sdx > 0, sdx, 1)
       } else{
         r = x
       }
       return(r)
     }
   ))
-
   return(phenlist)
 }
 # remove zero count categories (filter on sex and genotype)

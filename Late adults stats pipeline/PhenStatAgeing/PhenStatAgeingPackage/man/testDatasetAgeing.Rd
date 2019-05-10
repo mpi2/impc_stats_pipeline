@@ -77,7 +77,9 @@ testDatasetAgeing(
 	Only applies to the "MM" framework. Select from  "both" (for stepwise optimisation), "backward" (for backward elimination) or "forward" (for forward selection) for the optimisation algorithm. The default is "both".
 	}
   \item{MM_checks}{
-	Only applies to the "MM" framework. A vector of three 1/0 or TRUE/FALSE values such as c(TRUE, TRUE, TRUE). The first element of the vector activates checking the model terms (See MM_fixed) to be existed in data. The second term removes any single level factor from the model (in MM_fixed). The third element checks the interaction term to make sure all interactions have some data attached to them. Caution is needed for the third element of the check as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(TRUE, TRUE, TRUE).
+	Only applies to the "MM" framework. A vector of three 1/0 or TRUE/FALSE values such as c(TRUE, TRUE, TRUE). The first element of the vector activates checking the model terms (See MM_fixed) to be existed in data. The second term removes any single level factor from the model (in MM_fixed). The third element checks the interaction term to make sure all interactions have some data attached to them. Caution is needed for the third element of the check as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(TRUE, TRUE, TRUE).\cr
+	
+	* Note that the function removed duplicated columns in the dataset prior to applying the lme/gls.
 }
 	\item{MM_optimise}{
 	Only applies to the "MM" framework. A vector of three binary values such as c(1,1,1) or c(TRUE,TRUE,TRUE), default. The first element of the vector activates the fixed effect optimisation. The algorithm uses AICc to optimise the fixed effects (Check AICcmodavg package for more details about AICc). The second and third elements of the vector activate optimisation on weight and random effects respectively. The optimisation of weight and random effects refers to comparing the AICc between a model with and without those effects.

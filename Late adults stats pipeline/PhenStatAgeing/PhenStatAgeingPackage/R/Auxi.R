@@ -468,7 +468,8 @@ eff.size = function(object,
 										errorReturn = NULL        ,
 										debug       = FALSE) {
 	if (all(is.null(data)))
-		data = getData(object)
+		data = NormaliseDataFrame(getData(object))
+		
 	f    = reformulate(termlabels = effOfInd, depVariable)
 	agr  = aggregate(f, data = data, FUN = mean)
 	if (debug) {
@@ -478,7 +479,7 @@ eff.size = function(object,
 	}
 	if (any(dim(agr) < 2)) {
 		message0(
-			' \t\tEffect size estimation: No variation or less than two levels in ',
+			' \t\t(standardized) Effect size estimation: No variation or less than two levels in ',
 			pasteComma(effOfInd, collapse = ',')
 		)
 		return(errorReturn)
@@ -486,7 +487,15 @@ eff.size = function(object,
 	
 	NModel       =
 		tryCatch(
-			expr = update(object,  reformulate(termlabels = effOfInd,response = NULL,intercept = TRUE), data = data),
+			expr = update(
+				object,
+				reformulate(
+					termlabels = effOfInd,
+					response = '.',
+					intercept = TRUE
+				),
+				data = data
+			),
 			error = function(e) {
 				message0('\t\tError(s) in the effect size estimation for',
 								 pasteComma(effOfInd),
@@ -515,7 +524,7 @@ eff.size = function(object,
 			efSi         = list(value            = as.list(coef(NModel))[[effOfInd]][1],
 													percentageChange = PerChange,
 													variable         = effOfInd,
-													type             = 'coefficient')
+													type             = 'standardized coefficient')
 		} else{
 			# For categorical covariates it is the mean difference
 			MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
@@ -602,6 +611,21 @@ lop = function() {
 			'XRY'
 		)
 	)
+}
+
+RemoveDuplicatedColumnsFromDf = function(x) {
+	x         = as.data.frame(x)
+	numCols   = sapply(x, is.numeric)
+	ConCols   = x[, numCols]
+	CatCols   = x[, !numCols]
+	dcols     = duplicated(lapply(ConCols, summary))
+	if (any(dcols)) {
+		message0('Duplicated columns found (and removed) in the input data. Removed variables:\n\t',
+						PhenStatAgeing:::pasteComma(names(ConCols)[dcols]))
+	}
+	uniqCols  = ConCols[, !dcols]
+	r = cbind(CatCols, uniqCols)
+	return(r)
 }
 
 colExists = function(name, data) {
@@ -1717,31 +1741,36 @@ modelSummaryPvalueExtract = function(x,
 	return(as.vector(unlist(mSumFiltered)))
 }
 
-normalisePhenList = function(phenlist, colnames = NULL) {
-	message0('Normalising the PhenList object in progress ...')
+NormaliseDataFrame = function(data, colnames = NULL) {
+	message0('Normalising the data.frame in progress ...')
 	
 	if (!is.null(colnames)) {
-		colnames = colnames[colnames %in% names(phenlist@datasetPL)]
+		colnames = colnames[colnames %in% names(data)]
 		
 		if (length(colnames) < 1) {
 			message0('No variable name found in the data. Please check "colnames" ...')
-			return(phenlist)
+			return(data)
 		}
+	} else{
+		message0(
+			'No variable selected for normalisation. All numerical variables will be normalised.'
+		)
+		colnames = names(data)
 	}
 	######
-	phenlist@datasetPL[, colnames]   = as.data.frame(lapply(
-		phenlist@datasetPL[, colnames,drop=FALSE],
+	data  [, colnames]      = as.data.frame(lapply(
+		data[, colnames, drop = FALSE],
 		FUN = function(x) {
-			if (is.numeric(x)) {
-				r = (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+			if (is.numeric(x) && length(unique(x)) > 1) {
+				sdx = sd(x, na.rm = TRUE)
+				r   =   (x - mean(x, na.rm = TRUE)) / ifelse(sdx > 0, sdx, 1)
 			} else{
 				r = x
 			}
 			return(r)
 		}
 	))
-	
-	return(phenlist)
+	return(data)
 }
 
 SummaryStats = function(x,
@@ -2042,6 +2071,7 @@ as.list0 = function(x, ...) {
 
 AllEffSizes = function(object, depVariable, effOfInd, data) {
 	lst       = flst = olst = NULL
+	data      = NormaliseDataFrame(data)
 	effOfInd  = effOfInd[effOfInd %in% names(data)]
 	cats      = effOfInd[sapply(
 		effOfInd,
@@ -2055,10 +2085,11 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 			message0('\tLevel:', pasteComma(unlist(eff)))
 			# 1. Main effect
 			lstTmp = eff.size(
-				object = object,
+				object      = object,
 				depVariable = depVariable,
-				effOfInd = eff,
-				errorReturn = NULL
+				effOfInd    = eff,
+				errorReturn = NULL,
+				data        = data
 			)
 			if (!is.null(lstTmp)) {
 				lst[[counter1]] = lstTmp
@@ -2074,11 +2105,11 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 						for (lvl in levels(interact)) {
 							message0('\tLevel:', pasteComma(unlist(lvl)))
 							olstTmp = eff.size(
-								object = object,
-								data = droplevels(data[interact %in% lvl, ]),
+								object      = object,
+								data        = droplevels(data[interact %in% lvl, ]),
 								depVariable = depVariable,
 								errorReturn = NULL,
-								effOfInd = eff
+								effOfInd    = eff
 							)
 							if (!is.null(olstTmp)) {
 								olst[[counter2]] = olstTmp
