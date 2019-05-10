@@ -621,7 +621,7 @@ RemoveDuplicatedColumnsFromDf = function(x) {
 	dcols     = duplicated(lapply(ConCols, summary))
 	if (any(dcols)) {
 		message0('Duplicated columns found (and removed) in the input data. Removed variables:\n\t',
-						PhenStatAgeing:::pasteComma(names(ConCols)[dcols]))
+						pasteComma(names(ConCols)[dcols]))
 	}
 	uniqCols  = ConCols[, !dcols]
 	r = cbind(CatCols, uniqCols)
