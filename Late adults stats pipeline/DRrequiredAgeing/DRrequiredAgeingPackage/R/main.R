@@ -1,7 +1,8 @@
 ## You must check the 'check' parameter
-mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/select?q=*%3A*&fq=procedure_stable_id%3AIMPC_ECG_002&rows=590000&wt=csv&indent=true'                    ,
+mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/select?q=*%3A*&fq=procedure_stable_id%3AIMPC_ECG_002&rows=590000&wt=csv&indent=true'            ,
                       sep = ','                            ,
                       na.strings = 'NA'                    ,
+                      normalisedPhenlist = FALSE           ,
                       subdir = 'Results'                   ,
                       seed = 123456                        ,
                       readCategoriesFromFile  = TRUE       ,
@@ -706,6 +707,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       note = c(note, list(
                         bodyweight_initially_included_in_model = ifelse(method %in% 'MM', equationType, FALSE)
                       ))
+                      if (normalisedPhenlist){
+                        a = normalisePhenList(phenlist = a, colnames = c(depVar, 'Weight'))
+                      }
                       message0('Fitting the model ...')
                       message0('Method: ', method, '\n\t Equation:', equationType)
                       c.ww0 =	PhenStatWindow(
