@@ -125,23 +125,23 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
     stringsAsFactors = TRUE
   )
   #### Temporary for ageing pipeline only
-  rdataEarly = read.csv(
-    file = gsub(
-      pattern = 'LA_',
-      replacement = '_',
-      gsub(
-        pattern     = 'http://ves-ebi-d1.ebi.ac.uk:8988',
-        replacement = 'http://ves-ebi-d0.ebi.ac.uk:8986',
-        x = file
-      )
-    ),
-    check.names      = checkNamesForMissingColNames,
-    sep              = sep                         ,
-    na.strings       = na.strings                  ,
-    stringsAsFactors = TRUE
-  )
-  com_cols  = intersect(colnames(rdata), colnames(rdataEarly))
-  rdata     = rbind(rdata[, com_cols], rdataEarly[, com_cols])
+  # rdataEarly = read.csv(
+  #   file = gsub(
+  #     pattern = 'LA_',
+  #     replacement = '_',
+  #     gsub(
+  #       pattern     = 'http://ves-ebi-d1.ebi.ac.uk:8988',
+  #       replacement = 'http://ves-ebi-d0.ebi.ac.uk:8986',
+  #       x = file
+  #     )
+  #   ),
+  #   check.names      = checkNamesForMissingColNames,
+  #   sep              = sep                         ,
+  #   na.strings       = na.strings                  ,
+  #   stringsAsFactors = TRUE
+  # )
+  # com_cols  = intersect(colnames(rdata), colnames(rdataEarly))
+  # rdata     = rbind(rdata[, com_cols], rdataEarly[, com_cols])
 
   message0('Input file dimentions: ',
            paste0(dim(rdata), collapse  = ', '))

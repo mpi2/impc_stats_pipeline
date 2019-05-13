@@ -613,19 +613,32 @@ lop = function() {
 	)
 }
 
-RemoveDuplicatedColumnsFromDf = function(x) {
+RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 	x         = as.data.frame(x)
-	numCols   = sapply(x, is.numeric)
-	ConCols   = x[, numCols]
-	CatCols   = x[, !numCols]
-	dcols     = duplicated(lapply(ConCols, summary))
-	if (any(dcols)) {
-		message0('Duplicated columns found (and removed) in the input data. Removed variables:\n\t',
-						pasteComma(names(ConCols)[dcols]))
+	if (is.null(formula))
+		vars    = all_vars0(formula)
+	else
+		vars    = names(x)
+	colVars   = names(x)  %in% vars
+	if (sum(colVars)) {
+		subX    = x[, colVars]
+		numCols = sapply(subX, is.numeric)
+		ConCols = subX[,  numCols]
+		CatCols = subX[, !numCols]
+		dcols   = duplicated(lapply(ConCols, summary))
+		if (any(dcols)) {
+			message0(
+				'Duplicated columns found (and removed) in the input data. Removed variables:\n\t',
+				pasteComma(names(ConCols)[dcols])
+			)
+		}
+		uniqCols  = ConCols[, !dcols]
+		r         = cbind(x[, !colVars], CatCols, uniqCols)
+		return(r)
+	} else{
+		message0('Formula terms do not exist in the input data')
+		return(x)
 	}
-	uniqCols  = ConCols[, !dcols]
-	r = cbind(CatCols, uniqCols)
-	return(r)
 }
 
 colExists = function(name, data) {

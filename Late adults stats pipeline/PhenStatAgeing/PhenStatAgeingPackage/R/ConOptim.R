@@ -37,7 +37,7 @@ M.opt = function(object = NULL            ,
 	glCont      = glm.control(epsilon = 10 ^ -36, maxit = 1000)
 	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = OutR = NULL
 	VarHomo     = TRUE
-	data        = RemoveDuplicatedColumnsFromDf(object@datasetPL)
+	data        = RemoveDuplicatedColumnsFromDf(x = object@datasetPL, formula = fixed)
 	n           = nrow(data)
 	fixed = ModelChecks(fixed = fixed,
 											data  = data  ,
