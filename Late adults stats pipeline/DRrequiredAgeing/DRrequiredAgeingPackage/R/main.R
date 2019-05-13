@@ -116,6 +116,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   message0('Reading the input file ...\n\t ~>', file)
   if (!file.exists(file))
     message0('File is not local or does not exist!')
+
+  #### Temporary for ageing pipeline only
   rdata = read.csv(
     file = file                                    ,
     check.names      = checkNamesForMissingColNames,
@@ -123,6 +125,20 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
     na.strings       = na.strings                  ,
     stringsAsFactors = TRUE
   )
+  rdataEarly = read.csv(
+    file = gsub(
+      pattern     = 'http://ves-ebi-d1.ebi.ac.uk:8988',
+      replacement = 'http://ves-ebi-d0.ebi.ac.uk:8986',
+      x = file
+    )  ,
+    check.names      = checkNamesForMissingColNames,
+    sep              = sep                         ,
+    na.strings       = na.strings                  ,
+    stringsAsFactors = TRUE
+  )
+  com_cols  = intersect(colnames(rdata), colnames(rdataEarly))
+  rdata     = rbind(rdata[, com_cols], rdataEarly[, com_cols])
+
   message0('Input file dimentions: ',
            paste0(dim(rdata), collapse  = ', '))
   rdata = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
