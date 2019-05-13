@@ -117,7 +117,6 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   if (!file.exists(file))
     message0('File is not local or does not exist!')
 
-  #### Temporary for ageing pipeline only
   rdata = read.csv(
     file = file                                    ,
     check.names      = checkNamesForMissingColNames,
@@ -125,12 +124,17 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
     na.strings       = na.strings                  ,
     stringsAsFactors = TRUE
   )
+  #### Temporary for ageing pipeline only
   rdataEarly = read.csv(
     file = gsub(
-      pattern     = 'http://ves-ebi-d1.ebi.ac.uk:8988',
-      replacement = 'http://ves-ebi-d0.ebi.ac.uk:8986',
-      x = file
-    )  ,
+      pattern = 'LA_',
+      replacement = '_',
+      gsub(
+        pattern     = 'http://ves-ebi-d1.ebi.ac.uk:8988',
+        replacement = 'http://ves-ebi-d0.ebi.ac.uk:8986',
+        x = file
+      )
+    ),
     check.names      = checkNamesForMissingColNames,
     sep              = sep                         ,
     na.strings       = na.strings                  ,
