@@ -621,6 +621,7 @@ RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 		vars    = names(x)
 	colVars   = names(x)  %in% vars
 	if (sum(colVars)) {
+		message0('Checking the duplicated data in:\n\t', pasteComma(colVars))
 		subX    = x[, colVars]
 		numCols = sapply(subX, is.numeric)
 		ConCols = subX[,  numCols]
