@@ -15,17 +15,16 @@ SuccessfulOutput = function(args) {
     parameter_stable_id   = args$parameter                                                       , #5
     parameter_name        = UniqueAndNNull(args$n3.5$parameter_name,removeSpecials = FALSE)      , #6
     phenotyping_center    = args$center                                                          , #7
-    allele_symbol         = UniqueAndNNull(args$n3.5$allele_symbol,removeSpecials = FALSE)       , #8.0
-    allele_accession_id   = UniqueAndNNull(args$n3.5$allele_accession_id,removeSpecials = FALSE) , #8.1
-    gene_symbol           = UniqueAndNNull(args$n3.5$gene_symbol,removeSpecials = FALSE)         , #9
-    gene_accession_id     = UniqueAndNNull(args$n3.5$gene_accession_id,removeSpecials = FALSE)   , #10
-    pipeline_name         = UniqueAndNNull(args$n3.5$pipeline_name,removeSpecials = FALSE)       , #11
-    pipeline_stable_id    = UniqueAndNNull(args$n3.5$pipeline_stable_id,removeSpecials = FALSE)  , #12
-    strain_accession_id   = args$strain               , #13
-    metadata_group        = args$meta                 , #14
-    zygosity              = args$zyg                  , #15
-    colony_id             = args$colony               , #16
-    reserved              = 'NA'                        #17
+    allele_symbol         = UniqueAndNNull(args$n3.5$allele_symbol,removeSpecials = FALSE)       , #8
+    allele_accession_id   = UniqueAndNNull(args$n3.5$allele_accession_id,removeSpecials = FALSE) , #9
+    gene_symbol           = UniqueAndNNull(args$n3.5$gene_symbol,removeSpecials = FALSE)         , #10
+    gene_accession_id     = UniqueAndNNull(args$n3.5$gene_accession_id,removeSpecials = FALSE)   , #11
+    pipeline_name         = UniqueAndNNull(args$n3.5$pipeline_name,removeSpecials = FALSE)       , #12
+    pipeline_stable_id    = UniqueAndNNull(args$n3.5$pipeline_stable_id,removeSpecials = FALSE)  , #13
+    strain_accession_id   = args$strain               , #14
+    metadata_group        = args$meta                 , #15
+    zygosity              = args$zyg                  , #16
+    colony_id             = args$colony                 #17
   )
 
   ######## 2 JSON
