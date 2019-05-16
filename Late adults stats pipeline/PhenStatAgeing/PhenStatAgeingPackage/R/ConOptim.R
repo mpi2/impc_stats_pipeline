@@ -166,7 +166,7 @@ M.opt = function(object = NULL            ,
 			F.Model = I.Model
 			optimise[1] = FALSE
 		} else{
-			message0('\t Optimised model: ', printformula(formula(F.Model)))
+			message0('\tOptimised model: ', printformula(formula(F.Model)))
 			optimise[1] = TRUE
 		}
 	} else{
@@ -244,16 +244,16 @@ M.opt = function(object = NULL            ,
 			depVariable = allVars[1]
 		)
 		message0('Estimating effect sizes ... ')
-		EffectSizes = c(
-			suppressMessages(
-				AllEffSizes(
-					object = F.Model,
-					depVariable = allVars[ 1],
-					effOfInd    = allVars[-1],
-					data = data
-				)
-			),
-			CombinedEffectSizes = lapply(SplitModels, function(x) {
+		EffectSizes = c(suppressMessages(
+			AllEffSizes(
+				object = F.Model,
+				depVariable = allVars[1],
+				effOfInd    = allVars[-1],
+				data = data
+			)
+		),
+		CombinedEffectSizes = if (!is.null(SplitModels)) {
+			lapply(SplitModels, function(x) {
 				percentageChangeCont(
 					model = x,
 					data = getData(x),
@@ -263,12 +263,14 @@ M.opt = function(object = NULL            ,
 					mainEffsOnlyWhenIndivi = x$MainEffect
 				)
 			})
-		)
+		} else{
+			NULL
+		})
 		message0(
 			'\tTotal effect sizes estimated: ',
 			ifelse(
 				!is.null(EffectSizes),
-				length(EffectSizes),
+				length  (EffectSizes),
 				'Not possible because of errors!'
 			)
 		)

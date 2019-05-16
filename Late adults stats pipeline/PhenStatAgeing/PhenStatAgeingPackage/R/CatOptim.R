@@ -9,15 +9,20 @@ crunner = function(object              ,
 {
 	if (sum(method != c('FE', 'RR')) == 0 ||
 			is.null(object)                   ||
-			is.null(all_vars0(formula))) {
-		message0 ('Improper method (',
-							method,
-							') for the type of data, or the "formula" is left blank')
+			is.null(all_vars0(formula))       ||
+			length (all_vars0(formula)) < 2   
+			) {
+		message0 (
+			'Improper method (',
+			method,
+			') for the type of data, or the `formula` is not specified properly/left blank.\n\t(right sided) Formula: ',
+			printformula(formula)
+		)
 		return(NULL)
 	}
 	message0('FE framework in progress ...')
 	sta.time    = Sys.time()
-	message0('Top framework: ', method)
+	message0('\tTop framework: ', method)
 	message0('Fisher exact test with ',
 					 ifelse(rep > 0, rep, 'No'),
 					 ' repetition(s) in progress ...')
@@ -28,8 +33,11 @@ crunner = function(object              ,
 	)
 	####
 	allTerms    = all_vars0(newFormula)
-	if (length(allTerms) < 1) {
-		message0('No variable to test.')
+	if (length(allTerms) < 2) {
+		message0(
+			'No `response` to test or the right hand side of the `formula` not specified properly/left blank.\n\t(right sided) Formula: ',
+			printformula(newFormula)
+		)
 		return(NULL)
 	}
 	####

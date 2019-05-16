@@ -48,7 +48,7 @@ vectorOutputCat =	function(object)
 				lapply(
 					v,
 					FUN = function(v2) {
-						list('p-value' = v2$result$p.value,
+						list('p-val' = v2$result$p.value,
 								 'effect size' = v2$effectSize)
 					}
 				)

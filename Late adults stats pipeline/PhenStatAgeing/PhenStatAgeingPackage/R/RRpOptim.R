@@ -10,11 +10,15 @@ RRrunner = function(object              ,
 	allTerms    = all_vars0(x = formula)
 	if (!method %in% c('RR')        ||
 			is.null(allTerms)           ||
-			is.null(object)) {
+			is.null(object)             ||
+			sum(allTerms %in% names(object@datasetPL)) < 2) {
 		#####
-		message0 ('Improper method (',
-							method,
-							') for the type of data, or the "formula" is left blank')
+		message0 (
+			'Improper method (',
+			method,
+			') for the type of data, or the `formula` is not properly specified/left blank. \n\tFormula: ',
+			printformula(formula)
+		)
 		return(NULL)
 	}
 	message0('RR+ framework in progress ...')

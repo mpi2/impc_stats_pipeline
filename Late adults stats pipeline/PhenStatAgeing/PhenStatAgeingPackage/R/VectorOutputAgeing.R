@@ -5,8 +5,11 @@ vectorOutputAgeing = function(object,
 															...) {
 	debug = FALSE
 	if ((is.null(object) || !is.null(object$messages)) && !Null) {
-		message0('Null object. Please see the error below:')
-		print(object$messages)
+		message0('Null object')
+		if (!is.null(object$messages)) {
+			message0('Please see the error below:')
+			print(object$messages)
+		}
 		return(NULL)
 	}
 	##########

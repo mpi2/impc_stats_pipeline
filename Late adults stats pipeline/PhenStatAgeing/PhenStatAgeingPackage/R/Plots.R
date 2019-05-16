@@ -1,3 +1,7 @@
+plot.NULL = function(x, ...) {
+	message0('No plot available for a NULL object')
+}
+
 plotFERR = function(x, l1, l2, main, ...) {
 	if (!is.null(x$output$SplitModels[[l1]][[l2]]$table))
 		mosaicplot(x$output$SplitModels[[l1]][[l2]]$table, main = main, ...)

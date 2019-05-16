@@ -66,7 +66,7 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 		error = function(err) {
 			message0('The functions failed with an error (see below): ')
 			r$messages$error <<- err
-			warning(err)
+			message(err)
 			return(NULL)
 		}
 	)

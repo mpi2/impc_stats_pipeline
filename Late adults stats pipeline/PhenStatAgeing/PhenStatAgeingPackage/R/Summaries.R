@@ -1,3 +1,6 @@
+summary.NULL = function(object, ...) {
+	message0('No summary available for a NULL object')
+}
 summary.PhenStatAgeingRR = function(object, format = 'rst', ...) {
 	if (!is.null(object$messages) || is.null(object)) {
 		message0('Due to error(s), no plot available')

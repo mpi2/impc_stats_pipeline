@@ -60,7 +60,7 @@ pasteComma = function(...,
 }
 
 truncate_text = function(x, width) {
-	ifelse(nchar(x) > width, paste0(strtrim(x, width), '...'), x)
+	ifelse(nchar(x) > width, paste0(strtrim(x, width), ' ...'), x)
 }
 
 pasteUnderscore = function(...) {
@@ -78,7 +78,8 @@ checkModelTermsInData = function(formula,
 												fixed = TRUE)]
 	if (responseIsTheFirst) {
 		if (!(vars[1] %in% names(data))) {
-			message0('Response does not exist in the data!')
+			message0('Response does not exist in the data!\n\tFormula: ',
+							 printformula(formula))
 			stop(
 				'Response has not been specified properly. Please check that the response exists in the data'
 			)
@@ -231,7 +232,7 @@ variablesInData = function(df, names, debug = TRUE) {
 
 ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 	message0(
-		'Checking for the feasibility of terms and interactions. Formula:\n\t ',
+		'Checking for the feasibility of terms and interactions.\n\t Formula: ',
 		printformula(formula)
 	)
 	fbm = FeasibleTermsInContFormula(formula = formula, data = data)
@@ -418,7 +419,7 @@ applyFormulaToData = function(formula = NULL, data, add = FALSE) {
 			quiet = TRUE
 		))
 	m <- sapply(nms, function(x)
-				eval(parse(text = x), data))
+		eval(parse(text = x), data))
 	if (!is.null(m) && add)
 		m = cbind(data, m)
 	return(list(data = m, names = nms))
@@ -469,7 +470,7 @@ eff.size = function(object,
 										debug       = FALSE) {
 	if (all(is.null(data)))
 		data = NormaliseDataFrame(getData(object))
-		
+	
 	f    = reformulate(termlabels = effOfInd, depVariable)
 	agr  = aggregate(f, data = data, FUN = mean)
 	if (debug) {
@@ -613,28 +614,32 @@ lop = function() {
 	)
 }
 
+
 RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 	x         = as.data.frame(x)
-	if (is.null(formula))
+	if (!is.null(formula)                      ||
+			sum(all_vars0(formula) %in% names(x)) > 1)
 		vars    = all_vars0(formula)
 	else
 		vars    = names(x)
 	colVars   = names(x)  %in% vars
 	if (sum(colVars)) {
-		message0('Checking the duplicated data in:\n\t', pasteComma(colVars))
-		subX    = x[, colVars]
+		message0('Checking the duplicated data in:\n\t', pasteComma(names(x)[colVars]))
+		subX    = x[, colVars, drop = FALSE]
 		numCols = sapply(subX, is.numeric)
-		ConCols = subX[,  numCols]
-		CatCols = subX[, !numCols]
+		ConCols = subX[,  numCols, drop = FALSE]
+		CatCols = subX[, !numCols, drop = FALSE]
 		dcols   = duplicated(lapply(ConCols, summary))
 		if (any(dcols)) {
 			message0(
-				'Duplicated columns found (and removed) in the input data. Removed variables:\n\t',
+				'\tDuplicated columns found (and removed) in the input data. Removed variables:\n\t',
 				pasteComma(names(ConCols)[dcols])
 			)
+		} else{
+			message0('\tNo duplicate found')
 		}
-		uniqCols  = ConCols[, !dcols]
-		r         = cbind(x[, !colVars], CatCols, uniqCols)
+		uniqCols  = ConCols[, !dcols  , drop=FALSE]
+		r         = cbind(x[, !colVars, drop=FALSE], CatCols, uniqCols)
 		return(r)
 	} else{
 		message0('Formula terms do not exist in the input data')
@@ -653,7 +658,7 @@ colExists = function(name, data) {
 
 listFun = function(list, FUN, debug = FALSE) {
 	if (debug)
-		message0('Used model: ', FUN)
+		message0('\tUsed model: ', FUN)
 	fArgs = names(list) %in% formalArgs(args(FUN))
 	l     = list[names(list)[fArgs]]
 	return(l)
@@ -795,6 +800,7 @@ printformula = function(formula) {
 	if (!is.null(formula)) {
 		r = paste01(format(formula, trim = TRUE, width = 0), collapse = '')
 	} else{
+		message0('Ops! the formula is blank')
 		r = NULL
 	}
 	return(r)
@@ -1209,6 +1215,10 @@ unmatrix0 = function (x, byrow = FALSE, sep = ' ')
 }
 
 MoveResponseToRightOfTheFormula = function(formula) {
+	if(is.null(formula)){
+		message0('Ops! the formula is blank')
+		return(NULL)
+	}
 	newFormula = update.formula(old = formula,
 															new = reformulate(
 																response   = NULL,
@@ -1772,7 +1782,7 @@ NormaliseDataFrame = function(data, colnames = NULL) {
 		colnames = names(data)
 	}
 	######
-	data  [, colnames]      = as.data.frame(lapply(
+	data  [, colnames] = as.data.frame(lapply(
 		data[, colnames, drop = FALSE],
 		FUN = function(x) {
 			if (is.numeric(x) && length(unique(x)) > 1) {
@@ -1809,9 +1819,12 @@ SummaryStats = function(x,
 		return('empty dataset')
 	
 	cat    = all_vars0(formula)[!sapply(x[, all_vars0(formula)], is.numeric)]
-	lvls   = interaction(x[, cat], sep = sep, drop = drop)
-	isNumeric = is.numeric(x[, depVar])
+	if (length(cat) > 0)
+		lvls   = interaction(x[, cat], sep = sep, drop = drop)
+	else
+		lvls = rep(depVar, nrow(x))
 	
+	isNumeric  = is.numeric(x[, depVar])
 	summaryT   = as.list(tapply(x[, depVar], INDEX = lvls, function(xx) {
 		if (isNumeric) {
 			c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
@@ -2023,8 +2036,14 @@ QuyalityTests = function(object,
 												 noDataLab = 'No data',
 												 sep       = '_',
 												 collapse  = '_') {
-	if (is.null(object))
+	if (is.null(object) ||
+			length (levels) < 1
+	)
+	{
+		message0('\tSkipt. No model or the levels in the data for the quality test')
 		return(NULL)
+	}
+		
 	r = resid(object)
 	d = getData(object)
 	levels = levels[levels %in% names(d)]
@@ -2043,10 +2062,10 @@ QuyalityTests = function(object,
 							length(unique(x)) > 3    &&
 							length(x)         < 5000 &&
 							var(x)            != 0) {
-						list('p-value' = shapiro.test(x)$p.value, 
+						list('p-val' = shapiro.test(x)$p.value, 
 								 n         = length(x))
 					} else{
-						list('p-value' = 'Not possible(Possible causes: <3 or >5000 unique data points', 
+						list('p-val' = 'Not possible(Possible causes: <3 or >5000 unique data points', 
 								 n         = length(x))
 					}
 				})
@@ -2084,6 +2103,11 @@ as.list0 = function(x, ...) {
 }
 
 AllEffSizes = function(object, depVariable, effOfInd, data) {
+	if (length(effOfInd) < 1 ||
+			effOfInd ==   1){
+		message0('\tSkipt. No variable found for the effect size ...')
+		return(NULL)
+	}
 	lst       = flst = olst = NULL
 	data      = NormaliseDataFrame(data)
 	effOfInd  = effOfInd[effOfInd %in% names(data)]

@@ -35,11 +35,13 @@ S3method(summary   , PhenListAgeing)
 S3method(summary   , PhenStatAgeingMM)
 S3method(summary   , PhenStatAgeingRR)
 S3method(summary   , PhenStatAgeingFE)
+S3method(summary   , NULL)
 
 S3method(plot      , PhenListAgeing)
 S3method(plot      , PhenStatAgeingMM)
 S3method(plot      , PhenStatAgeingRR)
 S3method(plot      , PhenStatAgeingFE)
+S3method(plot      , NULL)
 
 
 
