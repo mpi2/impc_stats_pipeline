@@ -150,7 +150,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		MM1_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'MM',
-			MM_fixed = Lean.Mass ~ Genotype + Sex + Weight
+			MM_fixed = Lean.Mass ~ Genotype*Sex + Weight
 		)
 		VO_MM1 = vectorOutputAgeing(MM1_result)
 		plot(MM1_result, col = 2,main = 'Optimised model')
@@ -164,7 +164,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		MM2_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'MM',
-			MM_fixed = Lean.Mass ~ Genotype + Sex + Weight,
+			MM_fixed = Lean.Mass ~ Genotype*Sex + Weight,
 			MM_lower =           ~ Genotype + Sex + Weight + 1
 			# Or simply MM_optimised = c(0, 1, 1)
 		)
@@ -178,7 +178,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		MM3_result = testDatasetAgeing(
 			phenListAgeing = test_Cont,
 			method = 'MM',
-			MM_fixed = Lean.Mass ~ Genotype + Sex + Weight,
+			MM_fixed = Lean.Mass ~  + Genotype*Sex + Weight,
 			MM_optimise = c(0,0,0)
 		)
 		VO_MM3 = vectorOutputAgeing(MM3_result)
