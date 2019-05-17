@@ -2040,7 +2040,7 @@ QuyalityTests = function(object,
 			length (levels) < 1
 	)
 	{
-		message0('\tSkipt. No model or the levels in the data for the quality test')
+		message0('\tSkipped . No model or the levels in the data for the quality test')
 		return(NULL)
 	}
 		
@@ -2105,7 +2105,7 @@ as.list0 = function(x, ...) {
 AllEffSizes = function(object, depVariable, effOfInd, data) {
 	if (length(effOfInd) < 1 ||
 			effOfInd ==   1){
-		message0('\tSkipt. No variable found for the effect size ...')
+		message0('\tSkipped . No variable found for the effect size ...')
 		return(NULL)
 	}
 	lst       = flst = olst = NULL

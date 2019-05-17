@@ -500,7 +500,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       if (any(file.exists(paste(
                         outpfile, c('NotProcessed.tsv', 'Successful.tsv'), sep = '_'
                       )))) {
-                        message0('File already exists then skipt!')
+                        message0('File already exists then skipped!')
                         return(NULL)
                       }else{
                         rmme = lapply(list.files(dirname(outpfile), full.names = TRUE), function(x) {
@@ -579,7 +579,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     isException    = IsInList(
                       item = c(parameter, procedure),
                       list = exceptionList,
-                      message = 'Value found in the skipt list'
+                      message = 'Value found in the skip list'
                     )
                     n3.5.2 = n3.5.1
                     MergLev = MergeLevels(x = n3.5.2[, depVar],

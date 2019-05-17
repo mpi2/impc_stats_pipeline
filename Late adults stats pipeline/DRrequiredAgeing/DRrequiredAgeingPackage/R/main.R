@@ -529,7 +529,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       if (any(file.exists(paste(
                         outpfile, c('NotProcessed.tsv', 'Successful.tsv'), sep = '_'
                       )))) {
-                        message0('File already exists then skipt!')
+                        message0('File already exists then skipped!')
                         return(NULL)
                       } else{
                         message0('Result does not exist! Adding in progress ...')
@@ -609,7 +609,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     isException    = IsInList(
                       item = c(parameter, procedure),
                       list = exceptionList,
-                      message = 'Value found in the skipt list'
+                      message = 'Value found in the skip list'
                     )
                     n3.5.2 = n3.5.1
                     MergLev = MergeLevels(x = n3.5.2[, depVar],
