@@ -39,12 +39,14 @@ M.opt = function(object = NULL            ,
 	VarHomo     = TRUE
 	data        = RemoveDuplicatedColumnsFromDf(x = object@datasetPL, formula = fixed)
 	n           = nrow(data)
-	fixed = ModelChecks(fixed = fixed,
-											data  = data  ,
-											checks = checks)
+	fixed       = ModelChecks(fixed = fixed,
+														data  = data  ,
+														checks = checks)
+	CheckedRandom = RandomEffectCheck(formula = random,
+																		data  = data)
 	allVars     = all_vars0(fixed)
 	LifeStage   = 'LifeStage' %in% allVars
-	Batch_exist = !categorical && !is.null(random) &&
+	Batch_exist = !categorical && !is.null(CheckedRandom) &&
 		colExists(name = 'Batch', data = data)
 	mdl         = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls'))
 	message0(mdl, ': Fitting the full model ... ')
@@ -64,7 +66,7 @@ M.opt = function(object = NULL            ,
 												 		fixed     = fixed  ,
 												 		formula   = fixed  ,
 												 		family    = family ,
-												 		random    = random ,
+												 		random    = CheckedRandom ,
 												 		data      = data   ,
 												 		na.action = na.omit,
 												 		method    = ifelse(mdl == 'glm', 'glm.fit', 'ML'),

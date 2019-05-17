@@ -663,8 +663,22 @@ listFun = function(list, FUN, debug = FALSE) {
 	l     = list[names(list)[fArgs]]
 	return(l)
 }
-
-ModelChecks = function(fixed, data, checks = c(0, 0, 0)) {
+RandomEffectCheck = function(formula, data) {
+	if (is.null(formula) || is.null(data))
+		return(NULL)
+	message0('Checking the random effect terms ...')
+	if (any(!all_vars0(formula) %in% names(data))) {
+		message0(
+			'\tSome terms in the random effect do not exist in the data. Random effect is set to NULL.\n\tFormua: ',
+			printformula(formula)
+		)
+		return(NULL)
+	} else{
+		return(formula)
+	}
+	
+}
+ModelChecks = function(fixed, data, checks = c(0, 0, 0),responseIsTheFirst=TRUE) {
 	if (length(checks) != 3) {
 		message0('"checks" must be a vector of 3 values. Example c(1,1,1) or c(1,1,0) or c(0,0,0)')
 		return(fixed)
