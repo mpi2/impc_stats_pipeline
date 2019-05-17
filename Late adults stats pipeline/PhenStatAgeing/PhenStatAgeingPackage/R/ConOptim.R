@@ -46,8 +46,7 @@ M.opt = function(object = NULL            ,
 																		data  = data)
 	allVars     = all_vars0(fixed)
 	LifeStage   = 'LifeStage' %in% allVars
-	Batch_exist = !categorical && !is.null(CheckedRandom) &&
-		colExists(name = 'Batch', data = data)
+	Batch_exist = !categorical && !is.null(CheckedRandom) 
 	mdl         = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls'))
 	message0(mdl, ': Fitting the full model ... ')
 	# Just for rounding the full model errors
