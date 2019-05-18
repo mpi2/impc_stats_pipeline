@@ -1,9 +1,9 @@
 # all in small case and separated by underscore
 NotProcessedOutput = function(args) {
-  bsg3.5        = args$n3.5$biological_sample_group
-  bsg3.5.2      = args$n3.5.2$biological_sample_group
-  cid3.5.2      = args$n3.5.2$colony_id
-  n3.5.2OnlyKO  = subset(args$n3.5.2,args$n3.5.2$biological_sample_group %in% 'experimental')
+  bsg3.5        = droplevels(args$n3.5$biological_sample_group)
+  bsg3.5.2      = droplevels(args$n3.5.2$biological_sample_group)
+  cid3.5.2      = droplevels(args$n3.5.2$colony_id)
+  n3.5.2OnlyKO  = droplevels(subset(args$n3.5.2,args$n3.5.2$biological_sample_group %in% 'experimental'))
   ######## 1 LIST
   NotProcessedLogics = list(
     is_exception   =  args$isException,
@@ -28,13 +28,13 @@ NotProcessedOutput = function(args) {
       levels          = unique(bsg3.5.2)
     ),
     min_onbs_in_each_group_raw_data_before_preprocess = list(
-      criteria_result   = min0(table(bsg3.5)) > args$minSampRequired,
+      criteria_result   = min0(table(bsg3.5)) >= args$minSampRequired,
       threshold         = args$minSampRequired,
       stage             = 'before_preprocessing',
       min_obs_in_data   = min0(table(bsg3.5))
     ),
     min_onbs_in_each_group_processed_data_after_preprocess = list(
-      criteria_result   = min0(table(bsg3.5.2)) > args$minSampRequired,
+      criteria_result   = min0(table(bsg3.5.2)) >= args$minSampRequired,
       threshold         = args$minSampRequired,
       stage             = 'after_preprocessing',
       min_obs_in_data = min0(table(bsg3.5.2))

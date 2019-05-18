@@ -384,7 +384,7 @@ concurrentContSelect = function(activate = TRUE,
         # is it  really exist!
         length(unique(PhenListObj@datasetPL[, GenotypeColName])) > 1 &&
         # include mut and cont
-        min0(table(PhenListObj@datasetPL[, GenotypeColName])) > minSampRequired &&
+        min0(table(PhenListObj@datasetPL[, GenotypeColName])) >= minSampRequired &&
         # include at least 4/2 of each genotype
         checkGenInCol(
           PhenListObj@datasetPL,
@@ -973,7 +973,7 @@ RemoveZeroFrequencyCategories = function(x,
     counts = table(lvls)
     newx   = (x[lvls %in% names(counts)[counts >= minSampRequired], ])
     #####
-    if ((length(names(counts[counts > minSampRequired])) != totalLevels ||
+    if ((length(names(counts[counts >= minSampRequired])) != totalLevels ||
          !identical(droplevels0(newx), droplevels0(x))) &&
         length(lvls) > 0) {
       note$sex_genotype_data_included_in_analysis = c(
@@ -981,7 +981,7 @@ RemoveZeroFrequencyCategories = function(x,
           'Not all Sex*Genotype interactions exist in data. Threshold: ',
           paste0(minSampRequired),
           ' sample per group. INCLUDED categories: ',
-          paste(names(counts)[counts > minSampRequired],
+          paste(names(counts)[counts >= minSampRequired],
                 sep = ',',
                 collapse = ', '),
           '',

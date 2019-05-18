@@ -611,7 +611,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       list = exceptionList,
                       message = 'Value found in the skip list'
                     )
-                    n3.5.2 = n3.5.1
+                    n3.5.2  = droplevels(n3.5.1)
                     MergLev = MergeLevels(x = n3.5.2[, depVar],
                                           listOfLevelMaps = CategoryMap)
                     n3.5.2[, depVar] = MergLev$x
@@ -624,7 +624,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         # is it  really exist!
                         length(unique(n3.5.2$biological_sample_group)) > 1 &&
                         # include mut and cont
-                        min0(table(n3.5.2$biological_sample_group)) > minSampRequired &&
+                        min0(table(n3.5.2$biological_sample_group)) >= minSampRequired &&
                         max0(table(n3.5.2OnlyKO$biological_sample_group, n3.5.2OnlyKO$sex)) > 1 &&
                         # include at least 4/2 of each genotype
                         #length(unique(n3.5.2$colony_id)) > 1  &&
