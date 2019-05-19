@@ -1,9 +1,9 @@
 # all in small case and separated by underscore
 NotProcessedOutput = function(args) {
-  bsg3.5        = droplevels(args$n3.5$biological_sample_group)
-  bsg3.5.2      = droplevels(args$n3.5.2$biological_sample_group)
-  cid3.5.2      = droplevels(args$n3.5.2$colony_id)
-  n3.5.2OnlyKO  = droplevels(subset(args$n3.5.2,args$n3.5.2$biological_sample_group %in% 'experimental'))
+  bsg3.5        = droplevels0(args$n3.5$biological_sample_group)
+  bsg3.5.2      = droplevels0(args$n3.5.2$biological_sample_group)
+  cid3.5.2      = droplevels0(args$n3.5.2$colony_id)
+  n3.5.2OnlyKO  = droplevels0(subset(args$n3.5.2,args$n3.5.2$biological_sample_group %in% 'experimental'))
   ######## 1 LIST
   NotProcessedLogics = list(
     is_exception   =  args$isException,

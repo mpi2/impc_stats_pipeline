@@ -581,7 +581,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       list = exceptionList,
                       message = 'Value found in the skip list'
                     )
-                    n3.5.2  = droplevels(n3.5.1)
+                    n3.5.2  = droplevels0(n3.5.1)
                     MergLev = MergeLevels(x = n3.5.2[, depVar],
                                           listOfLevelMaps = CategoryMap)
                     n3.5.2[, depVar] = MergLev$x
