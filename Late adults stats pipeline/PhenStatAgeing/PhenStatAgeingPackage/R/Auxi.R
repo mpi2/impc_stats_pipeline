@@ -658,7 +658,7 @@ colExists = function(name, data) {
 
 listFun = function(list, FUN, debug = FALSE) {
 	if (debug)
-		message0('\tUsed model: ', FUN)
+		message0('\tApplied model: ', FUN)
 	fArgs = names(list) %in% formalArgs(args(FUN))
 	l     = list[names(list)[fArgs]]
 	return(l)
@@ -1679,8 +1679,9 @@ capitalise = function (string)
 }
 
 message0 = function(...,
-										breakLine = TRUE,
-										capitalise = TRUE) {
+										breakLine  = TRUE,
+										capitalise = TRUE,
+										appendLF   = TRUE) {
 	x = paste0(..., collapse = '')
 	if (breakLine)
 		nmessage = unlist(strsplit(x = x, split = '\n'))
@@ -1688,7 +1689,8 @@ message0 = function(...,
 		nmessage = x
 	if (capitalise)
 		nmessage = capitalise(nmessage)
-	message(paste(Sys.time(), nmessage, sep = '. ', collapse = '\n'))
+	message(paste(Sys.time(), nmessage, sep = '. ', collapse = '\n'),
+					appendLF = appendLF)
 }
 
 warning0 = function(...,
