@@ -3446,3 +3446,49 @@ ignoromeGenes = function() {
   )
   return(list)
 }
+
+requiredDataColumns = function(x){
+  ColumnsList = c(
+    'allele_accession_id',
+    'metadata',
+    'gene_accession_id',
+    'project_name',
+    'genetic_background',
+    'strain_accession_id',
+    'litter_id',
+    'phenotyping_center',
+    'time_point',
+    'external_sample_id',
+    'developmental_stage_name',
+    'datasource_name',
+    'procedure_group',
+    'pipeline_stable_id',
+    'parameter_stable_id',
+    'age_in_days',
+    'date_of_experiment',
+    'weight',
+    'pipeline_name',
+    'procedure_stable_id',
+    'observation_type',
+    'developmental_stage_acc',
+    'procedure_name',
+    'date_of_birth',
+    'gene_symbol',
+    'metadata_group',
+    'biological_sample_group',
+    'discrete_point',
+    'experiment_source_id',
+    'data_point',
+    'sex',
+    'production_center',
+    'colony_id',
+    'parameter_name',
+    'allele_symbol',
+    'age_in_weeks',
+    'zygosity',
+    'strain_name',
+    'data_type',
+    'category'
+  )
+  return(ColumnsList)
+}

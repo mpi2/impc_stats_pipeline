@@ -251,7 +251,7 @@ ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 		)
 		if (min(fbm$min.freq, na.rm = TRUE) < 1)
 			message0(
-				'The following term(s) removed because there is either "no data" or "no data in the interactions":\n\t ** Note. Not all terms necessarily in the initial model \n\t ',
+				'The following term(s) removed because there is either "no data" or "no data for the interactions":\n\t ** Note. Not all terms necessarily in the initial model \n\t ',
 				pasteComma(fbm[fbm$min.freq <= 0, c('names')], replaceNull = FALSE)
 			)
 	}
@@ -614,6 +614,28 @@ lop = function() {
 	)
 }
 
+diff0 = function(x) {
+	r = if (length(x) < 2) {
+		x
+	}	else{
+		diff(x)
+	}
+	return(r)
+}
+
+summary0 = function(x, ...) {
+	if (is.null(x) || length(x) < 1) {
+		message0('Null column found in the data!')
+		return(x)
+	}
+	if (is.numeric(x)) {
+		r  = summary(diff0(x), ...)
+	} else{
+		xx = as.factor(x)
+		r  = c(sort(levels(xx)), summary(diff0(as.integer(xx)), ...))
+	}
+	return(r)
+}
 
 RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 	x         = as.data.frame(x)
@@ -624,22 +646,24 @@ RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 		vars    = names(x)
 	colVars   = names(x)  %in% vars
 	if (sum(colVars)) {
-		message0('Checking the duplicated data in:\n\t', pasteComma(names(x)[colVars]))
+		message0('Checking duplications in the model data:\n\t ',
+						 pasteComma(names(x)[colVars]),
+						 truncate = FALSE)
 		subX    = x[, colVars, drop = FALSE]
-		numCols = sapply(subX, is.numeric)
-		ConCols = subX[,  numCols, drop = FALSE]
-		CatCols = subX[, !numCols, drop = FALSE]
-		dcols   = duplicated(lapply(ConCols, summary))
+		#numCols = sapply(subX, is.numeric)
+		#ConCols = subX[,  numCols, drop = FALSE]
+		#CatCols = subX[, !numCols, drop = FALSE]
+		dcols   = duplicated(lapply(subX, summary0))
 		if (any(dcols)) {
 			message0(
-				'\tDuplicated columns found (and removed) in the input data. Removed variables:\n\t',
-				pasteComma(names(ConCols)[dcols])
+				'\tDuplicated columns found (and removed) in the input data. Removed variables:\n\t ',
+				pasteComma(names(subX)[dcols], truncate = FALSE)
 			)
 		} else{
 			message0('\tNo duplicate found')
 		}
-		uniqCols  = ConCols[, !dcols  , drop=FALSE]
-		r         = cbind(x[, !colVars, drop=FALSE], CatCols, uniqCols)
+		uniqCols  = subX   [, !dcols  , drop = FALSE]
+		r         = cbind(x[, !colVars, drop = FALSE], uniqCols)
 		return(r)
 	} else{
 		message0('Formula terms do not exist in the input data')
@@ -666,17 +690,19 @@ listFun = function(list, FUN, debug = FALSE) {
 RandomEffectCheck = function(formula, data) {
 	if (is.null(formula) || is.null(data))
 		return(NULL)
-	message0('Checking the random effect terms ...')
-	if (any(!all_vars0(formula) %in% names(data))) {
+	message0('Checking the random effect term ...\n\tFormula: ',
+					 printformula(formula))
+	difTerms = setdiff(all_vars0(formula), names(data))
+	if (length(difTerms)) {
 		message0(
-			'\tSome terms in the random effect do not exist in the data. Random effect is set to NULL.\n\tFormua: ',
-			printformula(formula)
+			'\tSome terms in the random effect do not exist in the data. See:\n\t ',
+			difTerms,
+			'\n\tRandom effect is set to NULL'
 		)
 		return(NULL)
 	} else{
 		return(formula)
 	}
-	
 }
 ModelChecks = function(fixed, data, checks = c(0, 0, 0),responseIsTheFirst=TRUE) {
 	if (length(checks) != 3) {
@@ -754,7 +780,7 @@ SplitEffect = 	function(finalformula,
 						),
 						intercept = TRUE
 					)
-					message0('Check the split model:\n\t', printformula(newModel))
+					message0('Checking the split model:\n\t', printformula(newModel))
 					# we can safely remove the line below!
 					# newModel = ModelChecks(fixed = newModel,
 					# 											 data = data,
@@ -1850,14 +1876,7 @@ SummaryStats = function(x,
 				count = c                       ,
 				mean = m                        ,
 				sd = sd                         ,
-				normality_test = ifelse(
-					length(xx)           > 3    &&
-						length(unique(xx)) > 3    &&
-						length(xx)         < 5000 &&
-						var(xx)            != 0,
-					shapiro.test(xx)$p.value,
-					'Not possible(Possible causes: <3 or >5000 unique data points'
-				)
+				normality_test = shapiro.test0(xx)
 			)
 		} else{
 			c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
@@ -2046,6 +2065,20 @@ rndProce = function(procedure = NULL ) {
 	return(random)
 }
 
+shapiro.test0 = function(x, ...) {
+	if (!is.null(x) && !is.na(x) &&
+			length(x)           > 3  &&
+			length(unique(x)) > 3    &&
+			length(x)         < 5000 &&
+			var(x)            != 0) {
+		r = shapiro.test(x)$p.value
+	} else{
+		r = 'Not possible(Possible causes: <3 or >5000 unique data points'
+	}
+	return(r)
+}
+
+
 QuyalityTests = function(object,
 												 levels    = c('Genotype', 'Sex', 'LifeStage'),
 												 list      = TRUE,
@@ -2073,17 +2106,7 @@ QuyalityTests = function(object,
 			cmb = combn(x = levels, i)
 			for (j in 1:ncol(cmb)) {
 				result = tapply(r, as.list(d[, cmb[, j], drop = FALSE]), function(x) {
-					if (!is.null(x) && !is.na(x) &&
-							length(x)           > 3  &&
-							length(unique(x)) > 3    &&
-							length(x)         < 5000 &&
-							var(x)            != 0) {
-						list('p-val' = shapiro.test(x)$p.value, 
-								 n         = length(x))
-					} else{
-						list('p-val' = 'Not possible(Possible causes: <3 or >5000 unique data points', 
-								 n         = length(x))
-					}
+					list('p-val' = shapiro.test0(x), n = length(x))
 				})
 				if (!is.null(result)) {
 					flst[[counter]] = result
@@ -2092,6 +2115,7 @@ QuyalityTests = function(object,
 				}
 			}
 		}
+		flst$overall = list('p-val' = shapiro.test0(x = r), n = length(r))
 		if (list) {
 			flst = as.list(lapply(flst, function(f) {
 				r = f

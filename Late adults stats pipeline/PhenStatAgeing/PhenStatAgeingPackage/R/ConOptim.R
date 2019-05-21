@@ -138,8 +138,8 @@ M.opt = function(object = NULL            ,
 	###########
 	optimiseMessage (optimise)
 	if (optimise[1] && !is.null(I.Model) && !is.null(lowerCorrected)) {
+		message0('\tThe direction of the optimisation (backward, forward, both): ', direction)
 		message0('\tOptimising the model ... ')
-		message0('\tThe direction of  the optimisation (backward, forward, both): ', direction)
 		F.Model = tryCatch(
 			expr = stepAIC0(
 				I.Model                     ,
