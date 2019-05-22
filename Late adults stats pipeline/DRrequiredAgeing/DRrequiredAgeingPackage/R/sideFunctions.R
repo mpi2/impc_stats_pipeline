@@ -934,6 +934,15 @@ RemoveZerovarCategories = function(x,
 }
 
 
+sd0 = function(x, ...) {
+  if (!is.numeric(x))
+    return(NA)
+  r = if (length(na.omit(x) > 1))
+    sd(x, ...)
+  else
+    0
+  return(r)
+}
 
 
 SummaryStatisticsOriginal = function(x,
@@ -964,8 +973,8 @@ SummaryStatisticsOriginal = function(x,
   summaryT   = as.list(tapply(x[, depVar], INDEX = lvls, function(xx) {
     if (isNumeric) {
       c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
-      m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE), NA)
-      sd = ifelse(length(na.omit(xx)) > 1, sd(xx, na.rm = TRUE)  , NA)
+      m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE) , NA)
+      sd = ifelse(length(na.omit(xx)) > 0, sd0(xx, na.rm = TRUE)  , NA)
       r = list(
         count = c                       ,
         mean = m                        ,
@@ -1766,7 +1775,7 @@ ReadMe = function(obj, URL = NULL, skip = NULL) {
         UniqueAndNNull(obj$strain_accession_id, removeSpecials = FALSE)  ,
         #UniqueAndNNull(obj$metadata,removeSpecials = FALSE)             ,
         UniqueAndNNull(obj$zygosity, removeSpecials = FALSE)             ,
-        UniqueAndNNull(obj$colony_id, removeSpecials = FALSE)            ,
+        UniqueAndNNull(obj$colony_id[obj$biological_sample_group %in% 'experimental'],removeSpecials = FALSE),
         UniqueAndNNull(obj$metadata_group, removeSpecials = FALSE)       ,
         UniqueAndNNull(URL, removeSpecials = FALSE)
       ),
@@ -2134,7 +2143,7 @@ mimicControls = function(df                             ,
   note$original_mutant_indices   =  mutInd
   note$dataset_status            = 'No problem detected'
   # Replace the biological_sample_group and colony_id
-  df$colony_id[Ind] = paste0(unique(na.omit(df$colony_id)), collapse = '')
+  df$colony_id[Ind] = paste0(unique(na.omit(df$colony_id[df$biological_sample_group == mutLabel])), collapse = '')
   df = Factor2CharAndSubstitution(
     df = df,
     Ind = Ind,

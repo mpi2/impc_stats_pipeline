@@ -16,10 +16,11 @@ NotProcessedOutput = function(args) {
         'Not numeric or factor response'
       ),
       threshold = 0,
-      model     ='var() function'
+      model     = 'unique() function'
     ),
     variation_in_respone_before_preprocess =   list(
       criteria_result = columnLevelsVariationRadio(dataset = args$n3.5.2, columnName = args$depVar) > 0.005,
+      value           = columnLevelsVariationRadio(dataset = args$n3.5.2, columnName = args$depVar)        ,
       threshold       = 0.005,
       model           = 'PhenStat variaiton'
     ),
@@ -46,7 +47,6 @@ NotProcessedOutput = function(args) {
       max_mutants_in_genotype_sex_table = max0(table(n3.5.2OnlyKO$biological_sample_group,n3.5.2OnlyKO$sex))
     ),
     the_num_colonies_after_preprocess = list(
-      #criteria_result = length(unique(args$n3.5.12$colony_id)) > 1,
       criteria_result = length(RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))) > 1,
       threshold       = 2,
       colonies        = RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))
