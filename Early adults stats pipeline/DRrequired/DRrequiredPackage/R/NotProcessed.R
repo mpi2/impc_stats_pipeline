@@ -16,10 +16,11 @@ NotProcessedOutput = function(args) {
         'Not numeric or factor response'
       ),
       threshold = 0,
-      model     ='var() function'
+      model     ='unique() function'
     ),
     variation_in_respone_before_preprocess =   list(
       criteria_result = columnLevelsVariationRadio(dataset = args$n3.5.2, columnName = args$depVar) > 0.005,
+      value           = columnLevelsVariationRadio(dataset = args$n3.5.2, columnName = args$depVar),
       threshold       = 0.005,
       model           = 'PhenStat variaiton'
     ),

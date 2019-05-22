@@ -1062,7 +1062,15 @@ RemoveZerovarCategories = function(x,
 }
 
 
-
+sd0 = function(x, ...) {
+  if (!is.numeric(x))
+    return(NA)
+  r = if (length(na.omit(x) > 1))
+    sd(x, ...)
+  else
+    0
+  return(r)
+}
 
 SummaryStatisticsOriginal = function(x,
                                      depVar,
@@ -1088,11 +1096,12 @@ SummaryStatisticsOriginal = function(x,
   }
 
   isNumeric = is.numeric(x[, depVar])
+
   summaryT   = as.list(tapply(x[, depVar], INDEX = lvls, function(xx) {
     if (isNumeric) {
       c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
       m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE), NA)
-      sd = ifelse(length(na.omit(xx)) > 1, sd(xx, na.rm = TRUE)  , NA)
+      sd = ifelse(length(na.omit(xx)) > 0, sd0(xx, na.rm = TRUE) , NA)
       r = list(
         count = c                       ,
         mean = m                        ,
