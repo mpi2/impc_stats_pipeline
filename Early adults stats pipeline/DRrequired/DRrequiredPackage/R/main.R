@@ -127,7 +127,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)), ]
   #########
   new.data$colony_id    = as.character(new.data$colony_id)
-  new.data$colony_id[new.data$biological_sample_group %in% "control"] = NA
+  #new.data$colony_id[new.data$biological_sample_group %in% "control"] = NA
   new.data$external_sample_id = as.factor(new.data$external_sample_id)
   ################
   # Start analysis

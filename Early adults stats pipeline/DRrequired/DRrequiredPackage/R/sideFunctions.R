@@ -2012,9 +2012,9 @@ ReadMe = function(obj, URL = NULL, skip = NULL) {
         UniqueAndNNull(obj$strain_accession_id,removeSpecials = FALSE) ,
         #UniqueAndNNull(obj$metadata,removeSpecials = FALSE)           ,
         UniqueAndNNull(obj$zygosity,removeSpecials = FALSE)            ,
-        UniqueAndNNull(obj$colony_id,removeSpecials = FALSE)           ,
-        UniqueAndNNull(obj$metadata_group,removeSpecials = FALSE)      ,
-        UniqueAndNNull(URL,removeSpecials = FALSE)
+        UniqueAndNNull(obj$colony_id[df$biological_sample_group %in% 'experimental'],removeSpecials = FALSE)           ,
+        UniqueAndNNull(obj$metadata_group, removeSpecials = FALSE)      ,
+        UniqueAndNNull(URL, removeSpecials = FALSE)
       ),
       sep = ' = '
     )
@@ -2360,7 +2360,7 @@ mimicControls = function(df                             ,
   note$original_mutant_indices   =  mutInd
   note$dataset_status            = 'No problem detected'
   # Replace the biological_sample_group and colony_id
-  df$colony_id[Ind] = paste0(unique(na.omit(df$colony_id)), collapse = '')
+  df$colony_id[Ind] = paste0(unique(na.omit(df$colony_id[df$biological_sample_group == mutLabel])), collapse = '')
   df = Factor2CharAndSubstitution(
     df = df,
     Ind = Ind,
