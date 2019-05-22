@@ -2012,7 +2012,7 @@ ReadMe = function(obj, URL = NULL, skip = NULL) {
         UniqueAndNNull(obj$strain_accession_id,removeSpecials = FALSE) ,
         #UniqueAndNNull(obj$metadata,removeSpecials = FALSE)           ,
         UniqueAndNNull(obj$zygosity,removeSpecials = FALSE)            ,
-        UniqueAndNNull(obj$colony_id[df$biological_sample_group %in% 'experimental'],removeSpecials = FALSE)           ,
+        UniqueAndNNull(obj$colony_id[obj$biological_sample_group %in% 'experimental'],removeSpecials = FALSE)           ,
         UniqueAndNNull(obj$metadata_group, removeSpecials = FALSE)      ,
         UniqueAndNNull(URL, removeSpecials = FALSE)
       ),
