@@ -45,6 +45,7 @@ testDatasetAgeing(
 	RR_formula   = data_point ~ Genotype + Sex + LifeStage,
 	RR_prop      = 0.95,
 	FERR_rep     = 1500,
+	seed         = NULL,
 	debug        = TRUE,
 	...
 )
@@ -96,15 +97,18 @@ testDatasetAgeing(
 	Only applies to the "RR" framework. A single value between (0.5,1) not including the boundaries. The threshold for the variation ranges in the RR framework. The default value is 0.95. 
 }
   \item{FERR_rep}{
-  Only applies to the "RR" or "FE" framework. The number of repetition for the Bayesian fisher exact test. See "B" parameter in fisher.test() function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
+  Only applies to the "RR" or "FE" framework. The number of repetition for the Bayesian fisher exact test. See "B" parameter in `fisher.test()` function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
+}
+ \item{seed}{
+	seed to be placed in `set.seed()` function. The default, NULL, imposes no seed.
 }
   \item{debug}{
 	A logical flag. Set to TRUE to see more details about the progress of the function. Default TRUE
 }
   \item{\dots}{
   Other parameters that can be passed to:\cr
-  If the model is set to Linear Mixed Model (MM) then the parameters that can be passed to lme function. See ?lme() manual page\cr
-  If the model is either Fisher Exact test (FE) or Reference Range + (RR) then the parameters that can be passed to the fisher.test function. See ?fisher.test() manual page\cr
+  If the model is set to Linear Mixed Model (MM) then the parameters that can be passed to `lme` function. See ?lme() manual page\cr
+  If the model is either Fisher Exact test (FE) or Reference Range + (RR) then the parameters that can be passed to the `fisher.test` function. See ?fisher.test() manual page\cr
 }
 }
 

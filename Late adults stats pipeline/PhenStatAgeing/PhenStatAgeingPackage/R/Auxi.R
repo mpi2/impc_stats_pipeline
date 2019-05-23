@@ -530,10 +530,13 @@ eff.size = function(object,
 			# For categorical covariates it is the mean difference
 			MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
 			r            = resid(NModel)
-			efSi         = list(value            = ifelse(sd(r) > 0, abs(MDiff) / sd(r), NA),
-													percentageChange = PerChange,
-													variable         = effOfInd,
-													type             = 'Mean difference')
+			sd           = sd0(r, na.rm = TRUE)
+			efSi         = list(
+				value            = ifelse(!is.na(sd) && sd > 0, abs(MDiff) / sd, NA), 
+				percentageChange = PerChange,
+				variable         = effOfInd,
+				type             = 'Mean difference'
+			)
 		}
 	} else{
 		efSi = errorReturn
@@ -1319,7 +1322,7 @@ dataSignature = function(formula, data, digits = 16) {
 					pasteComma(
 						length(d)                            ,
 						round(mean(d, na.rm = TRUE), digits) ,
-						round(sd  (d, na.rm = TRUE), digits) ,
+						round(sd0 (d, na.rm = TRUE), digits) ,
 						truncate      = FALSE                ,
 						trailingSpace = FALSE
 					),
@@ -1828,8 +1831,8 @@ NormaliseDataFrame = function(data, colnames = NULL) {
 		data[, colnames, drop = FALSE],
 		FUN = function(x) {
 			if (is.numeric(x) && length(unique(x)) > 1) {
-				sdx = sd(x, na.rm = TRUE)
-				r   =   (x - mean(x, na.rm = TRUE)) / ifelse(sdx > 0, sdx, 1)
+				sdx = sd0(x, na.rm = TRUE)
+				r   =    (x - mean(x, na.rm = TRUE)) / ifelse(!is.na(sdx) && sdx > 0, sdx, 1)
 			} else{
 				r = x
 			}
@@ -1837,6 +1840,16 @@ NormaliseDataFrame = function(data, colnames = NULL) {
 		}
 	))
 	return(data)
+}
+
+sd0 = function(x, ...) {
+	if (!is.numeric(x))
+		return(NA)
+	r = if (length(na.omit(x)) > 1)
+		sd(x, ...)
+	else
+		0
+	return(r)
 }
 
 SummaryStats = function(x,
@@ -1871,7 +1884,7 @@ SummaryStats = function(x,
 		if (isNumeric) {
 			c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
 			m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE), NA)
-			sd = ifelse(length(na.omit(xx)) > 1, sd(xx, na.rm = TRUE)  , NA)
+			sd = ifelse(length(na.omit(xx)) > 0, sd0 (xx, na.rm = TRUE), NA)
 			r = list(
 				count = c                       ,
 				mean = m                        ,

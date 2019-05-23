@@ -3,6 +3,7 @@ NotProcessedOutput = function(args) {
   bsg3.5        = droplevels0(args$n3.5$biological_sample_group)
   bsg3.5.2      = droplevels0(args$n3.5.2$biological_sample_group)
   cid3.5.2      = args$n3.5.2$colony_id#[args$n3.5.2$biological_sample_group %in% 'experimental']
+  cid3.5        = args$n3.5$colony_id
   n3.5.2OnlyKO  = droplevels0(subset(args$n3.5.2,args$n3.5.2$biological_sample_group %in% 'experimental'))
   ######## 1 LIST
   NotProcessedLogics = list(
@@ -34,7 +35,7 @@ NotProcessedOutput = function(args) {
       stage             = 'before_preprocessing',
       min_obs_in_data   = min0(table(bsg3.5))
     ),
-    min_onbs_in_each_group_processed_data_after_preprocess = list(
+    min_onbs_in_each_group_after_preprocess = list(
       criteria_result   = min0(table(bsg3.5.2)) >= args$minSampRequired,
       threshold         = args$minSampRequired,
       stage             = 'after_preprocessing',
@@ -45,6 +46,11 @@ NotProcessedOutput = function(args) {
       threshold         = 1,
       stage             = 'after_preprocessing',
       max_mutants_in_genotype_sex_table = max0(table(n3.5.2OnlyKO$biological_sample_group,n3.5.2OnlyKO$sex))
+    ),
+	the_num_colonies_before_preprocess = list(
+      criteria_result = length(RepBlank(unique(cid3.5), match = c('', NA, 'NA'))) > 1,
+      threshold       = 2,
+      colonies        = RepBlank(unique(cid3.5), match = c('', NA, 'NA'))
     ),
     the_num_colonies_after_preprocess = list(
       criteria_result = length(RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))) > 1,

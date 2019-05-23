@@ -940,8 +940,8 @@ normalisePhenList =   function(phenlist, colnames = NULL) {
     phenlist@datasetPL[, colnames, drop = FALSE],
     FUN = function(x) {
       if (is.numeric(x) && length(unique(x)) > 1) {
-        sdx = sd(x, na.rm = TRUE)
-        r   =   (x - mean(x, na.rm = TRUE)) / ifelse(sdx > 0, sdx, 1)
+        sdx = sd0(x         , na.rm = TRUE)
+        r   =    (x - mean(x, na.rm = TRUE)) / ifelse(!is.na(sdx) && sdx > 0, sdx, 1)
       } else{
         r = x
       }
@@ -1065,7 +1065,7 @@ RemoveZerovarCategories = function(x,
 sd0 = function(x, ...) {
   if (!is.numeric(x))
     return(NA)
-  r = if (length(na.omit(x) > 1))
+  r = if (length(na.omit(x)) > 1)
     sd(x, ...)
   else
     0
@@ -1100,8 +1100,8 @@ SummaryStatisticsOriginal = function(x,
   summaryT   = as.list(tapply(x[, depVar], INDEX = lvls, function(xx) {
     if (isNumeric) {
       c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
-      m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE), NA)
-      sd = ifelse(length(na.omit(xx)) > 0, sd0(xx, na.rm = TRUE) , NA)
+      m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE) , NA)
+      sd = ifelse(length(na.omit(xx)) > 0, sd0 (xx, na.rm = TRUE) , NA)
       r = list(
         count = c                       ,
         mean = m                        ,

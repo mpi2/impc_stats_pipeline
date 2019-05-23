@@ -831,8 +831,8 @@ normalisePhenList =   function(phenlist, colnames = NULL) {
     phenlist@datasetPL[, colnames, drop = FALSE],
     FUN = function(x) {
       if (is.numeric(x) && length(unique(x)) > 1) {
-        sdx = sd(x, na.rm = TRUE)
-        r   =   (x - mean(x, na.rm = TRUE)) / ifelse(sdx > 0, sdx, 1)
+        sdx = sd0(x, na.rm = TRUE)
+        r   =    (x - mean(x, na.rm = TRUE)) / ifelse(sdx > 0, sdx, 1)
       } else{
         r = x
       }
@@ -937,7 +937,7 @@ RemoveZerovarCategories = function(x,
 sd0 = function(x, ...) {
   if (!is.numeric(x))
     return(NA)
-  r = if (length(na.omit(x) > 1))
+  r = if (length(na.omit(x)) > 1)
     sd(x, ...)
   else
     0

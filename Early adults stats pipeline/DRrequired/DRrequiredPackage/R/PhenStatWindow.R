@@ -219,7 +219,7 @@ PhenStatWindow = function (phenlistObject                                ,
             ind      = 1:length(tt)
             CriTeria = (tt %in% i) & (ind %in% mm)
             if (sum(CriTeria) > 1) {
-              sd(data[CriTeria],na.rm = TRUE)
+              sd0(data[CriTeria],na.rm = TRUE)
             } else{
               NA
             }

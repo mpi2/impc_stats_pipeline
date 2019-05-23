@@ -23,13 +23,16 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 														 MM_checks    = c(TRUE, TRUE, TRUE),
 														 MM_optimise  = c(TRUE, TRUE, TRUE),
 														 ### FE or RR
-														 FE_formula = category ~  Genotype + Sex + LifeStage,
+														 FE_formula = category   ~ Genotype + Sex + LifeStage,
 														 RR_formula = data_point ~ Genotype + Sex + LifeStage,
 														 RR_prop    = 0.95,
 														 FERR_rep   = 1500,
 														 ##### Others
+														 seed       = NULL,
 														 debug      = TRUE,
 														 ...) {
+	if(!is.null(seed))
+		set.seed(seed)
 	r = NULL
 	s = tryCatch(
 		expr = {

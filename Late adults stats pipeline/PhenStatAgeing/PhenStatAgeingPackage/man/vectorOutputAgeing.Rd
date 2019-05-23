@@ -31,7 +31,7 @@
 		A logical flag. Setting to TRUE forces the function to return results even if the testDatasetAgeing returns a failure message
 	}
 	\item{\dots}{
-		Other parameters that can be passed to toJSON() function in "jsonlite" library
+		Other parameters that can be passed to `toJSON()` function in the "jsonlite" library
 	}
 }
 
