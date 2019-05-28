@@ -15,7 +15,7 @@ PhenListAgeing = function(PhenListobject,
 		PhenListobject@datasetPL$Age       = as.numeric(age.in.day)
 		PhenListobject@datasetPL$LifeStage = ifelse    (age.in.day > d.threshold, 'Late', 'Early')
 		PhenListobject@datasetPL$LifeStage = as.factor (PhenListobject@datasetPL$LifeStage)
-		PhenListobject@datasetPL           = PhenListobject@datasetPL[PhenListobject@datasetPL$Age > 0, ]
+		PhenListobject@datasetPL           = PhenListobject@datasetPL[PhenListobject@datasetPL$Age > 0,]
 		message0 ('Age range: ', paste0(range(age.in.day), collapse = '-'))
 	} else{
 		message0('DOE and DOB are not specified. Then PhenList is returned.')
@@ -28,14 +28,16 @@ PhenListAgeing = function(PhenListobject,
 	if (length(LL) != 2 && debug && Ageing) {
 		message0(
 			'Ageing pipeline requires two levels in the LifeStage. Levels: ',
-			pasteComma(LL, replaceNull = FALSE),
+			pasteComma(LL, replaceNull = FALSE, truncate = FALSE),
 			'\nNormal pipeline will apply to this data'
 		)
 		#return(NULL)
 	}
 	if (length(LS) != 2 && debug) {
-		message0('There should be two levels in Sex. Levels: ',
-						 pasteComma(LS, replaceNull = FALSE))
+		message0(
+			'There should be two levels in Sex. Levels: ',
+			pasteComma(LS, replaceNull = FALSE, truncate = FALSE)
+		)
 		#return(NULL)
 	}
 	if ('Weight' %in% names(PhenListobject@datasetPL) &&
@@ -43,8 +45,10 @@ PhenListAgeing = function(PhenListobject,
 		message0('There are ', sum(is.na(PhenListobject@datasetPL[, 'Weight'])), ' NAs in body weights.')
 	
 	if (length(LG) < 2 && debug) {
-		message0('Genotype must have two levels. Levels: ',
-						 pasteComma(LG, replaceNull = FALSE))
+		message0(
+			'Genotype must have two levels. Levels: ',
+			pasteComma(LG, replaceNull = FALSE, truncate = FALSE)
+		)
 		return(NULL)
 	}
 	PhenListobject        = unclass(PhenListobject)
@@ -99,7 +103,7 @@ plot.PhenListAgeing = function(x,
 	if (length(cnamesF) < 1) {
 		message0(
 			'Non of the specified variables exist in the data. See the list below:\n\t',
-			pasteComma(cnames)
+			pasteComma(cnames,truncate = FALSE)
 		)
 		return(NULL)
 	}

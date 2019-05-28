@@ -89,7 +89,7 @@ checkModelTermsInData = function(formula,
 	if (any(!In)) {
 		message0(
 			'Some terms in the model are not included in the data. See: \n\t ',
-			pasteComma(vars[!In], replaceNull = FALSE),
+			pasteComma(vars[!In], replaceNull = FALSE, truncate = FALSE), 
 			'\n\t Initial  model: ',
 			printformula(formula)
 		)
@@ -226,7 +226,7 @@ variablesInData = function(df, names, debug = TRUE) {
 		return(NULL)
 	newNames = names[names %in%  names(df)]
 	if (debug)
-		message0('Variables that being found in data: ', pasteComma(newNames))
+		message0('Variables that being found in data: ', pasteComma(newNames,truncate = FALSE))
 	return(newNames)
 }
 
@@ -252,7 +252,7 @@ ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 		if (min(fbm$min.freq, na.rm = TRUE) < 1)
 			message0(
 				'The following term(s) removed because there is either "no data" or "no data for the interactions":\n\t ** Note. Not all terms necessarily in the initial model \n\t ',
-				pasteComma(fbm[fbm$min.freq <= 0, c('names')], replaceNull = FALSE)
+				pasteComma(fbm[fbm$min.freq <= 0, c('names')], replaceNull = FALSE, truncate = FALSE)
 			)
 	}
 	return(formula)
@@ -291,10 +291,10 @@ CheckMissing = function(data, formula) {
 	if (missings)
 		message0(
 			'The data (variable(s) = ',
-			pasteComma(all_vars0(formula)),
+			pasteComma(all_vars0(formula),truncate = FALSE),
 			') contain ',
 			missings,
-			' missing(s)...\n\tMissing data removed.'
+			' missing(s) ...\n\tMissing data removed.'
 		)
 	return(invisible(
 		list(
@@ -343,6 +343,29 @@ percentageChangeCont = function(model                ,
 	))
 		return(NULL)
 	####
+	model       =
+		tryCatch(
+			expr = update(
+				model                          ,
+				data = NormaliseDataFrame(data)
+			),
+			error = function(e) {
+				message0('\t\tError(s) in the (combined) effect size estimation for',
+								 pasteComma(variable),
+								 '. See: ')
+				message0('\t\t', e, breakLine = FALSE)
+				return(NULL)
+			} ,
+			warning = function(w) {
+				message0('\t\tWarning(s) in the (combined) effect size estimation for',
+								 pasteComma(variable),
+								 '. See: ')
+				message0('\t\t', w, breakLine = FALSE)
+				return(NULL)
+			}
+		)
+	if (is.null(model))
+		return(NULL)
 	coefs = unlist(
 		suppressMessagesANDWarnings(
 			summary(model, verbose = FALSE)$tTable[, 1],
@@ -390,17 +413,18 @@ percentageChangeCont = function(model                ,
 																data   = data)
 		return(
 			list(
-				value            = out                                      ,
-				percentageChange = Matrix2List(out / ran * 100, sep = sep)  ,
-				variable         = mainEffsOnlyWhenIndivi                   ,
-				type             = 'interaction coefficients '
+				value               = as.list(out)                             ,
+				variable            = mainEffsOnlyWhenIndivi                   ,
+				model               = printformula(formula(model))             ,
+				type                = 'Standardized interaction coefficients ' ,
+				'percentage change' = Matrix2List(out / ran * 100, sep = sep)  
 			)
 		)
 	}
 }
 
 optimM = function(optimise) {
-	paste0(c('Fixed term(s) = ', 'Weight term(s) = ', 'Random term(s) = '),
+	paste0(c('Fixed term = ', 'Weight term = ', 'Random term = '),
 				 optimise,collapse = ', ')
 }
 
@@ -515,27 +539,29 @@ eff.size = function(object,
 	if (!is.null(NModel)) {
 		CoefEffSizes = sapply(data[, effOfInd, drop = FALSE], FUN = is.numeric)
 		PerChange = percentageChangeCont(
-			model = NModel,
-			data = data,
-			variable = effOfInd,
-			depVar = depVariable
+			model    = NModel    ,
+			data     = data      ,
+			variable = effOfInd  ,
+			depVar   = depVariable
 		)
 		if (sum(CoefEffSizes)) {
 			# For continues covariates it is the coefficient
-			efSi         = list(value            = as.list(coef(NModel))[[effOfInd]][1],
-													percentageChange = PerChange,
-													variable         = effOfInd,
-													type             = 'standardized coefficient')
+			efSi         = list(value               = as.list(coef(NModel))[[effOfInd]][1],
+													variable            = effOfInd                            ,
+													model               = printformula(formula(NModel))       ,
+													type                = 'Standardized coefficient'          ,
+													'percentage change' = PerChange                           )
 		} else{
 			# For categorical covariates it is the mean difference
 			MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
 			r            = resid(NModel)
 			sd           = sd0(r, na.rm = TRUE)
 			efSi         = list(
-				value            = ifelse(!is.na(sd) && sd > 0, abs(MDiff) / sd, NA), 
-				percentageChange = PerChange,
-				variable         = effOfInd,
-				type             = 'Mean difference'
+				value               = ifelse(!is.na(sd) && sd > 0, abs(MDiff) / sd, NA), 
+				variable            = effOfInd                            ,
+				model               = printformula(formula(NModel))       ,
+				type                = 'Mean difference'                   ,
+				'percentage change' = PerChange                           
 			)
 		}
 	} else{
@@ -707,7 +733,10 @@ RandomEffectCheck = function(formula, data) {
 		return(formula)
 	}
 }
-ModelChecks = function(fixed, data, checks = c(0, 0, 0),responseIsTheFirst=TRUE) {
+ModelChecks = function(fixed,
+											 data,
+											 checks = c(0, 0, 0),
+											 responseIsTheFirst = TRUE) {
 	if (length(checks) != 3) {
 		message0('"checks" must be a vector of 3 values. Example c(1,1,1) or c(1,1,0) or c(0,0,0)')
 		return(fixed)
@@ -737,13 +766,17 @@ termInTheModel = function(model, term, message = FALSE) {
 	return(all(term %in% all_vars0(formula(model))))
 }
 
-SplitEffect = 	function(finalformula,
-												fullModelFormula,
-												F.Model,
-												data,
-												depVariable,
+SplitEffect = 	function(finalformula     ,
+												fullModelFormula  ,
+												F.Model           , 
+												data              ,
+												depVariable       ,
 												mandatoryVar = 'Genotype') {
 	Allargs  = all_vars0(fullModelFormula)[!all_vars0(fullModelFormula) %in% c(depVariable, mandatoryVar)]
+	if (is.null(Allargs)) {
+		message0 ('Nothing to split on ...')
+		return(NULL)
+	}
 	isCat    = !sapply(data[, Allargs, drop = FALSE], is.numeric)
 	args     = Allargs[isCat]
 	argsCon  = if (length(Allargs[!isCat]) > 0) {
@@ -753,6 +786,7 @@ SplitEffect = 	function(finalformula,
 		1
 	}
 	largs    = length(args)
+	dname    = names(data)
 	l        = NULL
 	names    = c()
 	counter = 1
@@ -761,7 +795,7 @@ SplitEffect = 	function(finalformula,
 			argComb = combn(args, i, simplify = TRUE)
 			for (j in 1:ncol(argComb)) {
 				arg = as.vector(argComb[, j])
-				if (arg %in% names(data) &&
+				if (arg %in% dname &&
 						!is.numeric(data[, arg]) &&
 						# model = finalformula
 						termInTheModel(model = fullModelFormula, term = arg)) {
@@ -771,23 +805,17 @@ SplitEffect = 	function(finalformula,
 									 ' ...')
 					newModel = reformulate(
 						response = depVariable,
-						termlabels = c(
-							arg,
-							paste(
-								mandatoryVar,
-								arg,
-								collapse = ':',
-								sep = ':'
-							),
-							argsCon
-						),
+						termlabels = c(arg              ,
+													 paste(
+													 	mandatoryVar   ,
+													 	arg            ,
+													 	collapse = ':' ,
+													 	sep = ':'
+													 ),
+													 argsCon),
 						intercept = TRUE
 					)
 					message0('Checking the split model:\n\t', printformula(newModel))
-					# we can safely remove the line below!
-					# newModel = ModelChecks(fixed = newModel,
-					# 											 data = data,
-					# 											 checks = c(1, 1, 0))
 					
 					l0    = tryCatch(
 						update(F.Model,
@@ -808,13 +836,14 @@ SplitEffect = 	function(finalformula,
 						breakLine = FALSE
 					)
 					if (!is.null(l0)) {
-						l0$MainEffect = arg
-						l[[counter]]   = l0
-						names[counter] = paste(
+						l0$MainEffect   = arg
+						l0$SplitFormula = printformula(newModel)
+						l[[counter]]    = l0
+						names[counter]  = paste(
 							paste0(mandatoryVar, collapse = '_'),
-							paste0(arg, collapse = '.'),
+							paste0(arg         , collapse = '.'),
 							collapse = '_',
-							sep = '_'
+							sep      = '_'
 						)
 						counter = counter + 1
 					}
@@ -823,7 +852,7 @@ SplitEffect = 	function(finalformula,
 		}
 		if (length(names) > 0) {
 			message0('SplitEffects. Output names: ',
-							 paste0(names, collapse = ', '))
+							   paste0(names,  collapse = ', '))
 			names(l) = paste0(names)
 		}
 	}
@@ -839,18 +868,21 @@ dim0 <- function(...) {
 	})
 }
 
-printformula = function(formula) {
+printformula = function(formula, message = TRUE) {
 	if (!is.null(formula)) {
 		r = paste01(format(formula, trim = TRUE, width = 0), collapse = '')
 	} else{
-		message0('Ops! the formula is blank')
+		if (message)
+			message0('Ops! the formula is blank')
 		r = NULL
 	}
 	return(r)
 }
 # Categorical effect size
 # https://github.com/mpi2/stats_working_group/raw/master/PhenStatUserGuide/PhenStatUsersGuide.pdf p122
-cat.eff.size = function(xtb,varName = NULL) {
+cat.eff.size = function(xtb,
+												varName = NULL,
+												formula = NULL) {
 	if (any(dim(xtb) < 1)) {
 		r = NULL
 	} else{
@@ -858,27 +890,27 @@ cat.eff.size = function(xtb,varName = NULL) {
 			max(dist(x, method = 'maximum', diag = TRUE), na.rm = TRUE)
 		}), na.rm = TRUE)
 	}
-	
 	out = list(
-		value = r                                         ,
-		percentageChange = NULL                           ,
-		variable         = ifelse(!is.null(varName)       ,
-															varName                 , 
-															'Variable does not exist'),
-		type = 'Proportion change'
+		value               = r                                               ,
+		variable            = ifelse(!is.null(varName)                        ,
+																 varName                                  ,
+																 'Variable does not exist')               ,
+		model               = printformula(RightFormula2LeftFormula(formula, removeResIfExists = TRUE)),
+		type                = 'Proportion change'                             ,
+		'percentage change' = NULL
 	)
 	return(out)
 }
 # Test engine
 ctest = function(x,
-								 formula,
+								 formula = NULL,
 								 asset = NULL,
-								 rep = 1500,
+								 rep = 1500  ,
 								 ...) {
 	message = c()
 	xtb = xtabs(
-		formula = formula,
-		data = x,
+		formula = formula        ,
+		data = x                 ,
 		drop.unused.levels = TRUE,
 		na.action = 'na.omit'
 	)
@@ -889,11 +921,11 @@ ctest = function(x,
 			message = c(message, 'There are some empty levels in data')
 			return(
 				list(
-					result     = NULL,
-					effectSize = NULL,
+					result     = NULL   ,
+					effectSize = NULL   ,
 					note       = message,
-					table      = xtb,
-					input      = x  ,
+					table      = xtb    ,
+					input      = x      ,
 					formula    = formula
 				)
 			)
@@ -906,11 +938,11 @@ ctest = function(x,
 								'No variation in al least two levels of one or more categories')
 		return(
 			list(
-				result = NULL,
-				effectSize = NULL,
-				note    = message,
-				table   = xtb,
-				input   = x,
+				result = NULL     ,
+				effectSize = NULL ,
+				note    = message ,
+				table   = xtb     ,
+				input   = x       ,
 				formula = formula
 			)
 		)
@@ -937,7 +969,9 @@ ctest = function(x,
 				return(NULL)
 			}
 		)
-		effect     = cat.eff.size(xtb, varName = pasteComma(all_vars0(formula)[-1]))
+		effect      = cat.eff.size(xtb,
+															 varName = pasteComma(all_vars0(formula)[-1], truncate = FALSE),
+															 formula = formula)
 		r$formula   = formula
 		r$table     = xtb
 	}
@@ -1313,7 +1347,8 @@ dataSignature = function(formula, data, digits = 16) {
 			!is.null(a.vars)  &&
 			nrow(data) > 1    &&
 			sum(a.vars %in% names(data))) {
-		res0 = lapply(a.vars[a.vars %in% names(data)], function(name) {
+		v.vars= a.vars[a.vars %in% names(data)]
+		res0 = lapply(v.vars, function(name) {
 			d = data[, name]
 			if (is.numeric(d))
 				paste0(
@@ -1338,6 +1373,17 @@ dataSignature = function(formula, data, digits = 16) {
 							 ),
 							 ']')
 		})
+		
+		overal  = mean(rowMeans(apply(data[, v.vars, drop = FALSE], 2, function(x) {
+			r = if (!is.numeric(x)) {
+				as.integer(as.factor(x))
+			} else{
+				x
+			}
+			return(r)
+		}), na.rm = TRUE))
+		
+		res0$overal = paste0('overall:[', overal, ']')
 		res = pasteComma(sort(unlist(res0), decreasing = FALSE) ,
 										 truncate      = FALSE                  ,
 										 trailingSpace = FALSE)
@@ -1768,7 +1814,9 @@ removeSingleLevelFactors = function(formula, data) {
 		if (length(FactsThatMustBeRemoved)) {
 			message0(
 				'The following terms from the model are removed because they only contain one level: ',
-				pasteComma(FactsThatMustBeRemoved, replaceNull = FALSE)
+				pasteComma(FactsThatMustBeRemoved,
+									 replaceNull = FALSE,
+									 truncate = FALSE)
 			)
 			formula = update.formula(formula,
 															 reformulate0(
@@ -1842,6 +1890,62 @@ NormaliseDataFrame = function(data, colnames = NULL) {
 	return(data)
 }
 
+getlmeObjectConfigs = function(obj) {
+	l    = list(
+		formula = printformula(if (class(obj) %in% 'lme') {
+			obj$call$fixed
+		} else{
+			obj$call$model
+		}, message = FALSE),
+		random_effect         = printformula(obj$call$random, message = FALSE)
+	)
+	return(l)
+}
+
+extractLmeTerms = function(object) {
+	if (is.null(object) || !is.null(object$messages))
+		return(NULL)
+	r = list(
+		'Initial model' = getlmeObjectConfigs(object$output$Initial.Model),
+		'Final model'   = getlmeObjectConfigs(object$output$Final.Model)
+	)
+	return(r)
+}
+
+extractFERRTerms = function(object) {
+	if (is.null(object) || !is.null(object$messages))
+		return(NULL)
+	lnitial = final = list(
+		formula               = printformula(object$input$formula, message = FALSE),
+		random_effect         = NULL
+	)
+	final$formula = printformula(RightFormula2LeftFormula(object$extra$Cleanedformula),
+															 message = FALSE)
+	return(list('Initial model' = lnitial, 'Final model' = final))
+}
+
+RightFormula2LeftFormula = function(formula,removeResIfExists = FALSE) {
+	r = if (!is.null(formula) &&
+					length(all_vars0(formula)) > 0) {
+		
+		if (removeResIfExists && FormulaHasResponse(formula)) {
+			formula = update(formula, NULL ~ .)
+		}
+		
+		update(
+			as.formula(formula),
+			reformulate0(
+				termlabels = c('.', all_vars0(formula)[1]),
+				response = all_vars0(formula)[1],
+				sep = '-'
+			)
+		)
+	} else{
+		NULL
+	}
+	return(r)
+}
+
 sd0 = function(x, ...) {
 	if (!is.numeric(x))
 		return(NA)
@@ -1889,7 +1993,7 @@ SummaryStats = function(x,
 				count = c                       ,
 				mean = m                        ,
 				sd = sd                         ,
-				normality_test = shapiro.test0(xx)
+				'normality test' = head(shapiro.test0(xx), 3)
 			)
 		} else{
 			c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
@@ -2079,14 +2183,25 @@ rndProce = function(procedure = NULL ) {
 }
 
 shapiro.test0 = function(x, ...) {
-	if (!is.null(x) && !is.na(x) &&
-			length(x)           > 3  &&
-			length(unique(x)) > 3    &&
-			length(x)         < 5000 &&
-			var(x)            != 0) {
-		r = shapiro.test(x)$p.value
+	if (!is.null(x)                     &&
+			is.numeric(x)                   &&
+			length(x)           > 3         &&
+			length(x)         < 5000        &&
+			length(unique(na.omit(x))) > 3  &&
+			!is.na(sd0(x, na.rm = TRUE))    &&
+			sd0(x, na.rm = TRUE)             > 0) {
+		r = list('p-val'    = shapiro.test(x)$p.value   ,
+						 'n'        = length(x)                 ,
+						 'unique n' = length(unique(na.omit(x))),
+						 'sd'       = sd0(x, na.rm = TRUE)      ,
+						 'test'     = 'Shapiro'                 )
 	} else{
-		r = 'Not possible(Possible causes: <3 or >5000 unique data points'
+		r = list('p-val'    = NULL                                                               ,
+						 'n'        = length(x)                                                          ,
+						 'unique n' = length(unique(na.omit(x)))                                         ,
+						 'sd'       = sd0(x, na.rm = TRUE)                                               ,
+						 'test'     = 'Not possible (Possible cause:n < 3 or n > 5000 unique data points'
+						 )
 	}
 	return(r)
 }
@@ -2119,7 +2234,7 @@ QuyalityTests = function(object,
 			cmb = combn(x = levels, i)
 			for (j in 1:ncol(cmb)) {
 				result = tapply(r, as.list(d[, cmb[, j], drop = FALSE]), function(x) {
-					list('p-val' = shapiro.test0(x), n = length(x))
+					 shapiro.test0(x)
 				})
 				if (!is.null(result)) {
 					flst[[counter]] = result
@@ -2128,7 +2243,7 @@ QuyalityTests = function(object,
 				}
 			}
 		}
-		flst$overall = list('p-val' = shapiro.test0(x = r), n = length(r))
+		flst$overall =  shapiro.test0(x = r)
 		if (list) {
 			flst = as.list(lapply(flst, function(f) {
 				r = f
@@ -2183,7 +2298,7 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 				data        = data
 			)
 			if (!is.null(lstTmp)) {
-				lst[[counter1]] = lstTmp
+				lst[[counter1]]      = lstTmp
 				names(lst)[counter1] = eff
 				counter1  = counter1  + 1
 			}

@@ -5,7 +5,7 @@
 	plot for a PhenListAgeing object
 }
 \description{
-	This function provides plot(s) for a PhenListAgeing object
+	This function visualises a PhenListAgeing object
 }
 \usage{
 	\method{plot}{PhenListAgeing}(x, vars = NULL, ...)

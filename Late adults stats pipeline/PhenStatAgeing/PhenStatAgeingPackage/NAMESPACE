@@ -12,7 +12,7 @@ importFrom("stats", "AIC", "aggregate", "as.formula", "complete.cases",
 					 "density", "fisher.test", "formula", "poisson", "predict",
 					 "qqnorm", "resid", "sd", "terms", "xtabs")
 importFrom("stats", "na.omit", "reformulate", "update")
-importFrom("utils", "combn")
+importFrom("utils", "combn", "head")
 importFrom("methods", "setClass")
 #importFrom("PhenStat","columnChecks","testGenotype","refGenotype")
 importFrom("Hmisc","describe")

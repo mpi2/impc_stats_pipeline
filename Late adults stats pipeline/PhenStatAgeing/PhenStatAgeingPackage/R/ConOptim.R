@@ -33,21 +33,21 @@ M.opt = function(object = NULL            ,
 		singular.ok = TRUE,
 		maxIter = 1000,
 		msMaxIter = 1000
-	)
-	glCont      = glm.control(epsilon = 10 ^ -36, maxit = 1000)
-	G.Model     = FV.Model  = I.Model = SplitModels = F.Model = OutR = NULL
-	VarHomo     = TRUE
-	data        = RemoveDuplicatedColumnsFromDf(x = object@datasetPL, formula = fixed)
-	n           = nrow(data)
-	fixed       = ModelChecks(fixed = fixed,
+	)  
+	glCont        = glm.control(epsilon = 10 ^ -36, maxit = 1000)
+	G.Model       = FV.Model  = I.Model = SplitModels = F.Model = OutR = NULL
+	VarHomo       = TRUE
+	data          = RemoveDuplicatedColumnsFromDf(x = object@datasetPL, formula = fixed)
+	n             = nrow(data)
+	fixed         = ModelChecks(fixed = fixed,
 														data  = data  ,
 														checks = checks)
 	CheckedRandom = RandomEffectCheck(formula = random,
 																		data  = data)
-	allVars     = all_vars0(fixed)
-	LifeStage   = 'LifeStage' %in% allVars
-	Batch_exist = !categorical && !is.null(CheckedRandom) 
-	mdl         = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls'))
+	allVars       = all_vars0(fixed)
+	LifeStage     = 'LifeStage' %in% allVars
+	Batch_exist   = !categorical && !is.null(CheckedRandom) 
+	mdl           = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls'))
 	message0(mdl, ': Fitting the full model ... ')
 	# Just for rounding the full model errors
 	initialFixed = fixed
@@ -69,7 +69,7 @@ M.opt = function(object = NULL            ,
 												 		data      = data   ,
 												 		na.action = na.omit,
 												 		method    = ifelse(mdl == 'glm', 'glm.fit', 'ML'),
-												 		weights   = if (mdl != 'glm') {
+												 		weights   = if    (mdl != 'glm') {
 												 			weight
 												 		} else{
 												 			NULL
@@ -101,7 +101,7 @@ M.opt = function(object = NULL            ,
 		###########
 		if (is.null(I.Model)) {
 			removedTerm = fixedTerms[length(fixedTerms) -	(i - 1)]
-			ltemp = ModelInReference(model = lower, reference = fixed)
+			ltemp       = ModelInReference(model = lower, reference = fixed)
 			if (!is.null(lower) &&
 					!is.null(fixed) &&
 					!is.null(ltemp) &&
@@ -114,7 +114,12 @@ M.opt = function(object = NULL            ,
 				)
 				next
 			}
-			fixed       = update.formula(old = initialFixed, new = paste0('.~.-', removedTerm))
+			fixed       = update.formula(old         = initialFixed       ,
+																	 new         = reformulate0(
+																	 	response   = '.'                ,
+																	 	termlabels = c('.', removedTerm),
+																	 	sep        = '-'
+																	 ))
 			message0(
 				'Round ',
 				i,
@@ -142,12 +147,12 @@ M.opt = function(object = NULL            ,
 		message0('\tOptimising the model ... ')
 		F.Model = tryCatch(
 			expr = stepAIC0(
-				I.Model                     ,
-				trace = trace               ,
-				direction = direction       ,
-				scope = list(lower = lowerCorrected) ,
-				na.action = na.omit                  ,
-				# BIC/AIC is replaced with AICc then this parameter does not work
+				I.Model                           ,
+				trace     = trace                 ,
+				direction = direction             ,
+				scope     = list(lower = lowerCorrected) ,
+				na.action = na.omit                      ,
+				# BIC/AIC is replaced with AICc then this parameter (k) does not work
 				k = log(n)
 			),
 			warning = function(war) {
@@ -163,8 +168,8 @@ M.opt = function(object = NULL            ,
 		)
 		###########
 		if (is.null(F.Model)) {
-			message0('\t Optimisation did not apply')
-			F.Model = I.Model
+			message0('\tOptimisation did not apply')
+			F.Model     = I.Model
 			optimise[1] = FALSE
 		} else{
 			message0('\tOptimised model: ', printformula(formula(F.Model)))
@@ -178,8 +183,8 @@ M.opt = function(object = NULL            ,
 	if (!is.null(F.Model)) {
 		if (optimise[2] && !is.null(weight) && !(mdl %in% 'glm')) {
 			message0('Testing varHom ... ')
-			FV.Model = tryCatch(
-				expr  = update(F.Model, weights = NULL),
+			FV.Model   = tryCatch(
+				expr    = update(F.Model, weights = NULL),
 				warning = function(war) {
 					message0('* Testing VarHom failed with the warning (see below): ')
 					message0('\t', war, breakLine = FALSE)
@@ -191,8 +196,9 @@ M.opt = function(object = NULL            ,
 					return(NULL)
 				}
 			)
-			if (!is.null(F.Model) &&
+			if (!is.null(F.Model ) &&
 					!is.null(FV.Model) &&
+					# k is useless here
 					AICc(FV.Model, k = log(n)) <= AICc(F.Model, k = log(n))) {
 				# = is important
 				F.Model = FV.Model
@@ -230,6 +236,7 @@ M.opt = function(object = NULL            ,
 			)
 			if (!is.null(G.Model) &&
 					!is.null(F.Model) &&
+					# k is useless here
 					AICc(G.Model, k = log(n)) <= AICc(F.Model, k = log(n))) {
 				F.Model = G.Model
 				message0('\tBatch checked out ... ')
@@ -247,10 +254,10 @@ M.opt = function(object = NULL            ,
 		message0('Estimating effect sizes ... ')
 		EffectSizes = c(suppressMessages(
 			AllEffSizes(
-				object = F.Model,
-				depVariable = allVars[1],
+				object      = F.Model    ,
+				depVariable = allVars[ 1],
 				effOfInd    = allVars[-1],
-				data = data
+				data        = data
 			)
 		),
 		CombinedEffectSizes = if (!is.null(SplitModels)) {

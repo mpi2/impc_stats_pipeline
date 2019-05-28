@@ -29,35 +29,42 @@ vectorOutputCat =	function(object)
 											'Dataset contains multi batches',
 											'Dataset contains single batch')
 	addInfo           = list(
-		'Formula'                = list(
-			input   = printformula(object$input$formula),
-			final   = printformula(formula)
+		Data = list(
+			'Data signature'         = dataSignature(formula = frm,
+																							 data   = x),
+			'Variability'            = variability      ,
+			'Summary statistics'      = DSsize
 		),
-		'Variability'            = variability,
-		'Multibatch in analysis' = MultiBatch,
-		'Gender included in analysis' = ifelse(
-			nlevels(x$Sex) > 1,
-			'Both sexes included',
-			'Only one sex included in the analysis'
-		),
-		'data signature'          = dataSignature(formula = frm,
-																							data   = x),
-		'Summary statistics'      = DSsize,
-		'Further models' = if (!is.null(object$output$SplitModels)) {
-			setNames(sapply(object$output$SplitModels, function(v) {
-				lapply(
-					v,
-					FUN = function(v2) {
-						list('p-val' = v2$result$p.value,
-								 'effect size' = v2$effectSize)
-					}
-				)
-			}),
-			nm = names(object$output$SplitModels))
-		} else{
-			NULL
-		},
-		'Other residual normality tests' = NULL
+		Analysis = list(
+			# 'Formula'                = list(
+			# 	input   = printformula(object$input$formula),
+			# 	final   = printformula(formula)
+			# ),
+			'Model setting' =  extractFERRTerms(object),
+			'Is model optimised'     = NULL                    , 
+			'Multibatch in analysis' = MultiBatch,
+			'Gender included in analysis' = ifelse(
+				nlevels(x$Sex) > 1,
+				'Both sexes included',
+				paste0('Only one sex included in the analysis; ', levels(x$Sex))
+			),
+			'Further models' = if (!is.null(object$output$SplitModels)) {
+				setNames(sapply(object$output$SplitModels, function(v) {
+					lapply(
+						v,
+						FUN = function(v2) {
+							list('p-val'       = v2$result$p.value,
+									 'effect size' = v2$effectSize)
+						}
+					)
+				}),
+				nm = names(object$output$SplitModels))
+			} else{
+				NULL
+			},
+			'Effect sizes'                   = 'Look at the individual models',
+			'Other residual normality tests' = NULL
+		)
 	)
 	#####################################################################
 	percentageChanges = NA

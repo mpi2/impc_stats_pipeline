@@ -36,46 +36,54 @@ vectorOutputCont =	function(object,
 			responseIsTheFirst = TRUE
 		),
 		#label = 'Summary statistics',
-		lower = TRUE,
-		drop = TRUE,
-		sep = ' '
+		lower  = TRUE,
+		drop   = TRUE,
+		sep    = ' '
 	)
 	MultiBatch = ifelse(multiBatch(x),
 											'Dataset contains multi batches',
 											'Dataset contains single batch')
 	addInfo           = list(
-		'Formula'                = list(
-			input   = printformula(object$input$fixed),
-			final   =	printformula(formula)
-		),
-		'Variability'            = variability             ,
-		'Multibatch in analysis' = MultiBatch              ,
-		'Gender included in analysis' = ifelse(
-			nlevels(x$Sex) > 1                               ,
-			'Both sexes included'                            ,
-			'Only one sex included in the analysis'
-		)                                                  ,
-		'Is model optimised'       = optimM(object$output$optimised)           , 
-		'data signature'           = dataSignature(formula = object$input$fixed,
+		Data = list(
+			'Data signature'         = dataSignature(formula = object$input$fixed,
 																							 data    = object$input$data),
-		'Summary statistics'        = DSsize                     ,
-		'Further models' = if (!is.null(object$output$SplitModels)) {
-			lapply(object$output$SplitModels, function(v) {
-				if (class(v) %in% c('lme', 'gls', 'glm')) {
-					as.list(unmatrix0(summary(v)$tTable))
-				} else{
-					v
-				}
-			})
-		} else{
-			NULL
-		},
-		'Effect sizes'                   = object$output$EffectSizes,
-		'Other residual normality tests' = object$output$ResidualNormalityTests
+			'Variability'            = variability                               ,
+			'Summary statistics'     = DSsize
+		),
+		# 'Formula'                = list(
+		# 	input   = printformula(object$input$fixed),
+		# 	final   =	printformula(formula)
+		# ),
+		Analysis = list(
+			'Model setting'          = extractLmeTerms(object)         ,
+			'Is model optimised'     = optimM(object$output$optimised) ,
+			'Multibatch in analysis' = MultiBatch                      ,
+			'Gender included in analysis' = ifelse(
+				nlevels(x$Sex) > 1                                       ,
+				'Both sexes included'                                    ,
+				paste0('Only one sex included in the analysis; ', levels(x$Sex))
+			)                                                          ,
+			'Further models' = if (!is.null(object$output$SplitModels)) {
+				lapply(object$output$SplitModels, function(v) {
+					if (class(v) %in% c('lme', 'gls', 'glm')) {
+						r          = as.list(unmatrix0(summary(v)$tTable))
+						r$Model    = printformula(v$SplitFormula)
+						r$Method   = pasteComma(class(v),truncate = FALSE)
+					} else{
+						r = v
+					}
+					return(r)
+				})
+			} else{
+				NULL
+			},
+			'Effect sizes'                   = object$output$EffectSizes,
+			'Other residual normality tests' = object$output$ResidualNormalityTests
+		)
 	)
 	#####################################################################
-	pcS = object$output$EffectSizes$CombinedEffectSizes.Genotype_Sex$percentageChange
-	pcO = object$output$EffectSizes$Genotype$percentageChange
+	pcS = object$output$EffectSizes$CombinedEffectSizes.Genotype_Sex$'percentage change'
+	pcO = object$output$EffectSizes$Genotype$'percentage change'
 	percentageChanges = if (!is.null(pcS)) {
 		pcS
 	} else{

@@ -60,12 +60,12 @@ crunner = function(object              ,
 			message0('\tTesting for the main effect: ',
 							 pasteComma(vars[j], replaceNull = FALSE))
 			l[[counter]] = ctest(
-				x = newObject,
+				x = newObject                         ,
 				formula = reformulate(
 					termlabels = c(depVariable, vars[j]),
 					response = NULL
-				),
-				rep = rep,
+				)                                     ,
+				rep = rep                             ,
 				...
 			)
 			names = c(names, vars[j])
@@ -86,10 +86,13 @@ crunner = function(object              ,
 			)
 			message0('Testing for the combined effects ... ')
 			lcomb = c(lcomb, lapply(alTbls, function(x) {
-				ctest(x = x,
-							formula = Freq ~ .,
-							rep     = rep,
-							...)
+				ctest(
+					x = x                                          ,
+					formula = reformulate0(response = 'Freq',
+																 termlabels = colnames(x)[!colnames(x) %in% 'Freq']),
+					rep     = rep                                  ,
+					...
+				)
 			}))
 			names(lcomb) = paste(lapply(
 				names(lcomb),
@@ -120,7 +123,7 @@ crunner = function(object              ,
 	OutR = list(
 		output = list(SplitModels = lComplete) ,
 		input  = list(
-			PhenListAgeing  = object   ,
+			PhenListAgeing  = object             ,
 			data            = object@datasetPL   ,
 			depVariable     = allTerms[1]        ,
 			rep             = rep                ,

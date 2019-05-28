@@ -979,13 +979,13 @@ SummaryStatisticsOriginal = function(x,
         count = c                       ,
         mean = m                        ,
         sd = sd                         ,
-        normality_test = ifelse(
+        'normality test p-val' = ifelse(
           length(xx)           > 3    &&
             length(unique(xx)) > 3    &&
             length(xx)         < 5000 &&
-            var(xx)            != 0,
+            var(xx,na.rm = TRUE)!= 0,
           shapiro.test(xx)$p.value,
-          'Not possible(Possible causes: <3 or >5000 unique data points'
+          'Not possible(Possible cause: n<3 or n>5000 unique data points'
         )
       )
     } else{

@@ -39,18 +39,15 @@ summaryCore = function(x,
 													Null = FALSE)
 	out = list(
 		'Method'                         = vo$Method,
-		'Input model'                    = vo$`Additional information`$Formula$input,
-		################################ = that is true x$output$Final.Model!
-		'...........................>'   = '* Optimised model for MM and right-sided formula for RR & FE frameworks',
 		'Final model'                    = if (procedure %in% 'MM') {
 			if (!is.null(x$output$Final.Model))
 				formula(x$output$Final.Model)
 			else
 				NULL
 		} else if (procedure %in% 'FE') {
-			x$extra$Cleanedformula
+			RightFormula2LeftFormula(x$extra$Cleanedformula)
 		}	else if (procedure %in% 'RR') {
-			x$extra$Cleanedformula
+			RightFormula2LeftFormula(x$extra$Cleanedformula)
 		} else{
 			NULL
 		},
