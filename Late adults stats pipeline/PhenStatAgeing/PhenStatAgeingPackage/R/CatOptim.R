@@ -10,8 +10,7 @@ crunner = function(object              ,
 	if (sum(method != c('FE', 'RR')) == 0 ||
 			is.null(object)                   ||
 			is.null(all_vars0(formula))       ||
-			length (all_vars0(formula)) < 2   
-			) {
+			length (all_vars0(formula)) < 2) {
 		message0 (
 			'Improper method (',
 			method,
@@ -20,7 +19,7 @@ crunner = function(object              ,
 		)
 		return(NULL)
 	}
-	message0('FE framework in progress ...')
+	#message0('FE framework in progress ...')
 	sta.time    = Sys.time()
 	message0('\tTop framework: ', method)
 	message0('Fisher exact test with ',
@@ -59,7 +58,7 @@ crunner = function(object              ,
 		for (j in 1:length(vars)) {
 			message0('\tTesting for the main effect: ',
 							 pasteComma(vars[j], replaceNull = FALSE))
-			l[[counter]] = ctest(
+			lt = ctest(
 				x = newObject                         ,
 				formula = reformulate(
 					termlabels = c(depVariable, vars[j]),
@@ -68,10 +67,15 @@ crunner = function(object              ,
 				rep = rep                             ,
 				...
 			)
-			names = c(names, vars[j])
-			counter = counter + 1
+			
+			if (!is.null(lt) && !is.null(lt$result)) {
+				l[[counter]] = lt
+				names        = c(names, vars[j])
+				names(l)     = names
+				counter      = counter + 1
+			}
 		}
-		names(l)       = names
+		
 		if (CmbiVars) {
 			message0('Combined effects in progress ...')
 			alTbls = AllTables(
@@ -94,22 +98,25 @@ crunner = function(object              ,
 					...
 				)
 			}))
-			names(lcomb) = paste(lapply(
+			if (!is.null(lcomb)) {
+				names(lcomb) = paste(lapply(
+					names(lcomb),
+					FUN = function(nam) {
+						n1 = names(dimnames(lcomb[[nam]]$table))
+						n2 = paste0(n1[!n1 %in% depVariable], collapse = '.')
+						return(n2)
+					}
+				),
 				names(lcomb),
-				FUN = function(nam) {
-					n1 = names(dimnames(lcomb[[nam]]$table))
-					n2 = paste0(n1[!n1 %in% depVariable], collapse = '.')
-					return(n2)
-				}
-			), names(lcomb),
-			sep = '_')
-			l = c(l, lcomb)
+				sep = '_')
+				l = c(l, lcomb)
+			}
 		}
 		# fix naming issue (make them short)
-		names(l) = gsub("\\.{4}.*", "", names(l))
+		if (!is.null(l) && length(l) > 0)
+			names(l) = gsub("\\.{4}.*", "", names(l))
 		lComplete[[depVariable]] = l
 	}
-	
 	message0('Total tested categories = ',
 					 length(lComplete),
 					 ': ',
@@ -119,7 +126,7 @@ crunner = function(object              ,
 					 noteToFinish,
 					 ' executed in ',
 					 round(difftime(Sys.time() , sta.time, units = 'sec'), 2),
-					 ' seconds')
+					 ' seconds.')
 	OutR = list(
 		output = list(SplitModels = lComplete) ,
 		input  = list(

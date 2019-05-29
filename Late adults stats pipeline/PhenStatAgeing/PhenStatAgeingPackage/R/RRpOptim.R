@@ -21,7 +21,7 @@ RRrunner = function(object              ,
 		)
 		return(NULL)
 	}
-	message0('RR+ framework in progress ...')
+	#message0('RR+ framework in progress ...')
 	if (is.null(RRprop)     ||
 			!is.numeric(RRprop) ||
 			RRprop <= 0.5       ||
@@ -72,7 +72,7 @@ RRrunner = function(object              ,
 		noteToFinish = 'in step 2'         ,
 		...
 	)
-	message0('RR framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
+	message0('RR framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds.')
 	#####
 	SpltResult = c(
 		renameVariableNameInList(

@@ -19,7 +19,7 @@ M.opt = function(object = NULL            ,
 							') for the type of data, or the "formula" is left blank')
 		return(NULL)
 	}
-	message0('MM framework in progress ...')
+	#message0('MM framework in progress ...')
 	# Future devs
 	family      = poisson(link = "log")
 	categorical = FALSE
@@ -255,12 +255,12 @@ M.opt = function(object = NULL            ,
 		EffectSizes = c(suppressMessages(
 			AllEffSizes(
 				object      = F.Model    ,
-				depVariable = allVars[ 1],
+				depVariable = allVars[1],
 				effOfInd    = allVars[-1],
 				data        = data
 			)
 		),
-		CombinedEffectSizes = if (!is.null(SplitModels)) {
+		CombinedEffectSizes = suppressMessages(if (!is.null(SplitModels)) {
 			lapply(SplitModels, function(x) {
 				percentageChangeCont(
 					model = x,
@@ -273,7 +273,7 @@ M.opt = function(object = NULL            ,
 			})
 		} else{
 			NULL
-		})
+		}))
 		message0(
 			'\tTotal effect sizes estimated: ',
 			ifelse(
@@ -289,7 +289,7 @@ M.opt = function(object = NULL            ,
 		OutR$messages  = 'This process fully terminated. No success in recovering the initial model.'
 		return(OutR)
 	}
-	message0('MM framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds')
+	message0('MM framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds.')
 	####
 	OutR = list(
 		output = list(

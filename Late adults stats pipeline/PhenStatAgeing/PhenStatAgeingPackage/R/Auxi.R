@@ -675,7 +675,7 @@ RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 		vars    = names(x)
 	colVars   = names(x)  %in% vars
 	if (sum(colVars)) {
-		message0('Checking duplications in the model data:\n\t ',
+		message0('Checking duplications in the data model:\n\t ',
 						 pasteComma(names(x)[colVars]),
 						 truncate = FALSE)
 		subX    = x[, colVars, drop = FALSE]
@@ -1577,10 +1577,10 @@ RRCut = function(object                     ,
 		qntl = sort(qntl)
 	}
 	message0('quantile(s) for cutting the data '      ,
-					 '[probs = '                                 ,
+					 '[probs = '                              ,
 					 pasteComma(round(prb,3))                 ,
 					 ']: '                                    ,
-					 pasteComma(qntl, replaceNull = FALSE))
+					 pasteComma(round(qntl,3), replaceNull = FALSE))
 	controls$data_point_discretised  = cut(
 		x = controls[, depVariable],
 		breaks = qntl,
@@ -1858,7 +1858,8 @@ modelSummaryPvalueExtract = function(x,
 	return(as.vector(unlist(mSumFiltered)))
 }
 
-NormaliseDataFrame = function(data, colnames = NULL) {
+NormaliseDataFrame = function(data           ,
+															colnames = NULL) {
 	message0('Normalising the data.frame in progress ...')
 	
 	if (!is.null(colnames)) {
@@ -1880,7 +1881,8 @@ NormaliseDataFrame = function(data, colnames = NULL) {
 		FUN = function(x) {
 			if (is.numeric(x) && length(unique(x)) > 1) {
 				sdx = sd0(x, na.rm = TRUE)
-				r   =    (x - mean(x, na.rm = TRUE)) / ifelse(!is.na(sdx) && sdx > 0, sdx, 1)
+				r   =    (x - mean(x, na.rm = TRUE)) / ifelse(!is.na(sdx) &&
+																												sdx > 0, sdx, 1)
 			} else{
 				r = x
 			}
