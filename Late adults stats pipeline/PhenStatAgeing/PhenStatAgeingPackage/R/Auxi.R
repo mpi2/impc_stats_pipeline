@@ -1933,7 +1933,7 @@ CatEstimateAndCI = function(object) {
 			'value' = v$intervals$est.    ,
 			'confidence' = list(
 				'lower' = v$intervals$lower ,
-				'uppwe' = v$intervals$upper
+				'upper' = v$intervals$upper
 			)                             ,
 			'level'   = v$level
 		))
@@ -2759,4 +2759,9 @@ safe_pchisq0 <- function(q, df, ...)
 {
 	df[df <= 0] <- NA
 	pchisq(q = q, df = df, ...)
+}
+
+lowHighList = function(x, y, ...) {
+	r = list('low' = x, 'high' = y)
+	return(r)
 }
