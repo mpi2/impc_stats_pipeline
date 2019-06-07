@@ -28,8 +28,9 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 														 RR_prop    = 0.95,
 														 FERR_rep   = 1500,
 														 ##### Others
-														 seed       = NULL,
-														 debug      = TRUE,
+														 MMFERR_conf.level = 0.95 ,
+														 seed       = NULL        ,
+														 debug      = TRUE        ,
 														 ...) {
 	if(!is.null(seed))
 		set.seed(seed)
@@ -41,19 +42,20 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 					phenListAgeing = phenListAgeing,
 					method = method ,
 					#### MM
-					MM_fixed = MM_fixed              ,
-					MM_random = MM_random            ,
-					MM_lower = MM_lower              ,
-					MM_weight = MM_weight            ,
-					MM_direction = MM_direction      ,
-					MM_checks   = MM_checks          ,
-					MM_optimise = MM_optimise        ,
-					#### FE
-					FE_formula = FE_formula          ,
-					RR_formula = RR_formula          ,
-					RR_prop = RR_prop                ,
-					FERR_rep = FERR_rep              ,
-					debug = debug                    ,
+					MM_fixed = MM_fixed                   ,
+					MM_random = MM_random                 ,
+					MM_lower = MM_lower                   ,
+					MM_weight = MM_weight                 ,
+					MM_direction = MM_direction           ,
+					MM_checks   = MM_checks               ,
+					MM_optimise = MM_optimise             ,
+					#### FE     
+					FE_formula = FE_formula               ,
+					RR_formula = RR_formula               ,
+					RR_prop = RR_prop                     ,
+					FERR_rep = FERR_rep                   ,
+					debug = debug                         ,
+					MMFERR_conf.level = MMFERR_conf.level ,
 					...
 				),
 				sup.messages = !debug,
@@ -79,23 +81,24 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 		return(s)
 }
 
-testDatasetAgeing0 = function(phenListAgeing = NULL ,
-															method                ,
-															#### MM
-															MM_fixed               ,
-															MM_random              ,
-															MM_lower               ,
-															MM_weight              ,
-															MM_direction = 'both'  ,
-															MM_checks              ,
-															MM_optimise            ,
-															##### FE or RR
-															FE_formula             ,
-															RR_formula             ,
-															RR_prop                ,
-															FERR_rep               ,
+testDatasetAgeing0 = function(phenListAgeing = NULL     ,
+															method                    ,
+															#### MM   
+															MM_fixed                  ,
+															MM_random                 ,
+															MM_lower                  ,
+															MM_weight                 ,
+															MM_direction = 'both'     ,
+															MM_checks                 ,
+															MM_optimise               ,
+															##### FE or RR   
+															FE_formula                ,
+															RR_formula                ,
+															RR_prop                   ,
+															FERR_rep                  ,
+															MMFERR_conf.level = 0.95  ,
 															##### Others
-															debug = TRUE           ,
+															debug = TRUE              ,
 															...) {
 	message0('PhenStatAgeing loaded.')
 	if (!is(phenListAgeing, 'PhenList') &&
@@ -103,21 +106,26 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 		stop('\n ~> function expects "PhenList" or "PhenListAgeing" object \n')
 	if (noVariation(data = phenListAgeing@datasetPL))
 		stop('\n ~> There is no variation in Genotype.\n')
+	if (MMFERR_conf.level >= 1   ||
+			MMFERR_conf.level <= 0   ||
+			length(MMFERR_conf.level) > 1)
+		stop('\n ~> Confidence level must be a single value in (0,1) interval')
 	
 	
 	if (method %in% 'MM') {
 		message0('Linear Mixed Model (MM framework) in progress ...')
 		output =    M.opt(
-			fixed     = MM_fixed        ,
-			random    = MM_random       ,
-			object    = phenListAgeing  ,
-			lower     = MM_lower        ,
-			direction = MM_direction    ,
-			weight    = MM_weight       ,
-			checks    = MM_checks       ,
-			optimise  = MM_optimise     ,
-			trace     = FALSE           ,
-			method    = 'MM'            ,
+			fixed     = MM_fixed          ,
+			random    = MM_random         ,
+			object    = phenListAgeing    ,
+			lower     = MM_lower          ,
+			direction = MM_direction      ,
+			weight    = MM_weight         ,
+			checks    = MM_checks         ,
+			optimise  = MM_optimise       ,
+			trace     = FALSE             ,
+			method    = 'MM'              ,
+			ci_levels = MMFERR_conf.level ,
 			...
 		)
 		# Important!
@@ -127,12 +135,13 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 	} else if (method %in% 'FE') {
 		message0('Fisher Exact Test (FE framework) in progress ...')
 		output = crunner(
-			object = phenListAgeing,
-			formula = MoveResponseToRightOfTheFormula(FE_formula),
+			object = phenListAgeing                                                    ,
+			formula = MoveResponseToRightOfTheFormula(FE_formula)                      ,
 			#expandDottedFormula(formula = FE_formula, data = phenListAgeing@datasetPL),
-			rep = FERR_rep,
-			method = 'FE',
-			fullComparisions = TRUE,
+			rep = FERR_rep                                                             ,
+			method = 'FE'                                                              ,
+			fullComparisions = TRUE                                                    ,
+			ci_levels = MMFERR_conf.level                                              ,
 			...
 		)
 		# Important!
@@ -142,12 +151,13 @@ testDatasetAgeing0 = function(phenListAgeing = NULL ,
 	} else if (method %in% 'RR') {
 		message0('Reference Range Plus (RR framework) in progress ...')
 		output = RRrunner(
-			object = phenListAgeing,
-			formula = MoveResponseToRightOfTheFormula(RR_formula),
-			#expandDottedFormula(formula = RR_formula, data = phenListAgeing@datasetPL),
-			rep = FERR_rep,
-			method = 'RR',
-			RRprop = RR_prop,
+			object = phenListAgeing                                                     ,
+			formula = MoveResponseToRightOfTheFormula(RR_formula)                       ,
+			#expandDottedFormula(formula = RR_formula, data = phenListAgeing@datasetPL) ,
+			rep = FERR_rep                                                              ,
+			method = 'RR'                                                               ,
+			RRprop = RR_prop                                                            ,
+			ci_levels = MMFERR_conf.level                                               ,
 			...
 		)
 		# Important!

@@ -1,9 +1,10 @@
 # Reference range OPT core
 RRrunner = function(object              ,
 										formula       = ~ category + Genotype + Sex + LifeStage,
-										rep           = 1500,
-										method        = NULL,
-										RRprop        = .05,
+										rep           = 1500                                   ,
+										method        = NULL                                   ,
+										RRprop        = .05                                    ,
+										ci_levels     = 0.95                                   ,
 										...)
 {
 	sta.time    = Sys.time()
@@ -52,6 +53,7 @@ RRrunner = function(object              ,
 		method = 'RR'                     ,
 		fullComparisions = TRUE           ,
 		noteToFinish = 'in step 1'        ,
+		ci_levels = ci_levels             ,
 		...
 	)
 	
@@ -70,21 +72,22 @@ RRrunner = function(object              ,
 		method = 'RR'                      ,
 		fullComparisions = TRUE            ,
 		noteToFinish = 'in step 2'         ,
+		ci_levels = ci_levels              ,
 		...
 	)
 	message0('RR framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds.')
 	#####
 	SpltResult = c(
 		renameVariableNameInList(
-			list = RRresult_low$output$SplitModels ,
-			name = RRobject_low$newDepVariable,
-			prefix  = 'Low',
+			list = RRresult_low$output$SplitModels  ,
+			name = RRobject_low$newDepVariable      ,
+			prefix  = 'Low'                         ,
 			not     = TRUE
 		)  ,
 		renameVariableNameInList(
-			list = RRresult_high$output$SplitModels,
-			name = RRobject_high$newDepVariable,
-			prefix  = 'High',
+			list = RRresult_high$output$SplitModels ,
+			name = RRobject_high$newDepVariable     ,
+			prefix  = 'High'                        ,
 			not = TRUE
 		)
 	)
@@ -97,7 +100,8 @@ RRrunner = function(object              ,
 			rep             = rep              ,
 			method          = method           ,
 			formula         = formula          ,
-			RRprop          = RRprop
+			RRprop          = RRprop           ,
+			ci_level        = ci_levels
 		),
 		extra  = list(
 			missings        = list(

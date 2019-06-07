@@ -17,13 +17,12 @@ Matrix2List = function(x, ...) {
 	if (is.null(x))
 		return(NULL)
 	
-	if (length(x) == 1) {
+	if (length(x) == 1 || class(x) == 'numeric') {
 		return(as.list(x))
 	}
 	
 	if (!is(x, 'matrix'))
 		x = as.matrix(x)
-	
 	r = as.list(unmatrix0(x, ...))
 	return(r)
 }
@@ -294,12 +293,12 @@ CheckMissing = function(data, formula) {
 			pasteComma(all_vars0(formula),truncate = FALSE),
 			') contain ',
 			missings,
-			' missing(s) ...\n\tMissing data removed.'
+			' missing(s) ...\n\tMissing data removed'
 		)
 	return(invisible(
 		list(
 			org.data = org.data,
-			new.data = new.data,
+			new.data = droplevels(new.data),
 			missings = missings
 		)
 	))
@@ -326,6 +325,8 @@ order0 = function(x, levels = FALSE) {
 	return(r)
 }
 
+
+
 percentageChangeCont = function(model                ,
 																data                 ,
 																variable             ,
@@ -333,7 +334,7 @@ percentageChangeCont = function(model                ,
 																individual = TRUE    ,
 																mainEffsOnlyWhenIndivi = 'Sex',
 																FUN = range0,
-																sep = '.') {
+																sep = ' ') {
 	if (!(
 		!is.null(data)                                           &&
 		(!is.null(variable) || !is.null(mainEffsOnlyWhenIndivi)) &&
@@ -771,7 +772,8 @@ SplitEffect = 	function(finalformula     ,
 												F.Model           , 
 												data              ,
 												depVariable       ,
-												mandatoryVar = 'Genotype') {
+												mandatoryVar = 'Genotype',
+												ci_levels    = .95) {
 	Allargs  = all_vars0(fullModelFormula)[!all_vars0(fullModelFormula) %in% c(depVariable, mandatoryVar)]
 	if (is.null(Allargs)) {
 		message0 ('Nothing to split on ...')
@@ -836,6 +838,7 @@ SplitEffect = 	function(finalformula     ,
 						breakLine = FALSE
 					)
 					if (!is.null(l0)) {
+						l0  = intervalsCon (object = l0, lvls = ci_levels)
 						l0$MainEffect   = arg
 						l0$SplitFormula = printformula(newModel)
 						l[[counter]]    = l0
@@ -903,9 +906,10 @@ cat.eff.size = function(xtb,
 }
 # Test engine
 ctest = function(x,
-								 formula = NULL,
-								 asset = NULL,
-								 rep = 1500  ,
+								 formula = NULL     ,
+								 asset = NULL       ,
+								 rep = 1500         ,
+								 ci_levels= 0.95    ,
 								 ...) {
 	message = c()
 	xtb = xtabs(
@@ -955,9 +959,10 @@ ctest = function(x,
 		r = tryCatch(
 			fisher.test(
 				xtb,
-				simulate.p.value = rep > 0,
-				#conf.int = FALSE,
-				B = rep,
+				simulate.p.value = rep > 0   ,
+				conf.int    = TRUE           ,
+				conf.level  = ci_levels      ,
+				B = rep                      ,
 				...
 			),
 			error = function(e) {
@@ -969,6 +974,7 @@ ctest = function(x,
 				return(NULL)
 			}
 		)
+		r           = intervalsCat(r,ci_levels)
 		effect      = cat.eff.size(xtb,
 															 varName = pasteComma(all_vars0(formula)[-1], truncate = FALSE),
 															 formula = formula)
@@ -1355,10 +1361,10 @@ dataSignature = function(formula, data, digits = 16) {
 					name,
 					':[',
 					pasteComma(
-						length(d)                            ,
-						round(mean(d, na.rm = TRUE), digits) ,
-						round(sd0 (d, na.rm = TRUE), digits) ,
-						truncate      = FALSE                ,
+						paste0('n='   , length(d))                            ,
+						paste0('mean=', round(mean(d, na.rm = TRUE), digits)) ,
+						paste0('sd='  , round(sd0 (d, na.rm = TRUE), digits)) ,
+						truncate      = FALSE                                 ,
 						trailingSpace = FALSE
 					),
 					']'
@@ -1493,11 +1499,11 @@ CombineLevels = function(..., debug = TRUE) {
 	return(r)
 }
 
-RRNewObjectAndFormula = function(object,
-																 RRprop,
-																 formula,
-																 labels = NULL,
-																 depVarPrefix = NULL) {
+RRNewObjectAndFormula = function(object              ,
+																 RRprop              ,
+																 formula             ,
+																 labels = NULL       ,
+																 depVarPrefix = NULL ) {
 	allTerms         = all_vars0(formula)
 	newobject        = object
 	RRcutObject      = RRCut(
@@ -1793,6 +1799,53 @@ all_vars0 = function(x, ...) {
 	}
 }
 
+
+intervalsCon = function(object, lvls, ...) {
+	if (is.null(object))
+		return(object)
+	
+	message0('\tComputing the confidence intervals at the level of ',
+					 pasteComma(lvls),
+					 ' ...')
+	ci = lapply(lvls, function(x) {
+		list(intervals = intervals(object, x, ...), level = x)
+	})
+	if (!is.null(ci))
+		names(ci) = paste('CI_', lvls, sep = '')
+	object$intervals = ci
+	return(object)
+}
+
+
+
+intervalsCat = function(object, lvls = .95, ...) {
+	if (is.null(object))
+		return(object)
+	
+	# message0('\t\tReformatting the confidence interval in the level of ',
+	# 				 pasteComma(lvls),
+	# 				 ' ...')
+	c0 = object$conf.int
+	c2 = NULL
+	if (!is.null(c0)) {
+		ci = list(
+			intervals = list(
+				lower = c0[1]                     ,
+				est.  = as.vector(object$estimate),
+				upper = c0[2]
+			)                                   ,
+			level   = attr(c0, "conf.level")
+		)
+	} else{
+		ci = NULL
+	}
+	c2$intervals = ci
+	if (!is.null(ci))
+		names(c2)  = paste('CI_', lvls, sep = '')
+	object$interval = c2
+	return(object)
+}
+
 expandDottedFormula = function(formula, data) {
 	if (is.null(formula) || is.null(data)) {
 		message0('Null formula or data')
@@ -1831,10 +1884,11 @@ removeSingleLevelFactors = function(formula, data) {
 }
 
 modelSummaryPvalueExtract = function(x,
-																		 variable  = 'Genotype'                        ,
-																		 anova     = TRUE                              ,
-																		 what      = c('Pr(>|z|)', 'Pr(>Chi)', 'p-value'),
-																		 debug     = TRUE) {
+																		 variable   = 'Genotype'                          ,
+																		 anova      = TRUE                                ,
+																		 what       = c('Pr(>|z|)', 'Pr(>Chi)', 'p-value'),
+																		 debug      = TRUE,
+																		 ci_display = FALSE) {
 	if (is.null(x))
 		return(NULL)
 	if (anova) {
@@ -1855,7 +1909,37 @@ modelSummaryPvalueExtract = function(x,
 	} else{
 		mSumFiltered = NULL # NA?
 	}
-	return(as.vector(unlist(mSumFiltered)))
+	if (ci_display && !is.null(mSumFiltered)) {
+		fixedEffInters = x$intervals[[1]]$intervals$fixed
+		return(list(
+			'value'      = as.vector(unlist(mSumFiltered))                                   ,
+			'confidence' = Matrix2List(fixedEffInters[rownames(fixedEffInters) %in% variable ,
+																								-2                                     , 
+																								drop = FALSE])                         ,
+			'level'      = fixedEffInters$level
+		))
+	} else{
+		return(as.vector(unlist(mSumFiltered)))
+	}
+}
+
+
+CatEstimateAndCI = function(object) {
+	if (is.null(object))
+		return(NULL)
+	v = object$interval[[1]]
+	if (!is.null(v)) {
+		return(list(
+			'value' = v$intervals$est.    ,
+			'confidence' = list(
+				'lower' = v$intervals$lower ,
+				'uppwe' = v$intervals$upper
+			)                             ,
+			'level'   = v$level
+		))
+	} else{
+		return('Only available for 2x2 tables')
+	}
 }
 
 NormaliseDataFrame = function(data           ,
@@ -2309,7 +2393,7 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 				for (j in 1:length(cats)) {
 					cmbn = combn(x = cats, m = j)
 					for (k in 1:ncol(cmbn)) {
-						interact = interaction(data[, cmbn[, k] , drop = FALSE], sep = '.', drop = TRUE)
+						interact = interaction(data[, cmbn[, k] , drop = FALSE], sep = ' ', drop = TRUE)
 						for (lvl in levels(interact)) {
 							message0('\tLevel:', pasteComma(unlist(lvl)))
 							olstTmp = eff.size(

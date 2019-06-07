@@ -162,7 +162,8 @@ vectorOutputCont =	function(object,
 				variable = unlist(Labels$Genotype$Levels),
 				anova = FALSE,
 				what = 'Value',
-				debug = debug
+				debug = debug,
+				ci_display = TRUE
 			),
 		'Genotype standard error'  =
 			modelSummaryPvalueExtract(
@@ -187,7 +188,8 @@ vectorOutputCont =	function(object,
 			variable = unlist(Labels$Sex$Levels),
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'Sex standard error'                   = modelSummaryPvalueExtract(
 			x = Fmodel,
@@ -209,7 +211,8 @@ vectorOutputCont =	function(object,
 			variable = unlist(Labels$LifeStage$Levels),
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'LifeStage standard error'                =	modelSummaryPvalueExtract(
 			x = Fmodel,
@@ -231,7 +234,8 @@ vectorOutputCont =	function(object,
 			variable = Labels$Weight,
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'Weight standard error'                =	modelSummaryPvalueExtract(
 			x = Fmodel,
@@ -261,7 +265,8 @@ vectorOutputCont =	function(object,
 			variable = '(Intercept)',
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'Intercept standard error'             =	modelSummaryPvalueExtract(
 			x = Fmodel,
@@ -365,7 +370,8 @@ vectorOutputCont =	function(object,
 				),
 				anova = FALSE,
 				what = 'Value',
-				debug = debug
+				debug = debug,
+				ci_display = TRUE
 			),
 		'Sex FvKO standard error'              =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex,
@@ -399,7 +405,8 @@ vectorOutputCont =	function(object,
 			),
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'Sex MvKO standard error'              =	 modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex,
@@ -434,7 +441,8 @@ vectorOutputCont =	function(object,
 			),
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'LifeStage EvKO standard error'              =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_LifeStage,
@@ -468,7 +476,8 @@ vectorOutputCont =	function(object,
 			),
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'LifeStage LvKO standard error'              =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_LifeStage,
@@ -505,7 +514,8 @@ vectorOutputCont =	function(object,
 			),
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'LifeStageSexGenotype FvEvKO standard error'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
@@ -542,7 +552,8 @@ vectorOutputCont =	function(object,
 			),
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'LifeStageSexGenotype MvEvKO standard error'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
@@ -579,7 +590,8 @@ vectorOutputCont =	function(object,
 			),
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'LifeStageSexGenotype FvLvKO standard error'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
@@ -616,7 +628,8 @@ vectorOutputCont =	function(object,
 			),
 			anova = FALSE,
 			what = 'Value',
-			debug = debug
+			debug = debug,
+			ci_display = TRUE
 		),
 		'LifeStageSexGenotype MvLvKO standard error'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,

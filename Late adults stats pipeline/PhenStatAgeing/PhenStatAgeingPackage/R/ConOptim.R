@@ -9,6 +9,7 @@ M.opt = function(object = NULL            ,
 								 checks      = c(1, 1, 1) ,
 								 method      = 'MM'       ,
 								 optimise    = c(TRUE,TRUE,TRUE) ,
+								 ci_levels   = .95               ,
 								 ...) {
 	if (!method %in% c('MM')        ||
 			is.null(all_vars0(fixed))   ||
@@ -19,20 +20,19 @@ M.opt = function(object = NULL            ,
 							') for the type of data, or the "formula" is left blank')
 		return(NULL)
 	}
-	#message0('MM framework in progress ...')
 	# Future devs
 	family      = poisson(link = "log")
 	categorical = FALSE
 	# Start from here
 	sta.time    = Sys.time()
-	lCont       = lmeControl (opt  = 'optim',
-														maxIter = 1000,
+	lCont       = lmeControl (opt       = 'optim',
+														maxIter   = 1000   ,
 														msMaxIter = 1000)
 	gCont       = glsControl (
-		opt  = 'optim',
+		opt         = 'optim',
 		singular.ok = TRUE,
-		maxIter = 1000,
-		msMaxIter = 1000
+		maxIter     = 1000,
+		msMaxIter   = 1000
 	)  
 	glCont        = glm.control(epsilon = 10 ^ -36, maxit = 1000)
 	G.Model       = FV.Model  = I.Model = SplitModels = F.Model = OutR = NULL
@@ -43,15 +43,15 @@ M.opt = function(object = NULL            ,
 														data  = data  ,
 														checks = checks)
 	CheckedRandom = RandomEffectCheck(formula = random,
-																		data  = data)
+																		data    = data)
 	allVars       = all_vars0(fixed)
 	LifeStage     = 'LifeStage' %in% allVars
 	Batch_exist   = !categorical && !is.null(CheckedRandom) 
 	mdl           = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls'))
 	message0(mdl, ': Fitting the full model ... ')
 	# Just for rounding the full model errors
-	initialFixed = fixed
-	fixedTerms   = formulaTerms(initialFixed)
+	initialFixed  = fixed
+	fixedTerms    = formulaTerms(initialFixed)
 	for (i in 1:length(fixedTerms)) {
 		I.Model    = tryCatch(
 			expr     = do.call(mdl,
@@ -137,6 +137,8 @@ M.opt = function(object = NULL            ,
 	if (is.null(I.Model))
 		message0('Full model failed ...')
 	###########
+	I.Model  = intervalsCon (object = I.Model, lvls = ci_levels)
+	###########
 	message0('The specified "lower" model: \n\t',
 					 ifelse(!is.null(lower), printformula(lower), 'Null lower'))
 	lowerCorrected = ModelInReference(model = lower, reference = fixed)
@@ -173,6 +175,7 @@ M.opt = function(object = NULL            ,
 			optimise[1] = FALSE
 		} else{
 			message0('\tOptimised model: ', printformula(formula(F.Model)))
+			F.Model     = intervalsCon (object = F.Model, lvls = ci_levels)
 			optimise[1] = TRUE
 		}
 	} else{
@@ -196,13 +199,16 @@ M.opt = function(object = NULL            ,
 					return(NULL)
 				}
 			)
+			########
+			FV.Model  = intervalsCon (object = FV.Model, lvls = ci_levels)
+			########
 			if (!is.null(F.Model ) &&
 					!is.null(FV.Model) &&
 					# k is useless here
 					AICc(FV.Model, k = log(n)) <= AICc(F.Model, k = log(n))) {
 				# = is important
-				F.Model = FV.Model
-				VarHomo = FALSE
+				F.Model  = FV.Model
+				VarHomo  = FALSE
 				message0('\tVarHom checked out ... ')
 			}
 		}else{
@@ -234,6 +240,9 @@ M.opt = function(object = NULL            ,
 					return(NULL)
 				}
 			)
+			########
+			G.Model  = intervalsCon (object = G.Model, lvls = ci_levels)
+			########
 			if (!is.null(G.Model) &&
 					!is.null(F.Model) &&
 					# k is useless here
@@ -246,10 +255,11 @@ M.opt = function(object = NULL            ,
 		}
 		SplitModels = SplitEffect(
 			finalformula = formula(F.Model),
-			fullModelFormula = fixed,
-			F.Model = F.Model,
-			data = data,
-			depVariable = allVars[1]
+			fullModelFormula = fixed     ,
+			F.Model          = F.Model   ,
+			data             = data      ,
+			depVariable      = allVars[1],
+			ci_levels        = ci_levels
 		)
 		message0('Estimating effect sizes ... ')
 		EffectSizes = c(suppressMessages(
@@ -328,6 +338,7 @@ M.opt = function(object = NULL            ,
 			weight              = weight                                 ,
 			checks              = checks                                 ,
 			optimise            = optimise                               ,
+			ci_level            = ci_levels                              ,
 			others              = ...
 		),
 		extra = list(Cleanedformula  = fixed,

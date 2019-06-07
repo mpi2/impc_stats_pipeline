@@ -5,6 +5,7 @@ crunner = function(object              ,
 									 method           = NULL,
 									 fullComparisions = TRUE,
 									 noteToFinish     = NULL,
+									 ci_levels        = .95 ,
 									 ...)
 {
 	if (sum(method != c('FE', 'RR')) == 0 ||
@@ -65,6 +66,7 @@ crunner = function(object              ,
 					response = NULL
 				)                                     ,
 				rep = rep                             ,
+				ci_levels = ci_levels                 ,
 				...
 			)
 			
@@ -92,9 +94,10 @@ crunner = function(object              ,
 			lcomb = c(lcomb, lapply(alTbls, function(x) {
 				ctest(
 					x = x                                          ,
-					formula = reformulate0(response = 'Freq',
+					formula   = reformulate0(response = 'Freq'     ,
 																 termlabels = colnames(x)[!colnames(x) %in% 'Freq']),
-					rep     = rep                                  ,
+					rep       = rep                                ,
+					ci_levels = ci_levels                          ,
 					...
 				)
 			}))
@@ -135,7 +138,8 @@ crunner = function(object              ,
 			depVariable     = allTerms[1]        ,
 			rep             = rep                ,
 			method          = method             ,
-			formula         = formula
+			formula         = formula            ,
+			ci_level        = ci_levels
 		),
 		extra  = list(
 			missings        = Obj$missings   ,
