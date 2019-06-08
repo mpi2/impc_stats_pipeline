@@ -844,17 +844,19 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         methodmap  = methodmap
 
                       )
-                      SucFaiFile = paste(
-                        outpfile2,
-                        ifelse(
-                          !NullOrError(c.ww0$NormalObj) && NullOrError(c.ww0$NormalObj$messages),
-                          'Successful.tsv',
-                          'Failed_critical_error.tsv'
-                        ),
-                        sep =
-                          '_'
-                      )
-
+                      StatusSF = !NullOrError(c.ww0$NormalObj) &&
+                        NullOrError(c.ww0$NormalObj$messages)
+                      SucFaiFile = paste(outpfile2,
+                                         ifelse(StatusSF,
+                                                'Successful.tsv',
+                                                'Failed_critical_error.tsv'),
+                                         sep =
+                                           '_')
+                      if (!StatusSF) {
+                        write(x    = SucFaiFile,
+                              file = file.path(wd, paste0('Failed_analyses_', Sys.Date(), '.log')),
+                              append = TRUE)
+                      }
                       write.table(
                         x = paste(outP,
                                   collapse =   outdelim),
