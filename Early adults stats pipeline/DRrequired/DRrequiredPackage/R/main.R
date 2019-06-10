@@ -815,16 +815,22 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         ReadMeFile = ReadMeFile
 
                       )
+                      StatusSF   = !NullOrError(c.ww0$NormalObj$value)
                       SucFaiFile = paste(
                         outpfile2,
                         ifelse(
-                          !NullOrError(c.ww0$NormalObj$value),
+                          StatusSF,
                           'Successful.tsv',
                           'Failed_critical_error.tsv'
                         ),
                         sep =
                           '_'
                       )
+                      if (!StatusSF) {
+                        write(x    = SucFaiFile,
+                              file = file.path(wd, paste0('Failed_analyses_', Sys.Date(), '.log')),
+                              append = TRUE)
+                      }
 
                       write.table(
                         x = paste(outP,

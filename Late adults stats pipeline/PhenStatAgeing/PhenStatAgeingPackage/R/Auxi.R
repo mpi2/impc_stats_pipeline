@@ -298,10 +298,17 @@ CheckMissing = function(data, formula) {
 	return(invisible(
 		list(
 			org.data = org.data,
-			new.data = droplevels(new.data),
+			new.data = droplevels0(new.data),
 			missings = missings
 		)
 	))
+}
+
+droplevels0 = function(x, ...) {
+	if (is.null(x)                        ||
+			class(x) %in% c('matrix', 'integer', 'double', 'numeric'))
+		return(x)
+	return(droplevels(x, ...))
 }
 
 range0 = function(x, ...) {
@@ -2404,7 +2411,7 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 							message0('\tLevel:', pasteComma(unlist(lvl)))
 							olstTmp = eff.size(
 								object      = object,
-								data        = droplevels(data[interact %in% lvl, ]),
+								data        = droplevels0(data[interact %in% lvl, , drop = FALSE]),
 								depVariable = depVariable,
 								errorReturn = NULL,
 								effOfInd    = eff
