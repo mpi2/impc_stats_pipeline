@@ -2058,7 +2058,33 @@ replaceInList <- function (x, FUN, ...)
     FUN(x, ...)
 }
 
+cleanNULLkeys = function(list){
+  requireNamespace('rlist')
+  if (!is.null(list)) {
+    message0 ('Removing the NULL keys ...')
+    list = rlist::list.clean(
+      list,
+      fun = function(x) {
+        length(x) == 0L || is.null(x)
+      },
+      recursive = TRUE
+    )
+  }
+  return(list)
+}
 
+NA2LabelInFactor = function(x, label = 'control') {
+  if (is.null(x) || !is.factor(x) || length(x)<1)
+    return(x)
+
+  x = factor(
+    x,
+    levels  = levels(addNA(x)),
+    labels  = c(levels(x), label),
+    exclude = NULL
+  )
+  return(x)
+}
 
 FinalJsonBobectCreator = function(FinalList,
                                   null = 'null',

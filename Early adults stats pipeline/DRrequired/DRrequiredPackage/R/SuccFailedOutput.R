@@ -33,7 +33,7 @@ SuccessfulOutput = function(args) {
   listDetails                  = list(details = sortList(args$note))
   listVectorOutput             = list(vectoroutput = args$c.ww.vec$list)
   FinalList                    = list(result = c(listVectorOutput, listDetails))
-  JsonObj                      = FinalJsonBobectCreator(FinalList = FinalList)
+  JsonObj                      = FinalJsonBobectCreator(FinalList = cleanNULLkeys(FinalList))
 
   ######## 2 CSV
   outP =   c(

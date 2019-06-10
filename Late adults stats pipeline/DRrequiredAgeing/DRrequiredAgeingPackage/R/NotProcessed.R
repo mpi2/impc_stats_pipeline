@@ -2,8 +2,8 @@
 NotProcessedOutput = function(args) {
   bsg3.5        = droplevels0(args$n3.5$biological_sample_group)
   bsg3.5.2      = droplevels0(args$n3.5.2$biological_sample_group)
-  cid3.5.2      = args$n3.5.2$colony_id
-  cid3.5        = args$n3.5$colony_id
+  cid3.5.2      = NA2LabelInFactor(args$n3.5.2$colony_id)
+  cid3.5        = NA2LabelInFactor(args$n3.5$colony_id)
   n3.5.2OnlyKO  = droplevels0(subset(args$n3.5.2,args$n3.5.2$biological_sample_group %in% 'experimental'))
   ######## 1 LIST
   NotProcessedLogics = list(
@@ -27,7 +27,11 @@ NotProcessedOutput = function(args) {
     ),
     both_mut_and_control_after_preprocess = list(
       criteria_result = length(unique(bsg3.5.2)) > 1 ,
-      levels          = unique(bsg3.5.2)
+      levels          = if (length(unique(bsg3.5.2)) > 0) {
+        unique(bsg3.5.2)
+      } else{
+        'No colony found'
+      }
     ),
     min_onbs_in_each_group_raw_data_before_preprocess = list(
       criteria_result   = min0(table(bsg3.5)) >= args$minSampRequired,
@@ -55,7 +59,11 @@ NotProcessedOutput = function(args) {
 	the_num_colonies_after_preprocess = list(
       criteria_result = length(RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))) > 1,
       threshold       = 2,
-      colonies        = RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))
+      colonies        = if (length(RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))) > 0) {
+        RepBlank(unique(cid3.5.2), match = c('', NA, 'NA'))
+      } else{
+        'No colony found'
+      }
     ),
     min_onbs_required_for_rr = list(
       criteria_result = RR_thresholdCheck(
@@ -97,7 +105,7 @@ NotProcessedOutput = function(args) {
     args$note
   )))
   listVectorOutput        = list(vectoroutput = NULL)
-  FinalList               = list(result = c(listVectorOutput, listDetails))
+  FinalList               = list(result = c(listVectorOutput, cleanNULLkeys(listDetails)))
   JsonObj                 = FinalJsonBobectCreator(FinalList = FinalList)
   ######## 3 CSV
   optFail =   c(
