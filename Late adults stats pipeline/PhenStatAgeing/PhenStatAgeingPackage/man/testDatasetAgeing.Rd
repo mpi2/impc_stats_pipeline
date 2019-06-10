@@ -45,6 +45,7 @@ testDatasetAgeing(
 	RR_formula   = data_point ~ Genotype + Sex + LifeStage,
 	RR_prop      = 0.95,
 	FERR_rep     = 1500,
+	MMFERR_conf.level = 0.95 ,
 	seed         = NULL,
 	debug        = TRUE,
 	...
@@ -98,6 +99,8 @@ testDatasetAgeing(
 }
   \item{FERR_rep}{
   Only applies to the "RR" or "FE" framework. The number of repetition for the Bayesian fisher exact test. See "B" parameter in `fisher.test()` function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
+}  \item{MMFERR_conf.level}{
+  Applies to all frameworks (MM, FE, RR). Single numeric value for the interval confidence level. Default is 0.95
 }
  \item{seed}{
 	seed to be placed in `set.seed()` function. The default, NULL, imposes no seed.

@@ -34,9 +34,12 @@ summaryCore = function(x,
 											 format = 'rst',
 											 ...) {
 	requireNamespace("knitr")
-	vo = vectorOutputAgeing(object = x,
-													JSON = FALSE,
-													Null = FALSE)
+	vo = vectorOutputAgeing(object           = x    ,
+													JSON             = FALSE,
+													ReportNullSchema = FALSE)
+	pasteComma2 = function(...){
+		pasteComma(...,replaceNull = FALSE,truncate = FALSE)
+	}
 	out = list(
 		'Method'                         = vo$Method,
 		'Final model'                    = if (procedure %in% 'MM') {
@@ -56,21 +59,21 @@ summaryCore = function(x,
 		'Reference Gene'                 = vo$`Gp1 genotype`,
 		'............................'   = '............................',
 		'Sexual dimorphism detected?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
-		'............................>'   = ifelse(
+		'............................'   = ifelse(
 			procedure == 'RR',
 			'* Separate p-values for (Low vs NormalHigh) and (LowNormal vs High) ',
 			'............................'
 		),
-		'Genotype contribution overal'   = vo$`Genotype p-val`,
-		'Genotype contribution Females'  = vo$`Sex FvKO p-val`,
-		'Genotype contribution Males'    = vo$`Sex MvKO p-val`,
+		'Genotype contribution overal'   = pasteComma2(vo$`Genotype p-val`),
+		'Genotype contribution Females'  = pasteComma2(vo$`Sex FvKO p-val`),
+		'Genotype contribution Males'    = pasteComma2(vo$`Sex MvKO p-val`),
 		'............................'   = '............................',
-		'LifeStage contribution'         = vo$`LifeStage p-val`,
-		'Genotype contribution Early'    = vo$`LifeStage EvKO p-val`,
-		'Genotype contribution Late'     = vo$`LifeStage LvKO p-val`,
+		'LifeStage contribution'         = pasteComma2(vo$`LifeStage p-val`),
+		'Genotype contribution Early'    = pasteComma2(vo$`LifeStage EvKO p-val`),
+		'Genotype contribution Late'     = pasteComma2(vo$`LifeStage LvKO p-val`),
 		'............................'   = '............................',
-		'Sex contribution'               = vo$`Sex p-val`,
-		'Body weight contribution'       = vo$`Weight p-val`
+		'Sex contribution'               = pasteComma2(vo$`Sex p-val`),
+		'Body weight contribution'       = pasteComma2(vo$`Weight p-val`)
 	)
 	outT = prepareSummaryOutput(out)
 	print(kable(

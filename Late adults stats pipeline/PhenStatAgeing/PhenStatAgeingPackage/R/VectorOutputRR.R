@@ -43,10 +43,6 @@ vectorOutputRR =	function(object)
 			'Summary statistics'      = DSsize
 		),
 		Analysis = list(
-			# 'Formula'                = list(
-			# 	input   = printformula(object$input$formula),
-			# 	final   = printformula(formula)
-			# ),
 			'Model setting'          = extractFERRTerms(object),
 			'Is model optimised'     = NULL                    , 
 			'Multibatch in analysis' = MultiBatch,
@@ -73,7 +69,7 @@ vectorOutputRR =	function(object)
 		)
 	)
 	#####################################################################
-	percentageChanges = NA
+	percentageChanges = NULL
 	#####################################################################
 	vectorOutput      = list(
 		'Method'                               = 	framework,
@@ -291,7 +287,7 @@ vectorOutputRR =	function(object)
 			high = VsplitHig$Genotype_Male.Late$effectSize 
 		) ,
 		################
-		'Classification tag'                          =	NA      ,
+		'Classification tag'                          =	'Legacy',
 		'Transformation'                              =	'Legacy',
 		'Additional information'                      =	addInfo
 	)

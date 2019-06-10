@@ -67,7 +67,7 @@ vectorOutputCat =	function(object)
 		)
 	)
 	#####################################################################
-	percentageChanges = NA
+	percentageChanges = NULL
 	#####################################################################
 	vectorOutput      = list(
 		'Method'                               = 	framework,
@@ -175,7 +175,7 @@ vectorOutputCat =	function(object)
 		'LifeStageSexGenotype MvLvKO p-val'           =	object$output$SplitModels[[depVariable]]$Genotype_Male.Late$result$p.value,
 		'LifeStageSexGenotype MvLvKO effect size'     = object$output$SplitModels[[depVariable]]$Genotype_Male.Late$effectSize ,
 		################
-		'Classification tag'                          =	NA      ,
+		'Classification tag'                          =	'Legacy',
 		'Transformation'                              =	'Legacy',
 		'Additional information'                      =	addInfo
 	)

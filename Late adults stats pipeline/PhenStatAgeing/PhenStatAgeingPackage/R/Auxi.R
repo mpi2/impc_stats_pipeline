@@ -1916,7 +1916,7 @@ modelSummaryPvalueExtract = function(x,
 			'confidence' = Matrix2List(fixedEffInters[rownames(fixedEffInters) %in% variable ,
 																								-2                                     , 
 																								drop = FALSE])                         ,
-			'level'      = fixedEffInters$level
+			'level'      = x$intervals[[1]]$level
 		))
 	} else{
 		return(as.vector(unlist(mSumFiltered)))
@@ -2007,7 +2007,13 @@ extractFERRTerms = function(object) {
 	)
 	final$formula = printformula(RightFormula2LeftFormula(object$extra$Cleanedformula),
 															 message = FALSE)
-	return(list('Initial model' = lnitial, 'Final model' = final))
+	out = list('Initial model' = lnitial,
+						 'Final model'   = final)
+
+	if (!is.null(object$input$RRprop))
+		out$'RR quantile' = unlist(object$input$RRprop)
+	
+	return(out)
 }
 
 RightFormula2LeftFormula = function(formula,removeResIfExists = FALSE) {

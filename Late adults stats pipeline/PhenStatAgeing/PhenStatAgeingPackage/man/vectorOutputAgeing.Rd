@@ -8,27 +8,31 @@
 	Wrapper for the model fitting results. Returns model fitting and testing results in a list or JSON format.
 }
 \usage{
-	vectorOutputAgeing(
-		object,
-		othercolumns = NULL,
-		JSON  = FALSE,
-		Null  = FALSE,
-		...
-	)
+vectorOutputAgeing(
+	object                   ,
+	othercolumns = NULL      ,
+	JSON = FALSE             ,
+	RemoveNullKeys = FALSE   ,
+	ReportNullSchema = FALSE ,
+	...
+)
 }
 %-maybe also 'usage' for other objects documented here.
 \arguments{
 	\item{object}{
-		Instance of the testDatasetAgeing result;	mandatory argument
+		An instance of the testDatasetAgeing result;	mandatory argument
 	}
 	\item{othercolumns}{
 		A list of column names that must be included in the results. Default NULL
 	}
 	\item{JSON}{
-		A logical flag. Setting to TRUE for the JSON output otherwise, the function returns a list
+		Logical flag. Setting to TRUE for the JSON (StatPacket) output otherwise, the function returns a list
 	}
-	\item{Null}{
-		A logical flag. Setting to TRUE forces the function to return results even if the testDatasetAgeing returns a failure message
+	\item{RemoveNullKeys}{
+		Logical flag. Setting to TRUE will remove all NULL elements from the output. Default is FALSE
+	}
+	\item{ReportNullSchema}{
+		logical flag. Setting to TRUE forces the function to return results even if the testDatasetAgeing returns a failure message
 	}
 	\item{\dots}{
 		Other parameters that can be passed to `toJSON()` function in the "jsonlite" library

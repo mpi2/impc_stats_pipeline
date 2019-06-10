@@ -656,7 +656,7 @@ vectorOutputCont =	function(object,
 		),
 		'LifeStageSexGenotype MvLvKO effect size'        = object$output$EffectSizes$Genotype_Male.Late ,
 		################
-		'Classification tag'                   =	NULL,
+		'Classification tag'                   =	'Legacy',
 		'Transformation'                       =	'Legacy',
 		'Additional information'               =	addInfo
 	)
