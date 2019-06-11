@@ -2778,3 +2778,53 @@ lowHighList = function(x, y, ...) {
 	r = list('low' = x, 'high' = y)
 	return(r)
 }
+
+factorise = function(dataset, variables) {
+	vars = variables[variables %in% names(dataset)]
+	if (length(vars) > 0) {
+		for (v in vars) {
+			dataset[, v] = as.factor(dataset[, v, drop = FALSE])
+		}
+	}
+	return(dataset)
+}
+
+fIsBecome = function(dataset,
+										 is = 'Assay.Date',
+										 rename = 'Batch',
+										 ifexist = NULL) {
+	if (is.null(is) || is.null(rename))
+		return(dataset)
+	for (iss in is) {
+		if (!is.null(ifexist)                &&
+				(ifexist %in% colnames(dataset)) &&
+				ifexist != is) {
+			colnames(dataset)[colnames(dataset) %in% rename] = paste('Original', ifexist, sep = '.')
+		}
+		if (iss %in% colnames(dataset)) {
+			names(dataset)[names(dataset) %in% iss] =
+				rename
+			if (is.factor(dataset[, rename]))
+				lvls = paste('\n\tLevels: ', pasteComma(levels(dataset[, rename]),width = 60))
+			else
+				lvls = NULL
+			message0('A variable named `',
+							 iss,
+							 '` found in the input data and renamed to `',
+							 rename,
+							 '`. ',
+							 lvls)
+			break
+		}
+	}
+	return(dataset)
+}
+
+CleanEmptyRecords = function(x, vars) {
+	vars1 = vars[vars %in% names(x)]
+	if (length(vars1)) {
+		x = x[all(!is.na(x[, vars1])) && all(x[, vars1] != ""),]
+	}
+	return(x)
+}
+

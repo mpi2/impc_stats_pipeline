@@ -12,7 +12,7 @@ setClass(
 		dataset.values.missingValue = 'character'  ,
 		dataset.values.male      = 'character'     ,
 		dataset.values.female    = 'character'     ,
-		dataset.clean = 'logical'             ,
+		clean.dataset = 'logical'             ,
 		datasetUNF = 'data.frame'            # ,
 		# reserve1   = 'list'                   ,
 		# reserve2   = 'data.frame',
