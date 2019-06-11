@@ -30,6 +30,7 @@ importFrom("stats", "drop.scope","model.matrix")
 importFrom("stats", "pchisq")
 importFrom("graphics", "mosaicplot")
 importFrom("car"     , "qqPlot", "densityPlot")
+importFrom("stats", "relevel")
 
 
 S3method(summary   , PhenListAgeing)
