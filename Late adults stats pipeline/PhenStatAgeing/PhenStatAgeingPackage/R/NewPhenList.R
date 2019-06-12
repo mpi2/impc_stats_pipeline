@@ -1,4 +1,4 @@
-PhenList0 =
+NewPhenList =
 	function(dataset,
 					 testGenotype,
 					 refGenotype = '+/+',
@@ -12,12 +12,27 @@ PhenList0 =
 					 dataset.values.male = NULL,
 					 dataset.values.female = NULL)
 	{
-		if (is.null(dataset) || class(dataset) != "data.frame")
-			stop('Null dataset or not a data.frame.')
+		if (is.null(dataset) || class(dataset) != "data.frame") {
+			message0('error ~> Null dataset or not a data.frame.')
+			return(NULL)
+		}
 		dataset_unfiltered = dataset
-		dataset = factorise(dataset, c('Genotype', 'Sex', 'Batch'))
-		dataset = dataset[, order(names(dataset)), drop = FALSE]
-		if (clean.dataset) {
+		if (clean.dataset) {	
+			chkcols = checkPhenlistColumns(
+				dataset = dataset,
+				vars    = c(
+					dataset.colname.genotype,
+					dataset.colname.sex     ,
+					dataset.colname.batch   ,
+					dataset.colname.weight
+				)
+			)
+			if (any(head(!chkcols, 2))) {
+				message0('error ~> Please make sure that the `dataset.colname.xxx` is set properly')
+				return(NULL)
+			}
+			dataset = factorise(dataset, c('Genotype', 'Sex', 'Batch'))
+			dataset = dataset[, order(names(dataset)), drop = FALSE]
 			dataset = fIsBecome(
 				dataset = dataset,
 				is      = c(dataset.colname.batch, 'Assay.Date', 'AssayDate'),
@@ -40,22 +55,17 @@ PhenList0 =
 													ifexist = 'Weight')
 			
 			## Replace missing values specified in the user format with NA
-			if (!is.null(dataset.values.missingValue))
+			if (!is.null(dataset.values.missingValue)) {
+				message0(
+					'Checking for the specified missing values (',
+					dataset.values.missingValue,
+					') ...'
+				)
 				dataset[dataset %in%  dataset.values.missingValue] = NA
+			}
 			dataset  [dataset == ""]                             = NA
 			# make Weight column numeric if possible (if there are no strings)
-			if ('Weight' %in% colnames(dataset)) {
-				columnName = "Weight"
-				checkNA_transformed =
-					sum(is.na(suppressWarnings(as.numeric(
-						as.character(dataset[, c(columnName)])
-					))))
-				checkNA_initial = sum(is.na(dataset[, c(columnName)]))
-				if (checkNA_transformed == checkNA_initial) {
-					dataset[, c(columnName)] =
-						as.numeric(as.character(dataset[, c(columnName)]))
-				}
-			}
+			dataset = droplevels0(dataset)
 			## Renew levels
 			if ('Sex' %in% colnames(dataset)) {
 				## Replace values for sexes with 'Male','Female'
@@ -69,31 +79,42 @@ PhenList0 =
 			}
 			## Hemi to test genotype replacement
 			if (!is.null(hemiGenotype)) {
-				if (any(rownames(dataset[dataset$Genotype == hemiGenotype, ]))) {
+				if (any(rownames(dataset[dataset$Genotype == hemiGenotype,]))) {
 					levels(dataset$Genotype)[levels(dataset$Genotype) == hemiGenotype] =
 						testGenotype
 					message0(
-						"Information: Hemizygotes '",
+						"Hemizygotes `",
 						hemiGenotype,
-						"' have been relabelled to test genotype '",
+						"` have been relabelled to test genotype `",
 						testGenotype,
-						"'.\nIf you don't want this behaviour then leave ",
-						"'hemiGenotype' to NULL,"
+						'`'
 					)
 				}
 			}
 			## Clean genotypes
 			if (length(setdiff(rownames(dataset),
-												 rownames(dataset[dataset$Genotype %in% c(testGenotype, refGenotype), ]))) >
+												 rownames(dataset[dataset$Genotype %in% c(testGenotype, refGenotype),]))) >
 					0) {
+				if (any(!c(testGenotype, refGenotype) %in% levels(dataset$Genotype))) {
+					message0(
+						'error ~> Mismatch between `Genotype` levels and input levels.',
+						'\n Genotype Levels: ',
+						pasteComma(sort(levels(
+							dataset$Genotype
+						))),
+						'\n Input levels   : ',
+						pasteComma(sort(c(
+							testGenotype, refGenotype
+						)))
+					)
+					return(NULL)
+				}
 				dataset = subset(dataset,
 												 dataset$Genotype %in% c(testGenotype, refGenotype))
 				message0(
-					"Information: Dataset has been cleaned by ",
-					"filtering out records with genotype value other than test ",
-					"genotype '",
+					"Dataset has been cleaned to only keep the genotype values, ",
 					testGenotype,
-					"' or reference genotype '",
+					" and ",
 					refGenotype
 				)
 			}
@@ -103,38 +124,38 @@ PhenList0 =
 			dataset = checkDataset(droplevels(dataset),
 														 testGenotype,
 														 refGenotype)
-			checkWeight = columnChecks0(dataset, "Weight", 2)
-			
-			if (!checkWeight[1]) {
-				message0("Information: Weight column is not present in the database")
-			}
-			else {
-				if (!checkWeight[2]) {
-					message0(
-						"Information: Weight column values are not numeric.\n",
-						"In order to avoid erroneous execution of statistical ",
-						"functions column is renamed to 'Weight_labels'"
-					)
+			if (is.null(dataset))
+				return(NULL)
+			if ('Weight' %in% colnames(dataset)) {
+				if (!is.numeric(dataset$Weight)) {
+					message0("`Weight` values are not numeric then renamed to `Weight_labels`")
 					colnames(dataset)[colnames(dataset) == 'Weight'] =
 						'Weight_labels'
 				}
-				if (!checkWeight[3]) {
+				wsglvls = tapply(X = dataset$Weight, INDEX = interaction(dataset$Genotype, dataset$Sex), function(x) {
+					length(na.omit(x))
+				}, default = 0)
+				message0(
+					'Total `Weight` data points for Genotype/Sex interaction.\n\t  Level(frequency): ',
+					pasteComma(paste0(names(wsglvls), '(', wsglvls, ')'), truncate = FALSE)
+				)
+				if (max(wsglvls, na.rm = TRUE) <= 2) {
 					message0(
-						"Information: Weight column does not have enough data points ",
-						"for genotype/sex combinations.\n",
-						"In order to avoid erroneous execution of statistical ",
-						"functions column is renamed to 'Weight_labels'"
+						"`Weight` column has (<2) data points for Genotype/Sex interaction, then renamed to `Weight_labels`",
 					)
 					colnames(dataset)[colnames(dataset) == 'Weight'] =
 						'Weight_labels'
+					
 				}
 			}
+		}else{
+			message0('No check performed on the input data')
 		}
 		new(
 			"PhenListAgeing",
 			datasetPL = as.data.frame(dataset),
-			refGenotype = refGenotype,
-			testGenotype = testGenotype,
+			refGenotype = as.character(refGenotype),
+			testGenotype = as.character(testGenotype),
 			hemiGenotype = ifelse(is.null(hemiGenotype), character(0), hemiGenotype),
 			dataset.colname.batch = ifelse(
 				is.null(dataset.colname.batch),
@@ -171,7 +192,7 @@ PhenList0 =
 				character(0),
 				as.character(dataset.values.female)
 			),
-			clean.dataset = clean.dataset,
+			clean.dataset = as.logical(clean.dataset),
 			datasetUNF = as.data.frame(dataset_unfiltered)
 		)
 	}
@@ -182,84 +203,42 @@ checkDataset = function(dataset,
 												refGenotype = "+/+")
 {
 	dataset = droplevels(dataset)
-	## Column names should be given
-	if (ncol(dataset) < 1 || is.null(colnames(dataset))) {
-		stop("Check failed: Dataset with no column names.")
-	}
-	## Check for mandatory columns: Genotype and Sex
-	if (!all(c('Genotype', 'Sex') %in% names(dataset))) {
-		stop("Check failed: Dataset's 'Genotype' or 'Sex' columns are missed.")
-	}
-	## Check for other columns: Weight and Batch
-	if (!('Weight' %in% colnames(dataset))) {
-		message0(
-			"Information: Dataset's 'Weight' column is missed.\n",
-			"You can define 'dataset.colname.weight' argument to specify column ",
-			"for the weight effect modeling"
-		)
-	}
-	if (!('Batch' %in% colnames(dataset))) {
-		message(
-			"Information: Dataset's 'Batch' column is missed.\n",
-			"You can define 'dataset.colname.batch' argument to specify column ",
-			"for the batch effect modeling"
-		)
-	}
 	if (all(c('Genotype', 'Sex') %in% colnames(dataset))) {
 		InGS = interaction(dataset$Genotype, dataset$Sex)
 		tbGS = table(InGS)
+		message0(
+			'Total samples in Genotype:Sex interaction.\n\t level(frequency): ',
+			pasteComma(paste0(names(tbGS), '(', tbGS, ')'), truncate = FALSE)
+		)
 		if (min(tbGS) <= 2)
 			message0(
-				'Data levels with less than 2 observations in the interaction of Genotype:Sex:\n\t',
-				pasteComma(names(tbGS[tbGS <= 2]), truncate = FALSE),
-				'\nAll available levels (frequency):\n',
-				pasteComma(paste0(names(tbGS), '(', tbGS, ')'), truncate = FALSE)
+				'Less than 2 observations detected in the Genotype:Sex interaction for:\n\t ',
+				pasteComma(names(tbGS[tbGS <= 2]), truncate = FALSE)
 			)
 		dataset = droplevels(dataset[InGS %in% names(tbGS[tbGS > 2]), , drop = FALSE])
 		## Check of genotype and sex levels after cleaning
 		if (nlevels(dataset$Genotype) != 2) {
-			stop(
-				"Check failed: Dataset's 'Genotype' ",
-				"column has to have two values.\nYou can define 'testGenotype' and ",
-				"'refGenotype' arguments to automatically filter out records with ",
-				"genotype values other than specified.\nAlternatively you can define ",
-				"'hemiGenotype' and 'testGenotype' arguments to relabel hemizygotes ",
-				"to homozygotes."
-			)
+			message0("error ~> `Genotype` column must have two levels. Current levels: ",
+							 pasteComma(levels(dataset$Genotype)))
+			return(NULL)
 		}
 		if (nlevels(dataset$Sex) > 2) {
-			stop(
-				"Check failed: Dataset's 'Sex' ",
-				"column has to have one or two values and currently the data has ",
-				"more than two."
-			)
+			message0("error ~> `Sex` column must have one or two levels. Current levels: ",
+							 pasteComma(levels(dataset$Sex)))
+			return(NULL)
 		}
 		## Check for sex levels - we want to have 'Female' and/or 'Male' only
 		wrong_sex_levels = setdiff(levels(dataset$Sex), c("Female", "Male"))
 		if (!length(wrong_sex_levels) == 0) {
-			stop('Sex has undefined levels. See:',
-					 pasteComma(wrong_sex_levels, truncate = FALSE))
+			message0(
+				'error ~> Sex has undefined levels. See: ',
+				pasteComma(wrong_sex_levels, truncate = FALSE)
+			)
+			return(NULL)
 		}
 		## Check for reference genotype records
-		#if (sum(grepl(refGenotype, Genotype_levels, fixed=TRUE))==1)
 		if (refGenotype %in% levels(dataset$Genotype))
 			dataset$Genotype = relevel(dataset$Genotype, ref = refGenotype)
-		else {
-			stop(
-				"Check failed: Dataset with not ",
-				"enough records for statistical analysis with reference genotype '",
-				refGenotype
-			)
-		}
-		## Check for test genotype records
-		if (!(testGenotype %in% levels(dataset$Genotype))) {
-			stop(
-				"Check failed: Dataset ",
-				"with not enough records for statistical analysis with test ",
-				"genotype '",
-				testGenotype
-			)
-		}
 	}
 	return(dataset)
 }

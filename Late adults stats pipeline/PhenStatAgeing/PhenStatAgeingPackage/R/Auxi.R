@@ -2789,6 +2789,21 @@ factorise = function(dataset, variables) {
 	return(dataset)
 }
 
+
+checkPhenlistColumns = function(dataset, vars) {
+	allExist = NULL
+	if (length(vars)) {
+		for (v in vars) {
+			r = v %in% names(dataset)
+			message0('check whether variable ', v, ' exists in the data. Result = ', r)
+			allExist = c(allExist , r)
+		}
+	} else{
+		allExist = FALSE
+	}
+	return(allExist)
+}
+
 fIsBecome = function(dataset,
 										 is = 'Assay.Date',
 										 rename = 'Batch',
@@ -2808,9 +2823,9 @@ fIsBecome = function(dataset,
 				lvls = paste('\n\tLevels: ', pasteComma(levels(dataset[, rename]),width = 60))
 			else
 				lvls = NULL
-			message0('A variable named `',
+			message0('Variable `',
 							 iss,
-							 '` found in the input data and renamed to `',
+							 '` renamed to `',
 							 rename,
 							 '`. ',
 							 lvls)

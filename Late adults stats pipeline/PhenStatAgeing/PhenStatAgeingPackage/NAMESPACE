@@ -27,10 +27,9 @@ importFrom("stats", "delete.response", "terms.formula")
 importFrom("MASS", "stepAIC","addterm")
 importFrom("stats", "deviance", "extractAIC", "factor.scope", "nobs")
 importFrom("stats", "drop.scope","model.matrix")
-importFrom("stats", "pchisq")
+importFrom("stats", "pchisq","relevel")
 importFrom("graphics", "mosaicplot")
 importFrom("car"     , "qqPlot", "densityPlot")
-importFrom("stats", "relevel")
 
 
 S3method(summary   , PhenListAgeing)
