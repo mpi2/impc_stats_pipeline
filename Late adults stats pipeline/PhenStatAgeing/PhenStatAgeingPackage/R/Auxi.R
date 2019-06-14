@@ -38,15 +38,18 @@ replaceNull = function(x, replaceBy = 'NULL') {
 	return(unlist(x))
 }
 pasteComma = function(...,
-											replaceNull = TRUE,
-											truncate = TRUE   ,
-											width = 100,
-											trailingSpace = TRUE) {
+											replaceNull   = TRUE   ,
+											truncate      = TRUE   ,
+											width         = 100    ,
+											trailingSpace = TRUE   ,
+											replaceNullby = 'NULL') {
 	sep = ifelse(trailingSpace, ', ', ',')
 	if (replaceNull)
-		r = paste(replaceNull(list(...), replaceBy = 'NULL'),
-							sep      = sep,
-							collapse = sep)
+		r = paste(
+			replaceNull(list(...), replaceBy = replaceNullby),
+			sep      = sep,
+			collapse = sep
+		)
 	else
 		r = paste(...,
 							sep      = sep,
@@ -88,7 +91,7 @@ checkModelTermsInData = function(formula,
 	if (any(!In)) {
 		message0(
 			'Some terms in the model are not included in the data. See: \n\t ',
-			pasteComma(vars[!In], replaceNull = FALSE, truncate = FALSE), 
+			pasteComma(vars[!In], replaceNull = FALSE, truncate = FALSE),
 			'\n\t Initial  model: ',
 			printformula(formula)
 		)
@@ -225,7 +228,8 @@ variablesInData = function(df, names, debug = TRUE) {
 		return(NULL)
 	newNames = names[names %in%  names(df)]
 	if (debug)
-		message0('Variables that being found in data: ', pasteComma(newNames,truncate = FALSE))
+		message0('Variables that being found in data: ',
+						 pasteComma(newNames, truncate = FALSE))
 	return(newNames)
 }
 
@@ -284,13 +288,13 @@ CheckMissing = function(data, formula) {
 		stop()
 	}
 	org.data = data
-	new.data = data[complete.cases(data[, all_vars0(formula)]), ]
+	new.data = data[complete.cases(data[, all_vars0(formula)]),]
 	missings = ifelse(all(dim(org.data) == dim(new.data)),	0, dim(org.data)[1] -
 											dim(new.data)[1])
 	if (missings)
 		message0(
 			'The data (variable(s) = ',
-			pasteComma(all_vars0(formula),truncate = FALSE),
+			pasteComma(all_vars0(formula), truncate = FALSE),
 			') contain ',
 			missings,
 			' missing(s) ...\n\tMissing data removed'
@@ -353,21 +357,23 @@ percentageChangeCont = function(model                ,
 	####
 	model       =
 		tryCatch(
-			expr = update(
-				model                          ,
-				data = NormaliseDataFrame(data)
-			),
+			expr = update(model                          ,
+										data = NormaliseDataFrame(data)),
 			error = function(e) {
-				message0('\t\tError(s) in the (combined) effect size estimation for',
-								 pasteComma(variable),
-								 '. See: ')
+				message0(
+					'\t\tError(s) in the (combined) effect size estimation for',
+					pasteComma(variable),
+					'. See: '
+				)
 				message0('\t\t', e, breakLine = FALSE)
 				return(NULL)
 			} ,
 			warning = function(w) {
-				message0('\t\tWarning(s) in the (combined) effect size estimation for',
-								 pasteComma(variable),
-								 '. See: ')
+				message0(
+					'\t\tWarning(s) in the (combined) effect size estimation for',
+					pasteComma(variable),
+					'. See: '
+				)
 				message0('\t\t', w, breakLine = FALSE)
 				return(NULL)
 			}
@@ -425,7 +431,7 @@ percentageChangeCont = function(model                ,
 				variable            = mainEffsOnlyWhenIndivi                   ,
 				model               = printformula(formula(model))             ,
 				type                = 'Standardized interaction coefficients ' ,
-				'percentage change' = Matrix2List(out / ran * 100, sep = sep)  
+				'percentage change' = Matrix2List(out / ran * 100, sep = sep)
 			)
 		)
 	}
@@ -433,7 +439,8 @@ percentageChangeCont = function(model                ,
 
 optimM = function(optimise) {
 	paste0(c('Fixed term = ', 'Weight term = ', 'Random term = '),
-				 optimise,collapse = ', ')
+				 optimise,
+				 collapse = ', ')
 }
 
 applyFormulaToData = function(formula = NULL, data, add = FALSE) {
@@ -466,7 +473,7 @@ optimiseMessage = function(optimise) {
 					 ))
 }
 
-extractCoefOfInterest = function(coefs, main = 'Sex',data) {
+extractCoefOfInterest = function(coefs, main = 'Sex', data) {
 	lvls = lapply(
 		main,
 		FUN = function(x) {
@@ -481,17 +488,31 @@ extractCoefOfInterest = function(coefs, main = 'Sex',data) {
 	)
 	
 	Cnames = names(coefs)
-	r = coefs[grepl(pattern = pasteBracket( unlist(lvls),left = '',right = '',col = '|'), x = Cnames)]
+	r = coefs[grepl(pattern = pasteBracket(
+		unlist(lvls),
+		left = '',
+		right = '',
+		col = '|'
+	),
+	x = Cnames)]
 	return(r)
 }
 
-pasteBracket = function(..., replaceNull = TRUE,col='|',right=']:',left='[') {
+pasteBracket = function(...,
+												replaceNull = TRUE,
+												col = '|',
+												right = ']:',
+												left = '[') {
 	if (replaceNull)
-		paste(left,replaceNull(list(...), replaceBy = 'NULL'),right,
-					sep = '',
-					collapse = col)
+		paste(
+			left,
+			replaceNull(list(...), replaceBy = 'NULL'),
+			right,
+			sep = '',
+			collapse = col
+		)
 	else
-		paste(left,...,right, sep = ' ', collapse = col)
+		paste(left, ..., right, sep = ' ', collapse = col)
 }
 
 eff.size = function(object,
@@ -502,9 +523,14 @@ eff.size = function(object,
 										debug       = FALSE) {
 	if (all(is.null(data)))
 		data = NormaliseDataFrame(getData(object))
-	
 	f    = reformulate(termlabels = effOfInd, depVariable)
-	agr  = aggregate(f, data = data, FUN = mean)
+	# Remove NAs
+	data = data[complete.cases(data[, all_vars0(f)]), ]
+	if (!(depVariable %in% names(data)          &&
+				length(na.omit(data[, depVariable])) > 1))
+		return(NULL)
+	
+	agr  = aggregate(f, data = data, FUN = function(x){mean(x,na.rm = TRUE)})
 	if (debug) {
 		cat('\n\n')
 		print(agr)
@@ -554,22 +580,25 @@ eff.size = function(object,
 		)
 		if (sum(CoefEffSizes)) {
 			# For continues covariates it is the coefficient
-			efSi         = list(value               = as.list(coef(NModel))[[effOfInd]][1],
-													variable            = effOfInd                            ,
-													model               = printformula(formula(NModel))       ,
-													type                = 'Standardized coefficient'          ,
-													'percentage change' = PerChange                           )
+			efSi         = list(
+				value               = as.list(coef(NModel))[[effOfInd]][1],
+				variable            = effOfInd                            ,
+				model               = printformula(formula(NModel))       ,
+				type                = 'Standardized coefficient'          ,
+				'percentage change' = PerChange
+			)
 		} else{
 			# For categorical covariates it is the mean difference
 			MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
 			r            = resid(NModel)
 			sd           = sd0(r, na.rm = TRUE)
 			efSi         = list(
-				value               = ifelse(!is.na(sd) && sd > 0, abs(MDiff) / sd, NA), 
+				value               = ifelse(!is.na(sd) &&
+																		 	sd > 0, abs(MDiff) / sd, NA),
 				variable            = effOfInd                            ,
 				model               = printformula(formula(NModel))       ,
 				type                = 'Mean difference'                   ,
-				'percentage change' = PerChange                           
+				'percentage change' = PerChange
 			)
 		}
 	} else{
@@ -776,7 +805,7 @@ termInTheModel = function(model, term, message = FALSE) {
 
 SplitEffect = 	function(finalformula     ,
 												fullModelFormula  ,
-												F.Model           , 
+												F.Model           ,
 												data              ,
 												depVariable       ,
 												mandatoryVar = 'Genotype',
@@ -814,27 +843,30 @@ SplitEffect = 	function(finalformula     ,
 									 ' ...')
 					newModel = reformulate(
 						response = depVariable,
-						termlabels = c(arg              ,
-													 paste(
-													 	mandatoryVar   ,
-													 	arg            ,
-													 	collapse = ':' ,
-													 	sep = ':'
-													 ),
-													 argsCon),
+						termlabels = c(
+							arg              ,
+							paste(
+								mandatoryVar   ,
+								arg            ,
+								collapse = ':' ,
+								sep = ':'
+							),
+							argsCon
+						),
 						intercept = TRUE
 					)
-					message0('Checking the split model:\n\t', printformula(newModel))
+					message0('Checking the split model:\n\t',
+									 printformula(newModel))
 					
 					l0    = tryCatch(
 						update(F.Model,
 									 newModel),
 						error = function(e) {
-							message0(e,breakLine=FALSE)
+							message0(e, breakLine = FALSE)
 							return(NULL)
 						} ,
 						warning = function(w) {
-							message0(w,breakLine=FALSE)
+							message0(w, breakLine = FALSE)
 							return(NULL)
 						}
 					)
@@ -862,7 +894,7 @@ SplitEffect = 	function(finalformula     ,
 		}
 		if (length(names) > 0) {
 			message0('SplitEffects. Output names: ',
-							   paste0(names,  collapse = ', '))
+							 paste0(names,  collapse = ', '))
 			names(l) = paste0(names)
 		}
 	}
@@ -916,7 +948,7 @@ ctest = function(x,
 								 formula = NULL     ,
 								 asset = NULL       ,
 								 rep = 1500         ,
-								 ci_levels= 0.95    ,
+								 ci_levels = 0.95    ,
 								 ...) {
 	message = c()
 	xtb = xtabs(
@@ -973,15 +1005,15 @@ ctest = function(x,
 				...
 			),
 			error = function(e) {
-				message0(e,breakLine=FALSE)
+				message0(e, breakLine = FALSE)
 				return(NULL)
 			} ,
 			warning = function(w) {
-				message0(w,breakLine=FALSE)
+				message0(w, breakLine = FALSE)
 				return(NULL)
 			}
 		)
-		r           = intervalsCat(r,ci_levels)
+		r           = intervalsCat(r, ci_levels)
 		effect      = cat.eff.size(xtb,
 															 varName = pasteComma(all_vars0(formula)[-1], truncate = FALSE),
 															 formula = formula)
@@ -1159,12 +1191,11 @@ expand.formula = function(formula) {
 								if (attr(terms(formula), "response") > 0)
 									formula[[2]]
 							else
-								NULL
-	)
+								NULL)
 }
 
-UnlistCall = function(x){
-	as(unlist(x),'character')
+UnlistCall = function(x) {
+	as(unlist(x), 'character')
 }
 
 ListOperation <- function(x, FUN = NULL)
@@ -1262,10 +1293,10 @@ greplM = function(x = NULL, pattern = NULL, ...) {
 	return(r)
 }
 
-modelContrasts = function(formula,data,...){
-	if(is.null(formula) || is.null(data))
+modelContrasts = function(formula, data, ...) {
+	if (is.null(formula) || is.null(data))
 		return(NULL)
-	r = colnames(model.matrix(formula , data,...))
+	r = colnames(model.matrix(formula , data, ...))
 	return(r)
 }
 
@@ -1283,7 +1314,7 @@ multiBatch = function(data) {
 
 unmatrix0 = function (x, byrow = FALSE, sep = ' ')
 {
-	if(is.null(x))
+	if (is.null(x))
 		return(NULL)
 	
 	rnames <- rownames(x)
@@ -1305,7 +1336,7 @@ unmatrix0 = function (x, byrow = FALSE, sep = ' ')
 }
 
 MoveResponseToRightOfTheFormula = function(formula) {
-	if(is.null(formula)){
+	if (is.null(formula)) {
 		message0('Ops! the formula is blank')
 		return(NULL)
 	}
@@ -1360,7 +1391,7 @@ dataSignature = function(formula, data, digits = 16) {
 			!is.null(a.vars)  &&
 			nrow(data) > 1    &&
 			sum(a.vars %in% names(data))) {
-		v.vars= a.vars[a.vars %in% names(data)]
+		v.vars = a.vars[a.vars %in% names(data)]
 		res0 = lapply(v.vars, function(name) {
 			d = data[, name]
 			if (is.numeric(d))
@@ -1397,9 +1428,11 @@ dataSignature = function(formula, data, digits = 16) {
 		}), na.rm = TRUE))
 		
 		res0$overal = paste0('overall:[', overal, ']')
-		res = pasteComma(sort(unlist(res0), decreasing = FALSE) ,
-										 truncate      = FALSE                  ,
-										 trailingSpace = FALSE)
+		res = pasteComma(
+			sort(unlist(res0), decreasing = FALSE) ,
+			truncate      = FALSE                  ,
+			trailingSpace = FALSE
+		)
 	} else{
 		res = paste0(
 			'Something is wrong with the data/model. Make sure that the data is not null and the formula matches the data. [This is a random number ',
@@ -1510,7 +1543,7 @@ RRNewObjectAndFormula = function(object              ,
 																 RRprop              ,
 																 formula             ,
 																 labels = NULL       ,
-																 depVarPrefix = NULL ) {
+																 depVarPrefix = NULL) {
 	allTerms         = all_vars0(formula)
 	newobject        = object
 	RRcutObject      = RRCut(
@@ -1545,12 +1578,12 @@ jitter0 = function(x,
 									 lower = .5,
 									 maxtry = 1500) {
 	for (i in 1:maxtry) {
-		if(i == maxtry)
+		if (i == maxtry)
 			message0('No solusion found for the RR_prop. You may want to revise the RR_prop?')
 		xx = jitter(x = x,
 								amount = amount,
 								factor = factor)
-		if (min(xx,na.rm = TRUE) > lower && max(xx,na.rm = TRUE) < upper)
+		if (min(xx, na.rm = TRUE) > lower && max(xx, na.rm = TRUE) < upper)
 			break
 	}
 	return(xx)
@@ -1568,8 +1601,10 @@ RRCut = function(object                     ,
 	}
 	# Preparation ...
 	object@datasetPL$data_point_discretised  = NA
-	controls = subset(object@datasetPL, object@datasetPL$Genotype %in% object@refGenotype)
-	mutants  = subset(object@datasetPL, object@datasetPL$Genotype %in% object@testGenotype)
+	controls = subset(object@datasetPL,
+										object@datasetPL$Genotype %in% object@refGenotype)
+	mutants  = subset(object@datasetPL,
+										object@datasetPL$Genotype %in% object@testGenotype)
 	prb      = unique(c(0,  prob, 1))
 	qntl     = quantile(x = controls[, depVariable],
 											probs = prb,
@@ -1589,11 +1624,13 @@ RRCut = function(object                     ,
 		)
 		qntl = sort(qntl)
 	}
-	message0('quantile(s) for cutting the data '      ,
-					 '[probs = '                              ,
-					 pasteComma(round(prb,3))                 ,
-					 ']: '                                    ,
-					 pasteComma(round(qntl,3), replaceNull = FALSE))
+	message0(
+		'quantile(s) for cutting the data '      ,
+		'[probs = '                              ,
+		pasteComma(round(prb, 3))                 ,
+		']: '                                    ,
+		pasteComma(round(qntl, 3), replaceNull = FALSE)
+	)
 	controls$data_point_discretised  = cut(
 		x = controls[, depVariable],
 		breaks = qntl,
@@ -1636,8 +1673,10 @@ RRextra = function(object,
 		return(NULL)
 	}
 	# Preparation ...
-	controls = subset(object@datasetPL, object@datasetPL$Genotype %in% object@refGenotype)
-	mutants  = subset(object@datasetPL, object@datasetPL$Genotype %in% object@testGenotype)
+	controls = subset(object@datasetPL,
+										object@datasetPL$Genotype %in% object@refGenotype)
+	mutants  = subset(object@datasetPL,
+										object@datasetPL$Genotype %in% object@testGenotype)
 	prb      = unique(c(0, 1 - prob, prob, 1))
 	qntl     = quantile(x = controls[, depVariable], probs = prb)
 	cutsC    = cut(x = controls[, depVariable], breaks = qntl)
@@ -1676,7 +1715,8 @@ TermInModelAndnLevels = function(model,
 																 term = 'LifeStage',
 																 data,
 																 threshold = 1) {
-	if (is.null(model) || is.null(data) || is.null(term) || !(term %in% colnames(data)))
+	if (is.null(model) ||
+			is.null(data) || is.null(term) || !(term %in% colnames(data)))
 		return(FALSE)
 	# if (!is.null(model$correctd))
 	# 	model      = model$correctd
@@ -1764,6 +1804,12 @@ capitalise = function (string)
 	substr(string[capped], 1, 1) <- toupper(substr(string[capped],
 																								 1, 1))
 	return(string)
+}
+
+sort0 = function(x, ...) {
+	if (length(x) > 0)
+		x = sort(x = x, ...)
+	return(x)
 }
 
 message0 = function(...,
@@ -1874,9 +1920,11 @@ removeSingleLevelFactors = function(formula, data) {
 		if (length(FactsThatMustBeRemoved)) {
 			message0(
 				'The following terms from the model are removed because they only contain one level: ',
-				pasteComma(FactsThatMustBeRemoved,
-									 replaceNull = FALSE,
-									 truncate = FALSE)
+				pasteComma(
+					FactsThatMustBeRemoved,
+					replaceNull = FALSE,
+					truncate = FALSE
+				)
 			)
 			formula = update.formula(formula,
 															 reformulate0(
@@ -1918,13 +1966,15 @@ modelSummaryPvalueExtract = function(x,
 	}
 	if (ci_display && !is.null(mSumFiltered)) {
 		fixedEffInters = x$intervals[[1]]$intervals$fixed
-		return(list(
-			'value'      = as.vector(unlist(mSumFiltered))                                   ,
-			'confidence' = Matrix2List(fixedEffInters[rownames(fixedEffInters) %in% variable ,
-																								-2                                     , 
-																								drop = FALSE])                         ,
-			'level'      = x$intervals[[1]]$level
-		))
+		return(
+			list(
+				'value'      = as.vector(unlist(mSumFiltered))                                   ,
+				'confidence' = Matrix2List(fixedEffInters[rownames(fixedEffInters) %in% variable ,
+																									-2                                     ,
+																									drop = FALSE])                         ,
+				'level'      = x$intervals[[1]]$level
+			)
+		)
 	} else{
 		return(as.vector(unlist(mSumFiltered)))
 	}
@@ -2016,17 +2066,16 @@ extractFERRTerms = function(object) {
 															 message = FALSE)
 	out = list('Initial model' = lnitial,
 						 'Final model'   = final)
-
+	
 	if (!is.null(object$input$RRprop))
 		out$'RR quantile' = unlist(object$input$RRprop)
 	
 	return(out)
 }
 
-RightFormula2LeftFormula = function(formula,removeResIfExists = FALSE) {
+RightFormula2LeftFormula = function(formula, removeResIfExists = FALSE) {
 	r = if (!is.null(formula) &&
 					length(all_vars0(formula)) > 0) {
-		
 		if (removeResIfExists && FormulaHasResponse(formula)) {
 			formula = update(formula, NULL ~ .)
 		}
@@ -2068,7 +2117,7 @@ SummaryStats = function(x,
 																	data = x,
 																	responseIsTheFirst = TRUE)
 	depVar  = all_vars0(formula)[1]
-	if(is.null(depVar)){
+	if (is.null(depVar)) {
 		message0('Null response! check the formula and the data')
 		return(NULL)
 	}
@@ -2186,14 +2235,14 @@ RandomRegardSeed = function(n = 1,
 
 
 ####
-rndProce = function(procedure = NULL ) {
+rndProce = function(procedure = NULL) {
 	if (length(procedure) < 1   ||
 			is.null(procedure)      ||
 			#!(procedure %in% lop()) ||
 			length(procedure) > 1) {
 		message0 (
 			'Error in inputing the procedure symbol. Current input: ',
-			ifelse(is.null(procedure),'NULL',procedure)              ,
+			ifelse(is.null(procedure), 'NULL', procedure)              ,
 			'. The default random effect, (1 |  Batch), is selected.'
 		)
 		return(reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE))
@@ -2275,7 +2324,7 @@ rndProce = function(procedure = NULL ) {
 		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
 	} else if (procedure == 'XRY') {
 		random = reformulate  (' 1 |  Batch', response = NULL, intercept = TRUE)
-	}else{
+	} else{
 		random = reformulate  (' 1 |  Batch'      , response = NULL, intercept = TRUE)
 	}
 	return(random)
@@ -2289,18 +2338,21 @@ shapiro.test0 = function(x, ...) {
 			length(unique(na.omit(x))) > 3  &&
 			!is.na(sd0(x, na.rm = TRUE))    &&
 			sd0(x, na.rm = TRUE)             > 0) {
-		r = list('p-val'    = shapiro.test(x)$p.value   ,
-						 'n'        = length(x)                 ,
-						 'unique n' = length(unique(na.omit(x))),
-						 'sd'       = sd0(x, na.rm = TRUE)      ,
-						 'test'     = 'Shapiro'                 )
+		r = list(
+			'p-val'    = shapiro.test(x)$p.value   ,
+			'n'        = length(x)                 ,
+			'unique n' = length(unique(na.omit(x))),
+			'sd'       = sd0(x, na.rm = TRUE)      ,
+			'test'     = 'Shapiro'
+		)
 	} else{
-		r = list('p-val'    = NULL                                                               ,
-						 'n'        = length(x)                                                          ,
-						 'unique n' = length(unique(na.omit(x)))                                         ,
-						 'sd'       = sd0(x, na.rm = TRUE)                                               ,
-						 'test'     = 'Not possible (Possible cause:n < 3 or n > 5000 unique data points'
-						 )
+		r = list(
+			'p-val'    = NULL                                                               ,
+			'n'        = length(x)                                                          ,
+			'unique n' = length(unique(na.omit(x)))                                         ,
+			'sd'       = sd0(x, na.rm = TRUE)                                               ,
+			'test'     = 'Not possible (Possible cause:n < 3 or n > 5000 unique data points'
+		)
 	}
 	return(r)
 }
@@ -2313,13 +2365,12 @@ QuyalityTests = function(object,
 												 sep       = '_',
 												 collapse  = '_') {
 	if (is.null(object) ||
-			length (levels) < 1
-	)
+			length (levels) < 1)
 	{
 		message0('\tSkipped . No model or the levels in the data for the quality test')
 		return(NULL)
 	}
-		
+	
 	r = resid(object)
 	d = getData(object)
 	levels = levels[levels %in% names(d)]
@@ -2333,7 +2384,7 @@ QuyalityTests = function(object,
 			cmb = combn(x = levels, i)
 			for (j in 1:ncol(cmb)) {
 				result = tapply(r, as.list(d[, cmb[, j], drop = FALSE]), function(x) {
-					 shapiro.test0(x)
+					shapiro.test0(x)
 				})
 				if (!is.null(result)) {
 					flst[[counter]] = result
@@ -2371,7 +2422,7 @@ as.list0 = function(x, ...) {
 
 AllEffSizes = function(object, depVariable, effOfInd, data) {
 	if (length(effOfInd) < 1 ||
-			effOfInd ==   1){
+			effOfInd ==   1) {
 		message0('\tSkipped . No variable found for the effect size ...')
 		return(NULL)
 	}
@@ -2595,7 +2646,7 @@ stepAIC0 = function (object,
 		ffac <- attr(Terms, "factors")
 		if (!is.null(sp <-
 								 attr(Terms, "specials")) && !is.null(st <- sp$strata))
-			ffac <- ffac[-st,]
+			ffac <- ffac[-st, ]
 		scope <- factor.scope(ffac, list(add = fadd, drop = fdrop))
 		aod <- NULL
 		change <- NULL
@@ -2647,14 +2698,14 @@ stepAIC0 = function (object,
 				break
 			nzdf <- if (!is.null(aod$Df))
 				aod$Df != 0 | is.na(aod$Df)
-			aod <- aod[nzdf,]
+			aod <- aod[nzdf, ]
 			if (is.null(aod) || ncol(aod) == 0)
 				break
 			nc <- match(c("Cp", "AIC"), names(aod))
 			nc <- nc[!is.na(nc)][1L]
 			o <- order(aod[, nc])
 			if (trace) {
-				print(aod[o,])
+				print(aod[o, ])
 				utils::flush.console()
 			}
 			if (o[1L] == 1)
@@ -2724,7 +2775,7 @@ dropterm0 =
 						 ncol = 2L,
 						 dimnames = list(c("<none>",
 						 									scope), c("df", "AIC")))
-		ans[1,] <- extractAICc(object, scale, k = k, ...)
+		ans[1, ] <- extractAICc(object, scale, k = k, ...)
 		n0 <- nobs(object, use.fallback = TRUE)
 		env <- environment(formula(object))
 		for (i in seq_len(ns)) {
@@ -2736,7 +2787,7 @@ dropterm0 =
 			nfit <- update(object, as.formula(paste("~ . -", tt)),
 										 evaluate = FALSE)
 			nfit <- eval(nfit, envir = env)
-			ans[i + 1,] <- extractAICc(nfit, scale, k = k, ...)
+			ans[i + 1, ] <- extractAICc(nfit, scale, k = k, ...)
 			nnew <- nobs(nfit, use.fallback = TRUE)
 			if (all(is.finite(c(n0, nnew))) && nnew != n0)
 				message0("\t Warning! number of rows in use has changed: remove missing values ...")
@@ -2758,7 +2809,7 @@ dropterm0 =
 			P[nas] <- safe_pchisq0(dev[nas], dfs[nas], lower.tail = FALSE)
 			aod[, c("LRT", "Pr(Chi)")] <- list(dev, P)
 		}
-		aod <- aod[o,]
+		aod <- aod[o, ]
 		head <-
 			c("Single term deletions", "\nModel:", deparse(formula(object)))
 		if (scale > 0)
@@ -2783,12 +2834,35 @@ factorise = function(dataset, variables) {
 	vars = variables[variables %in% names(dataset)]
 	if (length(vars) > 0) {
 		for (v in vars) {
-			dataset[, v] = as.factor(dataset[, v, drop = FALSE])
+			dataset[, v] = as.factor(dataset[, v])
 		}
 	}
 	return(dataset)
 }
 
+PhenListAgeingRelabling = function(dataset, col, l1, rel1, l2, rel2) {
+	if (col %in% names(dataset)) {
+		dataset[, col] = as.factor(dataset[, col])
+		levels(dataset[, col]) = capitalise(levels(dataset[, col]))
+		if (!is.null(l1))
+			levels(dataset[, col])[levels(dataset[, col]) %in% l1] =
+			rel1
+		if (!is.null(l2))
+			levels(dataset[, col])[levels(dataset[, col]) %in% l2] =
+			rel2
+		lbls = c(rel1, rel2)
+		if (!is.null(lbls) && any(!levels(dataset[, col]) %in% lbls)) {
+			message0(
+				'There are some unused levels in ',
+				col,
+				' that will be removed. \n\t Levels: ',
+				pasteComma(levels(dataset[, col]))
+			)
+			dataset = droplevels(subset(dataset, dataset[, col] %in% lbls))
+		}
+	}
+	return(dataset)
+}
 
 checkPhenlistColumns = function(dataset, vars) {
 	allExist = NULL
@@ -2804,23 +2878,29 @@ checkPhenlistColumns = function(dataset, vars) {
 	return(allExist)
 }
 
+
 fIsBecome = function(dataset,
 										 is = 'Assay.Date',
 										 rename = 'Batch',
 										 ifexist = NULL) {
 	if (is.null(is) || is.null(rename))
 		return(dataset)
+	
+
 	for (iss in is) {
-		if (!is.null(ifexist)                &&
-				(ifexist %in% colnames(dataset)) &&
-				ifexist != is) {
-			colnames(dataset)[colnames(dataset) %in% rename] = paste('Original', ifexist, sep = '.')
-		}
-		if (iss %in% colnames(dataset)) {
+		if (iss %in% colnames(dataset) &&
+				ifelse(is.null(ifexist), TRUE, !iss %in% ifexist)) {
+			####
+			if (!is.null(ifexist)               &&
+					ifexist  %in% colnames(dataset) &&
+					!ifexist %in% is) {
+				colnames(dataset)[colnames(dataset) %in% rename] = paste('Original', ifexist, sep = '.')
+			}
+			###
 			names(dataset)[names(dataset) %in% iss] =
 				rename
 			if (is.factor(dataset[, rename]))
-				lvls = paste('\n\tLevels: ', pasteComma(levels(dataset[, rename]),width = 60))
+				lvls = paste('\n\tLevels: ', pasteComma(levels(dataset[, rename]), width = 60))
 			else
 				lvls = NULL
 			message0('Variable `',
@@ -2838,8 +2918,7 @@ fIsBecome = function(dataset,
 CleanEmptyRecords = function(x, vars) {
 	vars1 = vars[vars %in% names(x)]
 	if (length(vars1)) {
-		x = x[all(!is.na(x[, vars1])) && all(x[, vars1] != ""),]
+		x = x[all(!is.na(x[, vars1])) && all(x[, vars1] != ""), ]
 	}
 	return(x)
 }
-

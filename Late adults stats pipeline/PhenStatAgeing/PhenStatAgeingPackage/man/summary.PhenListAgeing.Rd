@@ -20,7 +20,7 @@
 		Variable(s) of interest
 	}
 	\item{\dots}{
-		Optional parameters that can be passed to Hmisc::describe()
+		Optional parameters that can be passed to 'Hmisc::describe()'
 	}
 }
 

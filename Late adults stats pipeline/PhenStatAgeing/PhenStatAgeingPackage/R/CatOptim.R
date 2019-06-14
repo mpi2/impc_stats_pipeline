@@ -15,7 +15,7 @@ crunner = function(object              ,
 		message0 (
 			'Improper method (',
 			method,
-			') for the type of data, or the `formula` is not specified properly/left blank.\n\t(right sided) Formula: ',
+			') for the type of data, or the `formula/data` is not specified properly/left blank.\n\t(right sided) Formula: ',
 			printformula(formula)
 		)
 		return(NULL)

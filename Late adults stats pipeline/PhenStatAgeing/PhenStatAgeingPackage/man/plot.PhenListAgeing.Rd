@@ -16,7 +16,7 @@
 		PhenListAgeing object 
 	}
 	\item{vars}{
-		Variable(s) of interest. The default is Batch', 'Genotype', 'Sex and 'LifeStage' if exists in the data
+		Variable(s) of interest. The default is 'Batch', 'Genotype', 'Sex and 'LifeStage' if exists in the data
 	}
 	\item{\dots}{
 		Optional parameters that can be passed to `Hmisc::plot.describe()`

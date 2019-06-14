@@ -17,7 +17,7 @@ M.opt = function(object = NULL            ,
 		#####
 		message0 ('Improper method (',
 							method,
-							') for the type of data, or the "formula" is left blank')
+							') for the type of data, or the `formula/data` is left blank')
 		return(NULL)
 	}
 	# Future devs

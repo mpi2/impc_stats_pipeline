@@ -17,7 +17,7 @@ RRrunner = function(object              ,
 		message0 (
 			'Improper method (',
 			method,
-			') for the type of data, or the `formula` is not properly specified/left blank. \n\tFormula: ',
+			') for the type of data, or the `formula/data` is not properly specified/left blank. \n\tFormula: ',
 			printformula(formula)
 		)
 		return(NULL)

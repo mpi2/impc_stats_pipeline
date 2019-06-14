@@ -101,6 +101,8 @@ testDatasetAgeing0 = function(phenListAgeing = NULL     ,
 															debug = TRUE              ,
 															...) {
 	message0('PhenStatAgeing loaded.')
+	if(is.null(phenListAgeing))
+		stop('\n ~> The input dataset cannot be NULL')
 	if (!is(phenListAgeing, 'PhenList') &&
 			!is(phenListAgeing, 'PhenListAgeing'))
 		stop('\n ~> function expects "PhenList" or "PhenListAgeing" object \n')

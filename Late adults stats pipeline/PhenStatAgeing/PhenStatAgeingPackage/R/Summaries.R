@@ -37,8 +37,16 @@ summaryCore = function(x,
 	vo = vectorOutputAgeing(object           = x    ,
 													JSON             = FALSE,
 													ReportNullSchema = FALSE)
-	pasteComma2 = function(...){
-		pasteComma(...,replaceNull = FALSE,truncate = FALSE)
+	pasteComma2 = function(...) {
+		r = pasteComma(
+			...,
+			replaceNull   = TRUE  ,
+			truncate      = FALSE ,
+			replaceNullby = '-'
+		)
+		if (is.null(r))
+			r = '-'
+		return(r)
 	}
 	out = list(
 		'Method'                         = vo$Method,

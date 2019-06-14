@@ -5,7 +5,7 @@
 	Method "vectorOutputAgeing"
 }
 \description{
-	Wrapper for the model fitting results. Returns model fitting and testing results in a list or JSON format.
+	Wrapper for the output of 'testDatasetAgeing'. Returns model fitting and results in a list or JSON format (StatPacket).
 }
 \usage{
 vectorOutputAgeing(
@@ -20,7 +20,7 @@ vectorOutputAgeing(
 %-maybe also 'usage' for other objects documented here.
 \arguments{
 	\item{object}{
-		An instance of the testDatasetAgeing result;	mandatory argument
+		'mandatory argument'. An instance of the testDatasetAgeing result
 	}
 	\item{othercolumns}{
 		A list of column names that must be included in the results. Default NULL
