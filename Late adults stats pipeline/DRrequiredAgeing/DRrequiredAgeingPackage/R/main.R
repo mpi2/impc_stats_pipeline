@@ -645,8 +645,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$criteria_result
                     ) {
                       message0('Analysing the dataset in progress ...')
-                      message0('Creating PhenList object ...')
-                      a = PhenStat::PhenList(
+                      message0('Creating PhenListAgeing object ...')
+                      a = PhenStatAgeing::PhenListAgeing(
                         n3.5.2,
                         testGenotype             = 'experimental',
                         refGenotype              = 'control',

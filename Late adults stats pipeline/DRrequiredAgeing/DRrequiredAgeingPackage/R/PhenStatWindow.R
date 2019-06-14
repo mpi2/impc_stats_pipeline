@@ -159,10 +159,10 @@ PhenStatWindow = function (phenlistObject                                ,
         direction = direction                   ,
         min.obs = function(ignore.me.in.default) {
           message0('Total number of sex: ',
-                   PhenStat:::noSexes(phenlistObject))
+                   noSexes0(phenlistObject))
           lutm = length(unique(tt[mm]))
           r = ifelse(lutm > 1,
-                     PhenStat:::noSexes(phenlistObject) * 35,
+                     noSexes0(phenlistObject) * 35,
                      max(pi * sqrt(length(tt)), 35))
           r = max(r * lutm, length(mm), na.rm = TRUE)
           r = min(r       , length(tt), na.rm = TRUE)

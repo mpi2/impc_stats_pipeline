@@ -13,6 +13,17 @@
   )
 }
 
+noSexes0 = function(obj){
+  if(is.null((obj)))
+    return(1)
+  if('Sex' %in% colnames(obj@datasetPL)){
+    r = nlevels(obj@datasetPL$Sex)
+  }else{
+    r = 1
+  }
+  return(r)
+}
+
 # Behaviour parameters
 BehviourParamters = function(x, ...) {
   r =  c(
@@ -361,7 +372,7 @@ concurrentContSelect = function(activate = TRUE,
       genotype = GenotypeColName
     )
     #PhenListObj@datasetPL = checkNoZeroVar$x
-    PhenListObj = PhenStat::PhenList(
+    PhenListObj = PhenStatAgeing::PhenListAgeing(
       dataset = checkNoZeroVar$x,
       testGenotype = PhenListObjBck@testGenotype,
       refGenotype = PhenListObjBck@refGenotype
