@@ -784,7 +784,7 @@ RemoveZeroFrequencyCategories = function(x,
     }
     lvls   = lvls[!is.na(x[, depVar])]
     counts = table(lvls)
-    newx   = (x[lvls %in% names(counts)[counts > minSampRequired],])
+    newx   = (x[lvls %in% names(counts)[counts >= minSampRequired],])
     #####
     if ((length(names(counts[counts >= minSampRequired])) != totalLevels ||
          !identical(droplevels0(newx), droplevels0(x))) &&
