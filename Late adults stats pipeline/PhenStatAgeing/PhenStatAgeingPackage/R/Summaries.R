@@ -44,7 +44,9 @@ summaryCore = function(x,
 			truncate      = FALSE ,
 			replaceNullby = '-'
 		)
-		if (is.null(r))
+		if (is.null(r)    ||
+				length (r) < 1 ||
+				nchar  (r) < 1)
 			r = '-'
 		return(r)
 	}

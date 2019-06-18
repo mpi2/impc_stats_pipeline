@@ -948,7 +948,7 @@ ctest = function(x,
 								 formula = NULL     ,
 								 asset = NULL       ,
 								 rep = 1500         ,
-								 ci_levels = 0.95    ,
+								 ci_levels = 0.95   ,
 								 ...) {
 	message = c()
 	xtb = xtabs(
@@ -1543,15 +1543,18 @@ RRNewObjectAndFormula = function(object              ,
 																 RRprop              ,
 																 formula             ,
 																 labels = NULL       ,
-																 depVarPrefix = NULL) {
+																 depVarPrefix = NULL ,
+																 ### see right in the cut function
+																 right        = TRUE) {
 	allTerms         = all_vars0(formula)
 	newobject        = object
 	RRcutObject      = RRCut(
-		object = object          ,
-		prob   = RRprop          ,
-		depVariable = allTerms[1],
-		labels = labels,
-		depVarPrefix = depVarPrefix
+		object = object             ,
+		prob   = RRprop             ,
+		depVariable = allTerms[1]   ,
+		labels = labels             ,
+		depVarPrefix = depVarPrefix ,
+		right        = right
 	)
 	newobject@datasetPL = RRcutObject$discObject
 	newFormula          = replaceElementInFormula(
@@ -1578,7 +1581,7 @@ jitter0 = function(x,
 									 lower = .5,
 									 maxtry = 1500) {
 	for (i in 1:maxtry) {
-		if (i == maxtry)
+		if (i >= maxtry)
 			message0('No solusion found for the RR_prop. You may want to revise the RR_prop?')
 		xx = jitter(x = x,
 								amount = amount,
@@ -1589,48 +1592,105 @@ jitter0 = function(x,
 	return(xx)
 }
 
+addJitterToTheEntireData = function(x, min = -1, max = 0) {
+	if (is.null(x) || length(na.omit(x)) < 1)
+		return(x)
+	lx     = length(x)
+	jitter = sort(runif(n = lx, min = min, max = max), decreasing = FALSE)
+	message0(
+		'A small jitter (max value = ',
+		min(jitter, na.rm = TRUE) -
+		max(jitter, na.rm = TRUE), 
+		') is added to the data')
+	o      = order(x)
+	x      = x + jitter[o]
+	return(x)
+}
+
+ExpandTails = function(x,
+											 amount,
+											 upper = TRUE,
+											 lower = TRUE) {
+	xx = na.omit(x)
+	if (is.null (x)   ||
+			is.null (xx)  ||
+			length  (xx) < 1)
+		return(x)
+	if (upper)
+		x[x == max(xx, na.rm = TRUE)] = max(xx, na.rm = TRUE) + amount
+	if (lower)
+		x[x == min(xx, na.rm = TRUE)] = min(xx, na.rm = TRUE) - amount
+	return(x)
+}
+
+ReplaceTails = function(x         ,
+												lower = 0 ,
+												upper = 0 ,
+												add   = FALSE) {
+	xx = na.omit(x)
+	if (is.null (x)   ||
+			is.null (xx)  ||
+			length  (xx) < 1)
+		return(x)
+	if (!add) {
+		if (upper)
+			x[x == max(xx, na.rm = TRUE)] = upper
+		if (lower)
+			x[x == min(xx, na.rm = TRUE)] = lower
+	} else{
+		x = c(lower, x, upper)
+	}
+	return(x)
+}
 
 RRCut = function(object                     ,
 								 prob         = .95         ,
 								 depVariable  = 'data_point',
 								 labels       = NULL,
-								 depVarPrefix = NULL) {
+								 depVarPrefix = NULL,
+								 right        = TRUE) {
 	if (prob == .5) {
 		message0('"prob" must be different from 0.5')
 		return(NULL)
 	}
 	# Preparation ...
+	JitterPrecision = 4 + 1 * decimalplaces(min(object@datasetPL[, depVariable], na.rm = TRUE))
 	object@datasetPL$data_point_discretised  = NA
 	controls = subset(object@datasetPL,
 										object@datasetPL$Genotype %in% object@refGenotype)
 	mutants  = subset(object@datasetPL,
 										object@datasetPL$Genotype %in% object@testGenotype)
 	prb      = unique(c(0,  prob, 1))
-	qntl     = quantile(x = controls[, depVariable],
-											probs = prb,
-											na.rm = TRUE)
+	qntl     = ReplaceTails(
+		x      = quantile(x = controls[, depVariable],
+											probs = prb                ,
+											na.rm = TRUE               ),
+		upper = max(object@datasetPL[, depVariable], na.rm = TRUE)[1] + 1,
+		lower = min(object@datasetPL[, depVariable], na.rm = TRUE)[1] - 1,
+		add   = FALSE
+	)
 	if (sum(duplicated(qntl))) {
 		message0(
-			'duplicates in quantiles detected, then small (dependes ont he data precision) jitter will be added to quantiles. Qauntiles: ',
+			'* duplicates in quantiles detected, then small (dependes ont he data precision) jitter will be added to quantiles. Qauntiles: ',
 			pasteComma(qntl, replaceNull = FALSE)
 		)
-		JitterPrecision = 1 + decimalplaces(min(controls[, depVariable], na.rm = TRUE))
 		message0('Jitter precision (decimal) = ', JitterPrecision)
 		qntl[duplicated(qntl)] = jitter0(
 			x = qntl[duplicated(qntl)],
 			amount = 10 ^	-JitterPrecision,
-			upper = 1,
-			lower = .5
+			upper  = 1,
+			lower  = 0.5
 		)
 		qntl = sort(qntl)
 	}
 	message0(
-		'quantile(s) for cutting the data '      ,
+		'Initial quantiles for cutting the data '      ,
 		'[probs = '                              ,
 		pasteComma(round(prb, 3))                 ,
 		']: '                                    ,
 		pasteComma(round(qntl, 3), replaceNull = FALSE)
 	)
+	
 	controls$data_point_discretised  = cut(
 		x = controls[, depVariable],
 		breaks = qntl,
@@ -1638,8 +1698,14 @@ RRCut = function(object                     ,
 			FALSE
 		else
 			labels,
-		include.lowest = TRUE
+		include.lowest = TRUE ,
+		right          = right 
 	)
+	###
+	tbc  = prop.table(table(controls$data_point_discretised))
+	tbpc = setNames(as.list(tbc),names(tbc))
+	message0('Detected percentile in the data: ',pasteComma(paste(names(tbc),'=',round(tbc,6))))
+	###
 	mutants$data_point_discretised   = cut(
 		x = mutants [, depVariable],
 		breaks = qntl,
@@ -1647,7 +1713,8 @@ RRCut = function(object                     ,
 			FALSE
 		else
 			labels,
-		include.lowest = TRUE
+		include.lowest = TRUE,
+		right          = right
 	)
 	newObj                          = rbind(mutants, controls)
 	newdepVariable                  = pasteUnderscore(depVarPrefix, depVariable, 'discretised')
@@ -1656,10 +1723,11 @@ RRCut = function(object                     ,
 	message0('a new column is added to the data object: ', newdepVariable)
 	return(
 		list(
-			object = object,
-			discObject = newObj,
+			object = object                 ,
+			discObject = newObj             ,
 			newdepVariable = newdepVariable ,
-			depVariable = depVariable
+			depVariable = depVariable       ,
+			percentages = tbpc
 		)
 	)
 }
