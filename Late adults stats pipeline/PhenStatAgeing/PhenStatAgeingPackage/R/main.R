@@ -112,7 +112,8 @@ testDatasetAgeing0 = function(phenListAgeing = NULL     ,
 			MMFERR_conf.level <= 0   ||
 			length(MMFERR_conf.level) > 1)
 		stop('\n ~> Confidence level must be a single value in (0,1) interval')
-	
+	if (length(method) > 1 || !method %in% c('MM', 'FE', 'RR'))
+		stop('\n ~> `method` must be one of `MM`, `FE` or `RR`')
 	
 	if (method %in% 'MM') {
 		message0('Linear Mixed Model (MM framework) in progress ...')
