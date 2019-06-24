@@ -271,12 +271,12 @@ checkDataset = function(dataset,
 			'Total samples in Genotype:Sex interaction.\n\t Level(frequency): ',
 			pasteComma(paste0(names(tbGS), '(', tbGS, ')'), truncate = FALSE)
 		)
-		if (min(tbGS) <= 2)
+		if (min(tbGS) < 1)
 			message0(
-				'Less than 2 observations detected in the Genotype:Sex interaction for:\n\t ',
-				pasteComma(names(tbGS[tbGS <= 2]), truncate = FALSE)
+				'No observations detected in the Genotype:Sex interaction for:\n\t ',
+				pasteComma(names(tbGS[tbGS < 1]), truncate = FALSE)
 			)
-		dataset = droplevels(dataset[InGS %in% names(tbGS[tbGS > 2]), , drop = FALSE])
+		dataset = droplevels(dataset[InGS %in% names(tbGS[tbGS >= 1 ]), , drop = FALSE])
 		## Check of genotype and sex levels after cleaning
 		if (nlevels(dataset$Genotype) != 2) {
 			message0(
