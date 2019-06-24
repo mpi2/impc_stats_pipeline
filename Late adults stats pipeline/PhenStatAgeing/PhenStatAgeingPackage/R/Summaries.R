@@ -36,18 +36,22 @@ summaryCore = function(x,
 	requireNamespace("knitr")
 	vo = vectorOutputAgeing(object           = x    ,
 													JSON             = FALSE,
-													ReportNullSchema = FALSE)
+													ReportNullSchema = FALSE,
+													RemoveNullKeys   = FALSE )
 	pasteComma2 = function(...) {
-		r = pasteComma(
-			...,
-			replaceNull   = TRUE  ,
-			truncate      = FALSE ,
-			replaceNullby = '-'
-		)
-		if (is.null(r)    ||
-				length (r) < 1 ||
-				nchar  (r) < 1)
-			r = '-'
+		requireNamespace("rlist")
+		inp = as.list(...)
+		inp = list.clean(inp)
+		if (is.null(inp)           ||
+				length (inp) < 1)
+			r = ' - '
+		else
+			r = pasteCommaJustForSummary(
+				...,
+				replaceNull   = TRUE  ,
+				truncate      = FALSE ,
+				replaceNullby = ' - '
+			)
 		return(r)
 	}
 	out = list(
@@ -71,7 +75,7 @@ summaryCore = function(x,
 		'Sexual dimorphism detected?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
 		'............................'   = ifelse(
 			procedure == 'RR',
-			'* Separate p-values for (Low vs NormalHigh) and (LowNormal vs High) ',
+			'* Separate p-values for (Low vs NormalHigh), (LowNormal vs High) and (details) ',
 			'............................'
 		),
 		'Genotype contribution overal'   = pasteComma2(vo$`Genotype p-val`),
@@ -107,4 +111,28 @@ prepareSummaryOutput = function(out, nullMessage = 'Not applicable') {
 	outT = as.matrix(cbind(rownames(outT), outT))
 	rownames(outT) = NULL
 	return(outT)
+}
+
+pasteCommaJustForSummary = function(...,
+											replaceNull   = TRUE   ,
+											truncate      = TRUE   ,
+											width         = 100    ,
+											trailingSpace = TRUE   ,
+											replaceNullby = 'NULL') {
+	sep = ifelse(trailingSpace, ', ', ',')
+	if (replaceNull)
+		r = paste(
+			replaceNull(as.list(...), replaceBy = replaceNullby),
+			sep      = sep,
+			collapse = sep
+		)
+	else
+		r = paste(...,
+							sep      = sep,
+							collapse = sep)
+	
+	if (truncate)
+		r = truncate_text(r, width)
+	
+	return(r)
 }

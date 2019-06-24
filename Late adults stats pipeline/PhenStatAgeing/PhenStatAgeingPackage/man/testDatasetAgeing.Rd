@@ -43,8 +43,9 @@ testDatasetAgeing(
 	MM_optimise  = c(TRUE, TRUE, TRUE),
 	FE_formula   = category ~ Genotype + Sex + LifeStage,
 	RR_formula   = data_point ~ Genotype + Sex + LifeStage,
-	RR_prop      = 0.95,
-	FERR_rep     = 1500,
+	RRrefLevel = 'control',
+	RR_prop      = 0.95   ,
+	FERR_rep     = 1500   ,
 	MMFERR_conf.level = 0.95 ,
 	seed         = NULL,
 	debug        = TRUE,
@@ -92,10 +93,14 @@ testDatasetAgeing(
   Note that similar to MM_fixed, the terms that do not exist in data or the interaction terms will be dismissed from the model. 
 }
   \item{RR_formula}{
-	Only applies to the "RR" framework. The model for analysing the RR+ compatible data. The default is: data_point ~ Genotype + Sex + LifeStage. \cr
+	Only applies to the "RR" framework. The model for analysing the RR+ compatible data. \cr
+	** Important. The first term on the right hand side of the formula specifies the variable for discritising the response.\cr
+	The default is: data_point ~ Genotype + Sex + LifeStage. \cr
   Note that similar to MM_fixed,  the terms that do not exist in data or the interaction terms will be dismissed from the model. 
 }
-  \item{RR_prop}{
+  \item{RRrefLevel}{
+	Only applies to the "RR" framework. A single term for the `reference level` in the `reference variable` (the first term on the right hand side of the `RR_formula`) used for discritising the response. If left blank then the a level with more observations will be considered as the reference level. The default is `control`.
+}  \item{RR_prop}{
 	Only applies to the "RR" framework. A single value between (0.5,1) not including the boundaries. The threshold for the variation ranges in the RR framework. The default value is 0.95. 
 }
   \item{FERR_rep}{

@@ -6,8 +6,10 @@ crunner = function(object              ,
 									 fullComparisions = TRUE,
 									 noteToFinish     = NULL,
 									 ci_levels        = .95 ,
+									 RRextraResults   = NULL,
 									 ...)
 {
+	requireNamespace   ("rlist")
 	if (sum(method != c('FE', 'RR')) == 0 ||
 			is.null(object)                   ||
 			is.null(all_vars0(formula))       ||
@@ -26,9 +28,11 @@ crunner = function(object              ,
 	message0('Fisher exact test with ',
 					 ifelse(rep > 0, rep, 'No'),
 					 ' repetition(s) in progress ...')
+	
+	data          = ExtractDatasetPLIfPossible(object)
 	newFormula    = checkModelTermsInData(
-		formula = formula,
-		data = object@datasetPL,
+		formula     = formula     ,
+		data        = data        ,
 		responseIsTheFirst = TRUE
 	)
 	####
@@ -50,7 +54,7 @@ crunner = function(object              ,
 		####
 		message0('Step ', indx, '. Testing "', depVariable, '"')
 		####
-		newObject   = object@datasetPL
+		newObject   = data
 		Obj         = CheckMissing(newObject,
 															 reformulate(termlabels = depVariable, response = NULL))
 		newObject   = Obj$new.data
@@ -67,6 +71,7 @@ crunner = function(object              ,
 				)                                     ,
 				rep = rep                             ,
 				ci_levels = ci_levels                 ,
+				RRextraResults   = RRextraResults     ,
 				...
 			)
 			
@@ -78,12 +83,11 @@ crunner = function(object              ,
 			}
 		}
 		
-		if (CmbiVars) {
+		if (fullComparisions && CmbiVars) {
 			message0('Combined effects in progress ...')
 			alTbls = AllTables(
-				dframe = as.data.frame(xtabs(
-					formula = newFormula, data = newObject
-				))  ,
+				dframe    = as.data.frame(xtabs(formula = newFormula,
+																				data    = newObject))            ,
 				vars   = vars                                                    ,
 				cl     = 3:(length(vars) + 2)                                    ,
 				cols   = NULL                                                    ,
@@ -95,9 +99,10 @@ crunner = function(object              ,
 				ctest(
 					x = x                                          ,
 					formula   = reformulate0(response = 'Freq'     ,
-																 termlabels = colnames(x)[!colnames(x) %in% 'Freq']),
+																	 termlabels = colnames(x)[!colnames(x) %in% 'Freq']),
 					rep       = rep                                ,
 					ci_levels = ci_levels                          ,
+					RRextraResults   = RRextraResults              ,
 					...
 				)
 			}))
@@ -123,28 +128,28 @@ crunner = function(object              ,
 	message0('Total tested categories = ',
 					 length(lComplete),
 					 ': ',
-					 pasteComma(names(lComplete)))
-	message0('\tTotal tests =  ', sum(sapply(lComplete, length)))
+					 pasteComma(names(lComplete),replaceNullby='-'))
+	message0('\tTotal tests =  ', sum(unlist(sapply(lComplete, length))))
 	message0('FE framework ',
 					 noteToFinish,
 					 ' executed in ',
 					 round(difftime(Sys.time() , sta.time, units = 'sec'), 2),
 					 ' seconds.')
 	OutR = list(
-		output = list(SplitModels = lComplete) ,
+		output = list(SplitModels = list.clean(lComplete)) ,
 		input  = list(
-			PhenListAgeing  = object             ,
-			data            = object@datasetPL   ,
-			depVariable     = allTerms[1]        ,
-			rep             = rep                ,
-			method          = method             ,
-			formula         = formula            ,
-			ci_level        = ci_levels
+			PhenListAgeing  = object                         ,
+			data            = data                           ,
+			depVariable     = allTerms[1]                    ,
+			rep             = rep                            ,
+			method          = method                         ,
+			formula         = formula                        ,
+			ci_level        = ci_levels            
 		),
 		extra  = list(
-			missings        = Obj$missings   ,
-			UsedData        = Obj$new.data   ,
-			AllTable        = alTbls         ,
+			missings        = Obj$missings                   ,
+			UsedData        = Obj$new.data                   ,
+			AllTable        = alTbls                         ,
 			Cleanedformula  = newFormula
 		)
 	)

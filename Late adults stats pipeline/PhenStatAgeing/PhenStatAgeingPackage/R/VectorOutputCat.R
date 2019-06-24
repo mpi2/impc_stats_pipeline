@@ -73,9 +73,9 @@ vectorOutputCat =	function(object)
 		'Method'                               = 	framework,
 		'Dependent variable'                   =	depVariable,
 		'Batch included'                       =	 NULL   ,
-		'Batch p-val'                          =  'Legacy',
+		'Batch p-val'                          =   NULL,
 		'Residual variances homogeneity'       =   NULL   ,
-		'Residual variances homogeneity p-val' =  'Legacy',
+		'Residual variances homogeneity p-val' =   NULL,
 		#####################################################################
 		'Genotype contribution' =	list(
 			Overal = object$output$SplitModels[[depVariable]]$Genotype$result$p.value,
@@ -109,8 +109,8 @@ vectorOutputCat =	function(object)
 		'Gp2 genotype'                     =	Labels$Genotype$Mutant		,
 		'Gp2 Residuals normality test'     =	NULL                      ,
 		#####################################################################
-		'Blups test'                       =  'Legacy',
-		'Rotated residuals normality test' =  'Legacy',
+		'Blups test'                       =  NULL,
+		'Rotated residuals normality test' =  NULL,
 		#####################################################################
 		'Intercept estimate'               =	NULL,
 		'Intercept standard error'         =	NULL,
@@ -175,8 +175,8 @@ vectorOutputCat =	function(object)
 		'LifeStageSexGenotype MvLvKO p-val'           =	object$output$SplitModels[[depVariable]]$Genotype_Male.Late$result$p.value,
 		'LifeStageSexGenotype MvLvKO effect size'     = object$output$SplitModels[[depVariable]]$Genotype_Male.Late$effectSize ,
 		################
-		'Classification tag'                          =	'Legacy',
-		'Transformation'                              =	'Legacy',
+		'Classification tag'                          =	NULL,
+		'Transformation'                              =	NULL,
 		'Additional information'                      =	addInfo
 	)
 	return(vectorOutput)

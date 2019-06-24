@@ -92,11 +92,11 @@ vectorOutputCont =	function(object,
 	#####################################################################
 	vectorOutput      = list(
 		'Method'                               = 	paste0(framework, ", ", fittingMethod, ', ', format(equation)),
-		'Dependent variable'                   =	depVariable,
-		'Batch included'                       =	object$output$BatchIn,
-		'Batch p-val'                          =  'Legacy',
-		'Residual variances homogeneity'       =	object$output$VarHomoIn,
-		'Residual variances homogeneity p-val' =  'Legacy',
+		'Dependent variable'                   =	depVariable              ,
+		'Batch included'                       =	object$output$BatchIn    ,
+		'Batch p-val'                          =  NULL                     ,
+		'Residual variances homogeneity'       =	object$output$VarHomoIn  ,
+		'Residual variances homogeneity p-val' =  NULL                     ,
 		#####################################################################
 		'Genotype contribution' =	list(
 			Overal = TermInFormulaReturn(
@@ -257,8 +257,8 @@ vectorOutputCont =	function(object,
 		'Gp2 genotype'                         =	Labels$Genotype$Mutant				,
 		'Gp2 Residuals normality test'         =	object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Mutant][[1]],
 		#####################################################################
-		'Blups test'                           =  'Legacy',
-		'Rotated residuals normality test'     =  'Legacy',
+		'Blups test'                           =  NULL,
+		'Rotated residuals normality test'     =  NULL,
 		#####################################################################
 		'Intercept estimate'                   =	modelSummaryPvalueExtract(
 			x = Fmodel,
@@ -656,8 +656,8 @@ vectorOutputCont =	function(object,
 		),
 		'LifeStageSexGenotype MvLvKO effect size'        = object$output$EffectSizes$Genotype_Male.Late ,
 		################
-		'Classification tag'                   =	'Legacy',
-		'Transformation'                       =	'Legacy',
+		'Classification tag'                   =	NULL,
+		'Transformation'                       =	NULL,
 		'Additional information'               =	addInfo
 	)
 	

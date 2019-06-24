@@ -30,8 +30,8 @@ plot.PhenStatAgeingRR = function(x,
 	par(ask = ask, mfrow = mfrow)
 	
 	Labels  = PhenListAgeingLevels(x)
-	LowRes  = pasteUnderscore('Low' , Labels$response, 'discretised')
-	HighRes = pasteUnderscore('High', Labels$response, 'discretised')
+	LowRes  = pastedot('Low' , Labels$response, 'Genotype')
+	HighRes = pastedot('High', Labels$response, 'Genotype')
 	
 	plotFERR (
 		x = x,
@@ -49,14 +49,14 @@ plot.PhenStatAgeingRR = function(x,
 	)
 	plotFERR (
 		x = x,
-		l1 = pasteUnderscore('Low', Labels$Genotype$Genotype),
+		l1 = LowRes,
 		l2 = Labels$Sex$Sex,
 		main = main,
 		...
 	)
 	plotFERR (
 		x = x,
-		l1 = pasteUnderscore('Low', Labels$Genotype$Genotype),
+		l1 = HighRes,
 		l2 = Labels$LifeStage$LifeStage,
 		main = main,
 		...

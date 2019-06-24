@@ -2,10 +2,10 @@ vectorOutputNULL = function(object) {
 	VO      = list(
 		'Method'                               = 	NULL,
 		'Dependent variable'                   =	NULL,
-		'Batch included'                       =	 NULL,
-		'Batch p-val'                          =  'Legacy',
-		'Residual variances homogeneity'       =   NULL,
-		'Residual variances homogeneity p-val' =  'Legacy',
+		'Batch included'                       =	NULL,
+		'Batch p-val'                          =  NULL,
+		'Residual variances homogeneity'       =  NULL,
+		'Residual variances homogeneity p-val' =  NULL,
 		#####################################################################
 		'Genotype contribution' =	list(
 			Overal             = NULL,
@@ -39,8 +39,8 @@ vectorOutputNULL = function(object) {
 		'Gp2 genotype'                     =	NULL ,
 		'Gp2 Residuals normality test'     =	NULL ,
 		#####################################################################
-		'Blups test'                       =  'Legacy',
-		'Rotated residuals normality test' =  'Legacy',
+		'Blups test'                       =  NULL,
+		'Rotated residuals normality test' =  NULL,
 		#####################################################################
 		'Intercept estimate'               =	NULL,
 		'Intercept standard error'         =	NULL,
@@ -106,7 +106,7 @@ vectorOutputNULL = function(object) {
 		'LifeStageSexGenotype MvLvKO effect size'     = NULL ,
 		################
 		'Classification tag'                          =	NULL ,
-		'Transformation'                              =	'Legacy',
+		'Transformation'                              =	NULL ,
 		'Additional information'                      =	object$messages
 	)
 	return(VO)

@@ -68,7 +68,9 @@ truncate_text = function(x, width) {
 pasteUnderscore = function(...) {
 	paste(..., sep = '_', collapse = '_')
 }
-
+pastedot = function(...) {
+	paste(..., sep = '.', collapse = '.')
+}
 checkModelTermsInData = function(formula,
 																 data,
 																 responseIsTheFirst  = TRUE,
@@ -90,7 +92,7 @@ checkModelTermsInData = function(formula,
 	In      = vars %in% names(data)
 	if (any(!In)) {
 		message0(
-			'Some terms in the model are not included in the data. See: \n\t ',
+			'Some terms in the model are not included in the data. See: \n\t  ',
 			pasteComma(vars[!In], replaceNull = FALSE, truncate = FALSE),
 			'\n\t Initial  model: ',
 			printformula(formula)
@@ -945,10 +947,11 @@ cat.eff.size = function(xtb,
 }
 # Test engine
 ctest = function(x,
-								 formula = NULL     ,
-								 asset = NULL       ,
-								 rep = 1500         ,
-								 ci_levels = 0.95   ,
+								 formula   = NULL  ,
+								 asset     = NULL  ,
+								 rep       = 1500  ,
+								 ci_levels = 0.95  ,
+								 RRextraResults   = NULL  ,
 								 ...) {
 	message = c()
 	xtb = xtabs(
@@ -964,12 +967,13 @@ ctest = function(x,
 			message = c(message, 'There are some empty levels in data')
 			return(
 				list(
-					result     = NULL   ,
-					effectSize = NULL   ,
-					note       = message,
-					table      = xtb    ,
-					input      = x      ,
-					formula    = formula
+					result     = NULL       ,
+					effectSize = NULL       ,
+					note       = message    ,
+					table      = xtb        ,
+					input      = x          ,
+					formula    = formula    ,
+					RRextra    = RRextraResults
 				)
 			)
 		}
@@ -986,7 +990,8 @@ ctest = function(x,
 				note    = message ,
 				table   = xtb     ,
 				input   = x       ,
-				formula = formula
+				formula = formula ,
+				RRextra = RRextraResults
 			)
 		)
 	}
@@ -1027,7 +1032,8 @@ ctest = function(x,
 			note        = message,
 			table       = xtb    ,
 			input       = 'Only have values when the function fails',
-			formula     = formula
+			formula     = formula,
+			RRextra     = RRextraResults
 		)
 	)
 }
@@ -1542,22 +1548,28 @@ CombineLevels = function(..., debug = TRUE) {
 RRNewObjectAndFormula = function(object              ,
 																 RRprop              ,
 																 formula             ,
-																 labels = NULL       ,
+																 labels       = NULL ,
 																 depVarPrefix = NULL ,
+																 refLevel     = NULL ,
 																 ### see right in the cut function
 																 right        = TRUE) {
 	allTerms         = all_vars0(formula)
 	newobject        = object
-	RRcutObject      = RRCut(
-		object = object             ,
-		prob   = RRprop             ,
-		depVariable = allTerms[1]   ,
-		labels = labels             ,
-		depVarPrefix = depVarPrefix ,
-		right        = right
+	RRcutObject  = RRCut(
+		object         = object        ,
+		prob           = RRprop        ,
+		depVariable    = allTerms[1]   ,
+		labels         = labels        ,
+		depVarPrefix   = depVarPrefix  ,
+		right          = right         ,
+		refLevel       = refLevel      ,
+		lower          = allTerms[2]
 	)
-	newobject@datasetPL = RRcutObject$discObject
-	newFormula          = replaceElementInFormula(
+	if (is.null(RRcutObject))
+		return(NULL)
+	
+	newobject        = RRcutObject$discObject
+	newFormula       = replaceElementInFormula(
 		formula = formula,
 		pattern = allTerms[1] ,
 		replace = RRcutObject$newdepVariable
@@ -1569,7 +1581,13 @@ RRNewObjectAndFormula = function(object              ,
 			newDepVariable = RRcutObject$newdepVariable ,
 			object         = object                     ,
 			formula        = formula                    ,
-			depVariable    = allTerms[1]
+			depVariable    = allTerms[1]                ,
+			###
+			RRprop         = RRprop                     ,
+			labels         = labels                     ,
+			depVarPrefix   = depVarPrefix               ,
+			refLevel       = RRcutObject$refLevel       ,
+			empiricalQuantiles = RRcutObject$percentages
 		)
 	)
 }
@@ -1582,7 +1600,7 @@ jitter0 = function(x,
 									 maxtry = 1500) {
 	for (i in 1:maxtry) {
 		if (i >= maxtry)
-			message0('No solusion found for the RR_prop. You may want to revise the RR_prop?')
+			message0('\tNo solusion found for the specified RR_prop.')
 		xx = jitter(x = x,
 								amount = amount,
 								factor = factor)
@@ -1643,38 +1661,102 @@ ReplaceTails = function(x         ,
 	return(x)
 }
 
+CheckTheValidityOfTheRRLower = function(lower, data, depvar, minLevels = 2) {
+	if (is.null(data) || is.null(lower)) {
+		stop('~> Null data or the `Reference variable`. Please check the input data or the `Reference variable`')
+	}
+	if (is.null(depvar) || !depvar %in% names(data)) {
+		stop('~> dependent variable does not exist in the data')
+	}
+	if (!is.numeric(data[, depvar])) {
+		stop('~> dependent variable must be numeric')
+	}
+	if (is.null(lower) || !lower %in% names(data)) {
+		stop('~> `Reference variable` does not exist in the data')
+	}
+	if (is.numeric(data[, lower])) {
+		stop('~> `Reference variable` must be a factor')
+	}
+	if (nlevels(as.factor(data[, lower])) < minLevels) {
+		stop('~> `Reference variable` must have at least two levels')
+	}
+	return(TRUE)
+}
+
+RRGetTheLeveLWithMaxFrequency = function(data, lower) {
+	tbl = table(data[, lower])
+	maxTbl = tbl %in% max(tbl, na.rm = TRUE)[1]
+	r      = names(tbl[maxTbl])
+	if (length(r) > 1) {
+		message0(
+			'\tMore than one variable with the highest frequency detected. See:\n\tLevel(frequency): ',
+			pasteComma(paste0(r, '(', tbl[maxTbl], ')'), truncate = FALSE),
+			'\n\t\tThe first one (`',
+			r[1],
+			'`) would be used.'
+		)
+	} else{
+		message0('\t\tNominated level(frequency) = ', 	pasteComma(paste0(r, '(', tbl[maxTbl], ')')))
+	}
+	return(r[1])
+}
+
+ExtractDatasetPLIfPossible = function(x) {
+	if (class(x) %in% c('PhenList', 'PhenListAgeing')) {
+		x     = x@datasetPL
+	}
+	return(x)
+}
+
 RRCut = function(object                     ,
 								 prob         = .95         ,
 								 depVariable  = 'data_point',
 								 labels       = NULL,
 								 depVarPrefix = NULL,
-								 right        = TRUE) {
-	if (prob == .5) {
-		message0('"prob" must be different from 0.5')
+								 right        = TRUE,
+								 refLevel     = NULL,
+								 lower        = 'Genotype'
+								 ) {
+	data     = object
+	if (class(data) %in% c('PhenList', 'PhenListAgeing')) {
+		refLevel = data@refGenotype
+		data     = data@datasetPL
+	}
+	if (!CheckTheValidityOfTheRRLower(lower = lower, data = data,depvar = depVariable)) {
 		return(NULL)
 	}
+	if (prob == .5) {
+		message0('\t`prop` must be different from 0.5')
+		return(NULL)
+	}
+	if(is.null(refLevel)){
+		message0('\tReference level left blank, then the dominate level will be set as the reference level')
+		refLevel = RRGetTheLeveLWithMaxFrequency(data = data, lower = lower)
+	}else{
+		message0('Reference level is set to ', refLevel)
+	}
 	# Preparation ...
-	JitterPrecision = 4 + 1 * decimalplaces(min(object@datasetPL[, depVariable], na.rm = TRUE))
-	object@datasetPL$data_point_discretised  = NA
-	controls = subset(object@datasetPL,
-										object@datasetPL$Genotype %in% object@refGenotype)
-	mutants  = subset(object@datasetPL,
-										object@datasetPL$Genotype %in% object@testGenotype)
+	JitterPrecision = 4 + 1 * decimalplaces(min(data[, depVariable], na.rm = TRUE))
+	data$data_point_discretised  = NA
+	controls = subset(data,
+										  data[,lower] %in% refLevel)
+	mutants  = subset(data,
+										!(data[,lower] %in% refLevel))
 	prb      = unique(c(0,  prob, 1))
 	qntl     = ReplaceTails(
 		x      = quantile(x = controls[, depVariable],
 											probs = prb                ,
 											na.rm = TRUE               ),
-		upper = max(object@datasetPL[, depVariable], na.rm = TRUE)[1] + 1,
-		lower = min(object@datasetPL[, depVariable], na.rm = TRUE)[1] - 1,
+		upper = max(data[, depVariable], na.rm = TRUE)[1] + 1,
+		lower = min(data[, depVariable], na.rm = TRUE)[1] - 1,
 		add   = FALSE
 	)
 	if (sum(duplicated(qntl))) {
 		message0(
-			'* duplicates in quantiles detected, then small (dependes ont he data precision) jitter will be added to quantiles. Qauntiles: ',
-			pasteComma(qntl, replaceNull = FALSE)
+			'\t* duplicates in quantiles detected, then small (dependes on the data precision) jitters will be added to quantiles.\n\t\tQauntiles: ',
+			pasteComma(round(qntl,5), replaceNull = FALSE)
 		)
-		message0('Jitter precision (decimal) = ', JitterPrecision)
+		message0('\tJitter precision (decimal) = ', JitterPrecision)
 		qntl[duplicated(qntl)] = jitter0(
 			x = qntl[duplicated(qntl)],
 			amount = 10 ^	-JitterPrecision,
@@ -1684,13 +1766,18 @@ RRCut = function(object                     ,
 		qntl = sort(qntl)
 	}
 	message0(
-		'Initial quantiles for cutting the data '      ,
-		'[probs = '                              ,
-		pasteComma(round(prb, 3))                 ,
+		'\tInitial quantiles for cutting the data ',
+		'[probs = ('                               ,
+		pasteComma(round(prb, 3))                  ,
+		'), n.reference = '                        ,
+		length(controls[, depVariable]),
 		']: '                                    ,
 		pasteComma(round(qntl, 3), replaceNull = FALSE)
 	)
-	
+	if (length(unique(qntl)) < 2) {
+		message0('\tThe algorithm cannot specify non-unique quantiles.')
+		return(NULL)
+	}
 	controls$data_point_discretised  = cut(
 		x = controls[, depVariable],
 		breaks = qntl,
@@ -1704,7 +1791,7 @@ RRCut = function(object                     ,
 	###
 	tbc  = prop.table(table(controls$data_point_discretised))
 	tbpc = setNames(as.list(tbc),names(tbc))
-	message0('Detected percentile in the data: ',pasteComma(paste(names(tbc),'=',round(tbc,6))))
+	message0('\tDetected percentile in the data: ',pasteComma(paste(names(tbc),'=',round(tbc,6))))
 	###
 	mutants$data_point_discretised   = cut(
 		x = mutants [, depVariable],
@@ -1717,21 +1804,97 @@ RRCut = function(object                     ,
 		right          = right
 	)
 	newObj                          = rbind(mutants, controls)
-	newdepVariable                  = pasteUnderscore(depVarPrefix, depVariable, 'discretised')
+	newdepVariable                  = pasteUnderscore(c(depVarPrefix, depVariable, 'discretised'))
 	names(newObj)[names(newObj) %in% 'data_point_discretised'] = newdepVariable
-	newObj[, newdepVariable] = as.factor(newObj[, newdepVariable])
-	message0('a new column is added to the data object: ', newdepVariable)
+	newObj[, newdepVariable]        = as.factor(newObj[, newdepVariable])
+	#message0('\tA new column is added to the data object: ', newdepVariable)
 	return(
 		list(
-			object = object                 ,
-			discObject = newObj             ,
-			newdepVariable = newdepVariable ,
-			depVariable = depVariable       ,
-			percentages = tbpc
+			object      = object             ,
+			discObject  = newObj             ,
+			newdepVariable = newdepVariable  ,
+			depVariable = depVariable        ,
+			percentages = tbpc               ,
+			refLevel    = refLevel           ,
+			lower       = lower    
 		)
 	)
 }
 
+RRDiscretizedEngine = function(data,
+															 formula      = data_point ~ Genotype + Sex + zygosity ,
+															 depVar       = 'data_point'                           ,
+															 lower        = 'Genotype'                             ,
+															 refLevel     = NULL                                   ,
+															 labels       = c('Low', 'NormalHigh')                 ,
+															 depVarPrefix = 'Low'                                  ,
+															 right        = TRUE                                   ,
+															 prob         = .95) {
+	requireNamespace("rlist")
+	l1 = l2 = l3 = l4 = NULL
+	if (!CheckTheValidityOfTheRRLower(lower  = lower,
+																		depvar = depVar,
+																		data   = data)) {
+		return(NULL)
+	}
+	vars  =  names(data) %in% all.vars(formula)
+	df    =        data[, vars]
+	cat   = !sapply(df[, all.vars(formula)], is.numeric)
+	extra = all.vars(formula)[cat &
+															!all.vars(formula) %in% c(depVar, lower)]
+	lextra = length(extra)
+	message0('Preparing the reference ranges ...')
+	message0('Preparing the data for the variable: ', lower)
+	
+	l1 = RRNewObjectAndFormula(
+		object  = data                ,
+		RRprop  = prob                ,
+		formula = formula             ,
+		labels  = labels              ,
+		depVarPrefix =  depVarPrefix  ,
+		refLevel     = refLevel       ,
+		right        = right
+	)
+	
+	if (lextra > 0) {
+		for (i in 1:lextra) {
+			cbn = combn(extra, i)
+			for (j in 1:ncol(cbn)) {
+				message0('\tspliting on ', pasteComma(cbn[, j], replaceNull = FALSE))
+				out = split(df,
+										interaction(df[cbn[, j]]), drop = TRUE)
+				l2   = c(l2, out)
+			}
+		}
+	}
+	if (!is.null(l2)) {
+		l3 = lapply(names(l2), function(name) {
+			message0('Preparing the data for the combined effect: ', name)
+			x = l2[[name]]
+			out = RRNewObjectAndFormula(
+				object       = x            ,
+				RRprop       = prob         ,
+				formula      = formula      ,
+				labels       = labels       ,
+				depVarPrefix = depVarPrefix ,
+				refLevel     = refLevel     ,
+				right        = right
+			)
+		})
+		names(l3) = names(l2)
+	}
+	l4        = c(list(l1), l3)
+	#### must improve in future
+	if (!is.null(l4)) {
+		names(l4) =	ifelse(
+			nzchar(names(l4))                         ,
+			paste(depVar, lower, names(l4), sep = '.'),
+			paste(depVar, lower,            sep = '.')
+		)
+	}
+	l4        = list.clean(l4)
+	return(l4)
+}
 
 RRextra = function(object,
 									 prob = .95,
@@ -1883,16 +2046,19 @@ sort0 = function(x, ...) {
 message0 = function(...,
 										breakLine  = TRUE,
 										capitalise = TRUE,
-										appendLF   = TRUE) {
-	x = paste0(..., collapse = '')
-	if (breakLine)
-		nmessage = unlist(strsplit(x = x, split = '\n'))
-	else
-		nmessage = x
-	if (capitalise)
-		nmessage = capitalise(nmessage)
-	message(paste(Sys.time(), nmessage, sep = '. ', collapse = '\n'),
-					appendLF = appendLF)
+										appendLF   = TRUE,
+										active     = TRUE) {
+	if (active) {
+		x = paste0(..., collapse = '')
+		if (breakLine)
+			nmessage = unlist(strsplit(x = x, split = '\n'))
+		else
+			nmessage = x
+		if (capitalise)
+			nmessage = capitalise(nmessage)
+		message(paste(Sys.time(), nmessage, sep = '. ', collapse = '\n'),
+						appendLF = appendLF)
+	}
 }
 
 warning0 = function(...,
@@ -2894,7 +3060,10 @@ safe_pchisq0 <- function(q, df, ...)
 }
 
 lowHighList = function(x, y, ...) {
-	r = list('low' = x, 'high' = y)
+	if (!is.null(x) || !is.null(y))
+		r = list('low' = x, 'high' = y , ...)
+	else
+		r = list('low' = x, 'high' = y)
 	return(r)
 }
 
@@ -2932,12 +3101,32 @@ PhenListAgeingRelabling = function(dataset, col, l1, rel1, l2, rel2) {
 	return(dataset)
 }
 
+checkSummary = function(dataset, var, ...) {
+	if (is.null(dataset) || is.null(var))
+		return(NULL)
+	
+	if (is.factor(dataset[, var]) || is.character(dataset[, var]))
+		lvls = paste0('\tLevels: ', pasteComma(levels(as.factor(dataset[, var])), width = 60))
+	else
+		lvls = paste0('\tSummary: mean = ',
+								 mean(dataset[, var], na.rm = TRUE),
+								 ', sd = ',
+								 sd0(dataset[, var], na.rm = TRUE))
+	message0(lvls)
+	return(invisible(lvls))
+}
+
 checkPhenlistColumns = function(dataset, vars) {
 	allExist = NULL
 	if (length(vars)) {
 		for (v in vars) {
 			r = v %in% names(dataset)
-			message0('check whether variable ', v, ' exists in the data. Result = ', r)
+			message0('checking whether variable `',
+							 v,
+							 '` exists in the data. Result = ',
+							 r)
+			if (r)
+				checkSummary(dataset = dataset, var = v)
 			allExist = c(allExist , r)
 		}
 	} else{
@@ -2967,21 +3156,17 @@ fIsBecome = function(dataset,
 			###
 			names(dataset)[names(dataset) %in% iss] =
 				rename
-			if (is.factor(dataset[, rename]))
-				lvls = paste('\n\tLevels: ', pasteComma(levels(dataset[, rename]), width = 60))
-			else
-				lvls = NULL
 			message0('Variable `',
 							 iss,
 							 '` renamed to `',
-							 rename,
-							 '`. ',
-							 lvls)
+							 rename, '`')
 			break
 		}
 	}
 	return(dataset)
 }
+
+
 
 CleanEmptyRecords = function(x, vars) {
 	vars1 = vars[vars %in% names(x)]

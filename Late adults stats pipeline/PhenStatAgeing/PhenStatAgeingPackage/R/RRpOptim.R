@@ -3,14 +3,16 @@ RRrunner = function(object              ,
 										formula       = ~ category + Genotype + Sex + LifeStage,
 										rep           = 1500                                   ,
 										method        = NULL                                   ,
+										RRrefLevel    = NULL                                   ,
 										RRprop        = .05                                    ,
 										ci_levels     = 0.95                                   ,
 										...)
 {
+	requireNamespace("rlist")
 	sta.time    = Sys.time()
 	allTerms    = all_vars0(x = formula)
-	if (!method %in% c('RR')        ||
-			is.null(allTerms)           ||
+	if (!method %in% c('RR')          ||
+			is.null(allTerms)             ||
 			is.null(object)             ||
 			sum(allTerms %in% names(object@datasetPL)) < 2) {
 		#####
@@ -36,92 +38,106 @@ RRrunner = function(object              ,
 		data = object@datasetPL,
 		responseIsTheFirst = TRUE
 	)
-	message0('Discritizing the continuous data into discrete data. The quantile = ',
+	message0('Discritizing the continuous data into discrete levels. The quantile = ',
 					 RRprop)
 	message0('Stp 1. Low versus Normal/High')
-	RRobject_low = RRNewObjectAndFormula(
-		object = object                   ,
-		RRprop = 1 - RRprop               ,
-		formula = formula                 ,
-		labels = c('Low', 'NormalHigh')   ,
-		depVarPrefix = 'Low'              ,
-		right =  TRUE
+	RRobject_low = RRDiscretizedEngine(
+		data     = object@datasetPL                   ,
+		formula  = cleanFormulaForOutput              ,
+		depVar   = allTerms[1]                        ,
+		lower    = allTerms[2]                        ,
+		refLevel = RRrefLevel                         ,
+		labels   = c('Low', 'NormalHigh')             ,
+		depVarPrefix = 'Low'                          ,
+		right    = TRUE                               ,
+		prob     = 1 - RRprop
 	)
-	RRresult_low = crunner(
-		object = RRobject_low$newobject   ,
-		formula = RRobject_low$newFormula ,
-		rep = rep                         ,
-		method = 'RR'                     ,
-		fullComparisions = TRUE           ,
-		noteToFinish = 'in step 1'        ,
-		ci_levels = ci_levels             ,
-		...
-	)
-	
 	message0('Stp 2. Low/Normal versus High')
-	RRobject_high = RRNewObjectAndFormula(
-		object = object                    ,
-		RRprop = RRprop                    ,
-		formula = formula                  ,
-		labels = c('LowNormal', 'High')    ,
-		depVarPrefix = 'High'              ,
-		right = FALSE
+	RRobject_high = RRDiscretizedEngine(
+		data     = object@datasetPL                   ,
+		formula  = cleanFormulaForOutput              ,
+		depVar   = allTerms[1]                        ,
+		lower    = allTerms[2]                        ,
+		refLevel = RRrefLevel                         ,
+		labels   = c('LowNormal', 'High')             ,
+		depVarPrefix = 'High'                         ,
+		right    = FALSE                              ,
+		prob     = RRprop
 	)
-	RRresult_high = crunner(
-		object = RRobject_high$newobject   ,
-		formula = RRobject_high$newFormula ,
-		rep = rep                          ,
-		method = 'RR'                      ,
-		fullComparisions = TRUE            ,
-		noteToFinish = 'in step 2'         ,
-		ci_levels = ci_levels              ,
-		...
-	)
-	message0('RR framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds.')
-	#####
-	SpltResult = c(
-		renameVariableNameInList(
-			list = RRresult_low$output$SplitModels  ,
-			name = RRobject_low$newDepVariable      ,
-			prefix  = 'Low'                         ,
-			not     = TRUE
-		)  ,
-		renameVariableNameInList(
-			list = RRresult_high$output$SplitModels ,
-			name = RRobject_high$newDepVariable     ,
-			prefix  = 'High'                        ,
-			not = TRUE
-		)
-	)
-	OutR = list(
-		output = list(SplitModels = SpltResult),
-		input  = list(
-			PhenListAgeing  = object           ,
-			data            = object@datasetPL ,
-			depVariable     = allTerms[1]      ,
-			rep             = rep              ,
-			method          = method           ,
-			formula         = formula          ,
-			RRprop          = RRprop           ,
-			ci_level        = ci_levels
-		),
-		extra  = list(
-			missings        = list(
-				Low  = RRresult_low$extra$missings  ,
-				High = RRresult_high$extra$missings
-			),
-			UsedData        = list(Low  = RRresult_low$input$data      ,
-														 High = RRresult_high$input$data)    ,
-			AllTable        = list(
-				Low  = RRresult_low$extra$AllTable                       ,
-				High = RRresult_high$extra$AllTable
-			)                                                          ,
-			Cleanedformula           = cleanFormulaForOutput           ,
-			DiscritiseCleanedformula = list(
-				Low  = RRresult_low$extra$Cleanedformula                 ,
-				High = RRresult_high$extra$Cleanedformula
+	###########################
+	message0('Fisher exact test with '         ,
+					 ifelse(rep > 0, rep, 'No')        ,
+					 ' repetition(s) in progress ...')
+	message0('Analysing Low vs NormalHigh ...')
+	RRresult_low = lapply(RRobject_low, function(x) {
+		r = suppressMessages(
+			crunner(
+				object   = x$newobject                    ,
+				formula  = x$newFormula                   ,
+				rep      = rep                            ,
+				method   = 'RR'                           ,
+				fullComparisions = TRUE                   ,
+				noteToFinish     = 'in Low vs NormalHigh' ,
+				ci_levels        = ci_levels              ,
+				RRextraResults   = list(
+					depVariable      = x$depVariable        ,
+					disdepVariable   = x$newDepVariable     ,
+					RRprop           = x$RRprop             ,
+					RRLabels         = x$labels             ,
+					RRprefix         = x$depVarPrefix       ,
+					RRreferenceLevel = x$refLevel      ,
+					RRempiricalQuantiles  = x$empiricalQuantiles
+				)                                         ,
+				...
 			)
 		)
+		return(r$output$SplitModels)
+	})
+	message0('Analysing LowNormal vs High ...')
+	RRresult_high = lapply(RRobject_high, function(x) {
+		r = suppressMessages(
+			crunner(
+				object   = x$newobject                    ,
+				formula  = x$newFormula                   ,
+				rep      = rep                            ,
+				method   = 'RR'                           ,
+				fullComparisions = TRUE                   ,
+				noteToFinish     = 'in LowNormal vs High' ,
+				ci_levels        = ci_levels              ,
+				RRextraResults   = list(
+					depVariable      = x$depVariable        ,
+					disdepVariable   = x$newDepVariable     ,
+					RRprop           = x$RRprop             ,
+					RRLabels         = x$labels             ,
+					RRprefix         = x$depVarPrefix       ,
+					RRreferenceLevel = x$refLevel      ,
+					RRempiricalQuantiles  = x$empiricalQuantiles
+				)                                         ,
+				...
+			)
+		)
+		return(r$output$SplitModels)
+	})
+	message0('RR framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds.')
+	#####
+	SpltResult = lapply(c(Low  = RRresult_low,
+												High = RRresult_high), function(x) {
+													x[[1]]
+												})
+	OutR = list(
+		output = list(SplitModels = list.clean(SpltResult)) ,
+		input  = list(
+			PhenListAgeing  = object                          ,
+			data            = object@datasetPL                ,
+			depVariable     = allTerms[1]                     ,
+			rep             = rep                             ,
+			method          = method                          ,
+			formula         = formula                         ,
+			prop            = RRprop                          ,
+			ci_level        = ci_levels                       ,
+			refLevel        = RRrefLevel
+		),
+		extra  = list(Cleanedformula           = cleanFormulaForOutput)
 	)
 	class(OutR) <- 'PhenStatAgeingRR'
 	return(OutR)
