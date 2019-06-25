@@ -1618,7 +1618,7 @@ addJitterToTheEntireData = function(x, min = -1, max = 0) {
 	message0(
 		'A small jitter (max value = ',
 		min(jitter, na.rm = TRUE) -
-		max(jitter, na.rm = TRUE), 
+			max(jitter, na.rm = TRUE), 
 		') is added to the data')
 	o      = order(x)
 	x      = x + jitter[o]
@@ -1716,7 +1716,7 @@ RRCut = function(object                     ,
 								 right        = TRUE,
 								 refLevel     = NULL,
 								 lower        = 'Genotype'
-								 ) {
+) {
 	data     = object
 	if (class(data) %in% c('PhenList', 'PhenListAgeing')) {
 		refLevel = data@refGenotype
@@ -1739,7 +1739,7 @@ RRCut = function(object                     ,
 	JitterPrecision = 4 + 1 * decimalplaces(min(data[, depVariable], na.rm = TRUE))
 	data$data_point_discretised  = NA
 	controls = subset(data,
-										  data[,lower] %in% refLevel)
+										data[,lower] %in% refLevel)
 	mutants  = subset(data,
 										!(data[,lower] %in% refLevel))
 	prb      = unique(c(0,  prob, 1))
@@ -2086,7 +2086,6 @@ all_vars0 = function(x, ...) {
 	}
 }
 
-
 intervalsCon = function(object, lvls, ...) {
 	if (is.null(object))
 		return(object)
@@ -2095,7 +2094,50 @@ intervalsCon = function(object, lvls, ...) {
 					 pasteComma(lvls),
 					 ' ...')
 	ci = lapply(lvls, function(x) {
-		list(intervals = intervals(object, x, ...), level = x)
+		citerms = if (is(object, 'lme')) {
+			c('all', 'fixed', 'var-cov')
+		} else if (is(object, 'gls')) {
+			c('all', 'coef', 'var-cov')
+		} else{
+			c('all')
+		}
+		for (citerm in citerms) {
+			intv = tryCatch(
+				expr = intervals(
+					object = object,
+					level  = x,
+					which  = citerm,
+					...
+				),
+				error = function(e) {
+					message0('\t\tError in estimating the confidence intervals for `',
+									 citerm,
+									 '` term(s). See: ')
+					message0('\t\t ~> ', e, breakLine = FALSE)
+					return(NULL)
+				} ,
+				warning = function(w) {
+					message0('\t\tError in estimating the confidence intervals for `',
+									 citerm,
+									 '` term(s). See: ')
+					message0('\t\t ~> ', w, breakLine = FALSE)
+					return(NULL)
+				}
+			)
+			if (!is.null(intv)) {
+				message0('\tCI for `', citerm, '` term(s) successfully estimated')
+				break
+			} else if (!citerm %in% tail(citerms, 1)) {
+				message0('\tAdjustment applied. Retrying ....')
+			} else{
+				message0('CI estimation failed.')
+			}
+		}
+		if (is.null(intv)) {
+			return(NULL)
+		} else{
+			return(list(intervals = intv, level = x))
+		}
 	})
 	if (!is.null(ci))
 		names(ci) = paste('CI_', lvls, sep = '')
@@ -2172,6 +2214,7 @@ removeSingleLevelFactors = function(formula, data) {
 	return(formula)
 }
 
+
 modelSummaryPvalueExtract = function(x,
 																		 variable   = 'Genotype'                          ,
 																		 anova      = TRUE                                ,
@@ -2199,21 +2242,31 @@ modelSummaryPvalueExtract = function(x,
 		mSumFiltered = NULL # NA?
 	}
 	if (ci_display && !is.null(mSumFiltered)) {
-		fixedEffInters = x$intervals[[1]]$intervals$fixed
-		return(
-			list(
-				'value'      = as.vector(unlist(mSumFiltered))                                   ,
-				'confidence' = Matrix2List(fixedEffInters[rownames(fixedEffInters) %in% variable ,
-																									-2                                     ,
-																									drop = FALSE])                         ,
-				'level'      = x$intervals[[1]]$level
-			)
+		fixedEffInters = CheckWhetherNamesExistInListExtractCI(
+			x        = x$intervals[[1]]$intervals,
+			lnames   = c('coef', 'fixed')        ,
+			variable = variable
 		)
+		return(list(
+			'value'      = as.vector(unlist(mSumFiltered))     ,
+			'confidence' =  Matrix2List(x = fixedEffInters)    ,
+			'level'      = ifelse(is.null(fixedEffInters), NULL, x$intervals[[1]]$level)
+		))
 	} else{
 		return(as.vector(unlist(mSumFiltered)))
 	}
 }
 
+CheckWhetherNamesExistInListExtractCI = function(x, lnames, variable, minusCol = 2) {
+	if (!is.null(x) && any(names(x) %in% lnames)) {
+		Toplst = x[names(x) %in% lnames][[1]]
+		Toplst = Toplst[rownames(Toplst) %in% variable , -minusCol,
+					 drop = FALSE]
+		return(Toplst)
+	} else{
+		return(NULL)
+	}
+}
 
 CatEstimateAndCI = function(object) {
 	if (is.null(object))
@@ -3109,9 +3162,9 @@ checkSummary = function(dataset, var, ...) {
 		lvls = paste0('\tLevels: ', pasteComma(levels(as.factor(dataset[, var])), width = 60))
 	else
 		lvls = paste0('\tSummary: mean = ',
-								 mean(dataset[, var], na.rm = TRUE),
-								 ', sd = ',
-								 sd0(dataset[, var], na.rm = TRUE))
+									mean(dataset[, var], na.rm = TRUE),
+									', sd = ',
+									sd0(dataset[, var], na.rm = TRUE))
 	message0(lvls)
 	return(invisible(lvls))
 }
@@ -3143,7 +3196,7 @@ fIsBecome = function(dataset,
 	if (is.null(is) || is.null(rename))
 		return(dataset)
 	
-
+	
 	for (iss in is) {
 		if (iss %in% colnames(dataset) &&
 				ifelse(is.null(ifexist), TRUE, !iss %in% ifexist)) {
