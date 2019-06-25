@@ -715,8 +715,8 @@ RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 	colVars   = names(x)  %in% vars
 	if (sum(colVars)) {
 		message0('Checking duplications in the data model:\n\t ',
-						 pasteComma(names(x)[colVars]),
-						 truncate = FALSE)
+						 pasteComma(names(x)[colVars],
+						 					 truncate = FALSE))
 		subX    = x[, colVars, drop = FALSE]
 		#numCols = sapply(subX, is.numeric)
 		#ConCols = subX[,  numCols, drop = FALSE]
@@ -2110,17 +2110,17 @@ intervalsCon = function(object, lvls, ...) {
 					...
 				),
 				error = function(e) {
-					message0('\t\tError in estimating the confidence intervals for `',
+					message0('\t\t ~> Error in estimating the confidence intervals for `',
 									 citerm,
-									 '` term(s). See: ')
-					message0('\t\t ~> ', e, breakLine = FALSE)
+									 '` term(s)')
+					#message0('\t\t ~> ', e, breakLine = FALSE)
 					return(NULL)
 				} ,
 				warning = function(w) {
-					message0('\t\tError in estimating the confidence intervals for `',
+					message0('\t\t ~> Error in estimating the confidence intervals for `',
 									 citerm,
-									 '` term(s). See: ')
-					message0('\t\t ~> ', w, breakLine = FALSE)
+									 '` term(s)')
+					#message0('\t\t ~> ', w, breakLine = FALSE)
 					return(NULL)
 				}
 			)
