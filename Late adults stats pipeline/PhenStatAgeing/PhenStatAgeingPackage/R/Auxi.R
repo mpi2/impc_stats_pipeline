@@ -1652,13 +1652,13 @@ ReplaceTails = function(x         ,
 		return(x)
 	if (!add) {
 		if (upper)
-			x[x == max(xx, na.rm = TRUE)] = upper
+			x[which.max(x)] = upper[1]
 		if (lower)
-			x[x == min(xx, na.rm = TRUE)] = lower
+			x[which.min(x)] = lower[1]
 	} else{
 		x = c(lower, x, upper)
 	}
-	return(x)
+	return(sort(unname(x)))
 }
 
 CheckTheValidityOfTheRRLower = function(lower, data, depvar, minLevels = 2) {
@@ -1733,7 +1733,7 @@ RRCut = function(object                     ,
 		message0('\tReference level left blank, then the dominate level will be set as the reference level')
 		refLevel = RRGetTheLeveLWithMaxFrequency(data = data, lower = lower)
 	}else{
-		message0('Reference level is set to ', refLevel)
+		message0('Reference level is set to `', refLevel,'`')
 	}
 	# Preparation ...
 	JitterPrecision = 4 + 1 * decimalplaces(min(data[, depVariable], na.rm = TRUE))
