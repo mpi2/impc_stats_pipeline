@@ -12,7 +12,7 @@ importFrom("stats", "AIC", "aggregate", "as.formula", "complete.cases",
 					 "density", "fisher.test", "formula", "poisson", "predict",
 					 "qqnorm", "resid", "sd", "terms", "xtabs")
 importFrom("stats", "na.omit", "reformulate", "update")
-importFrom("utils", "combn", "head")
+importFrom("utils", "combn", "head", "tail")
 importFrom("methods", "setClass")
 importFrom("Hmisc","describe")
 importFrom("methods", "is")
