@@ -3155,8 +3155,11 @@ PhenListAgeingRelabling = function(dataset, col, l1, rel1, l2, rel2) {
 }
 
 checkSummary = function(dataset, var, ...) {
-	if (is.null(dataset) || is.null(var))
-		return(NULL)
+	lvls = NULL
+	if (is.null(dataset) ||
+			is.null(var)     ||
+			length (na.omit(dataset[, var])) < 1)
+		return(lvls)
 	
 	if (is.factor(dataset[, var]) || is.character(dataset[, var]))
 		lvls = paste0('\tLevels: ', pasteComma(levels(as.factor(dataset[, var])), width = 60))

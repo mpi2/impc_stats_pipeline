@@ -37,6 +37,8 @@ PhenListAgeing =
 					 dataset.values.early        = NULL,
 					 dataset.values.late         = NULL)
 	{
+		testGenotype = as.character(testGenotype)
+		refGenotype  = as.character( refGenotype)
 		if (is.null(dataset) || class(dataset) != "data.frame") {
 			message0('error ~> Null dataset or not a data.frame.')
 			return(NULL)
