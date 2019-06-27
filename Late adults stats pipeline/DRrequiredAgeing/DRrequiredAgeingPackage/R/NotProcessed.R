@@ -120,7 +120,7 @@ NotProcessedOutput = function(args) {
   dbtemp                = optFail
   names(dbtemp)[names(dbtemp) %in% '']  =  'Results'
   dbtemp                = as.data.frame(as.list(dbtemp))
-  con <- dbConnect(drv  = RSQLite::SQLite(), dbname = "DR10SQLite.db")
+  con <- dbConnect(drv  = RSQLite::SQLite(), dbname = paste0(dbtemp$procedure_stable_id[1],"_DR10SQLite.db"))
   dbWriteTable(con, "DR10", dbtemp, append = TRUE)
   dbDisconnect(conn     = con)
 
