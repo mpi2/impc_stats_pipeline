@@ -1881,9 +1881,11 @@ WriteToDB = function(df,
         dbDisconnect(conn     = con)
       },
       warning = function(war) {
+        dbDisconnect(conn     = con)
         return(NULL)
       },
       error   = function(err) {
+        dbDisconnect(conn     = con)
         return(NULL)
       }
     )
