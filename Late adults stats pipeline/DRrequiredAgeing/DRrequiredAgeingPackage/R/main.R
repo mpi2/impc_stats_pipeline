@@ -88,6 +88,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   requireNamespace('base64enc')
   requireNamespace('RJSONIO'    )
   requireNamespace('jsonlite'   )
+  requireNamespace('DBI'        )
   # Config files
   message0('Loading configuration ...')
   methodmap                      = readConf('MethodMap.conf')
@@ -342,8 +343,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     'nlme'        ,
                     'RJSONIO'     ,
                     'jsonlite'    ,
-                    'PhenStatAgeing',
-                    'DRrequiredAgeing'
+                    'PhenStatAgeing'  ,
+                    'DRrequiredAgeing',
+                    'DBI'
                   ),
                   .errorhandling = c(MultiCoreErrorHandling),
                   .verbose = verbose                        ,

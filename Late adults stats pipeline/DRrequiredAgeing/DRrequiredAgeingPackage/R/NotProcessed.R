@@ -1,5 +1,6 @@
 # all in small case and separated by underscore
 NotProcessedOutput = function(args) {
+  requireNamespace("DBI")
   bsg3.5        = droplevels0(args$n3.5$biological_sample_group)
   bsg3.5.2      = droplevels0(args$n3.5.2$biological_sample_group)
   cid3.5.2      = NA2LabelInFactor(args$n3.5.2$colony_id)
@@ -114,6 +115,14 @@ NotProcessedOutput = function(args) {
              JsonObj,
            active = args$encode)
   )
+  # Write to the SQLite DB
+  message0('Writting to the SQLite ...')
+  dbtemp                = optFail
+  names(dbtemp)[names(dbtemp) %in% '']  =  'Results'
+  dbtemp                = as.data.frame(as.list(dbtemp))
+  con <- dbConnect(drv  = RSQLite::SQLite(), dbname = "DR10SQLite.db")
+  dbWriteTable(con, "DR10", dbtemp, append = TRUE)
+  dbDisconnect(conn     = con)
 
-  return(optFail)
+    return(optFail)
 }

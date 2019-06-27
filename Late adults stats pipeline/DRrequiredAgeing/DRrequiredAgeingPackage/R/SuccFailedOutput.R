@@ -1,6 +1,6 @@
 # all in small case and separated by underscore
 SuccessfulOutput = function(args) {
-
+  requireNamespace("DBI")
   ### 1 Experiment detail
   experiment_details      = list(
     ####
@@ -43,5 +43,16 @@ SuccessfulOutput = function(args) {
              JsonObj,
            active = args$encode)
   )
+
+  # Write to the SQLite DB
+  # Write to the SQLite DB
+  message0('Writting to the SQLite ...')
+  dbtemp                = outP
+  names(dbtemp)[names(dbtemp) %in% '']  =  'Results'
+  dbtemp                = as.data.frame(as.list(dbtemp))
+  con <- dbConnect(drv  = RSQLite::SQLite(), dbname = "DR10SQLite.db")
+  dbWriteTable(con, "DR10", dbtemp, append = TRUE)
+  dbDisconnect(conn     = con)
+
   return(outP)
 }
