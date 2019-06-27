@@ -1851,7 +1851,30 @@ replaceInList <- function (x, FUN, ...)
     FUN(x, ...)
 }
 
-
+WriteToDB = function(df,
+                     dbname    = 'db' ,
+                     TableName = 'DR10') {
+  requireNamespace("DBI")
+  dbname  = RemoveSpecialChars(dbname)
+  message0('Writting to the SQLite ...')
+  message0('DB name: ', dbname)
+  dbtemp                = df
+  names(dbtemp)[names(dbtemp) %in% '']  =  'Results'
+  dbtemp                = as.data.frame(as.list(dbtemp))
+  con =
+    dbConnect(
+      drv    = RSQLite::SQLite()   ,
+      dbname = file.path0(
+        'db'                    ,
+        dbname                  ,
+        check = TRUE            ,
+        create = TRUE           ,
+        IncludedFileName = TRUE
+      )
+    )
+  dbWriteTable(con, TableName, dbtemp, append = TRUE)
+  dbDisconnect(conn     = con)
+}
 
 FinalJsonBobectCreator = function(FinalList,
                                   null = 'null',

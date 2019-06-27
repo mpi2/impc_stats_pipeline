@@ -116,13 +116,11 @@ NotProcessedOutput = function(args) {
            active = args$encode)
   )
   # Write to the SQLite DB
-  message0('Writting to the SQLite ...')
-  dbtemp                = optFail
-  names(dbtemp)[names(dbtemp) %in% '']  =  'Results'
-  dbtemp                = as.data.frame(as.list(dbtemp))
-  con <- dbConnect(drv  = RSQLite::SQLite(), dbname = paste0(dbtemp$procedure_stable_id[1],"_DR10SQLite.db"))
-  dbWriteTable(con, "DR10", dbtemp, append = TRUE)
-  dbDisconnect(conn     = con)
+  WriteToDB(optFail,
+            dbname = paste0(experiment_details$gene_accession_id[1], "_DR10SQLite.db"))
 
     return(optFail)
 }
+
+
+
