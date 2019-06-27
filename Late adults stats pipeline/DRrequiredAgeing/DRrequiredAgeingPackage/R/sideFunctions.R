@@ -1870,7 +1870,8 @@ WriteToDB = function(df,
         check = TRUE            ,
         create = TRUE           ,
         IncludedFileName = TRUE
-      )
+      ),
+      synchronous       = NULL
     )
   dbWriteTable(con, TableName, dbtemp, append = TRUE)
   dbDisconnect(conn     = con)
