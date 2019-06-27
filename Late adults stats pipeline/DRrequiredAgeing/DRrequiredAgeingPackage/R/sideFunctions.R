@@ -1861,20 +1861,40 @@ WriteToDB = function(df,
   dbtemp                = df
   names(dbtemp)[names(dbtemp) %in% '']  =  'Results'
   dbtemp                = as.data.frame(as.list(dbtemp))
-  con =
-    dbConnect(
-      drv    = RSQLite::SQLite()   ,
-      dbname = file.path0(
-        'db'                    ,
-        dbname                  ,
-        check = TRUE            ,
-        create = TRUE           ,
-        IncludedFileName = TRUE
-      ),
-      synchronous       = NULL
+  res = NULL
+  for (i in 1:1500) {
+    res = tryCatch(
+      expr = {
+        con =
+          dbConnect(
+            drv    = RSQLite::SQLite(),
+            dbname = file.path0(
+              'db'                    ,
+              dbname                  ,
+              check = TRUE            ,
+              create = TRUE           ,
+              IncludedFileName = TRUE
+            ),
+            synchronous       = NULL
+          )
+        dbWriteTable(con, TableName, dbtemp, append = TRUE)
+        dbDisconnect(conn     = con)
+      },
+      warning = function(war) {
+        return(NULL)
+      },
+      error   = function(err) {
+        return(NULL)
+      }
     )
-  dbWriteTable(con, TableName, dbtemp, append = TRUE)
-  dbDisconnect(conn     = con)
+    if (is.null(res)) {
+      message0('Retrying ...')
+      Sys.sleep(RandomRegardSeed(1, max = .15))
+    } else{
+      message0('Writting to the database successful ...')
+      break
+    }
+  }
 }
 
 FinalJsonBobectCreator = function(FinalList,
