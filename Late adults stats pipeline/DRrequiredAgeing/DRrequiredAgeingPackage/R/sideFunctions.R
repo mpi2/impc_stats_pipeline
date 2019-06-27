@@ -1855,7 +1855,7 @@ WriteToDB = function(df,
                      dbname    = 'db' ,
                      TableName = 'DR10') {
   requireNamespace("DBI")
-  dbname  = RemoveSpecialChars(dbname)
+  dbname  = RemoveSpecialChars(dbname,what = '[^0-9A-Za-z/.]')
   message0('Writting to the SQLite ...')
   message0('DB name: ', dbname)
   dbtemp                = df
