@@ -288,7 +288,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                               file = BatchFileName,
                               row.names = FALSE)
 
-                    BatchFileNamezip  = DRrequiredAgeing:::compressFiles(
+                    BatchFileNamezip  = compressFiles(
                       fileList   = BatchFileName,
                       dir        = dirname (BatchFileName) ,
                       filename   = basename(BatchFileName) ,

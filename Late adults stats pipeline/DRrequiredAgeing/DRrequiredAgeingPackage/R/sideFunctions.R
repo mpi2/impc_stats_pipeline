@@ -1851,6 +1851,7 @@ replaceInList <- function (x, FUN, ...)
     FUN(x, ...)
 }
 
+
 WriteToDB = function(df,
                      dbname    = 'db' ,
                      TableName = 'DR10') {
@@ -1873,20 +1874,20 @@ WriteToDB = function(df,
     res = tryCatch(
       expr = {
         con =
-          dbConnect(
+          DBI::dbConnect(
             drv    = RSQLite::SQLite(),
-            dbname = dfpath           ,
+            dbname = dbpath           ,
             synchronous       = NULL
           )
-        dbWriteTable(con, TableName, dbtemp, append = TRUE)
-        dbDisconnect(conn     = con)
+        DBI::dbWriteTable(con, TableName, dbtemp, append = TRUE)
+        DBI::dbDisconnect(conn     = con)
       },
       warning = function(war) {
-        dbDisconnect(conn     = con)
+        DBI::dbDisconnect(conn     = con)
         return(NULL)
       },
       error   = function(err) {
-        dbDisconnect(conn     = con)
+        DBI::dbDisconnect(conn     = con)
         return(NULL)
       }
     )
