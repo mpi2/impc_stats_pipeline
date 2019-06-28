@@ -1855,12 +1855,19 @@ WriteToDB = function(df,
                      dbname    = 'db' ,
                      TableName = 'DR10') {
   requireNamespace("DBI")
-  dbname  = RemoveSpecialChars(dbname,what = '[^0-9A-Za-z/.]')
+  dbname  = RemoveSpecialChars(dbname, what = '[^0-9A-Za-z/.]')
   message0('Writting to the SQLite ...')
   message0('DB name: ', dbname)
   dbtemp                = df
   names(dbtemp)[names(dbtemp) %in% '']  =  'Results'
   dbtemp                = as.data.frame(as.list(dbtemp))
+  dbpath                = file.path0(
+    'db'                    ,
+    dbname                  ,
+    check = TRUE            ,
+    create = TRUE           ,
+    IncludedFileName = TRUE
+  )
   res = NULL
   for (i in 1:1500) {
     res = tryCatch(
@@ -1868,13 +1875,7 @@ WriteToDB = function(df,
         con =
           dbConnect(
             drv    = RSQLite::SQLite(),
-            dbname = file.path0(
-              'db'                    ,
-              dbname                  ,
-              check = TRUE            ,
-              create = TRUE           ,
-              IncludedFileName = TRUE
-            ),
+            dbname = dfpath           ,
             synchronous       = NULL
           )
         dbWriteTable(con, TableName, dbtemp, append = TRUE)
@@ -1891,7 +1892,10 @@ WriteToDB = function(df,
     )
     if (is.null(res)) {
       message0('Retrying ...')
-      Sys.sleep(RandomRegardSeed(1, max = .15))
+      Sys.sleep(RandomRegardSeed(1, max = .2))
+      if (i %% 50 == 0) {
+        dbpath = file.exists0(file = dbpath, overwrite = FALSE)
+      }
     } else{
       message0('Writting to the database successful ...')
       break

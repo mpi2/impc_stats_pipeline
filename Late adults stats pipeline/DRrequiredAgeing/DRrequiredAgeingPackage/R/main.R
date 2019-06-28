@@ -287,6 +287,17 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     write.csv(BatchData,
                               file = BatchFileName,
                               row.names = FALSE)
+
+                    BatchFileNamezip  = DRrequiredAgeing:::compressFiles(
+                      fileList   = BatchFileName,
+                      dir        = dirname (BatchFileName) ,
+                      filename   = basename(BatchFileName) ,
+                      overwrite  = FALSE                   ,
+                      rmSource   = TRUE
+                    )
+                    if (BatchFileNamezip$status == 0) {
+                      BatchFileName = BatchFileNamezip$file
+                    }
                     out = BatchGenerator(
                       file                 = BatchFileName    ,
                       dir                  = outpDir          ,
