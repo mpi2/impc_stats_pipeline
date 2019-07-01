@@ -293,10 +293,37 @@ shapiro.test0 = function(x) {
   return(r)
 }
 ###########
-addJitterifNoVariation = function(x      = NULL,
-                                  amount = .Machine$double.eps * 10 ^ 2) {
-  if (!is.null(x) && length(na.omit(x)) > 1 && var(x,na.rm = TRUE) == 0)
-    x = jitter(x, amount = amount)
+getdecimal = function(x) {
+  intv = tryCatch(
+    expr = {
+      if ((x %% 1) != 0) {
+        nchar(strsplit(sub('0+$', '', as.character(x)), ".", fixed = TRUE)[[1]][[2]])
+      } else {
+        return(0)
+      }
+    },
+    error = function(e) {
+      return(0)
+    } ,
+    warning = function(w) {
+      return(0)
+    }
+  )
+  return(intv)
+}
+###########
+addJitterifNoVariation = function(x            = NULL,
+                                  extradecimal = 3) {
+  if (!is.null(x)            &&
+      length(na.omit(x)) > 1 &&
+      is.numeric(x)          &&
+      var(x, na.rm = TRUE) <= .Machine$double.eps) {
+    dec = getdecimal(x = min(x, na.rm = TRUE)) + extradecimal
+    # message('No variation in the t/var.test! a small jitter (decimal = ',
+    #         dec,
+    #         ') will be added.')
+    x   = jitter(x, amount = 10 ^ -(dec))
+  }
   return(x)
 }
 ###########
