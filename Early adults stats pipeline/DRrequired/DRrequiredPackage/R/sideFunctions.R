@@ -1772,21 +1772,25 @@ VectorOutput0 = function(c.ww0,
   # The second piece (Windowing results)
   if (activeWindowing && !NullOrError(c.ww0$WindowedObj$value)) {
     p2 =  ifelse(
-      !is(c.ww0$WindowedObj$value, 'simpleWarning'),
+      !NullOrError(c.ww0$WindowedObj$value),
+      #!is(c.ww0$WindowedObj$value, 'simpleWarning'),
       funAux1 (
         PhenStat::vectorOutput(c.ww0$WindowedObj$value  ,
                                othercolumns = ExtraCols)
       ),
       ''
     )
-    p3 =  ifelse(!is(c.ww0$FullObj$value, 'simpleWarning'),
+    p3 =  ifelse(
+      !NullOrError(c.ww0$FullObj$value),
+      #!is(c.ww0$FullObj$value, 'simpleWarning'),
                  funAux1 (
                    PhenStat::vectorOutput(c.ww0$FullObj$value  ,
                                           othercolumns = ExtraCols)
                  ),
                  '')
     p4 =  ifelse(
-      !is(c.ww0$FullWindowedObj$value, 'simpleWarning'),
+      !NullOrError(c.ww0$FullWindowedObj$value),
+      #!is(c.ww0$FullWindowedObj$value, 'simpleWarning'),
       funAux1 (
         PhenStat::vectorOutput(c.ww0$FullWindowedObj$value  ,
                                othercolumns = ExtraCols)
