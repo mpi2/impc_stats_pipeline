@@ -293,6 +293,13 @@ shapiro.test0 = function(x) {
   return(r)
 }
 ###########
+addJitterifNoVariation = function(x      = NULL,
+                                  amount = .Machine$double.eps * 10 ^ 2) {
+  if (!is.null(x) && length(na.omit(x)) > 1 && var(x,na.rm = TRUE) == 0)
+    x = jitter(x, amount = amount)
+  return(x)
+}
+###########
 tv.test = function(obj                           ,
                    args                          ,
                    name          = 'parameter'   ,
@@ -316,11 +323,15 @@ tv.test = function(obj                           ,
       oim    = obj$weights[[i - 1]]
       thresh = 0 #args$threshold*0
       # Variations
-      vtl  = var.test(dfv[[i]][oi >= thresh], dfv[[i - 1]][oim >= thresh])$p.value
-      vtlp = var.test(dfp[[i]][oi >= thresh], dfp[[i - 1]][oim >= thresh])$p.value
+      vtl  = var.test(addJitterifNoVariation(dfv[[i]][oi >= thresh]),
+                      addJitterifNoVariation(dfv[[i - 1]][oim >= thresh]))$p.value
+      vtlp = var.test(addJitterifNoVariation(dfp[[i]][oi >= thresh]),
+                      addJitterifNoVariation(dfp[[i - 1]][oim >= thresh]))$p.value
       # Means
-      ttl  = t.test  (dfv[[i]][oi >= thresh], dfv[[i - 1]][oim >= thresh])$p.value
-      ttlp = t.test  (dfp[[i]][oi >= thresh], dfp[[i - 1]][oim >= thresh])$p.value
+      ttl  = t.test  (addJitterifNoVariation(dfv[[i]][oi >= thresh]),
+                      addJitterifNoVariation(dfv[[i - 1]][oim >= thresh]))$p.value
+      ttlp = t.test  (addJitterifNoVariation(dfp[[i]][oi >= thresh]),
+                      addJitterifNoVariation(dfp[[i - 1]][oim >= thresh]))$p.value
       # Normality
       nntp  = shapiro.test0(dfp[[i]][oi >= thresh])
       nntl  = shapiro.test0(dfv[[i]][oi >= thresh])
