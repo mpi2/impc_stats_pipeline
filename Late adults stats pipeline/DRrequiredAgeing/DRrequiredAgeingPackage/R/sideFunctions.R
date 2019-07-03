@@ -1909,7 +1909,8 @@ FinalJsonBobectCreator = function(FinalList,
                                   na = 'null' ,
                                   auto_unbox = TRUE,
                                   SpecialString = '==!!(:HAMED:)!!==',
-                                  rep = 3) {
+                                  rep = 3,
+                                  removeSpecialsFromNames = FALSE) {
   message0('Forming the JSON object ...')
   FinalList = replaceInList(
     FinalList,
@@ -1921,7 +1922,8 @@ FinalJsonBobectCreator = function(FinalList,
       }
     }
   )
-  FinalList = LowerandRemoveSpecials(FinalList)
+  if (removeSpecialsFromNames)
+    FinalList = LowerandRemoveSpecials(FinalList)
   for (i in 1:rep) {
     JsonObj  = jsonlite::toJSON(
       x = FinalList,
