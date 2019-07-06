@@ -167,9 +167,9 @@ getResponseColumn = function(x, activate = TRUE) {
     accepted = FALSE
   }
   return(list(
-    column = column,
+    column   = column,
     accepted = accepted,
-    lbl = lbl
+    lbl      = lbl
   ))
 }
 
@@ -320,16 +320,16 @@ concurrentContSelect = function(activate = TRUE,
           if (activate) {
             message0 ('Concurrent control selection in progress ...')
             PhenListObj@datasetPL = m1
-            note$concurrent_control_selection = paste0(LogicalToNote(activate),
+            note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                        ". Single Batch in use")
           } else{
-            note$concurrent_control_selection = paste0(LogicalToNote(activate),
+            note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                        '. Single Batch possible')
           }
         } else{
-          note$concurrent_control_selection = paste0(
+          note$'Concurrent control selection' = paste0(
             LogicalToNote(activate),
-            '. There are not enough controls in the dataset at the mutant dates  (min = ',
+            '. There are not enough controls in the dataset at the mutant dates (min = ',
             minSmp,
             ' but there are ',
             min0(tb[, which(colnames(tb) == control)]),
@@ -337,13 +337,13 @@ concurrentContSelect = function(activate = TRUE,
           )
         }
       } else{
-        note$concurrent_control_selection = paste0(
+        note$'Concurrent control selection' = paste0(
           LogicalToNote(activate),
           ". The is no control in the dataset at the same day as mutants DOE"
         )
       }
     } else{
-      note$concurrent_control_selection = paste0(
+      note$'Concurrent control selection' = paste0(
         LogicalToNote(activate),
         ". Concurrent control selection not possible. Mutants are scattered on different dates"
       )
@@ -351,13 +351,13 @@ concurrentContSelect = function(activate = TRUE,
   } else {
     tb  = table(PhenListObj@datasetPL[, BatchColName])
     if (length(tb) > 1) {
-      note$concurrent_control_selection = paste0(LogicalToNote(activate),
+      note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                  '. Multi batch found in data (categorical data)')
     } else if (length(tb) == 1) {
-      note$concurrent_control_selection = paste0(LogicalToNote(activate),
+      note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                  '. Original mutants in single batch (categorical data)')
     } else{
-      note$concurrent_control_selection = paste0(LogicalToNote(activate),
+      note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                  '. But batch not clear. Please check data')
     }
   }
@@ -401,7 +401,7 @@ concurrentContSelect = function(activate = TRUE,
 
     if (!conditions) {
       PhenListObj = PhenListObjBck
-      note$Concurrent_control_selection_error = paste0(
+      note$'Concurrent control selection error' = paste0(
         LogicalToNote(activate),
         'Cuncurrent control selection would cause failure in model then DISABLED'
       )
@@ -504,6 +504,7 @@ getEquation =  function(var,
 readConf = function(file, path = NULL, ...) {
   if (is.null(path))
     path = system.file("extdata", package = "DRrequiredAgeing")
+  message0('Reading the config file:\n\t ~> ',file)
 
   r   = read.dcf(file.path(path, file), all = TRUE,  ...)
   return(r)
@@ -517,7 +518,7 @@ readFile = function(file,
                     ...) {
   if (is.null(path))
     path = system.file("extdata", package = "DRrequiredAgeing")
-
+  message0('Reading the config file:\n\t ~> ',file)
   r   = FUN(file.path(path, file),  ...)
   return(r)
 }
@@ -671,10 +672,10 @@ removeNAPipe = function(x,
   x = na.omit(x)
   if (length(x) > 0)
     x = gsub(
-      pattern = pattern,
+      pattern     = pattern,
       replacement = replacement,
-      x = x,
-      fixed = FALSE
+      x           = x,
+      fixed       = FALSE
     )
   return(x)
 }
@@ -789,7 +790,7 @@ RemoveZeroFrequencyCategories = function(x,
     if ((length(names(counts[counts >= minSampRequired])) != totalLevels ||
          !identical(droplevels0(newx), droplevels0(x))) &&
         length(lvls) > 0) {
-      note$sex_genotype_data_included_in_analysis = c(
+      note$'Sex-Genotype data included in the analysis' = c(
         paste(
           'Not all Sex*Genotype interactions exist in data. Threshold: ',
           paste0(minSampRequired),
@@ -926,7 +927,7 @@ RemoveZerovarCategories = function(x,
       Zvars  = names(vars)[vars <= minvar]
       newx   = x[!lvls %in% Zvars, ]
       if (!identical(droplevels0(newx), droplevels0(x))) {
-        note$sex_genotype_zero_variation = paste0(
+        note$'Sex-Genotype interactions zero variation' = paste0(
           'Some categories have zero variation and then removed from the raw data. List of zero variation categories: ',
           paste0(Zvars, collapse = ', '),
           ''
@@ -988,11 +989,12 @@ SummaryStatisticsOriginal = function(x,
                                      depVar,
                                      sex = 'sex',
                                      genotype = 'biological_sample_group',
-                                     label = 'raw_data_summary_statistics',
+                                     label = 'Raw data summary statistics',
                                      lower = FALSE,
                                      drop = TRUE,
                                      sep = '_',
                                      removeSpecialChars = FALSE,
+                                     what = '[^0-9A-Za-z]',
                                      replace = '_') {
   r   = NULL
   # do not move me
@@ -1015,10 +1017,10 @@ SummaryStatisticsOriginal = function(x,
       m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE) , NA)
       sd = ifelse(length(na.omit(xx)) > 0, sd0(xx, na.rm = TRUE)  , NA)
       r = list(
-        count = c                       ,
-        mean = m                        ,
-        sd = sd                         ,
-        'normality test p-val' = ifelse(
+        'Count' = c                       ,
+        'Mean' = m                        ,
+        'SD' = sd                         ,
+        'Normality test p-val' = ifelse(
           length(xx)           > 3    &&
             length(unique(xx)) > 3    &&
             length(xx)         < 5000 &&
@@ -1029,18 +1031,18 @@ SummaryStatisticsOriginal = function(x,
       )
     } else{
       c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
-      r = list(count = c)
+      r = list('Count' = c)
     }
     return(r)
   }, default = -999.991233210123))
   ##
   fTmp = function(isNum) {
     if (isNum) {
-      r = list(count = 0,
-               mean = NA,
-               sd = NA)
+      r = list('Count' = 0,
+               'Mean' = NA,
+               'SD' = NA)
     } else{
-      r = list(count = 0)
+      r = list('Count' = 0)
     }
     return(r)
   }
@@ -1052,7 +1054,7 @@ SummaryStatisticsOriginal = function(x,
     nnames =  names(summaryT)
 
   if (removeSpecialChars) {
-    nnames = RemoveSpecialChars(nnames, replaceBy = replace)
+    nnames = RemoveSpecialChars(nnames, replaceBy = replace, what = what)
   }
 
   r = list(lbl = summaryT)
@@ -1079,7 +1081,7 @@ OtherExtraColumns = function(obj,
     p4 = as.list(p4)
     names(p4) = p0[ColNameInd]
   } else{
-    p4$Error_in_extra_columns = "Column names do not exist or the dataset is empty"
+    p4$'Error in extra columns' = "Column names do not exist or the dataset is empty"
   }
   return(p4)
 }
@@ -1187,7 +1189,7 @@ replaceNull = function(x, replace = '-') {
 mapLevelsToFactor = function(levels, newlevels, name = 'response') {
   #############
   res  = NULL
-  n1   = paste0('all_levels_in_',
+  n1   = paste0('All levels in the',
                 name,
                 collapse = '')
   res$n1 = newlevels
@@ -1203,7 +1205,7 @@ mapLevelsToFactor = function(levels, newlevels, name = 'response') {
     return(list(levels = levels, note = res))
   }
   ############
-  n0 = paste0('missing_levels_in_',
+  n0 = paste0('Missing levels in ',
               name,
               collapse = '')
   res$n0 = newlevels[-ind]
@@ -1278,9 +1280,9 @@ RR_thresholdCheck = function(data,
                              sexColumn = 'sex',
                              threshold = 60,
                              methodmap) {
-  r = list(criteria_result = TRUE           ,
-           value     = 'not applicable'     ,
-           threshold = 'not applicable')
+  r = list('Criteria result' = TRUE           ,
+           'Value'     = 'not applicable'     ,
+           'Threshold' = 'not applicable')
   if (!is.null(data) && !is.null(depVar) && !is.null(parameter)) {
     method = getMethodi(
       var = parameter,
@@ -1304,9 +1306,9 @@ RR_thresholdCheck = function(data,
           paste(names(tbl), tbl, sep = '=', collapse = ', ')
         )
         r = list(
-          criteria_result = FALSE,
-          value = paste(names(tbl), tbl, sep = '=', collapse = ', '),
-          threshold = threshold
+          'Criteria result' = FALSE,
+          'Value'           = paste(names(tbl), tbl, sep = '=', collapse = ', '),
+          'Threshold'       = threshold
         )
       }
     }
@@ -1357,7 +1359,7 @@ file.exists0 = function(file, overwrite = FALSE, ...) {
 }
 
 # add bits to file name
-addBitToFileName = function(file,
+addBitsToFileName = function(file,
                             bit = '',
                             sep = '_',
                             fullpath = TRUE) {
@@ -1507,7 +1509,7 @@ PlotWindowingResult = function(args, overwrite = FALSE, ...) {
     if (args$storeplot)
       graphics.off()
     # if (args$storeplot && 1 == 0) {
-    #   png(filename  = addBitToFileName(file = file, bit = 'boxplot'))
+    #   png(filename  = addBitsToFileName(file = file, bit = 'boxplot'))
     #   boxplot_win(
     #     phenlistObject = args$phenlistObject,
     #     we = args$we,
@@ -1529,7 +1531,6 @@ Date2Integer = function(x) {
   dates = as.numeric(dates)
   return(dates)
 }
-
 
 # check if variable name exists in the data frame
 CheckIfNameExistInDataFrame = function(obj, name, checkLevels = TRUE) {
@@ -1669,10 +1670,10 @@ VectorOutput0 = function(c.ww0,
   }
   ###
   output = list(
-    normal_result = p1,
-    windowed_result = p2,
-    full_model_result = p3,
-    full_model_windowed = p4
+    'Normal result'       = p1,
+    'Windowed result'     = p2,
+    'Full model result'   = p3,
+    'Full model windowed result' = p4
   )
 
   return(list(json = NULL,
@@ -2146,9 +2147,9 @@ mimicControls = function(df                             ,
   requireNamespace('stringi')
   df.bckOrg    = df
   note         = list(
-    shift = NULL,
-    new_mutant_indices = NULL,
-    original_mutant_indices = NULL
+    'Shift' = NULL,
+    'New mutant indices' = NULL,
+    'Original mutant indices' = NULL
   )
   shift        = Indices = NULL
   #####
@@ -2160,14 +2161,14 @@ mimicControls = function(df                             ,
     totalLevels = SexGenResLevels
   )
   df                             = df_rzeros$x
-  note$removed_categories_detail = df_rzeros$note
+  note$'Removed categories detail' = df_rzeros$note
   ###########
   if (is.null(df)                ||
       length(df) < 1             ||
       nrow  (df) < 1             ||
       nlevels(df[, sex]) < 1     ||
       !is.numeric(df[, depVariable])) {
-    note$dataset_status = 'Empty dataset'
+    note$'Dataset status' = 'Empty dataset'
     return(list(
       df = df          ,
       ctv = NULL       ,
@@ -2184,8 +2185,8 @@ mimicControls = function(df                             ,
   conInd    = (df$biological_sample_group == baselines)
   if (!sum(mutInd)  ||
       !sum(conInd)) {
-    note$dataset_status          = 'Missing controls or mutants'
-    note$original_mutant_indices =  mutInd
+    note$'Dataset status'          = 'Missing controls or mutants'
+    note$'Original mutant indices' =  mutInd
     return(list(
       df    = df.bckOrg,
       ctv   = NULL     ,
@@ -2229,11 +2230,11 @@ mimicControls = function(df                             ,
     }
     Indices = c(Indices, ctv$y.index)
   }
-  Ind                            =  df$id_d %in% Indices
-  note$new_mutant_indices        =  which(Ind)
-  note$shift                     = shift
-  note$original_mutant_indices   =  mutInd
-  note$dataset_status            = 'No problem detected'
+  Ind                              =  df$id_d %in% Indices
+  note$'New mutant indices'        =  which(Ind)
+  note$'shift'                     = shift
+  note$'Original mutant indices'   =  mutInd
+  note$'Dataset status'            = 'No problem detected'
   # Replace the biological_sample_group and colony_id
   df$colony_id[Ind] = paste0(unique(na.omit(df$colony_id[df$biological_sample_group == mutLabel])), collapse = '')
   df = Factor2CharAndSubstitution(

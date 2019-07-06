@@ -26,7 +26,8 @@ vectorOutputCont =	function(object,
 	x                = object$input$PhenListAgeing@datasetPL
 	columnOfInterest = x[, c(depVariable)]
 	#####################################################################
-	variability      = length(unique(columnOfInterest)) / length(columnOfInterest)
+	variability      = list('Value' = length(unique(columnOfInterest)) / max(length(columnOfInterest), 1), 
+													'Type'  = 'Length of unique response divided by total number of response')
 	#####################################################################
 	DSsize            = SummaryStats(
 		x = object$input$data         ,
@@ -38,7 +39,7 @@ vectorOutputCont =	function(object,
 		#label = 'Summary statistics',
 		lower  = TRUE,
 		drop   = TRUE,
-		sep    = ' '
+		sep    = '_'
 	)
 	MultiBatch = ifelse(multiBatch(x),
 											'Dataset contains multi batches',
@@ -77,13 +78,13 @@ vectorOutputCont =	function(object,
 			} else{
 				NULL
 			},
-			'Effect sizes'                   = object$output$EffectSizes,
+			'Effect sizes'                   = object$output$'Effect sizes',
 			'Other residual normality tests' = object$output$ResidualNormalityTests
 		)
 	)
 	#####################################################################
-	pcS = object$output$EffectSizes$CombinedEffectSizes.Genotype_Sex$'percentage change'
-	pcO = object$output$EffectSizes$Genotype$'percentage change'
+	pcS = object$output$'Effect sizes'$'Combined effect sizes.Genotype_Sex'$'percentage change'
+	pcO = object$output$'Effect sizes'$Genotype$'percentage change'
 	percentageChanges = if (!is.null(pcS)) {
 		pcS
 	} else{
@@ -91,12 +92,12 @@ vectorOutputCont =	function(object,
 	}
 	#####################################################################
 	vectorOutput      = list(
-		'Method'                               = 	paste0(framework, ", ", fittingMethod, ', ', format(equation)),
+		'Applied method'                       = 	paste0(framework, ", ", fittingMethod, ', ', format(equation)),
 		'Dependent variable'                   =	depVariable              ,
 		'Batch included'                       =	object$output$BatchIn    ,
-		'Batch p-val'                          =  NULL                     ,
+		'Batch p-value'                        =  NULL                     ,
 		'Residual variances homogeneity'       =	object$output$VarHomoIn  ,
-		'Residual variances homogeneity p-val' =  NULL                     ,
+		'Residual variances homogeneity p-value' =  NULL                     ,
 		#####################################################################
 		'Genotype contribution' =	list(
 			Overal = TermInFormulaReturn(
@@ -112,7 +113,7 @@ vectorOutputCont =	function(object,
 				),
 				debug = debug
 			),
-			'Sex FvKO p-val'   =	TermInFormulaReturn(
+			'Sex FvKO p-value'   =	TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
 				term = Labels$Sex$Sex,
@@ -130,7 +131,7 @@ vectorOutputCont =	function(object,
 				),
 				debug = debug
 			),
-			'Sex MvKO p-val'  =	TermInFormulaReturn(
+			'Sex MvKO p-value'  =	TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
 				term = Labels$Sex$Sex,
@@ -173,7 +174,7 @@ vectorOutputCont =	function(object,
 				what = 'Std.Error',
 				debug = debug
 			),
-		'Genotype p-val'           =
+		'Genotype p-value'           =
 			modelSummaryPvalueExtract(
 				x = Fmodel,
 				variable = Labels$Genotype$Genotype,
@@ -181,7 +182,7 @@ vectorOutputCont =	function(object,
 				debug = debug
 			),
 		'Genotype percentage change'           =	percentageChanges,
-		'Genotype effect size'                 = object$output$EffectSizes[[Labels$Genotype$Genotype]],
+		'Genotype effect size'                 = object$output$'Effect sizes'[[Labels$Genotype$Genotype]],
 		#####################################################################
 		'Sex estimate'                         =	modelSummaryPvalueExtract(
 			x = Fmodel,
@@ -198,13 +199,13 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'Sex p-val'                            =	modelSummaryPvalueExtract(
+		'Sex p-value'                            =	modelSummaryPvalueExtract(
 			x = Fmodel,
 			variable = Labels$Sex$Sex,
 			anova = TRUE,
 			debug = debug
 		),
-		'Sex effect size'                         =	object$output$EffectSizes[[Labels$Sex$Sex]],
+		'Sex effect size'                         =	object$output$'Effect sizes'[[Labels$Sex$Sex]],
 		#####################################################################
 		'LifeStage estimate'                      =	modelSummaryPvalueExtract(
 			x = Fmodel,
@@ -221,13 +222,13 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'LifeStage p-val'                         =	modelSummaryPvalueExtract(
+		'LifeStage p-value'                         =	modelSummaryPvalueExtract(
 			x = Fmodel,
 			variable = Labels$LifeStage$LifeStage,
 			anova = TRUE,
 			debug = debug
 		),
-		'LifeStage effect size'                = object$output$EffectSizes[[Labels$LifeStage$LifeStage]] ,
+		'LifeStage effect size'                = object$output$'Effect sizes'[[Labels$LifeStage$LifeStage]] ,
 		#####################################################################
 		'Weight estimate'                      =	modelSummaryPvalueExtract(
 			x = Fmodel,
@@ -244,13 +245,13 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'Weight p-val'                         =	modelSummaryPvalueExtract(
+		'Weight p-value'                         =	modelSummaryPvalueExtract(
 			x = Fmodel,
 			variable = Labels$Weight,
 			anova = TRUE,
 			debug = debug
 		),
-		'Weight effect size'                   =  object$output$EffectSizes[[Labels$Weight]],
+		'Weight effect size'                   =  object$output$'Effect sizes'[[Labels$Weight]],
 		#####################################################################
 		'Gp1 genotype'                         =	Labels$Genotype$Control		,
 		'Gp1 Residuals normality test'         =	object$output$ResidualNormalityTests$Genotype[Labels$Genotype$Control][[1]],
@@ -275,7 +276,7 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'Intercept p-val'                      =	modelSummaryPvalueExtract(
+		'Intercept p-value'                      =	modelSummaryPvalueExtract(
 			x = Fmodel,
 			variable = '(Intercept)',
 			anova = TRUE,
@@ -323,7 +324,7 @@ vectorOutputCont =	function(object,
 		),
 		#####################################################################
 		################ interaction
-		'Interactions p-val'      =	list(
+		'Interactions p-value'      =	list(
 			'Genotype Sex'  =
 				modelSummaryPvalueExtract(
 					x = Fmodel,
@@ -384,7 +385,7 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'Sex FvKO p-val'                       = modelSummaryPvalueExtract(
+		'Sex FvKO p-value'                       = modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex,
 			variable = CombineLevels(
 				paste0('Sex', Labels$Sex$Female),
@@ -394,7 +395,7 @@ vectorOutputCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'Sex FvKO effect size'                 = object$output$EffectSizes[[paste(Labels$Genotype$Genotype, Labels$Sex$Female, sep = '_')]],
+		'Sex FvKO effect size'                 = object$output$'Effect sizes'[[paste(Labels$Genotype$Genotype, Labels$Sex$Female, sep = '_')]],
 		#####################################################################
 		'Sex MvKO estimate'                    =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex,
@@ -419,7 +420,7 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'Sex MvKO p-val'                       =	modelSummaryPvalueExtract(
+		'Sex MvKO p-value'                       =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex,
 			variable = CombineLevels(
 				paste0('Sex', Labels$Sex$Male),
@@ -429,7 +430,7 @@ vectorOutputCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'Sex MvKO effect size'                 = object$output$EffectSizes[[paste(Labels$Genotype$Genotype, Labels$Sex$Male, sep = '_')]],
+		'Sex MvKO effect size'                 = object$output$'Effect sizes'[[paste(Labels$Genotype$Genotype, Labels$Sex$Male, sep = '_')]],
 		#####################################################################
 		################ LifeStage interaction
 		'LifeStage EvKO estimate'                    =	modelSummaryPvalueExtract(
@@ -455,7 +456,7 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'LifeStage EvKO p-val'                       =	modelSummaryPvalueExtract(
+		'LifeStage EvKO p-value'                       =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_LifeStage,
 			variable =  CombineLevels(
 				paste0(Labels$LifeStage$LifeStage, Labels$LifeStage$Early),
@@ -465,7 +466,7 @@ vectorOutputCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStage EvKO effect size'                 = object$output$EffectSizes$Genotype_Early ,
+		'LifeStage EvKO effect size'                 = object$output$'Effect sizes'$Genotype_Early ,
 		#####################################################################
 		'LifeStage LvKO estimate'                    =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_LifeStage,
@@ -490,7 +491,7 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'LifeStage LvKO p-val'                       =	modelSummaryPvalueExtract(
+		'LifeStage LvKO p-value'                       =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_LifeStage,
 			variable = CombineLevels(
 				paste0(Labels$LifeStage$LifeStage, Labels$LifeStage$Late),
@@ -500,7 +501,7 @@ vectorOutputCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStage LvKO effect size'                 = object$output$EffectSizes$Genotype_Late ,
+		'LifeStage LvKO effect size'                 = object$output$'Effect sizes'$Genotype_Late ,
 		#####################################################################
 		################ Sex LifeStage Genotype interactions
 		# 1.
@@ -529,7 +530,7 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'LifeStageSexGenotype FvEvKO p-val'           =	modelSummaryPvalueExtract(
+		'LifeStageSexGenotype FvEvKO p-value'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
 			variable = 		CombineLevels(
 				paste0(Labels$Sex$Sex, Labels$Sex$Female),
@@ -540,7 +541,7 @@ vectorOutputCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStageSexGenotype FvEvKO effect size'        = object$output$EffectSizes$Genotype_Female.Early ,
+		'LifeStageSexGenotype FvEvKO effect size'        = object$output$'Effect sizes'$Genotype_Female.Early ,
 		# 2.
 		'LifeStageSexGenotype MvEvKO estimate'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
@@ -567,7 +568,7 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'LifeStageSexGenotype MvEvKO p-val'           =	modelSummaryPvalueExtract(
+		'LifeStageSexGenotype MvEvKO p-value'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
 			variable = CombineLevels(
 				paste0(Labels$Sex$Sex, Labels$Sex$Male),
@@ -578,7 +579,7 @@ vectorOutputCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStageSexGenotype MvEvKO effect size'        = object$output$EffectSizes$Genotype_Male.Early ,
+		'LifeStageSexGenotype MvEvKO effect size'        = object$output$'Effect sizes'$Genotype_Male.Early ,
 		# 3.
 		'LifeStageSexGenotype FvLvKO estimate'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
@@ -605,7 +606,7 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'LifeStageSexGenotype FvLvKO p-val'           =	modelSummaryPvalueExtract(
+		'LifeStageSexGenotype FvLvKO p-value'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
 			variable =  CombineLevels(
 				paste0(Labels$Sex$Sex, Labels$Sex$Female),
@@ -616,7 +617,7 @@ vectorOutputCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStageSexGenotype FvLvKO effect size'        = object$output$EffectSizes$Genotype_Female.Late ,
+		'LifeStageSexGenotype FvLvKO effect size'        = object$output$'Effect sizes'$Genotype_Female.Late ,
 		#4.
 		'LifeStageSexGenotype MvLvKO estimate'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
@@ -643,7 +644,7 @@ vectorOutputCont =	function(object,
 			what = 'Std.Error',
 			debug = debug
 		),
-		'LifeStageSexGenotype MvLvKO p-val'           =	modelSummaryPvalueExtract(
+		'LifeStageSexGenotype MvLvKO p-value'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
 			variable = CombineLevels(
 				paste0(Labels$Sex$Sex, Labels$Sex$Male),
@@ -654,7 +655,7 @@ vectorOutputCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStageSexGenotype MvLvKO effect size'        = object$output$EffectSizes$Genotype_Male.Late ,
+		'LifeStageSexGenotype MvLvKO effect size'        = object$output$'Effect sizes'$Genotype_Male.Late ,
 		################
 		'Classification tag'                   =	NULL,
 		'Transformation'                       =	NULL,

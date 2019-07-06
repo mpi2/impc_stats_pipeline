@@ -16,9 +16,9 @@ gridSearchModel = function(object                                     ,
                            weightOrthreshold = 'weight'               ,
                            direction         = c(1, 1)                ,
                            ...) {
-  lk = length(k)
-  ll = length(l)
-  m  = unique(m)
+  lk     = length(k)
+  ll     = length(l)
+  m      = unique(m)
   ## outputs
   lmodel = lweight = orgWeight = list(NULL)
   rmat   = matrix(0, ncol = 4       , nrow = ll * lk)
@@ -34,7 +34,7 @@ gridSearchModel = function(object                                     ,
     width = 50
   )
   for (kp in k) {
-  for (lp in l) {
+    for (lp in l) {
       weight = expWeight(
         t = t                               ,
         k = kp                              ,
@@ -71,12 +71,12 @@ gridSearchModel = function(object                                     ,
         },
         error = function(err, messsages = messages) {
           if (messsages)
-            message('\n ~> Error: '  , err)
+            message0(' ~> Error: '  , err)
           slm = NULL
         } ,
         warning = function(war, messsages = messages) {
           if (messsages)
-            message('\n ~> Warning: ', war)
+            message0(' ~> Warning: ', war)
           slm = NULL
         }
       )
@@ -99,8 +99,7 @@ gridSearchModel = function(object                                     ,
     }
   }
   close(pb)
-  cat('\n')
-  
+
   return(
     list(
       output = as.data.frame(rmat),

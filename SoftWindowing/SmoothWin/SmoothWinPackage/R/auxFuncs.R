@@ -13,6 +13,31 @@
   )
 }
 ###########
+message0 = function(...,
+                    breakLine  = TRUE,
+                    capitalise = TRUE,
+                    appendLF   = TRUE,
+                    active     = TRUE) {
+  if (active) {
+    x = paste0(..., collapse = '')
+    if (breakLine)
+      nmessage = unlist(strsplit(x = x, split = '\n'))
+    else
+      nmessage = x
+    if (capitalise)
+      nmessage = capitalise(nmessage)
+    message(paste(Sys.time(), nmessage, sep = '. ', collapse = '\n'),
+            appendLF = appendLF)
+  }
+}
+capitalise = function (string)
+{
+  capped <- grep("^[A-Z]", string, invert = TRUE)
+  substr(string[capped], 1, 1) <- toupper(substr(string[capped],
+                                                 1, 1))
+  return(string)
+}
+###########
 check_version = function(pkg_name, min_version) {
   cur_version = packageVersion(pkg_name)
   if(cur_version < min_version) {
@@ -97,7 +122,7 @@ expWeight = function(t                         ,
   if (progress) {
     setTxtProgressBar(pb, lm)
     close(pb)
-    message('# Zero rows = ',
+    message0('# Zero rows = ',
             sum(FinalS <= zeroCompensation),
             ' [',
             round(sum(FinalS <= zeroCompensation) / length(FinalS) * 100, 1),
@@ -181,8 +206,8 @@ lseq = function (from = 1,
 }
 ###########
 msg = function(args, ...) {
-  message(
-    '\n Min observation required: ' ,
+  message0(
+    'Min observation required: ' ,
     args$min.obs + length(args$m),
     '\n  The number of modes: ',
     length(unique(args$t[args$m])),
@@ -264,8 +289,8 @@ checkWeightsN <- function(w             ,
         w  = w[zw]
       }
     } else{
-      message(
-        '\n ~> Windowing weights are ignored! (1) weights may be all close to zero. (2) there may be only one date in dataset [can cause errors in the mixed model]. (3) Setting check = 1 or check = 2 may solve the problem.\n'
+      message0(
+        ' ~> Windowing weights are ignored! (1) weights may be all close to zero. (2) there may be only one date in dataset [can cause errors in the mixed model]. (3) Setting check = 1 or check = 2 may solve the problem.'
       )
       w = (w * 0 + 1)
       r = 1:n
@@ -319,7 +344,7 @@ addJitterifNoVariation = function(x            = NULL,
       is.numeric(x)          &&
       var(x, na.rm = TRUE) <= .Machine$double.eps) {
     dec = getdecimal(x = min(x, na.rm = TRUE)) + extradecimal
-    # message('No variation in the t/var.test! a small jitter (decimal = ',
+    # message0('No variation in the t/var.test! a small jitter (decimal = ',
     #         dec,
     #         ') will be added.')
     x   = jitter(x, amount = 10 ^ -(dec))
@@ -415,10 +440,10 @@ tv.test = function(obj                           ,
         is.infinite(pmin)   ||
         is.na(final)        ||
         is.na(pmin)) {
-      message(paste('\n An optimal', name, 'is not found. Max value will be used.'))
+      message0(paste('An optimal', name, 'is not found. Max value will be used.'))
       final = NULL
     } else{
-      message ('\n score: ',
+      message0 ('score: ',
                round(pmin, digits = 4),
                '. ',
                name,

@@ -270,7 +270,7 @@ M.opt = function(object = NULL            ,
 				data        = data
 			)
 		),
-		CombinedEffectSizes = suppressMessages(if (!is.null(SplitModels)) {
+		'Combined effect sizes' = suppressMessages(if (!is.null(SplitModels)) {
 			lapply(SplitModels, function(x) {
 				percentageChangeCont(
 					model = x,
@@ -305,7 +305,7 @@ M.opt = function(object = NULL            ,
 		output = list(
 			Final.Model         = F.Model                  ,
 			Initial.Model       = I.Model                  ,
-			EffectSizes         = EffectSizes              ,
+			'Effect sizes'         = EffectSizes              ,
 			ResidualNormalityTests = ResidualNormalityTest ,
 			NoVarStr.Model      = FV.Model                 ,
 			NoBatch.Model       = G.Model                  ,

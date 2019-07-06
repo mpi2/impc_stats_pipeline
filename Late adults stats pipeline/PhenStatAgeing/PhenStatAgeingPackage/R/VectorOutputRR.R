@@ -49,7 +49,8 @@ vectorOutputRR =	function(object)
 	x                = object$input$data
 	columnOfInterest = x[, c(depVariable)]
 	#####################################################################
-	variability      = length(unique(columnOfInterest)) / length(columnOfInterest)
+	variability      =  list('Value' = length(unique(columnOfInterest)) / max(length(columnOfInterest), 1), 
+													 'Type'  = 'Length of unique response divided by total number of response')
 	#####################################################################
 	DSsize            = SummaryStats(
 		x = x,
@@ -57,7 +58,7 @@ vectorOutputRR =	function(object)
 		#label = 'Summary statistics',
 		lower  = TRUE,
 		drop   = TRUE,
-		sep    = ' '
+		sep    = '_'
 	)
 	MultiBatch = ifelse(multiBatch(x),
 											'Dataset contains multi batches',
@@ -83,9 +84,9 @@ vectorOutputRR =	function(object)
 					lapply(
 						v,
 						FUN = function(v2) {
-							list('p-val'       = v2$result$p.value,
-									 'effect size' = v2$effectSize    ,
-									 'extra'       = v2$RRextra)
+							list('P-value'     = v2$result$p.value,
+									 'Effect size' = v2$effectSize    ,
+									 'Extra'       = v2$RRextra)
 						}
 					)
 				}), nm = names(Vsplit))
@@ -100,82 +101,82 @@ vectorOutputRR =	function(object)
 	percentageChanges = NULL
 	#####################################################################
 	vectorOutput      = list(
-		'Method'                               = 	framework   ,
+		'Applied method'                       = 	framework   ,
 		'Dependent variable'                   =	depVariable , 
 		'Batch included'                       =	 NULL       ,
-		'Batch p-val'                          =   NULL       ,
+		'Batch p-value'                        =   NULL       ,
 		'Residual variances homogeneity'       =   NULL       ,
-		'Residual variances homogeneity p-val' =   NULL       ,
+		'Residual variances homogeneity p-value' =   NULL       ,
 		#####################################################################
 		'Genotype contribution' =	list(
 			Overal = lowHighList(
 				VsplitLow$Genotype$result$p.value,
 				VsplitHig$Genotype$result$p.value,
-				details  = GenotypeDiscLabel
+				'Details'  = GenotypeDiscLabel
 			),
-			'Sex FvKO p-val'   =	lowHighList(
+			'Sex FvKO p-value'   =	lowHighList(
 				VsplitLowFemale$Genotype$result$p.value,
 				VsplitHigFemale$Genotype$result$p.value,
-				details = SexDiscLabel
+				'Details' = SexDiscLabel
 			),
-			'Sex MvKO p-val'   =  lowHighList(
+			'Sex MvKO p-value'   =  lowHighList(
 				VsplitLowMale$Genotype$result$p.value,
 				VsplitHigMale$Genotype$result$p.value,
-				details = SexDiscLabel
+				'Details' = SexDiscLabel
 			),
 			'Sexual dimorphism detected' = 'Sex specific results for Low/High tables are always reported'
 		),
 		'Genotype estimate'           = lowHighList(
 			CatEstimateAndCI(VsplitLow$Genotype$result),
 			CatEstimateAndCI(VsplitHig$Genotype$result),
-			details = GenotypeDiscLabel
+			'Details' = GenotypeDiscLabel
 		), 
 		'Genotype standard error'     = NULL, 
-		'Genotype p-val'              = lowHighList(
+		'Genotype p-value'            = lowHighList(
 			VsplitLow$Genotype$result$p.value,
 			VsplitHig$Genotype$result$p.value,
-			details = GenotypeDiscLabel
+			'Details' = GenotypeDiscLabel
 		),
 		'Genotype percentage change'  =	percentageChanges                            ,
 		'Genotype effect size'        = lowHighList(VsplitLow$Genotype$effectSize    ,
 																								VsplitHig$Genotype$effectSize    ,
-																								details = GenotypeDiscLabel)     ,
+																								'Details' = GenotypeDiscLabel)     ,
 		#####################################################################
 		'Sex estimate'                =	lowHighList(
 			CatEstimateAndCI(VsplitLow$Sex$result),
 			CatEstimateAndCI(VsplitHig$Sex$result),
-			details = GenotypeDiscLabel
+			'Details' = GenotypeDiscLabel
 		), 
 		'Sex standard error'          = NULL,
-		'Sex p-val'                   =	lowHighList(
+		'Sex p-value'                 =	lowHighList(
 			VsplitLow$Sex$result$p.value      ,
 			VsplitHig$Sex$result$p.value      ,
-			details = GenotypeDiscLabel
+			'Details' = GenotypeDiscLabel
 		)   ,
 		'Sex effect size'             =	lowHighList(VsplitLow$Sex$effectSize    ,
 																								VsplitHig$Sex$effectSize    ,
-																								details = GenotypeDiscLabel), 
+																								'Details' = GenotypeDiscLabel), 
 		#####################################################################
 		'LifeStage estimate'          =	lowHighList(
 			CatEstimateAndCI(VsplitLow$LifeStage$result),
 			CatEstimateAndCI(VsplitHig$LifeStage$result),
-			details = GenotypeDiscLabel
+			'Details' = GenotypeDiscLabel
 		), 
 		'LifeStage standard error'    =	NULL,
-		'LifeStage p-val'             =	lowHighList(
+		'LifeStage p-value'           =	lowHighList(
 			VsplitLow$LifeStage$result$p.value,
 			VsplitHig$LifeStage$result$p.value,
-			details = GenotypeDiscLabel
+			'Details' = GenotypeDiscLabel
 		),
 		'LifeStage effect size'       = lowHighList(
 			VsplitLow$LifeStage$effectSize     ,
 			VsplitHig$LifeStage$effectSize     ,
-			details = GenotypeDiscLabel
+			'Details' = GenotypeDiscLabel
 		)    ,
 		#####################################################################
 		'Weight estimate'                  =	NULL,
 		'Weight standard error'            =	NULL,
-		'Weight p-val'                     =	NULL,
+		'Weight p-value'                   =	NULL,
 		'Weight effect size'               =  NULL,
 		#####################################################################
 		'Gp1 genotype'                     =	Labels$Genotype$Control		,
@@ -188,7 +189,7 @@ vectorOutputRR =	function(object)
 		#####################################################################
 		'Intercept estimate'               =	NULL,
 		'Intercept standard error'         =	NULL,
-		'Intercept p-val'                  =	NULL,
+		'Intercept p-value'                =	NULL,
 		#####################################################################
 		'Interactions included'          =	list(
 			'Genotype Sex'                   =  NULL,
@@ -198,7 +199,7 @@ vectorOutputRR =	function(object)
 		),
 		#####################################################################
 		################ interaction
-		'Interactions p-val'            =	list(
+		'Interactions p-value'            =	list(
 			'Genotype Sex'                  = NULL,
 			'Genotype LifeStage'            = NULL,
 			'Sex LifeStage'                 = NULL,
@@ -209,70 +210,70 @@ vectorOutputRR =	function(object)
 		'Sex FvKO estimate'         = lowHighList(
 			CatEstimateAndCI(VsplitLowFemale$Genotype$result),
 			CatEstimateAndCI(VsplitHigFemale$Genotype$result),
-			details = SexDiscLabel
+			'Details' = SexDiscLabel
 		), 
 		'Sex FvKO standard error'   = NULL,
-		'Sex FvKO p-val'            = lowHighList(
+		'Sex FvKO p-value'          = lowHighList(
 			VsplitLowFemale$Genotype$result$p.value,
 			VsplitHigFemale$Genotype$result$p.value,
-			details = SexDiscLabel
+			'Details' = SexDiscLabel
 		),
 		'Sex FvKO effect size'      = lowHighList(
 			VsplitLowFemale$Genotype$effectSize,
 			VsplitHigFemale$Genotype$effectSize,
-			details = SexDiscLabel
+			'Details' = SexDiscLabel
 		),
 		#####################################################################
 		'Sex MvKO estimate'         = lowHighList(
 			CatEstimateAndCI(VsplitLowMale$Genotype$result),
 			CatEstimateAndCI(VsplitHigMale$Genotype$result),
-			details = SexDiscLabel
+			'Details' = SexDiscLabel
 		), 
 		'Sex MvKO standard error'   = NULL,
-		'Sex MvKO p-val'            = lowHighList(
+		'Sex MvKO p-value'          = lowHighList(
 			VsplitLowMale$Genotype$result$p.value,
 			VsplitHigMale$Genotype$result$p.value,
-			details = SexDiscLabel
+			'Details' = SexDiscLabel
 		)  ,
 		'Sex MvKO effect size'      = lowHighList(
 			VsplitLowMale$Genotype$effectSize,
 			VsplitHigMale$Genotype$effectSize,
-			details = SexDiscLabel
+			'Details' = SexDiscLabel
 		) ,
 		#####################################################################
 		################ LifeStage interaction
 		'LifeStage EvKO estimate'         =	lowHighList(
 			CatEstimateAndCI(VsplitLowEarly$Genotype$result),
 			CatEstimateAndCI(VsplitHigEarly$Genotype$result),
-			details = LifeStageDiscLabel
+			'Details' = LifeStageDiscLabel
 		), 
 		'LifeStage EvKO standard error'   =	NULL,
-		'LifeStage EvKO p-val'            =	lowHighList(
+		'LifeStage EvKO p-value'          =	lowHighList(
 			VsplitLowEarly$Genotype$result$p.value,
 			VsplitHigEarly$Genotype$result$p.value,
-			details = LifeStageDiscLabel
+			'Details' = LifeStageDiscLabel
 		) ,
 		'LifeStage EvKO effect size'      = lowHighList(
 			VsplitLowEarly$Genotype$effectSize,
 			VsplitHigEarly$Genotype$effectSize,
-			details = LifeStageDiscLabel
+			'Details' = LifeStageDiscLabel
 		)  ,
 		#####################################################################
 		'LifeStage LvKO estimate'         =	lowHighList(
 			CatEstimateAndCI(VsplitLowLate$Genotype$result),
 			CatEstimateAndCI(VsplitHigLate$Genotype$result),
-			details = LifeStageDiscLabel
+			'Details' = LifeStageDiscLabel
 		), 
 		'LifeStage LvKO standard error'   =	NULL,
-		'LifeStage LvKO p-val'            =	lowHighList(
+		'LifeStage LvKO p-value'          =	lowHighList(
 			VsplitLowLate$Genotype$result$p.value ,
 			VsplitHigLate$Genotype$result$p.value ,
-			details = LifeStageDiscLabel
+			'Details' = LifeStageDiscLabel
 		),
 		'LifeStage LvKO effect size'      = lowHighList(
 			VsplitLowLate$Genotype$effectSize,
 			VsplitHigLate$Genotype$effectSize,
-			details = LifeStageDiscLabel
+			'Details' = LifeStageDiscLabel
 		),
 		#####################################################################
 		################ Sex LifeStage Genotype interactions
@@ -281,68 +282,68 @@ vectorOutputRR =	function(object)
 		'LifeStageSexGenotype FvEvKO estimate'        =	lowHighList(
 			CatEstimateAndCI(VsplitLowEarlyFemale$Genotype$result),
 			CatEstimateAndCI(VsplitHigEarlyFemale$Genotype$result),
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		), 
 		'LifeStageSexGenotype FvEvKO standard error'  =	NULL,
-		'LifeStageSexGenotype FvEvKO p-val'           =	lowHighList(
+		'LifeStageSexGenotype FvEvKO p-value'         =	lowHighList(
 			VsplitLowEarlyFemale$Genotype$result$p.value,
 			VsplitHigEarlyFemale$Genotype$result$p.value,
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype FvEvKO effect size'     = lowHighList(
 			VsplitLowEarlyFemale$Genotype$effectSize,
 			VsplitHigEarlyFemale$Genotype$effectSize,
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		)   ,
 		# 2.
 		'LifeStageSexGenotype MvEvKO estimate'        =	lowHighList(
 			CatEstimateAndCI(VsplitLowEarlyMale$Genotype$result),
 			CatEstimateAndCI(VsplitHigEarlyMale$Genotype$result),
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		), 
 		'LifeStageSexGenotype MvEvKO standard error'  =	NULL,
-		'LifeStageSexGenotype MvEvKO p-val'           =	lowHighList(
+		'LifeStageSexGenotype MvEvKO p-value'         =	lowHighList(
 			VsplitLowEarlyMale$Genotype$result$p.value,
 			VsplitHigEarlyMale$Genotype$result$p.value,
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype MvEvKO effect size'     = lowHighList(
 			VsplitLowEarlyMale$Genotype$effectSize,
 			VsplitHigEarlyMale$Genotype$effectSize,
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		),
 		# 3.
 		'LifeStageSexGenotype FvLvKO estimate'        = lowHighList(
 			CatEstimateAndCI(VsplitLowLateFemale$Genotype$result),
 			CatEstimateAndCI(VsplitHigLateFemale$Genotype$result),
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		), 
 		'LifeStageSexGenotype FvLvKO standard error'  = NULL,
-		'LifeStageSexGenotype FvLvKO p-val'           = lowHighList(
+		'LifeStageSexGenotype FvLvKO p-value'         = lowHighList(
 			VsplitLowLateFemale$Genotype$result$p.value ,
 			VsplitHigLateFemale$Genotype$result$p.value ,
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype FvLvKO effect size'     = lowHighList(
 			VsplitLowLateFemale$Genotype$effectSize,
 			VsplitHigLateFemale$Genotype$effectSize,
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		)   ,
 		'LifeStageSexGenotype MvLvKO estimate'        = lowHighList(
 			CatEstimateAndCI(VsplitLowLateMale$Genotype$result),
 			CatEstimateAndCI(VsplitHigLateMale$Genotype$result),
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype MvLvKO standard error'  = NULL,
-		'LifeStageSexGenotype MvLvKO p-val'           =	lowHighList(
+		'LifeStageSexGenotype MvLvKO p-value'         =	lowHighList(
 			VsplitLowLateMale$Genotype$result$p.value,
 			VsplitHigLateMale$Genotype$result$p.value,
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype MvLvKO effect size'     = lowHighList(
 			VsplitLowLateMale$Genotype$effectSize,
 			VsplitHigLateMale$Genotype$effectSize,
-			details = LifeStageSexDiscLabel
+			'Details' = LifeStageSexDiscLabel
 		),
 		################
 		'Classification tag'                          =	NULL,

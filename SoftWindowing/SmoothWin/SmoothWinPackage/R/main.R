@@ -45,6 +45,7 @@ SmoothWin = function(object                                           ,
                      simple.output = FALSE                            ,
                      debug         = FALSE                            ,
                      ...) {
+  sta.time    = Sys.time()
   if (!is.null(seed))
     set.seed(seed)
   min.obs = ceiling(is.function0(min.obs))
@@ -52,7 +53,7 @@ SmoothWin = function(object                                           ,
   k = is.function0(k, decreasing = TRUE)
   argg    = c(as.list(environment()), list())
   if (length(unique(t[m])) > 15)
-    message('More than 15 modes detected. The entire procedure can take a longer than usual!')
+    message0('More than 15 modes detected. The entire procedure can take a longer than usual!')
   
   if (length(m) > min.obs) {
     stop('`min.obs` is less than the total number of treatments!')
@@ -60,7 +61,7 @@ SmoothWin = function(object                                           ,
     msg(argg)
   }
   ### 1. Determining l
-  message('\n 1|3 Searching for l ...\n')
+  message0('1|3 Searching for the optimal l ...')
   rl = gridSearchModel(
     object = object                       ,
     data = data                           ,
@@ -95,7 +96,7 @@ SmoothWin = function(object                                           ,
   }
     
   ### 2. Determining k
-  message('\n 2|3 Searching for k ...\n')
+  message0('2|3 Searching for the optimal k ...')
   rk = gridSearchModel(
     object = object                       ,
     data = data                           ,
@@ -129,7 +130,7 @@ SmoothWin = function(object                                           ,
     finalk$score = NA
   }
   ##### final model
-  message('\n 3|3 Forming the final model ...\n')
+  message('3|3 Forming the final model ...')
   finalr = gridSearchModel(
     object = object                       ,
     data = data                           ,
@@ -163,6 +164,7 @@ SmoothWin = function(object                                           ,
     input   = argg
   )
   class(out) = 'SmoothWin'
+  message0('Finished in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds.')
   return(out)
 }
 
@@ -181,7 +183,7 @@ plot.SmoothWin = function(x,
     m  = x$input$m
     ly = length(y)
     if (is.unsorted(t, na.rm = TRUE))
-      message('To get the right plot, make sure that the dataset is sorted on time!')
+      message0('To get the right plot, make sure that the dataset is sorted on time!')
     
     if (is.null(col)) {
       col = rgb(abs(1 -  x$finalModel$FullWeight) ,
@@ -234,7 +236,7 @@ plot.SmoothWin = function(x,
       object = x
     )))
   } else{
-    message('Windowing failed. No plot available for the failed models.')
+    message0('Windowing failed. No plot available for the failed models.')
   }
   #####
 }

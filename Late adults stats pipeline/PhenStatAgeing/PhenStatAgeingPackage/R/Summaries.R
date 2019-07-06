@@ -55,7 +55,7 @@ summaryCore = function(x,
 		return(r)
 	}
 	out = list(
-		'Method'                         = vo$Method,
+		'Applied method'                 = vo$Method,
 		'Final model'                    = if (procedure %in% 'MM') {
 			if (!is.null(x$output$Final.Model))
 				formula(x$output$Final.Model)
@@ -78,16 +78,16 @@ summaryCore = function(x,
 			'* Separate p-values for (Low vs NormalHigh), (LowNormal vs High) and (details) ',
 			'............................'
 		),
-		'Genotype contribution overal'   = pasteComma2(vo$`Genotype p-val`),
-		'Genotype contribution Females'  = pasteComma2(vo$`Sex FvKO p-val`),
-		'Genotype contribution Males'    = pasteComma2(vo$`Sex MvKO p-val`),
+		'Genotype contribution overal'   = pasteComma2(vo$`Genotype p-value`),
+		'Genotype contribution Females'  = pasteComma2(vo$`Sex FvKO p-value`),
+		'Genotype contribution Males'    = pasteComma2(vo$`Sex MvKO p-value`),
 		'............................'   = '............................',
-		'LifeStage contribution'         = pasteComma2(vo$`LifeStage p-val`),
-		'Genotype contribution Early'    = pasteComma2(vo$`LifeStage EvKO p-val`),
-		'Genotype contribution Late'     = pasteComma2(vo$`LifeStage LvKO p-val`),
+		'LifeStage contribution'         = pasteComma2(vo$`LifeStage p-value`),
+		'Genotype contribution Early'    = pasteComma2(vo$`LifeStage EvKO p-value`),
+		'Genotype contribution Late'     = pasteComma2(vo$`LifeStage LvKO p-value`),
 		'............................'   = '............................',
-		'Sex contribution'               = pasteComma2(vo$`Sex p-val`),
-		'Body weight contribution'       = pasteComma2(vo$`Weight p-val`)
+		'Sex contribution'               = pasteComma2(vo$`Sex p-value`),
+		'Body weight contribution'       = pasteComma2(vo$`Weight p-value`)
 	)
 	outT = prepareSummaryOutput(out)
 	print(kable(

@@ -30,11 +30,11 @@ SuccessfulOutput = function(args) {
 
   ######## 2 JSON
   message0('Forming the list before applying JSON transformation ...')
-  args$note$experiment_details = experiment_details
-  listDetails                  = list(details = sortList(args$note))
-  listVectorOutput             = list(vectoroutput = args$c.ww.vec$list)
-  FinalList                    = list(result = c(listVectorOutput, listDetails))
-  JsonObj                      = FinalJsonBobectCreator(FinalList = cleanNULLkeys(FinalList))
+  args$note$'Experiment detail' = experiment_details
+  listDetails                   = list('Details' = sortList(args$note))
+  listVectorOutput              = list('Vector output' = args$c.ww.vec$list)
+  FinalList                     = list('Result' = c(listVectorOutput, listDetails))
+  JsonObj                       = FinalJsonBobectCreator(FinalList = cleanNULLkeys(FinalList))
 
   ######## 2 CSV
   outP =   c(

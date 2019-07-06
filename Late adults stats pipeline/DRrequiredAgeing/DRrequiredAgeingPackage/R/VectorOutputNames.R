@@ -1,6 +1,6 @@
-VectorOutPutNames = function(clean = TRUE,
+VectorOutPutNames = function(clean = FALSE,
                              replace = '_',
-                             lower = TRUE,
+                             lower = FALSE,
                              ...) {
   r = c(
     'Method',
@@ -38,8 +38,7 @@ VectorOutPutNames = function(clean = TRUE,
     'Sex MvKO p-val',
     'Classification tag',
     'Transformation',
-    'Additional information'#,
-    #'extraColumns'
+    'Additional information'
   )
   if (clean) {
     r = RemoveSpecialChars(r, replaceBy = replace)

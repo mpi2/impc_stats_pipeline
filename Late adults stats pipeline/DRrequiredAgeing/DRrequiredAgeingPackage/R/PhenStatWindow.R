@@ -53,7 +53,7 @@ PhenStatWindow = function (phenlistObject                                ,
     MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
     debug = TRUE
   )
-  note$normal_analysis_step1_1_messages = object0$messages
+  note$'Normal analysis'$'Step 1-1 messages' = object0$messages
   # If not possible use MM (only for ABR)
   if (is.ABR  (x            = parameter) &&
       !is.null (object0$messages))
@@ -66,7 +66,7 @@ PhenStatWindow = function (phenlistObject                                ,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
       debug = TRUE
     )
-    note$normal_analysis_step1_2_mm_messages = object0$messages
+    note$'Normal analysis'$'Step 1-2 Mixed Model messages' = object0$messages
   }
   ############## If not possible add jiter
   if (is.ABR(x = parameter) &&
@@ -80,7 +80,7 @@ PhenStatWindow = function (phenlistObject                                ,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
       debug = TRUE
     )
-    note$normal_analysis$step1_3_mm_jitter_messages = object0$messages
+    note$'Normal analysis'$'Step 1-3 Mixed Model with added Jitter messages' = object0$messages
   }
 
   if(!is.null(object0$messages))
@@ -95,7 +95,7 @@ PhenStatWindow = function (phenlistObject                                ,
     message0('Running the full model before applying windowing ... ')
     objectNorm = ModelAgeingWithErrorsAndMessages(
       m2ethod  = method,
-      key = 'initial_full_model_before_appliying_windowing',
+      key = 'Initial full model before appliying the windowing',
       method = method,
       phenList = phenlistObject,
       #depVariable = depVariable,
@@ -109,11 +109,9 @@ PhenStatWindow = function (phenlistObject                                ,
       # ),
       check = check,
       equation = equation,
-      name = 'windowing_analysis'
+      name = 'Windowing analysis'
     )
-    windowingNote$windowing_analysis$fully_loaded_model = objectNorm$note
-
-
+    windowingNote$'Windowing analysis'$'Fully loaded model' = objectNorm$note
     #######################################################
     message0('Start windowing ... ')
     #######################################################
@@ -176,7 +174,7 @@ PhenStatWindow = function (phenlistObject                                ,
           length(unique(we)) < 2 ||
           var(we, na.rm = TRUE) < threshold) {
         we2  = NULL
-        windowingNote$windowing_extra = 'There is no variation in the weights then the standard model is applied.'
+        windowingNote$'Windowing extra' = 'There is no variation in the weights then the standard model is applied.'
       } else{
         ####################
         MeanVarOverTime = function(mm, tt, data = phenlistObject@datasetPL) {
@@ -218,7 +216,7 @@ PhenStatWindow = function (phenlistObject                                ,
       message0('Fitting the windowing weights into the optimized PhenStat model ...')
       objectf = ModelAgeingWithErrorsAndMessages(
         m2ethod = method,
-        key = 'final_windowing_model',
+        key = 'Final windowing model',
         method = method,
         phenList = phenlistObject,
         depVariable = depVariable,
@@ -226,22 +224,22 @@ PhenStatWindow = function (phenlistObject                                ,
         threshold = threshold,
         check = check,
         equation = equation,
-        name = 'windowing_analysis'
+        name = 'Windowing analysis'
       )
-      windowingNote$windowing_analysis$final_model = objectf$note
+      windowingNote$'Windowing analysis'$'Final model' = objectf$note
       # Full model windowing
       message0('Fitting the windowing weights into the full PhenStat model ...')
       objectfulw = ModelAgeingWithErrorsAndMessages(
         m2ethod = method,
-        key = 'full_model_windowing',
+        key = 'Full model windowing',
         method = method,
         phenList = phenlistObject,
         depVariable = depVariable,
         modelWeight = we2,
         threshold = threshold,
-        check = check,
+        check    = check,
         equation = equation,
-        name = 'windowing_analysis',
+        name     = 'Windowing analysis',
         keepList =  c(
           keep_batch        = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Batch', checkLevels = FALSE),
           keep_equalvar     = TRUE,
@@ -250,7 +248,7 @@ PhenStatWindow = function (phenlistObject                                ,
           keep_interaction  = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Sex')
         )
       )
-      windowingNote$windowing_analysis$full_model_windowed = objectfulw$note
+      windowingNote$'Windowing analysis'$'Full model windowed result' = objectfulw$note
       # Plotting
       args = list(
         # for output
@@ -273,7 +271,7 @@ PhenStatWindow = function (phenlistObject                                ,
         external_sample_ids = nlme::getData(obj)[,'external_sample_id']
       )
       #args    = c(as.list(environment()), list())
-      windowingNote$window_parameters = WindowingDetails(args)
+      windowingNote$'Window parameters' = WindowingDetails(args)
       graphFileName  = PlotWindowingResult(args = args, overwrite = OverwriteExistingFiles)
       ObjectsThatMustBeRemovedInEachIteration(c('args', 'objectNorm'))
     } else{

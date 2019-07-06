@@ -429,11 +429,11 @@ percentageChangeCont = function(model                ,
 																data   = data)
 		return(
 			list(
-				value               = as.list(out)                             ,
-				variable            = mainEffsOnlyWhenIndivi                   ,
-				model               = printformula(formula(model))             ,
-				type                = 'Standardized interaction coefficients ' ,
-				'percentage change' = Matrix2List(out / ran * 100, sep = sep)
+				'Value'               = as.list(out)                             ,
+				'Variable'            = mainEffsOnlyWhenIndivi                   ,
+				'Model'               = printformula(formula(model))             ,
+				'Type'                = 'Standardized interaction coefficients ' ,
+				'Percentage change' = Matrix2List(out / ran * 100, sep = sep)
 			)
 		)
 	}
@@ -583,11 +583,11 @@ eff.size = function(object,
 		if (sum(CoefEffSizes)) {
 			# For continues covariates it is the coefficient
 			efSi         = list(
-				value               = as.list(coef(NModel))[[effOfInd]][1],
-				variable            = effOfInd                            ,
-				model               = printformula(formula(NModel))       ,
-				type                = 'Standardized coefficient'          ,
-				'percentage change' = PerChange
+				'Value'               = as.list(coef(NModel))[[effOfInd]][1],
+				'Variable'            = effOfInd                            ,
+				'Model'               = printformula(formula(NModel))       ,
+				'Type'                = 'Standardized coefficient'          ,
+				'Percentage change' = PerChange
 			)
 		} else{
 			# For categorical covariates it is the mean difference
@@ -595,12 +595,12 @@ eff.size = function(object,
 			r            = resid(NModel)
 			sd           = sd0(r, na.rm = TRUE)
 			efSi         = list(
-				value               = ifelse(!is.na(sd) &&
+				'Value'               = ifelse(!is.na(sd) &&
 																		 	sd > 0, abs(MDiff) / sd, NA),
-				variable            = effOfInd                            ,
-				model               = printformula(formula(NModel))       ,
-				type                = 'Mean difference'                   ,
-				'percentage change' = PerChange
+				'Variable'            = effOfInd                            ,
+				'Model'               = printformula(formula(NModel))       ,
+				'Type'                = 'Mean difference'                   ,
+				'Percentage change' = PerChange
 			)
 		}
 	} else{
@@ -1390,7 +1390,7 @@ decimalplaces <- function(x) {
 	}
 }
 
-dataSignature = function(formula, data, digits = 16) {
+dataSignature = function(formula, data, digits = 10) {
 	a.vars = all_vars0(formula)
 	if (!is.null(formula) &&
 			!is.null(data)    &&
@@ -1433,7 +1433,8 @@ dataSignature = function(formula, data, digits = 16) {
 			return(r)
 		}), na.rm = TRUE))
 		
-		res0$overal = paste0('overall:[', overal, ']')
+		res0$overal    = paste0('Overall:['  , overal , ']')
+		res0$precision = paste0('Precision:[', digits , ']')
 		res = pasteComma(
 			sort(unlist(res0), decreasing = FALSE) ,
 			truncate      = FALSE                  ,
@@ -2248,9 +2249,9 @@ modelSummaryPvalueExtract = function(x,
 			variable = variable
 		)
 		return(list(
-			'value'      = as.vector(unlist(mSumFiltered))     ,
-			'confidence' =  Matrix2List(x = fixedEffInters)    ,
-			'level'      = ifelse(is.null(fixedEffInters), NULL, x$intervals[[1]]$level)
+			'Value'      = as.vector(unlist(mSumFiltered))     ,
+			'Confidence' =  Matrix2List(x = fixedEffInters)    ,
+			'Level'      = ifelse(is.null(fixedEffInters), NULL, x$intervals[[1]]$level)
 		))
 	} else{
 		return(as.vector(unlist(mSumFiltered)))
@@ -2274,12 +2275,12 @@ CatEstimateAndCI = function(object) {
 	v = object$interval[[1]]
 	if (!is.null(v)) {
 		return(list(
-			'value' = v$intervals$est.    ,
-			'confidence' = list(
-				'lower' = v$intervals$lower ,
-				'upper' = v$intervals$upper
+			'Value' = v$intervals$est.    ,
+			'Confidence' = list(
+				'Lower' = v$intervals$lower ,
+				'Upper' = v$intervals$upper
 			)                             ,
-			'level'   = v$level
+			'Level'   = v$level
 		))
 	} else{
 		return('Only available for 2x2 tables')
@@ -2322,12 +2323,12 @@ NormaliseDataFrame = function(data           ,
 
 getlmeObjectConfigs = function(obj) {
 	l    = list(
-		formula = printformula(if (class(obj) %in% 'lme') {
+		'Formula' = printformula(if (class(obj) %in% 'lme') {
 			obj$call$fixed
 		} else{
 			obj$call$model
 		}, message = FALSE),
-		random_effect         = printformula(obj$call$random, message = FALSE)
+		'Random effect'         = printformula(obj$call$random, message = FALSE)
 	)
 	return(l)
 }
@@ -2425,27 +2426,27 @@ SummaryStats = function(x,
 			m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE), NA)
 			sd = ifelse(length(na.omit(xx)) > 0, sd0 (xx, na.rm = TRUE), NA)
 			r = list(
-				count = c                       ,
-				mean = m                        ,
-				sd = sd                         ,
-				'normality test' = head(shapiro.test0(xx), 3)
+				'Count' = c                       ,
+				'Mean' = m                        ,
+				'SD' = sd                         ,
+				'Normality test' = head(shapiro.test0(xx), 3)
 			)
 		} else{
 			c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
-			r = list(count = c,
-							 mean = NULL,
-							 sd = NULL)
+			r = list('Count' = c,
+							 'Mean' = NULL,
+							 'SD' = NULL)
 		}
 		return(r)
 	}, default = -999.991233210123))
 	##
 	fTmp = function(isNum) {
 		if (isNum) {
-			r = list(count = 0,
-							 mean = NA,
-							 sd = NA)
+			r = list('Count' = 0,
+							 'Mean' = NA,
+							 'SD' = NA)
 		} else{
-			r = list(count = 0)
+			r = list('Count' = 0)
 		}
 		return(r)
 	}
@@ -2626,19 +2627,19 @@ shapiro.test0 = function(x, ...) {
 			!is.na(sd0(x, na.rm = TRUE))    &&
 			sd0(x, na.rm = TRUE)             > 0) {
 		r = list(
-			'p-val'    = shapiro.test(x)$p.value   ,
-			'n'        = length(x)                 ,
-			'unique n' = length(unique(na.omit(x))),
-			'sd'       = sd0(x, na.rm = TRUE)      ,
-			'test'     = 'Shapiro'
+			'P-value'  = shapiro.test(x)$p.value   ,
+			'N'        = length(x)                 ,
+			'Unique n' = length(unique(na.omit(x))),
+			'SD'       = sd0(x, na.rm = TRUE)      ,
+			'Test'     = 'Shapiro'
 		)
 	} else{
 		r = list(
-			'p-val'    = NULL                                                               ,
-			'n'        = length(x)                                                          ,
-			'unique n' = length(unique(na.omit(x)))                                         ,
-			'sd'       = sd0(x, na.rm = TRUE)                                               ,
-			'test'     = 'Not possible (Possible cause:n < 3 or n > 5000 unique data points'
+			'P-value'  = NULL                                                               ,
+			'N'        = length(x)                                                          ,
+			'Unique n' = length(unique(na.omit(x)))                                         ,
+			'SD'       = sd0(x, na.rm = TRUE)                                               ,
+			'Test'     = 'Not possible (Possible cause:n < 3 or n > 5000 unique data points'
 		)
 	}
 	return(r)
@@ -2680,7 +2681,7 @@ QuyalityTests = function(object,
 				}
 			}
 		}
-		flst$overall =  shapiro.test0(x = r)
+		flst$Overall =  shapiro.test0(x = r)
 		if (list) {
 			flst = as.list(lapply(flst, function(f) {
 				r = f
@@ -3114,9 +3115,9 @@ safe_pchisq0 <- function(q, df, ...)
 
 lowHighList = function(x, y, ...) {
 	if (!is.null(x) || !is.null(y))
-		r = list('low' = x, 'high' = y , ...)
+		r = list('Low' = x, 'High' = y , ...)
 	else
-		r = list('low' = x, 'high' = y)
+		r = list('Low' = x, 'High' = y)
 	return(r)
 }
 

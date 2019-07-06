@@ -96,7 +96,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   CategoryMap                    = readConf('CategoryMap.conf')
   initial                        = readConf('Initialize.conf')
   exceptionList                  = readFile(file = 'ExceptionMap.list')
-  #CategoricalCategoryBlackList   = readFile(file = 'CategoricalCategoryBlackList.list')
+  # CategoricalCategoryBlackList   = readFile(file = 'CategoricalCategoryBlackList.list')
   # Main subdirectory/working directory
   message0('Preparing the working directory ...')
   cwd = getwd()
@@ -146,12 +146,11 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
 
   message0('Input file dimentions: ',
            paste0(dim(rdata), collapse  = ', '))
-  rdata = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
+  rdata                 = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
   new.data              = rdata
   new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)), ]
   #########
   new.data$colony_id    = as.character(new.data$colony_id)
-  #new.data$colony_id[new.data$biological_sample_group %in% "control"] = NA
   new.data$external_sample_id = as.factor(new.data$external_sample_id)
   ################
   # Start analysis
@@ -165,7 +164,6 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   if (.Platform$OS.type == 'windows') {
     cl = makeCluster(crs,
                      outfile = outMCoreLog(wd))
-
   } else{
     cl = makeForkCluster(crs,
                          outfile = outMCoreLog(wd))
@@ -336,7 +334,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                 ### Single or multiple cores?
                 `%activemulticore%` = ifelse (activateMulticore &&
                                                 !BatchProducer,
-                                              `%dopar%`,
+                                              `%dopar%`       ,
                                               `%do%`)
                 if (activateMulticore &&
                     !BatchProducer) {
@@ -376,14 +374,15 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     n3.5 = rbind (n3.4, n3.3.c)
                     note = c(note,
                              list(
-                               bodyweight_included_in_data = CheckIfNameExistInDataFrame(obj = n3.5,
-                                                                                         name = 'weight',
-                                                                                         checkLevels = FALSE)
+                               'Bodyweight included in the input data' = CheckIfNameExistInDataFrame(
+                                 obj   = n3.5,
+                                 name  = 'weight',
+                                 checkLevels = FALSE
+                               )
                              ))
-
                     # Imaginary URLs
-                    note$gene_page_url        = GenePageURL       = GenePageURL(n3.5)
-                    note$bodyweight_page_url = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
+                    note$'Gene page URL'        = GenePageURL       = GenePageURL(n3.5)
+                    note$'Body weight page URL' = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
 
                     ReadMeTxt       = ReadMe (obj = n3.4, URL = GenePageURL)
 
@@ -391,10 +390,10 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     depVariable = getResponseColumn(n3.5$observation_type)
                     depVar      = depVariable$column
                     message0('Dependent variable: ', depVar)
-                    note$response_type       = paste0(depVar,
+                    note$'Response type  '       = paste0(depVar,
                                                       '_of_type_',
                                                       paste(depVariable$lbl, sep = '.'))
-                    note$observation_type    =
+                    note$'Observation type'    =
                       if (!is.null(unique(n3.5$observation_type))) {
                         paste(unique(n3.5$observation_type),
                               sep = '~',
@@ -402,7 +401,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       } else{
                         NULL
                       }
-                    note$data_type           =
+                    note$'Data type'           =
                       if (!is.null(unique(n3.5$data_type))) {
                         paste(unique(n3.5$data_type),
                               sep = '~',
@@ -457,22 +456,24 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         plot = superDebug
                       )
                       n3.5 = n3.5_tmp$df
-                      note = list(note , simulation_details = n3.5_tmp$note)
+                      note = list(note , 'Simulation details' = n3.5_tmp$note)
                     }
 
                     # Summary statistics
-                    n3.5_summary = SummaryStatisticsOriginal(x = n3.5, depVar = depVar)
+                    n3.5_summary = SummaryStatisticsOriginal(x      = n3.5,
+                                                             depVar = depVar,
+                                                             label  = 'Raw data summary statistics')
                     note         = c(note, n3.5_summary)
 
                     # Remove zero frequency categories
                     n3.5.1_F_list = RemoveZeroFrequencyCategories(
-                      x = n3.5,
+                      x               = n3.5,
                       minSampRequired = minSampRequired,
-                      depVar = depVar,
+                      depVar      = depVar,
                       totalLevels = SexGenResLevels
                     )
                     n3.5.1 = n3.5.1_F_list$x
-                    note   =  c(note, n3.5.1_F_list$note)
+                    note   = c(note, n3.5.1_F_list$note)
 
                     # Remove var categories
                     n3.5.1_v_list = RemoveZerovarCategories(
@@ -504,12 +505,12 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       ),
                       names = c(
                         # all lower case
-                        'original_external_sample_id',
-                        'original_sex',
-                        'original_biological_sample_group',
-                        'original_response',
-                        'original_date_of_experiment',
-                        'original_body_weight'
+                        'Original external_sample_id',
+                        'Original sex',
+                        'Original biological_sample_group',
+                        'Original response',
+                        'Original date_of_experiment',
+                        'Original body weight'
                       )
                     )
                     note = c(note, OrgSpecIds)
@@ -528,8 +529,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     outDir   = file.path0(
                       wd,
                       SubSubDirOrdFileName,
-                      create = TRUE,
-                      check  = FALSE,
+                      create           = TRUE,
+                      check            = FALSE,
                       IncludedFileName = FALSE
                     )
                     outpfile = outpfile2 = paste0(outDir,
@@ -604,14 +605,14 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         RawoutputFile0 = comRes$file
                       }
                     }
-                    note$input_file           = relativePath(path = file, reference  = wd)
-                    note$output_raw_data_file = relativePath(path = if (storeRawData) {
+                    note$'Input file'           = relativePath(path = file, reference  = wd)
+                    note$'Exported raw data file' = relativePath(path = if (storeRawData) {
                       RawoutputFile0
                     } else{
                       NULL
                     },
                     reference = wd)
-                    note$read_me_file         = relativePath(path = if (storeRawData &&
+                    note$'Readme file'         = relativePath(path = if (storeRawData &&
                                                                         !compressRawData) {
                       ReadMeFile
                     } else{
@@ -630,7 +631,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     n3.5.2[, depVar] = MergLev$x
                     n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]),])
                     n3.5.2OnlyKO     = subset(n3.5.2,n3.5.2$biological_sample_group %in% 'experimental')
-                    note$relabeled_levels_categorical_variables_only  = MergLev$note
+                    note$'Relabeled levels for categorical variables'  = MergLev$note
                     if (!is.null(n3.5.2) &&
                         # data.frame is not zero
                         min0(dim(n3.5.2)) > 0 &&
@@ -655,7 +656,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         NonZeroVariation(n3.5.2[, depVar]) &&
                         !isException &&
                         columnLevelsVariationRadio(dataset = n3.5.2, columnName = depVar) > 0.005 &&
-                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$criteria_result
+                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$'Criteria result'
                     ) {
                       message0('Analysing the dataset in progress ...')
                       message0('Creating PhenListAgeing object ...')
@@ -673,14 +674,14 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         depVar = depVar,
                         sex = 'Sex',
                         genotype = 'Genotype',
-                        label = 'phenlist_data_summary_statistics'
+                        label = 'Phenlist object summary statistics'
                       )
                       note = c(note, a_summary_before_concurrent)
                       #
                       PhenListSpecIds = OtherExtraColumns (
                         obj = a@datasetPL,
                         ColNames = 'external_sample_id',
-                        names = 'phenlist_data_spec_ids'
+                        names    = 'Phenlist external_sample_id'
                       )
                       note = c(note, PhenListSpecIds)
                       ### Get method of analysis
@@ -719,14 +720,14 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                           depVar = depVar,
                           sex = 'Sex',
                           genotype = 'Genotype',
-                          label = 'phenlist_and_cuncurrent_data_summary_statistics'
+                          label = 'Phenlist and cuncurrent data summary statistics'
                         )
                         note  =  c(note, a_phenlist_concurrent_summary)
                       }
                       # check the Weight column
                       message0('Checking whether Weight column exists in the raw data ...')
                       if (!CheckIfNameExistInDataFrame(a@datasetPL, 'Weight')) {
-                        note$existence_of_weight_column =
+                        note$'Existence of the weight column in the PhenList object' =
                           'Weight column does not exist in the raw data'
                       }
                       # Equation type
@@ -738,7 +739,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       )
                       # This is the main engine!
                       note = c(note, list(
-                        bodyweight_initially_included_in_model = ifelse(method %in% 'MM', equationType, FALSE)
+                        'Bodyweight initially included in the model' = ifelse(method %in% 'MM', equationType, FALSE)
                       ))
                       if (normalisedPhenlist){
                         a = normalisePhenList(phenlist = a, colnames = c(depVar, 'Weight'))
@@ -784,8 +785,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       note = c(
                         note                               ,
                         c.ww0$note                         ,
-                        applied_method = c.ww0$method      ,
-                        image_url      = relativePath(
+                        'Applied method' = c.ww0$method    ,
+                        'Image url'      = relativePath(
                           path = c.ww0$graphFileName ,
                           reference = wd
                         )

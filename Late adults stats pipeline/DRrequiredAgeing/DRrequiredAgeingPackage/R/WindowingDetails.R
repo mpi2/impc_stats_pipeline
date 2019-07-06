@@ -4,14 +4,14 @@
 WindowingDetails = function(args) {
   # 1 LIST
   wn = list(
-    l =  args$r$final.l                   ,
-    k = args$r$final.k                    ,
-    doe = unique(args$tt[args$mm])        ,
-    min_obs = unique(args$r$min.obs)      ,
-    obs_in_window = unique(args$r$finalModel$output$ObsInInterval),
-    threshold = unique(args$threshold)                            ,
-    the_number_of_doe_in_window = length(unique(args$tt[args$mm])),
-    doe_note = ifelse(
+    'l' =  args$r$final.l                   ,
+    'k' = args$r$final.k                    ,
+    'DOE' = unique(args$tt[args$mm])        ,
+    'Min obs required in the window'    = unique(args$r$min.obs)      ,
+    'Total obs or weight in the window' = unique(args$r$finalModel$output$ObsInInterval),
+    'Threshold'                         = unique(args$threshold)                            ,
+    'The number of DOE in the window'   = length(unique(args$tt[args$mm])),
+    'DOE note' = ifelse(
       length(unique(args$tt[args$mm])) > args$maxPeaks,
       paste0(
         'More than ',
@@ -22,8 +22,8 @@ WindowingDetails = function(args) {
       ),
       'no note available'
     ),
-    weights = as.vector(unlist(args$we)),
-    external_sample_id = as.vector(unlist(args$external_sample_ids))
+    'Window weights' = as.vector(unlist(args$we)),
+    'external_sample_id' = as.vector(unlist(args$external_sample_ids))
   )
   return(wn)
 }
