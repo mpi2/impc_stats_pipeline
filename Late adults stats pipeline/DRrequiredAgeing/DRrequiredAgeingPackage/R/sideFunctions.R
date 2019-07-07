@@ -1332,6 +1332,7 @@ file.exists0 = function(file, overwrite = FALSE, ...) {
                  stop = nchar(fname))
 
   } else{
+    ext  = ''
     name = fname
   }
   ###
@@ -1866,12 +1867,12 @@ WriteToDB = function(df,
   dbpath                = file.path0(
     'db'                    ,
     dbname                  ,
-    check = TRUE            ,
+    check = FALSE           ,
     create = TRUE           ,
     IncludedFileName = TRUE
   )
   res = NULL
-  for (i in 1:1500) {
+  for (i in 1:5000) {
     res = tryCatch(
       expr = {
         con =
@@ -1895,7 +1896,7 @@ WriteToDB = function(df,
     if (is.null(res)) {
       message0('Retrying ...')
       Sys.sleep(RandomRegardSeed(1, max = .2))
-      if (i %% 50 == 0) {
+      if (i %% 25 == 0) {
         dbpath = file.exists0(file = dbpath, overwrite = FALSE)
       }
     } else{
