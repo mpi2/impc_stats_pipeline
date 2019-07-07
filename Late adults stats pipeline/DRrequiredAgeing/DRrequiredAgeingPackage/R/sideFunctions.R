@@ -1854,9 +1854,13 @@ replaceInList <- function (x, FUN, ...)
 }
 
 
+
 WriteToDB = function(df,
                      dbname    = 'db' ,
-                     TableName = 'DR10') {
+                     TableName = 'DR10',
+                     maxtry    = 5000,
+                     steptry   = 25,
+                     maxdelay  = .25) {
   requireNamespace("DBI")
   dbname  = RemoveSpecialChars(dbname, what = '[^0-9A-Za-z/.]')
   message0('Writting to the SQLite ...')
@@ -1871,8 +1875,8 @@ WriteToDB = function(df,
     create = TRUE           ,
     IncludedFileName = TRUE
   )
-  res = NULL
-  for (i in 1:5000) {
+  res    = NULL
+  for (i in 1:maxtry) {
     res = tryCatch(
       expr = {
         con =
@@ -1893,15 +1897,19 @@ WriteToDB = function(df,
         return(NULL)
       }
     )
+
     if (is.null(res)) {
       message0('Retrying ...')
-      Sys.sleep(RandomRegardSeed(1, max = .2))
-      if (i %% 25 == 0) {
+      Sys.sleep(RandomRegardSeed(1, max = maxdelay))
+      if (i %% steptry == 0) {
         dbpath = file.exists0(file = dbpath, overwrite = FALSE)
       }
     } else{
       message0('Writting to the database successful ...')
       break
+    }
+    if (i >= maxtry) {
+      stop('something wrong with the data or the database')
     }
   }
 }
