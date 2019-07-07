@@ -1859,7 +1859,7 @@ WriteToDB = function(df,
                      dbname    = 'db' ,
                      TableName = 'DR10',
                      maxtry    = 5000,
-                     steptry   = 25,
+                     steptry   = 5,
                      maxdelay  = .25) {
   requireNamespace("DBI")
   dbname  = RemoveSpecialChars(dbname, what = '[^0-9A-Za-z/.]')
@@ -1875,7 +1875,8 @@ WriteToDB = function(df,
     create = TRUE           ,
     IncludedFileName = TRUE
   )
-  res    = NULL
+  res     = NULL
+  counter = 1
   for (i in 1:maxtry) {
     res = tryCatch(
       expr = {
@@ -1886,6 +1887,7 @@ WriteToDB = function(df,
             synchronous       = NULL
           )
         DBI::dbWriteTable(con, TableName, dbtemp, append = TRUE)
+        Sys.sleep(.1)
         DBI::dbDisconnect(conn     = con)
       },
       warning = function(war) {
@@ -1902,8 +1904,9 @@ WriteToDB = function(df,
       message0('Retrying ...')
       Sys.sleep(RandomRegardSeed(1, max = maxdelay))
       if (i %% steptry == 0) {
-        dbpath = file.exists0(file = dbpath, overwrite = FALSE)
+        dbpath = file.path(dirname(dbpath), paste0('Dup', counter, '_', basename(dbpath)))
       }
+      counter = counter + 1
     } else{
       message0('Writting to the database successful ...')
       break
