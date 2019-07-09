@@ -1904,8 +1904,8 @@ WriteToDB = function(df,
       message0('Retrying ...')
       Sys.sleep(RandomRegardSeed(1, max = maxdelay))
       if (i %% steptry == 0) {
-        newBase = sub(pattern = '.*(Dup_)', '' , basename(dbpath), perl = TRUE)
-        dbpath  = file.path(dirname(dbpath), paste0(counter, 'Dup_', newBase))
+        newBase = sub(pattern = '.*(_Dup_)', '' , basename(dbpath), perl = TRUE)
+        dbpath  = file.path(dirname(dbpath), paste0(counter, '_Dup_', newBase))
         counter = counter + 1
       }
 

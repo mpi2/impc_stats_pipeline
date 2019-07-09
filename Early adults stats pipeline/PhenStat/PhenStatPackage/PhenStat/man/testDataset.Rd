@@ -43,7 +43,7 @@ testDataset(
         default value TRUE}
     \item{pThreshold}{a numerical value for the p-value threshold used to determine which fixed effects
         to keep in the model, default value 0.05}
-    \item{method}{a character string ("MM", "FE" or "RR") defining the method to use for model building;
+    \item{method}{a character string ("MM", "FE", "TF" or "RR") defining the method to use for model building;
         default value "MM" for mixed model}
     \item{modelWeight}{
         a vector of possible weights (the same length as the response) that are imposed on the weighted MM. Only works when method="MM". The default is NULL that leads to normal (non-weighted) MM.

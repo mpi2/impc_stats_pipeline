@@ -51,7 +51,11 @@ testFinalModel <- function(phenTestResult)
     No_Gp1 <- sum(is.finite(Gp1[, c("res")]))
     No_Gp2 <- sum(is.finite(Gp2[, c("res")]))
 
-    if (keep_batch && No_batches > 7 && outputnumeric) {
+    if (keep_batch     &&
+        No_batches > 7 &&
+        outputnumeric  &&
+        !is.null(analysisResults$model.output) &&
+        is(analysisResults$model.output,'lme')) {
       blups <- ranef(analysisResults$model.output)
       blups_test <-
         suppressWarnings(cvm.test(blups [, 1])$p.value)

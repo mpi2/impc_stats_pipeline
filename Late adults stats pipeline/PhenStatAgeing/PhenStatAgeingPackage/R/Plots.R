@@ -134,8 +134,9 @@ plot.PhenStatAgeingMM = function (x                   ,
 	p = par()
 	par(ask = ask, mfrow = mfrow)
 	
-	predR  = predict(fm)
-	residR = resid(fm)
+	predR            = predict(fm)
+	residR           = resid(fm)
+	residShapiroTest = shapiro.test0(residR)
 	plot(
 		predR ,
 		residR,
@@ -149,7 +150,16 @@ plot.PhenStatAgeingMM = function (x                   ,
 	abline(h = 0, lwd = 3, lty = 2)
 	densityPlot(
 		residR,
-		xlab = 'Residuals',
+		xlab = ifelse(
+			is.null(residShapiroTest$'P-value'),
+			'Residuals'              ,
+			paste0(
+				'Residual - '          ,
+				residShapiroTest$'Test',
+				' p-value = '          ,
+				round(residShapiroTest$'P-value', 8)
+			)
+		),
 		main = paste0(main, ': Density of the residuals'),
 		...
 	)
@@ -157,7 +167,8 @@ plot.PhenStatAgeingMM = function (x                   ,
 		as.vector(residR),
 		ylab = 'Residuals',
 		main = paste0(main, ': Normal Q-Q of the residuals'),
-		grid = FALSE,
+		grid = FALSE ,
+		col.lines = 1,
 		...
 	)
 	#qqline(residR, ...)
