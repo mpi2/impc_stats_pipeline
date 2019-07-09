@@ -6,7 +6,7 @@ Author: Hamed Haseli Mashhadi
 Maintainer: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 Description: Package contains several methods for statistical analysis of phenotypic data. This package is designed to substitute the old PhenStat package.
 License: GPL (>= 2)
-Imports: nlme, MASS, jsonlite, Hmisc, methods, knitr, AICcmodavg, car, rlist
+Imports: nlme, MASS, jsonlite, Hmisc, methods, knitr, AICcmodavg, car, rlist, summarytools
 Encoding: UTF-8
 LazyData: true
 Repository: CRAN

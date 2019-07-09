@@ -1,11 +1,12 @@
 import(nlme)
 import(MASS)
 import(methods)
-import(Hmisc)
+#import(Hmisc)
 import(jsonlite)
 import(knitr)
 import(AICcmodavg)
 import(rlist)
+#import(summarytools)
 
 importFrom("graphics", "abline", "hist", "par", "plot")
 importFrom("stats", "AIC", "aggregate", "as.formula", "complete.cases",

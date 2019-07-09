@@ -13,10 +13,10 @@ setClass(
 		dataset.colname.weight      = 'character'     ,
 		dataset.values.missingValue = 'character'  ,
 		dataset.values.male         = 'character'     ,
-		dataset.values.female       = 'character'     ,		
+		dataset.values.female       = 'character'     ,
 		dataset.values.early        = 'character'     ,
 		dataset.values.late         = 'character'     ,
-		datasetUNF                  = 'data.frame'           
+		datasetUNF                  = 'data.frame'
 	)
 )
 
@@ -38,7 +38,7 @@ PhenListAgeing =
 					 dataset.values.late         = NULL)
 	{
 		testGenotype = as.character(testGenotype)
-		refGenotype  = as.character( refGenotype)
+		refGenotype  = as.character(refGenotype)
 		if (is.null(dataset) || class(dataset) != "data.frame") {
 			message0('error ~> Null dataset or not a data.frame.')
 			return(NULL)
@@ -278,7 +278,7 @@ checkDataset = function(dataset,
 				'No observations detected in the Genotype:Sex interaction for:\n\t ',
 				pasteComma(names(tbGS[tbGS < 1]), truncate = FALSE)
 			)
-		dataset = droplevels(dataset[InGS %in% names(tbGS[tbGS >= 1 ]), , drop = FALSE])
+		dataset = droplevels(dataset[InGS %in% names(tbGS[tbGS >= 1]), , drop = FALSE])
 		## Check of genotype and sex levels after cleaning
 		if (nlevels(dataset$Genotype) != 2) {
 			message0(
@@ -309,6 +309,7 @@ checkDataset = function(dataset,
 	}
 	return(dataset)
 }
+
 PhenListAgeingBuilder = function(PhenListobject,
 																 DOE = NULL,
 																 DOB = NULL,
@@ -371,25 +372,11 @@ PhenListAgeingBuilder = function(PhenListobject,
 summary.PhenListAgeing = function(object,
 																	vars = NULL,
 																	...) {
-	PhenListobject = object
-	data = PhenListobject@datasetPL
-	if ('LifeStage' %in% names(PhenListobject@datasetPL))
-		cnames = c('Batch',
-							 'Genotype',
-							 'Sex',
-							 'Age',
-							 'LifeStage')
-	else
-		cnames = c('Batch',
-							 'Genotype',
-							 'Sex')
-	ndata = data[, if (is.null(vars)) {
-		cnames
-	} else{
-		vars
-	}]
-	r = describe(ndata, ...)
-	
+	requireNamespace("summarytools")
+	r  = NULL
+	df = SelectVariablesOrDefault(data = object@datasetPL, vars)
+	if (!is.null(df))
+		r  = summarytools::dfSummary (df, ...)
 	return(r)
 }
 
@@ -397,35 +384,45 @@ summary.PhenListAgeing = function(object,
 plot.PhenListAgeing = function(x,
 															 vars = NULL,
 															 ...) {
-	data = x@datasetPL
-	if ('LifeStage' %in% names(data))
-		cnames = c('Batch',
-							 'Genotype',
-							 'Sex',
-							 'Age',
-							 'LifeStage')
-	else
-		cnames = c('Batch',
-							 'Genotype',
-							 'Sex')
-	
+	requireNamespace("Hmisc")
+	options(grType = 'plotly')
+	df = SelectVariablesOrDefault(data = x@datasetPL, vars)
+	if (!is.null(df)) {
+		r    = Hmisc::describe (df)
+		plot = suppressWarnings(plot(r, ...))
+		return(plot)
+	} else{
+		message0('No variable found in the data. Please make sure that `vars` exist in the input data')
+		return(NULL)
+	}
+}
+
+
+SelectVariablesOrDefault = function(data, vars = NULL) {
+	cnames = c('Genotype'     ,
+						 'Sex'          ,
+						 'Batch'        ,
+						 'Age_in_weeks' ,
+						 'LifeStage')
 	###################
-	cnamesF = cnames[cnames %in% names(data)]
-	if (length(cnamesF) < 1) {
+	cnamesF = varExistsInDF(data = data, if (is.null(vars)) {
+		cnames
+	} else{
+		vars
+	})
+	if (is.null(cnamesF) || length(cnamesF) < 1) {
 		message0(
 			'Non of the specified variables exist in the data. See the list below:\n\t',
-			pasteComma(cnames,truncate = FALSE)
+			pasteComma(cnames, truncate = FALSE)
 		)
 		return(NULL)
 	}
-	##################
-	ndata = data[, if (is.null(vars)) {
-		cnamesF
-	} else{
-		vars
-	}]
-	r = describe(ndata, ...)
-	
-	plot = suppressWarnings(plot(r, ...))
-	return(plot)
+	return(data[, cnamesF, drop = FALSE])
+}
+
+varExistsInDF = function(data = NULL, vars = NULL) {
+	if (is.null(vars) || is.null(data))
+		return(NULL)
+	r = vars[vars %in% names(data)]
+	return(r)
 }
