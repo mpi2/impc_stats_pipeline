@@ -104,7 +104,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
   	dataset.colname.weight = 'weight'
   )
   plot   (PhenListAgeing)
-  summary(PhenListAgeing)
+  summary(PhenListAgeing, style = 'grid')
   class  (PhenListAgeing)
   # str(PhenListAgeing@datasetPL)
 }

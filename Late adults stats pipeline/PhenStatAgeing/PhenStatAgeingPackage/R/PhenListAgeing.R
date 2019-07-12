@@ -385,7 +385,7 @@ plot.PhenListAgeing = function(x,
 															 vars = NULL,
 															 ...) {
 	requireNamespace("Hmisc")
-	options(grType = 'plotly')
+	#options(grType = 'plotly')
 	df = SelectVariablesOrDefault(data = x@datasetPL, vars)
 	if (!is.null(df)) {
 		r    = Hmisc::describe (df)
@@ -401,9 +401,12 @@ plot.PhenListAgeing = function(x,
 SelectVariablesOrDefault = function(data, vars = NULL) {
 	cnames = c('Genotype'     ,
 						 'Sex'          ,
+						 'LifeStage'    ,
 						 'Batch'        ,
-						 'Age_in_weeks' ,
-						 'LifeStage')
+						 'age_in_weeks' ,
+						 'phenotyping_center',
+						 'metadata_group'
+						 )
 	###################
 	cnamesF = varExistsInDF(data = data, if (is.null(vars)) {
 		cnames
