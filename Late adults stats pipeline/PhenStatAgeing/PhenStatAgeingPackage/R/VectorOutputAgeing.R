@@ -90,7 +90,7 @@ vectorOutputAgeing = function(object,
 		},
 		error = function(err) {
 			message0('The functions failed with an error (see below): ')
-			warning(err)
+			message(err)
 			return(NULL)
 		}
 	)

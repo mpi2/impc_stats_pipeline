@@ -596,7 +596,7 @@ eff.size = function(object,
 			sd           = sd0(r, na.rm = TRUE)
 			efSi         = list(
 				'Value'               = ifelse(!is.na(sd) &&
-																		 	sd > 0, abs(MDiff) / sd, NA),
+																			 	sd > 0, abs(MDiff) / sd, NA),
 				'Variable'            = effOfInd                            ,
 				'Model'               = printformula(formula(NModel))       ,
 				'Type'                = 'Mean difference'                   ,
@@ -945,37 +945,88 @@ cat.eff.size = function(xtb,
 	)
 	return(out)
 }
+
+printVarFreqfromTable = function(tbl) {
+	if (is.null(tbl) || any(dim(tbl) < 1))
+		return(NULL)
+	r = pasteComma(paste0(names(tbl), '[', tbl, ']'))
+	return(r)
+}
+
+GenderIncludedInAnalysis = function(x, sexCol = 'Sex') {
+	r = if (!sexCol %in% colnames(x)) {
+		paste0(sexCol, ' does not included in the input data')
+	}	else if (nlevels(x[, sexCol]) > 1) {
+		paste0('Both sexes included; ', printVarFreqfromTable(table(x$Sex)))
+	} else{
+		paste0('Only one sex included in the analysis; ',
+					 printVarFreqfromTable(table(x$Sex)))
+	}
+	return(r)
+}
+
 # Test engine
 ctest = function(x,
 								 formula   = NULL  ,
 								 asset     = NULL  ,
 								 rep       = 1500  ,
 								 ci_levels = 0.95  ,
-								 RRextraResults   = NULL  ,
+								 RRextraResults   = NULL             ,
+								 overalTableName  = 'Complete table' ,
 								 ...) {
-	message = c()
 	xtb = xtabs(
 		formula = formula        ,
 		data = x                 ,
 		drop.unused.levels = TRUE,
 		na.action = 'na.omit'
 	)
+	
+	checkRes = checkTableForFisherTest(xtb = xtb, asset = asset)
+	if (!checkRes$passed) {
+		r        = setNames(list(overal = list(
+			p.value = NULL, effect = NULL
+		)), overalTableName)
+	} else{
+		if (any(dim(xtb) < 2)) {
+			r        = setNames(list(overal = list(
+				p.value = 1, effect = 1
+			)), overalTableName)
+		} else{
+			r = fisher.test1(
+				x           = xtb            ,
+				formula     = formula        ,
+				ci_levels   = ci_levels      ,
+				simulate.p.value = rep > 0   ,
+				conf.int    = TRUE           ,
+				conf.level  = ci_levels      ,
+				B           = rep            ,
+				overalTableName = overalTableName ,
+				...
+			)
+		}
+	}
+	return(
+		list(
+			result      = r               ,
+			note        = checkRes$message,
+			table       = xtb             ,
+			input       = x               ,
+			formula     = formula         ,
+			RRextra     = RRextraResults
+		)
+	)
+}
+
+# check table for fisher.test
+checkTableForFisherTest = function(xtb, asset = NULL) {
+	message = NULL
 	if (!is.null(asset)) {
 		if (asset <= dim(xtb)[3]) {
 			xtb = xtb[, , asset]
 		} else{
 			message = c(message, 'There are some empty levels in data')
-			return(
-				list(
-					result     = NULL       ,
-					effectSize = NULL       ,
-					note       = message    ,
-					table      = xtb        ,
-					input      = x          ,
-					formula    = formula    ,
-					RRextra    = RRextraResults
-				)
-			)
+			return(list(passed     = FALSE       ,
+									note       = message))
 		}
 	}
 	if (length(dim0(xtb)) < 2                      ||
@@ -983,61 +1034,93 @@ ctest = function(x,
 			sum(margin.table(xtb, margin = 1) > 0) < 2) {
 		message = c(message,
 								'No variation in al least two levels of one or more categories')
-		return(
-			list(
-				result = NULL     ,
-				effectSize = NULL ,
-				note    = message ,
-				table   = xtb     ,
-				input   = x       ,
-				formula = formula ,
-				RRextra = RRextraResults
-			)
-		)
+		return(list(passed   = FALSE  ,
+								note     = message))
 	}
-	
-	if (any(dim(xtb) < 2)) {
-		r = list(p.value = 1)
-		effect = 1
-	} else{
-		r = tryCatch(
-			fisher.test(
-				xtb,
-				simulate.p.value = rep > 0   ,
-				conf.int    = TRUE           ,
-				conf.level  = ci_levels      ,
-				B = rep                      ,
-				...
-			),
-			error = function(e) {
-				message0(e, breakLine = FALSE)
-				return(NULL)
-			} ,
-			warning = function(w) {
-				message0(w, breakLine = FALSE)
-				return(NULL)
-			}
-		)
-		r           = intervalsCat(r, ci_levels)
-		effect      = cat.eff.size(xtb,
-															 varName = pasteComma(all_vars0(formula)[-1], truncate = FALSE),
-															 formula = formula)
-		r$formula   = formula
-		r$table     = xtb
-	}
-	return(
-		list(
-			result      = r      ,
-			effectSize  = effect ,
-			note        = message,
-			table       = xtb    ,
-			input       = 'Only have values when the function fails',
-			formula     = formula,
-			RRextra     = RRextraResults
-		)
-	)
+	return(list(passed   = TRUE  ,
+							note     = message))
 }
 
+# Bulletproof fisher.test
+fisher.test0 = function(x, formula, ci_levels, ...) {
+	r = tryCatch(
+		fisher.test(x,
+								...),
+		error = function(e) {
+			message0(e, breakLine = FALSE)
+			return(NULL)
+		} ,
+		warning = function(w) {
+			message0(w, breakLine = FALSE)
+			return(NULL)
+		}
+	)
+	r           = intervalsCat(r, ci_levels)
+	r$effect    = cat.eff.size(x,
+														 varName = pasteComma(all_vars0(formula)[-1], truncate = FALSE),
+														 formula = formula)
+	r$formula   = formula
+	r$table     = x
+	return(r)
+}
+
+# Fisher test with broken table
+fisher.test1 = function(x,
+												formula,
+												ci_levels,
+												overalTableName = 'Complete table',
+												...) {
+	if (is.null(x))
+		return(NULL)
+	
+	nrx = nrow(x)
+	outList = NULL
+	if (nrx > 2) {
+		message0(
+			'\t\t testing sub tables in progress ...\n\t\t\t Total tests: ',
+			ncombn(n = nrx, x = 2:nrx),
+			'; ',
+			pasteComma(names(attributes(x)$dimnames))
+		)
+		for (i in 2:nrx) {
+			cbn = combn(nrx, i)
+			subtbl = lapply(1:ncol(cbn), function(j) {
+				r = suppressMessages(fisher.test0(
+					x = x[cbn[, j], ],
+					formula = formula,
+					ci_levels = ci_levels,
+					...
+				))
+				if (nrow(cbn[, j, drop = FALSE]) == nrow(x)) {
+					# this name is used in more places!
+					r$data.name = overalTableName
+				} else{
+					r$data.name = paste(rownames(x[cbn[, j], ]), sep = '.', collapse = '.')
+				}
+				return(r)
+			})
+			
+			outList = c(outList, setNames(object = subtbl, lapply(subtbl, function(x)
+				x$data.name)))
+		}
+	} else{
+		outList = setNames(list(overal = fisher.test0(
+			x = x,
+			formula = formula,
+			ci_levels = ci_levels,
+			...
+		)), overalTableName)
+	}
+	return(outList)
+}
+
+ncombn = function(n,x,total = TRUE){
+	r = lfactorial(n)- (lfactorial(x)+lfactorial(n-x))
+	if(total)
+		return(sum(exp(r)))
+	else
+		return(exp(r))
+}
 
 # Change with super extra care
 # This is a complicated function for modeling all variation of the variables
@@ -2076,6 +2159,19 @@ warning0 = function(...,
 }
 
 
+extractFisherSubTableResults = function(x, what = 'p.value') {
+	r = lapply0(x, function(y)
+		y[what])
+	return(r)
+}
+
+lapply0 = function(X, FUN, ...) {
+	if (is.null(X))
+		return(NULL)
+	r = lapply(X = X, FUN = FUN, ...)
+	return(r)
+}
+
 all_vars0 = function(x, ...) {
 	if (is.null(x))
 		return(NULL)
@@ -2262,7 +2358,7 @@ CheckWhetherNamesExistInListExtractCI = function(x, lnames, variable, minusCol =
 	if (!is.null(x) && any(names(x) %in% lnames)) {
 		Toplst = x[names(x) %in% lnames][[1]]
 		Toplst = Toplst[rownames(Toplst) %in% variable , -minusCol,
-					 drop = FALSE]
+										drop = FALSE]
 		return(Toplst)
 	} else{
 		return(NULL)

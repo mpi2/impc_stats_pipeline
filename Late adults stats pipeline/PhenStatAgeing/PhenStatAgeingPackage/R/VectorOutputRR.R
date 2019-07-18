@@ -17,29 +17,29 @@ vectorOutputRR =	function(object)
 	Vsplit         = object$output$SplitModels
 	low            = pastedot('Low' , depVariable, refVariable)
 	high           = pastedot('High', depVariable, refVariable)
-	VsplitLow      = Vsplit[[low ]]
+	VsplitLow      = Vsplit[[low]]
 	VsplitHig      = Vsplit[[high]]
 	#### Sex
-	VsplitLowFemale= Vsplit[[pastedot(low ,'Female')]]
-	VsplitHigFemale= Vsplit[[pastedot(high,'Female')]]
-	VsplitLowMale  = Vsplit[[pastedot(low ,'Male'  )]]
-	VsplitHigMale  = Vsplit[[pastedot(high,'Male'  )]]
+	VsplitLowFemale = Vsplit[[pastedot(low , 'Female')]]
+	VsplitHigFemale = Vsplit[[pastedot(high, 'Female')]]
+	VsplitLowMale   = Vsplit[[pastedot(low , 'Male')]]
+	VsplitHigMale   = Vsplit[[pastedot(high, 'Male')]]
 	### Lifestage
-	VsplitLowEarly = Vsplit[[pastedot(low ,'Early'  )]]
-	VsplitHigEarly = Vsplit[[pastedot(high,'Early'  )]]
-	VsplitLowLate  = Vsplit[[pastedot(low ,'Late'   )]]
-	VsplitHigLate  = Vsplit[[pastedot(high,'Late'   )]]
+	VsplitLowEarly = Vsplit[[pastedot(low , 'Early')]]
+	VsplitHigEarly = Vsplit[[pastedot(high, 'Early')]]
+	VsplitLowLate  = Vsplit[[pastedot(low , 'Late')]]
+	VsplitHigLate  = Vsplit[[pastedot(high, 'Late')]]
 	### LifeStage x Sex
 	# Female
-	VsplitLowEarlyFemale = Vsplit[[pastedot(low ,'Female','Early'  )]]
-	VsplitHigEarlyFemale = Vsplit[[pastedot(high,'Female','Early'  )]]
-	VsplitLowLateFemale  = Vsplit[[pastedot(low ,'Female','Late'   )]]
-	VsplitHigLateFemale  = Vsplit[[pastedot(high,'Female','Late'   )]]
+	VsplitLowEarlyFemale = Vsplit[[pastedot(low , 'Female', 'Early')]]
+	VsplitHigEarlyFemale = Vsplit[[pastedot(high, 'Female', 'Early')]]
+	VsplitLowLateFemale  = Vsplit[[pastedot(low , 'Female', 'Late')]]
+	VsplitHigLateFemale  = Vsplit[[pastedot(high, 'Female', 'Late')]]
 	# Male
-	VsplitLowEarlyMale = Vsplit[[pastedot(low ,'Male','Early'  )]]
-	VsplitHigEarlyMale = Vsplit[[pastedot(high,'Male','Early'  )]]
-	VsplitLowLateMale  = Vsplit[[pastedot(low ,'Male','Late'   )]]
-	VsplitHigLateMale  = Vsplit[[pastedot(high,'Male','Late'   )]]
+	VsplitLowEarlyMale = Vsplit[[pastedot(low , 'Male', 'Early')]]
+	VsplitHigEarlyMale = Vsplit[[pastedot(high, 'Male', 'Early')]]
+	VsplitLowLateMale  = Vsplit[[pastedot(low , 'Male', 'Late')]]
+	VsplitHigLateMale  = Vsplit[[pastedot(high, 'Male', 'Late')]]
 	###
 	GenotypeDiscLabel  = 'Data is discritised by Genotype levels'
 	SexDiscLabel       = 'Data is first split by Sex levels then discritised by Genotype levels'
@@ -49,8 +49,22 @@ vectorOutputRR =	function(object)
 	x                = object$input$data
 	columnOfInterest = x[, c(depVariable)]
 	#####################################################################
-	variability      =  list('Value' = length(unique(columnOfInterest)) / max(length(columnOfInterest), 1), 
+	variability      =  list('Value' = length(unique(columnOfInterest)) / max(length(columnOfInterest), 1),
 													 'Type'  = 'Length of unique response divided by total number of response')
+	#####################################################################
+	extractFisherSubTableResults1 = function(x, what = 'p.value') {
+		r = extractFisherSubTableResults(x = x, what = what)
+		if (length(r) == 1)
+			r = r[[1]]
+		return(r)
+	}
+	lapply1 = function(X, FUN, ...) {
+		r = lapply0(X = X, FUN = FUN, ...)
+		if (length(r) == 1)
+			r = r[[1]]
+		return(r)
+		
+	}
 	#####################################################################
 	DSsize            = SummaryStats(
 		x = x,
@@ -61,7 +75,7 @@ vectorOutputRR =	function(object)
 		sep    = '_'
 	)
 	MultiBatch = ifelse(multiBatch(x),
-											'Dataset contains multi batches',
+											'Dataset contains multiple batches',
 											'Dataset contains single batch')
 	addInfo           = list(
 		Data = list(
@@ -72,21 +86,19 @@ vectorOutputRR =	function(object)
 		),
 		Analysis = list(
 			'Model setting'          = extractFERRTerms(object),
-			'Is model optimised'     = NULL                    , 
-			'Multibatch in analysis' = MultiBatch,
-			'Gender included in analysis' = ifelse(
-				nlevels(x$Sex) > 1,
-				'Both sexes included',
-				paste0('Only one sex included in the analysis; ', levels(x$Sex))
-			),
+			'Is model optimised'     = NULL                    ,
+			'Multibatch in analysis' = MultiBatch              ,
+			'Gender included in analysis' = GenderIncludedInAnalysis(x),
 			'Further models' = if (!is.null(Vsplit)) {
-				setNames(lapply(Vsplit, function(v) {
-					lapply(
+				setNames(lapply0(Vsplit, function(v) {
+					lapply1(
 						v,
 						FUN = function(v2) {
-							list('P-value'     = v2$result$p.value,
-									 'Effect size' = v2$effectSize    ,
-									 'Extra'       = v2$RRextra)
+							list(Result = extractFisherSubTableResults1(
+								x = v2$result,
+								what = c('p.value', 'effect')
+							),
+							RRextra    = v2$RRextra)
 						}
 					)
 				}), nm = names(Vsplit))
@@ -101,76 +113,80 @@ vectorOutputRR =	function(object)
 	percentageChanges = NULL
 	#####################################################################
 	vectorOutput      = list(
-		'Applied method'                       = 	framework   ,
-		'Dependent variable'                   =	depVariable , 
-		'Batch included'                       =	 NULL       ,
-		'Batch p-value'                        =   NULL       ,
-		'Residual variances homogeneity'       =   NULL       ,
+		'Applied method'                         = 	framework   ,
+		'Dependent variable'                     =	depVariable ,
+		'Batch included'                         =	 NULL       ,
+		'Batch p-value'                          =   NULL       ,
+		'Residual variances homogeneity'         =   NULL       ,
 		'Residual variances homogeneity p-value' =   NULL       ,
 		#####################################################################
 		'Genotype contribution' =	list(
 			Overal = lowHighList(
-				VsplitLow$Genotype$result$p.value,
-				VsplitHig$Genotype$result$p.value,
+				extractFisherSubTableResults1(VsplitLow$Genotype$result),
+				extractFisherSubTableResults1(VsplitHig$Genotype$result),
 				'Details'  = GenotypeDiscLabel
 			),
 			'Sex FvKO p-value'   =	lowHighList(
-				VsplitLowFemale$Genotype$result$p.value,
-				VsplitHigFemale$Genotype$result$p.value,
+				extractFisherSubTableResults1(VsplitLowFemale$Genotype$result),
+				extractFisherSubTableResults1(VsplitHigFemale$Genotype$result),
 				'Details' = SexDiscLabel
 			),
 			'Sex MvKO p-value'   =  lowHighList(
-				VsplitLowMale$Genotype$result$p.value,
-				VsplitHigMale$Genotype$result$p.value,
+				extractFisherSubTableResults1(VsplitLowMale$Genotype$result),
+				extractFisherSubTableResults1(VsplitHigMale$Genotype$result),
 				'Details' = SexDiscLabel
 			),
 			'Sexual dimorphism detected' = 'Sex specific results for Low/High tables are always reported'
 		),
 		'Genotype estimate'           = lowHighList(
-			CatEstimateAndCI(VsplitLow$Genotype$result),
-			CatEstimateAndCI(VsplitHig$Genotype$result),
-			'Details' = GenotypeDiscLabel
-		), 
-		'Genotype standard error'     = NULL, 
-		'Genotype p-value'            = lowHighList(
-			VsplitLow$Genotype$result$p.value,
-			VsplitHig$Genotype$result$p.value,
+			lapply1(VsplitLow$Genotype$result, CatEstimateAndCI),
+			lapply1(VsplitHig$Genotype$result, CatEstimateAndCI),
 			'Details' = GenotypeDiscLabel
 		),
-		'Genotype percentage change'  =	percentageChanges                            ,
-		'Genotype effect size'        = lowHighList(VsplitLow$Genotype$effectSize    ,
-																								VsplitHig$Genotype$effectSize    ,
-																								'Details' = GenotypeDiscLabel)     ,
+		'Genotype standard error'     = NULL,
+		'Genotype p-value'            = lowHighList(
+			extractFisherSubTableResults1(VsplitLow$Genotype$result),
+			extractFisherSubTableResults1(VsplitHig$Genotype$result),
+			'Details' = GenotypeDiscLabel
+		),
+		'Genotype percentage change'  =	percentageChanges                  ,
+		'Genotype effect size'        = lowHighList(
+			extractFisherSubTableResults1(VsplitLow$Genotype$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHig$Genotype$result, 'effect'),
+			'Details' = GenotypeDiscLabel
+		)     ,
 		#####################################################################
 		'Sex estimate'                =	lowHighList(
-			CatEstimateAndCI(VsplitLow$Sex$result),
-			CatEstimateAndCI(VsplitHig$Sex$result),
+			lapply1(VsplitLow$Sex$result, CatEstimateAndCI),
+			lapply1(VsplitHig$Sex$result, CatEstimateAndCI),
 			'Details' = GenotypeDiscLabel
-		), 
+		),
 		'Sex standard error'          = NULL,
 		'Sex p-value'                 =	lowHighList(
-			VsplitLow$Sex$result$p.value      ,
-			VsplitHig$Sex$result$p.value      ,
+			extractFisherSubTableResults1(VsplitLow$Sex$result),
+			extractFisherSubTableResults1(VsplitHig$Sex$result),
 			'Details' = GenotypeDiscLabel
 		)   ,
-		'Sex effect size'             =	lowHighList(VsplitLow$Sex$effectSize    ,
-																								VsplitHig$Sex$effectSize    ,
-																								'Details' = GenotypeDiscLabel), 
+		'Sex effect size'             =	lowHighList(
+			extractFisherSubTableResults1(VsplitLow$Sex$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHig$Sex$result, 'effect'),
+			'Details' = GenotypeDiscLabel
+		),
 		#####################################################################
 		'LifeStage estimate'          =	lowHighList(
-			CatEstimateAndCI(VsplitLow$LifeStage$result),
-			CatEstimateAndCI(VsplitHig$LifeStage$result),
+			lapply1(VsplitLow$LifeStage$result, CatEstimateAndCI),
+			lapply1(VsplitHig$LifeStage$result, CatEstimateAndCI),
 			'Details' = GenotypeDiscLabel
-		), 
+		),
 		'LifeStage standard error'    =	NULL,
 		'LifeStage p-value'           =	lowHighList(
-			VsplitLow$LifeStage$result$p.value,
-			VsplitHig$LifeStage$result$p.value,
+			extractFisherSubTableResults1(VsplitLow$LifeStage$result),
+			extractFisherSubTableResults1(VsplitHig$LifeStage$result),
 			'Details' = GenotypeDiscLabel
 		),
 		'LifeStage effect size'       = lowHighList(
-			VsplitLow$LifeStage$effectSize     ,
-			VsplitHig$LifeStage$effectSize     ,
+			extractFisherSubTableResults1(VsplitLow$LifeStage$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHig$LifeStage$result, 'effect'),
 			'Details' = GenotypeDiscLabel
 		)    ,
 		#####################################################################
@@ -208,71 +224,71 @@ vectorOutputRR =	function(object)
 		#####################################################################
 		################ Sex interactions
 		'Sex FvKO estimate'         = lowHighList(
-			CatEstimateAndCI(VsplitLowFemale$Genotype$result),
-			CatEstimateAndCI(VsplitHigFemale$Genotype$result),
+			lapply1(VsplitLowFemale$Genotype$result, CatEstimateAndCI),
+			lapply1(VsplitHigFemale$Genotype$result, CatEstimateAndCI),
 			'Details' = SexDiscLabel
-		), 
+		),
 		'Sex FvKO standard error'   = NULL,
 		'Sex FvKO p-value'          = lowHighList(
-			VsplitLowFemale$Genotype$result$p.value,
-			VsplitHigFemale$Genotype$result$p.value,
+			extractFisherSubTableResults1(VsplitLowFemale$Genotype$result),
+			extractFisherSubTableResults1(VsplitHigFemale$Genotype$result),
 			'Details' = SexDiscLabel
 		),
 		'Sex FvKO effect size'      = lowHighList(
-			VsplitLowFemale$Genotype$effectSize,
-			VsplitHigFemale$Genotype$effectSize,
+			extractFisherSubTableResults1(VsplitLowFemale$Genotype$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHigFemale$Genotype$result, 'effect'),
 			'Details' = SexDiscLabel
 		),
 		#####################################################################
 		'Sex MvKO estimate'         = lowHighList(
-			CatEstimateAndCI(VsplitLowMale$Genotype$result),
-			CatEstimateAndCI(VsplitHigMale$Genotype$result),
+			lapply1(VsplitLowMale$Genotype$result, CatEstimateAndCI),
+			lapply1(VsplitHigMale$Genotype$result, CatEstimateAndCI),
 			'Details' = SexDiscLabel
-		), 
+		),
 		'Sex MvKO standard error'   = NULL,
 		'Sex MvKO p-value'          = lowHighList(
-			VsplitLowMale$Genotype$result$p.value,
-			VsplitHigMale$Genotype$result$p.value,
+			extractFisherSubTableResults1(VsplitLowMale$Genotype$result),
+			extractFisherSubTableResults1(VsplitHigMale$Genotype$result),
 			'Details' = SexDiscLabel
 		)  ,
 		'Sex MvKO effect size'      = lowHighList(
-			VsplitLowMale$Genotype$effectSize,
-			VsplitHigMale$Genotype$effectSize,
+			extractFisherSubTableResults1(VsplitLowMale$Genotype$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHigMale$Genotype$result, 'effect'),
 			'Details' = SexDiscLabel
 		) ,
 		#####################################################################
 		################ LifeStage interaction
 		'LifeStage EvKO estimate'         =	lowHighList(
-			CatEstimateAndCI(VsplitLowEarly$Genotype$result),
-			CatEstimateAndCI(VsplitHigEarly$Genotype$result),
+			lapply1(VsplitLowEarly$Genotype$result, CatEstimateAndCI),
+			lapply1(VsplitHigEarly$Genotype$result, CatEstimateAndCI),
 			'Details' = LifeStageDiscLabel
-		), 
+		),
 		'LifeStage EvKO standard error'   =	NULL,
 		'LifeStage EvKO p-value'          =	lowHighList(
-			VsplitLowEarly$Genotype$result$p.value,
-			VsplitHigEarly$Genotype$result$p.value,
+			extractFisherSubTableResults1(VsplitLowEarly$Genotype$result),
+			extractFisherSubTableResults1(VsplitHigEarly$Genotype$result),
 			'Details' = LifeStageDiscLabel
 		) ,
 		'LifeStage EvKO effect size'      = lowHighList(
-			VsplitLowEarly$Genotype$effectSize,
-			VsplitHigEarly$Genotype$effectSize,
+			extractFisherSubTableResults1(VsplitLowEarly$Genotype$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHigEarly$Genotype$result, 'effect'),
 			'Details' = LifeStageDiscLabel
 		)  ,
 		#####################################################################
 		'LifeStage LvKO estimate'         =	lowHighList(
-			CatEstimateAndCI(VsplitLowLate$Genotype$result),
-			CatEstimateAndCI(VsplitHigLate$Genotype$result),
+			lapply1(VsplitLowLate$Genotype$result, CatEstimateAndCI),
+			lapply1(VsplitHigLate$Genotype$result, CatEstimateAndCI),
 			'Details' = LifeStageDiscLabel
-		), 
+		),
 		'LifeStage LvKO standard error'   =	NULL,
 		'LifeStage LvKO p-value'          =	lowHighList(
-			VsplitLowLate$Genotype$result$p.value ,
-			VsplitHigLate$Genotype$result$p.value ,
+			extractFisherSubTableResults1(VsplitLowLate$Genotype$result) ,
+			extractFisherSubTableResults1(VsplitHigLate$Genotype$result) ,
 			'Details' = LifeStageDiscLabel
 		),
 		'LifeStage LvKO effect size'      = lowHighList(
-			VsplitLowLate$Genotype$effectSize,
-			VsplitHigLate$Genotype$effectSize,
+			extractFisherSubTableResults1(VsplitLowLate$Genotype$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHigLate$Genotype$result, 'effect'),
 			'Details' = LifeStageDiscLabel
 		),
 		#####################################################################
@@ -280,69 +296,69 @@ vectorOutputRR =	function(object)
 		#####################################################################
 		# 1.
 		'LifeStageSexGenotype FvEvKO estimate'        =	lowHighList(
-			CatEstimateAndCI(VsplitLowEarlyFemale$Genotype$result),
-			CatEstimateAndCI(VsplitHigEarlyFemale$Genotype$result),
+			lapply1(VsplitLowEarlyFemale$Genotype$result, CatEstimateAndCI),
+			lapply1(VsplitHigEarlyFemale$Genotype$result, CatEstimateAndCI),
 			'Details' = LifeStageSexDiscLabel
-		), 
+		),
 		'LifeStageSexGenotype FvEvKO standard error'  =	NULL,
 		'LifeStageSexGenotype FvEvKO p-value'         =	lowHighList(
-			VsplitLowEarlyFemale$Genotype$result$p.value,
-			VsplitHigEarlyFemale$Genotype$result$p.value,
+			extractFisherSubTableResults1(VsplitLowEarlyFemale$Genotype$result),
+			extractFisherSubTableResults1(VsplitHigEarlyFemale$Genotype$result),
 			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype FvEvKO effect size'     = lowHighList(
-			VsplitLowEarlyFemale$Genotype$effectSize,
-			VsplitHigEarlyFemale$Genotype$effectSize,
+			extractFisherSubTableResults1(VsplitLowEarlyFemale$Genotype$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHigEarlyFemale$Genotype$result, 'effect'),
 			'Details' = LifeStageSexDiscLabel
 		)   ,
 		# 2.
 		'LifeStageSexGenotype MvEvKO estimate'        =	lowHighList(
-			CatEstimateAndCI(VsplitLowEarlyMale$Genotype$result),
-			CatEstimateAndCI(VsplitHigEarlyMale$Genotype$result),
+			lapply1(VsplitLowEarlyMale$Genotype$result, CatEstimateAndCI),
+			lapply1(VsplitHigEarlyMale$Genotype$result, CatEstimateAndCI),
 			'Details' = LifeStageSexDiscLabel
-		), 
+		),
 		'LifeStageSexGenotype MvEvKO standard error'  =	NULL,
 		'LifeStageSexGenotype MvEvKO p-value'         =	lowHighList(
-			VsplitLowEarlyMale$Genotype$result$p.value,
-			VsplitHigEarlyMale$Genotype$result$p.value,
+			extractFisherSubTableResults1(VsplitLowEarlyMale$Genotype$result),
+			extractFisherSubTableResults1(VsplitHigEarlyMale$Genotype$result),
 			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype MvEvKO effect size'     = lowHighList(
-			VsplitLowEarlyMale$Genotype$effectSize,
-			VsplitHigEarlyMale$Genotype$effectSize,
+			extractFisherSubTableResults1(VsplitLowEarlyMale$Genotype$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHigEarlyMale$Genotype$result, 'effect'),
 			'Details' = LifeStageSexDiscLabel
 		),
 		# 3.
 		'LifeStageSexGenotype FvLvKO estimate'        = lowHighList(
-			CatEstimateAndCI(VsplitLowLateFemale$Genotype$result),
-			CatEstimateAndCI(VsplitHigLateFemale$Genotype$result),
+			lapply1(VsplitLowLateFemale$Genotype$result, CatEstimateAndCI),
+			lapply1(VsplitHigLateFemale$Genotype$result, CatEstimateAndCI),
 			'Details' = LifeStageSexDiscLabel
-		), 
+		),
 		'LifeStageSexGenotype FvLvKO standard error'  = NULL,
 		'LifeStageSexGenotype FvLvKO p-value'         = lowHighList(
-			VsplitLowLateFemale$Genotype$result$p.value ,
-			VsplitHigLateFemale$Genotype$result$p.value ,
+			extractFisherSubTableResults1(VsplitLowLateFemale$Genotype$result) ,
+			extractFisherSubTableResults1(VsplitHigLateFemale$Genotype$result) ,
 			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype FvLvKO effect size'     = lowHighList(
-			VsplitLowLateFemale$Genotype$effectSize,
-			VsplitHigLateFemale$Genotype$effectSize,
+			extractFisherSubTableResults1(VsplitLowLateFemale$Genotype$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHigLateFemale$Genotype$result, 'effect'),
 			'Details' = LifeStageSexDiscLabel
 		)   ,
 		'LifeStageSexGenotype MvLvKO estimate'        = lowHighList(
-			CatEstimateAndCI(VsplitLowLateMale$Genotype$result),
-			CatEstimateAndCI(VsplitHigLateMale$Genotype$result),
+			lapply1(VsplitLowLateMale$Genotype$result, CatEstimateAndCI),
+			lapply1(VsplitHigLateMale$Genotype$result, CatEstimateAndCI),
 			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype MvLvKO standard error'  = NULL,
 		'LifeStageSexGenotype MvLvKO p-value'         =	lowHighList(
-			VsplitLowLateMale$Genotype$result$p.value,
-			VsplitHigLateMale$Genotype$result$p.value,
+			extractFisherSubTableResults1(VsplitLowLateMale$Genotype$result),
+			extractFisherSubTableResults1(VsplitHigLateMale$Genotype$result),
 			'Details' = LifeStageSexDiscLabel
 		),
 		'LifeStageSexGenotype MvLvKO effect size'     = lowHighList(
-			VsplitLowLateMale$Genotype$effectSize,
-			VsplitHigLateMale$Genotype$effectSize,
+			extractFisherSubTableResults1(VsplitLowLateMale$Genotype$result, 'effect'),
+			extractFisherSubTableResults1(VsplitHigLateMale$Genotype$result, 'effect'),
 			'Details' = LifeStageSexDiscLabel
 		),
 		################

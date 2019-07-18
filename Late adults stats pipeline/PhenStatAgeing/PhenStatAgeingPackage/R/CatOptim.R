@@ -1,12 +1,13 @@
 # Categorical OPT core
 crunner = function(object              ,
 									 formula          = ~ category + Genotype + Sex + LifeStage,
-									 rep              = 1500,
-									 method           = NULL,
-									 fullComparisions = TRUE,
-									 noteToFinish     = NULL,
-									 ci_levels        = .95 ,
-									 RRextraResults   = NULL,
+									 rep              = 1500            ,
+									 method           = NULL            ,
+									 fullComparisions = TRUE            ,
+									 noteToFinish     = NULL            ,
+									 ci_levels        = .95             ,
+									 RRextraResults   = NULL            ,
+									 overalTableName  = 'Complete table', 
 									 ...)
 {
 	requireNamespace   ("rlist")
@@ -72,6 +73,7 @@ crunner = function(object              ,
 				rep = rep                             ,
 				ci_levels = ci_levels                 ,
 				RRextraResults   = RRextraResults     ,
+				overalTableName  = overalTableName    , 
 				...
 			)
 			
@@ -82,7 +84,6 @@ crunner = function(object              ,
 				counter      = counter + 1
 			}
 		}
-		
 		if (fullComparisions && CmbiVars) {
 			message0('Combined effects in progress ...')
 			alTbls = AllTables(
@@ -103,6 +104,7 @@ crunner = function(object              ,
 					rep       = rep                                ,
 					ci_levels = ci_levels                          ,
 					RRextraResults   = RRextraResults              ,
+					overalTableName  = overalTableName             , 
 					...
 				)
 			}))
@@ -110,7 +112,8 @@ crunner = function(object              ,
 				names(lcomb) = paste(lapply(
 					names(lcomb),
 					FUN = function(nam) {
-						n1 = names(dimnames(lcomb[[nam]]$table))
+						#n1 = names(dimnames(lcomb[[nam]]$result[[overalTableName]]$table))
+						n1 = all_vars0(lcomb[[nam]]$formula)[-1]
 						n2 = paste0(n1[!n1 %in% depVariable], collapse = '.')
 						return(n2)
 					}

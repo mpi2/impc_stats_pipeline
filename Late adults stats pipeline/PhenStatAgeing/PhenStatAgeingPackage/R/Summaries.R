@@ -54,8 +54,15 @@ summaryCore = function(x,
 			)
 		return(r)
 	}
+	IfOveralTableExistsThenReturnOne = function(x, overalTableName  = 'Complete table') {
+		if (overalTableName %in% names(x)) {
+			#message0('`',overalTableName, '` found in the object')
+			x = x[[overalTableName]]
+		}
+		return(x)
+	}
 	out = list(
-		'Applied method'                 = vo$Method,
+		'Applied framework'              = vo$`Applied method`,
 		'Final model'                    = if (procedure %in% 'MM') {
 			if (!is.null(x$output$Final.Model))
 				formula(x$output$Final.Model)
@@ -78,16 +85,16 @@ summaryCore = function(x,
 			'* Separate p-values for (Low vs NormalHigh), (LowNormal vs High) and (details) ',
 			'............................'
 		),
-		'Genotype contribution overal'   = pasteComma2(vo$`Genotype p-value`),
-		'Genotype contribution Females'  = pasteComma2(vo$`Sex FvKO p-value`),
-		'Genotype contribution Males'    = pasteComma2(vo$`Sex MvKO p-value`),
-		'............................'   = '............................',
-		'LifeStage contribution'         = pasteComma2(vo$`LifeStage p-value`),
-		'Genotype contribution Early'    = pasteComma2(vo$`LifeStage EvKO p-value`),
-		'Genotype contribution Late'     = pasteComma2(vo$`LifeStage LvKO p-value`),
-		'............................'   = '............................',
-		'Sex contribution'               = pasteComma2(vo$`Sex p-value`),
-		'Body weight contribution'       = pasteComma2(vo$`Weight p-value`)
+		'Genotype contribution overal'   = pasteComma2(IfOveralTableExistsThenReturnOne(vo$`Genotype p-value`)),
+		'Genotype contribution Females'  = pasteComma2(IfOveralTableExistsThenReturnOne(vo$`Sex FvKO p-value`)),
+		'Genotype contribution Males'    = pasteComma2(IfOveralTableExistsThenReturnOne(vo$`Sex MvKO p-value`)),
+		'............................'   = '............................'                                      ,
+		'LifeStage contribution'         = pasteComma2(IfOveralTableExistsThenReturnOne(vo$`LifeStage p-value`)),
+		'Genotype contribution Early'    = pasteComma2(IfOveralTableExistsThenReturnOne(vo$`LifeStage EvKO p-value`)),
+		'Genotype contribution Late'     = pasteComma2(IfOveralTableExistsThenReturnOne(vo$`LifeStage LvKO p-value`)),
+		'............................'   = '............................'                                      ,
+		'Sex contribution'               = pasteComma2(IfOveralTableExistsThenReturnOne(vo$`Sex p-value`))     ,
+		'Body weight contribution'       = pasteComma2(IfOveralTableExistsThenReturnOne(vo$`Weight p-value`))
 	)
 	outT = prepareSummaryOutput(out)
 	print(kable(

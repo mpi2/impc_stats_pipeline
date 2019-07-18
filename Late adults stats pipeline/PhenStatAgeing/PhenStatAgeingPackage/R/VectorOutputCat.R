@@ -14,6 +14,7 @@ vectorOutputCat =	function(object)
 	#####################################################################
 	x                = object$input$data
 	columnOfInterest = x[, c(depVariable)]
+	objRes           = object$output$SplitModels[[depVariable]]
 	#####################################################################
 	variability      =  list('Value' = length(unique(columnOfInterest)) / max(length(columnOfInterest), 1), 
 													 'Type'  = 'Length of unique response divided by total number of response')
@@ -27,7 +28,7 @@ vectorOutputCat =	function(object)
 		sep = '_'
 	)
 	MultiBatch = ifelse(multiBatch(x),
-											'Dataset contains multi batches',
+											'Dataset contains multiple batches',
 											'Dataset contains single batch')
 	addInfo           = list(
 		Data = list(
@@ -42,20 +43,16 @@ vectorOutputCat =	function(object)
 			# 	final   = printformula(formula)
 			# ),
 			'Model setting' =  extractFERRTerms(object),
-			'Is model optimised'     = NULL                    , 
-			'Multibatch in analysis' = MultiBatch,
-			'Gender included in analysis' = ifelse(
-				nlevels(x$Sex) > 1,
-				'Both sexes included',
-				paste0('Only one sex included in the analysis; ', levels(x$Sex))
-			),
+			'Is model optimised'     = NULL                            , 
+			'Multibatch in analysis' = MultiBatch                      ,
+			'Gender included in analysis' = GenderIncludedInAnalysis(x),
 			'Further models' = if (!is.null(object$output$SplitModels)) {
 				setNames(sapply(object$output$SplitModels, function(v) {
-					lapply(
+					lapply0(
 						v,
 						FUN = function(v2) {
-							list('P-value'     = v2$result$p.value,
-									 'Effect size' = v2$effectSize)
+							v3 = extractFisherSubTableResults(v2$result,what = c('p.value','effect'))
+							v3
 						}
 					)
 				}),
@@ -71,34 +68,34 @@ vectorOutputCat =	function(object)
 	percentageChanges = NULL
 	#####################################################################
 	vectorOutput      = list(
-		'Applied method'                       = 	framework,
-		'Dependent variable'                   =	depVariable,
-		'Batch included'                       =	 NULL   ,
-		'Batch p-value'                        =   NULL,
-		'Residual variances homogeneity'       =   NULL   ,
-		'Residual variances homogeneity p-value' =   NULL,
+		'Applied method'                         = 	framework  ,
+		'Dependent variable'                     =	depVariable,
+		'Batch included'                         =	NULL       ,
+		'Batch p-value'                          =  NULL       ,
+		'Residual variances homogeneity'         =  NULL       ,
+		'Residual variances homogeneity p-value' =  NULL       ,
 		#####################################################################
 		'Genotype contribution' =	list(
-			Overal = object$output$SplitModels[[depVariable]]$Genotype$result$p.value,
-			'Sex FvKO p-value'   =	object$output$SplitModels[[depVariable]]$Genotype_Female$result$p.value,
-			'Sex MvKO p-value'   =  object$output$SplitModels[[depVariable]]$Genotype_Male$result$p.value	,
+			'Overal'             =  extractFisherSubTableResults(objRes$Genotype$result)       ,
+			'Sex FvKO p-value'   =	extractFisherSubTableResults(objRes$Genotype_Female$result),
+			'Sex MvKO p-value'   =  extractFisherSubTableResults(objRes$Genotype_Male$result)  ,
 			'Sexual dimorphism detected' = 'Sex specific results are always reported'
 		),
-		'Genotype estimate'           = CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Genotype$result),
+		'Genotype estimate'           = lapply0(objRes$Genotype$result, CatEstimateAndCI)     ,
 		'Genotype standard error'     = NULL,
-		'Genotype p-value'            = object$output$SplitModels[[depVariable]]$Genotype$result$p.value ,
+		'Genotype p-value'            = extractFisherSubTableResults(objRes$Genotype$result)  ,
 		'Genotype percentage change'  =	percentageChanges                                 ,
-		'Genotype effect size'        = object$output$SplitModels[[depVariable]]$Genotype$effectSize     ,
+		'Genotype effect size'        = extractFisherSubTableResults(objRes$Genotype$result, 'effect') ,
 		#####################################################################
-		'Sex estimate'                =	CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Sex$result),
+		'Sex estimate'                =	lapply0(objRes$Sex$result, CatEstimateAndCI),
 		'Sex standard error'          = NULL,
-		'Sex p-value'                 =	object$output$SplitModels[[depVariable]]$Sex$result$p.value,
-		'Sex effect size'             =	object$output$SplitModels[[depVariable]]$Sex$effectSize    ,
+		'Sex p-value'                 =	extractFisherSubTableResults(objRes$Sex$result),
+		'Sex effect size'             =	extractFisherSubTableResults(objRes$Sex$result , 'effect') ,
 		#####################################################################
-		'LifeStage estimate'          =	CatEstimateAndCI(object$output$SplitModels[[depVariable]]$LifeStage$result),
+		'LifeStage estimate'          =	lapply0(objRes$LifeStage$result, CatEstimateAndCI),
 		'LifeStage standard error'    =	NULL,
-		'LifeStage p-value'           =	object$output$SplitModels[[depVariable]]$LifeStage$result$p.value,
-		'LifeStage effect size'       = object$output$SplitModels[[depVariable]]$LifeStage$effectSize    ,
+		'LifeStage p-value'           =	extractFisherSubTableResults(objRes$LifeStage$result),
+		'LifeStage effect size'       = extractFisherSubTableResults(objRes$LifeStage$result , 'effect'),
 		#####################################################################
 		'Weight estimate'             =	NULL,
 		'Weight standard error'       =	NULL,
@@ -133,48 +130,48 @@ vectorOutputCat =	function(object)
 		),
 		#####################################################################
 		################ Sex interactions
-		'Sex FvKO estimate'         = CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Genotype_Female$result),
+		'Sex FvKO estimate'         = lapply0(objRes$Genotype_Female$result, CatEstimateAndCI),
 		'Sex FvKO standard error'   = NULL,
-		'Sex FvKO p-value'            = object$output$SplitModels[[depVariable]]$Genotype_Female$result$p.value,
-		'Sex FvKO effect size'      = object$output$SplitModels[[depVariable]]$Genotype_Female$effectSize,
+		'Sex FvKO p-value'          = extractFisherSubTableResults(objRes$Genotype_Female$result),
+		'Sex FvKO effect size'      = extractFisherSubTableResults(objRes$Genotype_Female$result, 'effect'),
 		#####################################################################
-		'Sex MvKO estimate'         = CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Genotype_Male$result),
+		'Sex MvKO estimate'         = lapply0(objRes$Genotype_Male$result, CatEstimateAndCI),
 		'Sex MvKO standard error'   = NULL,
-		'Sex MvKO p-value'          = object$output$SplitModels[[depVariable]]$Genotype_Male$result$p.value,
-		'Sex MvKO effect size'      = object$output$SplitModels[[depVariable]]$Genotype_Male$effectSize,
+		'Sex MvKO p-value'          = extractFisherSubTableResults(objRes$Genotype_Male$result),
+		'Sex MvKO effect size'      = extractFisherSubTableResults(objRes$Genotype_Male$result, 'effect'),
 		#####################################################################
 		################ LifeStage interaction
-		'LifeStage EvKO estimate'         =	CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Genotype_Early$result),
+		'LifeStage EvKO estimate'         =	lapply0(objRes$Genotype_Early$result, CatEstimateAndCI),
 		'LifeStage EvKO standard error'   =	NULL,
-		'LifeStage EvKO p-value'          =	object$output$SplitModels[[depVariable]]$Genotype_Early$result$p.value,
-		'LifeStage EvKO effect size'      = object$output$SplitModels[[depVariable]]$Genotype_Early$effectSize,
+		'LifeStage EvKO p-value'          =	extractFisherSubTableResults(objRes$Genotype_Early$result),
+		'LifeStage EvKO effect size'      = extractFisherSubTableResults(objRes$Genotype_Early$result , 'effect'),
 		#####################################################################
-		'LifeStage LvKO estimate'         =	CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Genotype_Late$result),
+		'LifeStage LvKO estimate'         =	lapply0(objRes$Genotype_Late$result, CatEstimateAndCI),
 		'LifeStage LvKO standard error'   =	NULL,
-		'LifeStage LvKO p-value'          =	object$output$SplitModels[[depVariable]]$Genotype_Late$result$p.value,
-		'LifeStage LvKO effect size'      = object$output$SplitModels[[depVariable]]$Genotype_Late$effectSize,
+		'LifeStage LvKO p-value'          =	extractFisherSubTableResults(objRes$Genotype_Late$result),
+		'LifeStage LvKO effect size'      = extractFisherSubTableResults(objRes$Genotype_Late$result, 'effect'),
 		#####################################################################
 		################ Sex LifeStage Genotype interactions
 		# 1.
-		'LifeStageSexGenotype FvEvKO estimate'        =	CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Genotype_Female.Early$result),
+		'LifeStageSexGenotype FvEvKO estimate'        =	lapply0(objRes$Genotype_Female.Early$result, CatEstimateAndCI),
 		'LifeStageSexGenotype FvEvKO standard error'  =	NULL,
-		'LifeStageSexGenotype FvEvKO p-value'         =	object$output$SplitModels[[depVariable]]$Genotype_Female.Early$result$p.value,
-		'LifeStageSexGenotype FvEvKO effect size'     = object$output$SplitModels[[depVariable]]$Genotype_Female.Early$effectSize,
+		'LifeStageSexGenotype FvEvKO p-value'         =	extractFisherSubTableResults(objRes$Genotype_Female.Early$result),
+		'LifeStageSexGenotype FvEvKO effect size'     = extractFisherSubTableResults(objRes$Genotype_Female.Early$result, 'effect'),
 		# 2.
-		'LifeStageSexGenotype MvEvKO estimate'        =	CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Genotype_Male.Early$result),
+		'LifeStageSexGenotype MvEvKO estimate'        =	lapply0(objRes$Genotype_Male.Early$result, CatEstimateAndCI),
 		'LifeStageSexGenotype MvEvKO standard error'  =	NULL,
-		'LifeStageSexGenotype MvEvKO p-value'         =	object$output$SplitModels[[depVariable]]$Genotype_Male.Early$result$p.value,
-		'LifeStageSexGenotype MvEvKO effect size'     = object$output$SplitModels[[depVariable]]$Genotype_Male.Early$effectSize,
+		'LifeStageSexGenotype MvEvKO p-value'         =	extractFisherSubTableResults(objRes$Genotype_Male.Early$result),
+		'LifeStageSexGenotype MvEvKO effect size'     = extractFisherSubTableResults(objRes$Genotype_Male.Early$result, 'effect'),
 		# 3.
-		'LifeStageSexGenotype FvLvKO estimate'        = CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Genotype_Female.Late$result),
+		'LifeStageSexGenotype FvLvKO estimate'        = lapply0(objRes$Genotype_Female.Late$result, CatEstimateAndCI),
 		'LifeStageSexGenotype FvLvKO standard error'  = NULL,
-		'LifeStageSexGenotype FvLvKO p-value'         = object$output$SplitModels[[depVariable]]$Genotype_Female.Late$result$p.value,
-		'LifeStageSexGenotype FvLvKO effect size'     = object$output$SplitModels[[depVariable]]$Genotype_Female.Late$effectSize,
+		'LifeStageSexGenotype FvLvKO p-value'         = extractFisherSubTableResults(objRes$Genotype_Female.Late$result),
+		'LifeStageSexGenotype FvLvKO effect size'     = extractFisherSubTableResults(objRes$Genotype_Female.Late$result, 'effect'),
 		
-		'LifeStageSexGenotype MvLvKO estimate'        = CatEstimateAndCI(object$output$SplitModels[[depVariable]]$Genotype_Male.Late$result),
+		'LifeStageSexGenotype MvLvKO estimate'        = lapply0(objRes$Genotype_Male.Late$result, CatEstimateAndCI),
 		'LifeStageSexGenotype MvLvKO standard error'  = NULL,
-		'LifeStageSexGenotype MvLvKO p-value'         =	object$output$SplitModels[[depVariable]]$Genotype_Male.Late$result$p.value,
-		'LifeStageSexGenotype MvLvKO effect size'     = object$output$SplitModels[[depVariable]]$Genotype_Male.Late$effectSize ,
+		'LifeStageSexGenotype MvLvKO p-value'         =	extractFisherSubTableResults(objRes$Genotype_Male.Late$result),
+		'LifeStageSexGenotype MvLvKO effect size'     = extractFisherSubTableResults(objRes$Genotype_Male.Late$result , 'effect') ,
 		################
 		'Classification tag'                          =	NULL,
 		'Transformation'                              =	NULL,

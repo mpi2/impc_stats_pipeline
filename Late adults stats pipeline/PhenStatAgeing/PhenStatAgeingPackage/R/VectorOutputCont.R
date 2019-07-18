@@ -42,7 +42,7 @@ vectorOutputCont =	function(object,
 		sep    = '_'
 	)
 	MultiBatch = ifelse(multiBatch(x),
-											'Dataset contains multi batches',
+											'Dataset contains multiple batches',
 											'Dataset contains single batch')
 	addInfo           = list(
 		Data = list(
@@ -59,11 +59,7 @@ vectorOutputCont =	function(object,
 			'Model setting'          = extractLmeTerms(object)         ,
 			'Is model optimised'     = optimM(object$output$optimised) ,
 			'Multibatch in analysis' = MultiBatch                      ,
-			'Gender included in analysis' = ifelse(
-				nlevels(x$Sex) > 1                                       ,
-				'Both sexes included'                                    ,
-				paste0('Only one sex included in the analysis; ', levels(x$Sex))
-			)                                                          ,
+			'Gender included in analysis' = GenderIncludedInAnalysis(x),
 			'Further models' = if (!is.null(object$output$SplitModels)) {
 				lapply(object$output$SplitModels, function(v) {
 					if (class(v) %in% c('lme', 'gls', 'glm')) {
