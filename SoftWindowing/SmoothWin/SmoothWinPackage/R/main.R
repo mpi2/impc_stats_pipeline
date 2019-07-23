@@ -169,13 +169,13 @@ SmoothWin = function(object                                           ,
 }
 
 
-
-
 # Plot windowing object
 plot.SmoothWin = function(x,
-                          ylab   = 'Response',
-                          col    = NULL      ,
-                          digits = 2         ,
+                          ylab   = 'Response'              ,
+                          xlab   = 'Time (continuous)'     ,
+                          sub    = NULL                    ,
+                          col    = NULL                    ,
+                          digits = 2                       ,
                           ...) {
   if (!is.null(x$finalModel$models)) {
     t  = x$input$t
@@ -193,27 +193,31 @@ plot.SmoothWin = function(x,
     plot(
       t,
       y,
-      xlab = 'Time',
+      xlab = xlab,
       ylab = ylab,
-      sub = paste(
-        'l='                                                      ,
-        round(x$final.l$value, digits)                            ,
-        ', k='                                                    ,
-        round(x$final.k$value, digits)                            ,
-        ', '                                                      ,
-        ifelse(x$input$weightORthreshold == 'weight', 'SWS=', '#'),
-        round(x$finalModel$output$ObsInInterval, digits)          ,
-        ' [~'                                                     ,
-        round(x$finalModel$output$ObsInInterval / ly * 100, digits),
-        '%]'       ,
-        ', MaxBW=' ,
-        max(x$input$l, na.rm = TRUE),
-        ', MinObs=',
-        x$min.obs  ,
-        '+'        ,
-        length(m)  ,
-        sep = ''
-      ),
+      sub = if (is.null(sub)) {
+        paste(
+          'l='                                                      ,
+          round(x$final.l$value, digits)                            ,
+          ', k='                                                    ,
+          round(x$final.k$value, digits)                            ,
+          ', '                                                      ,
+          ifelse(x$input$weightORthreshold == 'weight', 'SWS=', '#'),
+          round(x$finalModel$output$ObsInInterval, digits)          ,
+          ' [~'                                                     ,
+          round(x$finalModel$output$ObsInInterval / ly * 100, digits),
+          '%]'       ,
+          ', MaxBW=' ,
+          max(x$input$l, na.rm = TRUE),
+          ', MinObs=',
+          x$min.obs  ,
+          '+'        ,
+          length(m)  ,
+          sep = ''
+        )
+      } else{
+        sub
+      },
       col = col,
       ...
     )
