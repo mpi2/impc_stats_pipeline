@@ -32,6 +32,7 @@ PhenStatWindow = function (phenlistObject                                ,
                            weightORthreshold = 'weight'                  ,
                            maxPeaks = 15                                 ,
                            direction = direction                         ,
+                           min.obs = 'auto'                              ,
                            ...)
 {
   requireNamespace('PhenStat')
@@ -193,14 +194,21 @@ PhenStatWindow = function (phenlistObject                                ,
         predictFun = predFunction               ,
         weightORthreshold = weightORthreshold   ,
         direction = direction                   ,
-        min.obs = function(ignore.me.in.default) {
-          message0('Total number of sex: ',PhenStat:::noSexes(phenlistObject))
-          lutm = length(unique(tt[mm]))
-          r = ifelse(lutm > 1, PhenStat:::noSexes(phenlistObject)*35, max(pi * sqrt(length(tt)), 35))
-          r = max(r * lutm, length(mm), na.rm = TRUE)
-          r = min(r       , length(tt), na.rm = TRUE)
-          message0('min.obs =  ',r)
-          return(r)
+        min.obs = if (min.obs %in% 'auto') {
+          function(ignore.me.in.default) {
+            message0('Total number of sex: ', PhenStat:::noSexes(phenlistObject))
+            lutm = length(unique(tt[mm]))
+            r = ifelse(lutm > 1,
+                       PhenStat:::noSexes(phenlistObject) * 35,
+                       max(pi * sqrt(length(tt)), 35))
+            r = max(r * lutm, length(mm), na.rm = TRUE)
+            r = min(r       , length(tt), na.rm = TRUE)
+            message0('min.obs =  ', r)
+            return(r)
+          }
+        } else{
+          message0('Manual min.obse set to ', min.obs)
+          min.obs
         }
       )
       ##############################

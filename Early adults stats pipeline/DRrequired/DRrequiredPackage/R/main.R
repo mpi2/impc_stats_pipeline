@@ -36,6 +36,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 }                                    ,
                 messages = TRUE                      ,
                 threshold = sqrt(.Machine$double.eps) * 10,
+                min.obs   = 'auto'                   ,
+                ##################
                 outdelim = '\t'                      ,
                 debug = TRUE                         ,
                 encode = FALSE                       ,
@@ -59,6 +61,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 superDebug             = FALSE       ,
                 extraBatchParameters   = '-m "rh7-hosts-ebi5-12 rh7-hosts-ebi5-13 rh7-hosts-ebi5-14 rh7-hosts-ebi5-15 rh7-hosts-ebi5-16 rh7-hosts-ebi5-17 rh7-hosts-ebi5-18 rh7-hosts-ebi5-19 rh7-hosts-ebi5-20 rh7-hosts-ebi5-24 rh7-hosts-ebi5-25 rh7-hosts-ebi5-26 rh7-hosts-ebi5-27 rh7-hosts-ebi6-00 rh7-hosts-ebi6-01 rh7-hosts-ebi6-02 rh7-hosts-ebi6-03 rh7-hosts-ebi6-04 rh7-hosts-ebi6-05 rh7-hosts-ebi6-06 rh7-hosts-ebi6-07 rh7-hosts-ebi6-08 rh7-hosts-ebi6-09 rh7-hosts-ebi6-10 rh7-hosts-ebi6-11 rh7-hosts-ebi6-12 rh7-hosts-ebi6-13 rh7-hosts-ebi6-14 rh7-hosts-ebi6-15 rh7-hosts-ebi6-16 rh7-hosts-ebi6-17"',
                 ...) {
+  multicoreResults = NULL
   message0('DRrequired loaded')
   message0(
     Sys.time(),
@@ -330,6 +333,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     # Removing the old objects if exist
                     ObjectsThatMustBeRemovedInEachIteration()
                     # Initialization before starting the analysis
+                    c.ww0  = NULL
                     note   = list()
                     colony = colonys[i]
                     message0('Current colony: ',colony)
@@ -737,7 +741,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         predFunction = predFunction,
                         residFunction = residFunction,
                         weightORthreshold = weightORthreshold,
-                        direction  = direction
+                        direction  = direction,
+                        min.obs = min.obs
                       )
                       note = c(
                         note                               ,
@@ -752,7 +757,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       ####
                       message0('Preparing the output from VectorOutput function ...')
                       c.ww.vec       = VectorOutput0(
-                        c.ww0     = c.ww0,
+                        c.ww0        = c.ww0,
                         ExtraCols    = ExtraCols,
                         activeWindowing = activeWindowing
                       )
@@ -894,7 +899,13 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                   \n\n '
                   )
                   counter  = counter  + 1
+                  if (!verbose){
+                    return(invisible(c.ww0))
+                  }else{
+                    messsage0('No result will be exported when verbose = TRUE')
+                  }
                 }
+                multicoreResults = c(multicoreResults, MultiCoreRes)
               }
             }
           }
@@ -909,4 +920,5 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   stopImplicitCluster()
   message0('Finished.')
   setwd(cwd)
+  return(invisible(multicoreResults))
 }

@@ -455,7 +455,7 @@ tv.test = function(obj                           ,
           al0$l[is.finite(al0$tp.pval)]       ,
           al0$tp.pval[is.finite(al0$tp.pval)] ,
           type = 'b'                          ,
-          ylab = 'Residual/Predict test pvals',
+          ylab = 'Score',
           xlab = name,
           main = name
         )
