@@ -4,6 +4,7 @@
       '\n ========================================================================',
       '\n ~> This project is supported by European Bioinformatic Institute (EBI)  ',
       '\n ~> https://www.mousephenotype.org/                                      ',
+      '\n ~> Github source code : http://bit.ly/2Zo9s3y                           ',
       '\n ~> If you have any question about this package contact us               ',
       '\n ~> hamedhm@ebi.ac.uk                                                    ',
       '\n ========================================================================'
@@ -443,7 +444,7 @@ tv.test = function(obj                           ,
       message0(paste('An optimal', name, 'is not found. Max value will be used.'))
       final = NULL
     } else{
-      message0 ('score: ',
+      message0 ('\tScore: ',
                round(pmin, digits = 4),
                '. ',
                name,
@@ -474,12 +475,14 @@ tv.test = function(obj                           ,
           al0$l[is.finite(al0$tp.pval)]      ,
           al0$ol[is.finite(al0$tp.pval)]     ,
           type = 'b'                         ,
-          ylab = paste0(
-            'Sum(weight), MinSumRequiredIncludingTreatment = ' ,
-            round(mimi, 4)
-          ),
+          ylab = 'Sum(weight)'               ,
           xlab = name                        ,
-          main = name
+          main = name                        ,
+          sub  = paste0(
+            '(MinSumRequiredIncludingTreatment = ' ,
+            round(mimi, 4)                         ,
+            ')'
+          )
         )
         abline(
           v = final                          ,

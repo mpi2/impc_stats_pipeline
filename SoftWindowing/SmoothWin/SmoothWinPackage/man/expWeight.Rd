@@ -65,7 +65,7 @@
 }
 
 \author{
-  Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
+  Hamed Haselimashhadi <hamedhm@ebi.ac.uk>
 }
 
 \seealso{
@@ -134,7 +134,7 @@
     type = 'l'                                      ,
     lty = 2                                         ,
     lwd = 3                                         ,
-    main = '3.3 If windows intersect with small k, then partially merge! (l=12, k=0.1)'
+    main = '3.2 If windows intersect with small k, then partially merge! (l=12, k=0.1)'
   )
   
 }

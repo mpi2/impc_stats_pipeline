@@ -42,7 +42,7 @@
 }
 }
 \author{
-	Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
+	Hamed Haselimashhadi <hamedhm@ebi.ac.uk>
 }
 
 \seealso{
