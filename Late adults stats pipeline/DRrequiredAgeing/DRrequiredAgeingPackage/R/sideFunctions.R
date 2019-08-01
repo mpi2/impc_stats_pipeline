@@ -6,6 +6,7 @@
       '\n "DRrequiredAgeing" is developed by International Mouse Phenotyping Consortium (IMPC) ',
       '\n More details  https://www.mousephenotype.org/                                        ',
       '\n Contact us hamedhm@ebi.ac.uk                                                         ',
+      '\n Source code and issues:  https://git.io/fj9WP                                        ',
       '\n >===================================================================================<'
     ),
     domain = NULL,

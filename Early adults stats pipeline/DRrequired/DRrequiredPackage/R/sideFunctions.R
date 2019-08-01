@@ -3,9 +3,10 @@
   packageStartupMessage(
     paste0(
       '\n >===============================================================================<',
-      '\n "DRrequired" is developed by International Mouse Phenotyping Consortium (IMPC) ',
-      '\n More details https://www.mousephenotype.org/                                            ',
-      '\n Contact us hamedhm@ebi.ac.uk                                                  ',
+      '\n "DRrequired" is developed by International Mouse Phenotyping Consortium (IMPC)   ',
+      '\n More details https://www.mousephenotype.org/                                     ',
+      '\n Contact us hamedhm@ebi.ac.uk                                                     ',
+      '\n Source code and issues:  https://git.io/fj9Wi                                    ',
       '\n >===============================================================================<'
     ),
     domain = NULL,

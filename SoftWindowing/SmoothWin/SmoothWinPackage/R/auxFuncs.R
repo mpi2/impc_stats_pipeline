@@ -4,7 +4,7 @@
       '\n ========================================================================',
       '\n ~> This project is supported by European Bioinformatic Institute (EBI)  ',
       '\n ~> https://www.mousephenotype.org/                                      ',
-      '\n ~> Github source code : http://bit.ly/2Zo9s3y                           ',
+      '\n ~> Github source code and issues: https://git.io/fj9W0                  ',
       '\n ~> If you have any question about this package contact us               ',
       '\n ~> hamedhm@ebi.ac.uk                                                    ',
       '\n ========================================================================'

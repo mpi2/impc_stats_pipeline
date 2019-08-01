@@ -6,6 +6,7 @@
 			'\n You *still* can use the previous functions by using `:::`. For example :   ',
 			'\n PhenStat:::boxplotSexGenotype   or   PhenStat:::FisherExactTest            ',
 			'\n *** Want to know what is new in this version? run PhenStat:::WhatIsNew()   ',
+			'\n Source code and issues: https://git.io/fj9Wg                               ',
 			'\n >=========================================================================<'
 		),
 		domain = NULL,
