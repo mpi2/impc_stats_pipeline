@@ -20,6 +20,7 @@ setClass(
 	)
 )
 
+
 PhenListAgeing =
 	function(dataset,
 					 testGenotype                = 'experimental',
@@ -78,7 +79,7 @@ PhenListAgeing =
 					all(!chkcols)              ||
 					length(c(testGenotype, refGenotype)) != 2) {
 				message0(
-					'error ~> Please make sure `dataset.colname.xxx` and/or Genotype levels are properly specified'
+					'error ~> Please make sure `dataset.colname.xxx` and/or Genotype column/levels are properly specified.'
 				)
 				return(NULL)
 			}
@@ -142,25 +143,31 @@ PhenListAgeing =
 					0) {
 				if (any(!c(testGenotype, refGenotype) %in% levels(dataset$Genotype))) {
 					message0(
-						'error ~> Mismatch between `Genotype` levels and input levels.',
-						'\n\t Genotype Levels: ',
-						pasteComma(sort0(levels(
-							dataset$Genotype
-						))),
-						'\n\t Input levels   : ',
+						'error ~> Mismatch between `Genotype` levels and input levels:',
+						'\n\t Genotype Levels:\n\t\t',
+						pasteComma(sort0(levels(dataset$Genotype)), sep = ',\n\t\t'),
+						'\n\t Input levels   :\n\t\t',
 						pasteComma(sort0(c(
 							testGenotype, refGenotype
-						)), replaceNull = TRUE)
+						)), replaceNull = TRUE, sep = '\n\t\t'
+						)
 					)
 					return(NULL)
 				}
 				dataset = subset(dataset,
 												 dataset$Genotype %in% c(testGenotype, refGenotype))
 				message0(
-					"Dataset has been cleaned to only keep the `Genotype` values: ",
+					"Dataset has been cleaned to only keep the `Genotype` values: \n\t",
 					pasteComma(testGenotype,
-										 refGenotype, replaceNull = TRUE)
+										 refGenotype,
+										 replaceNull = TRUE,
+										 sep = ',\n\t')
 				)
+			}
+			# NULL is ignored as it is checked below (avoid double messages)
+			if (!is.null(dataset) && is.df.empty(dataset)) {
+				message0('Check failed ~> The empty dataset or the preprocessing ended up an empty dataset.')
+				return(NULL)
 			}
 			## Clean the empty records!
 			dataset = CleanEmptyRecords(dataset , c('Genotype', 'Sex', 'Batch', 'LifeStage'))
@@ -170,22 +177,27 @@ PhenListAgeing =
 														 refGenotype)
 			if (is.null(dataset))
 				return(NULL)
+			
 			if ('Weight' %in% colnames(dataset)) {
 				if (!is.numeric(dataset$Weight)) {
 					message0("`Weight` values are not numeric then renamed to `Weight_labels`")
 					colnames(dataset)[colnames(dataset) == 'Weight'] =
 						'Weight_labels'
 				}
-				wsglvls = tapply(X = dataset$Weight, INDEX = interaction(dataset$Genotype, dataset$Sex), function(x) {
+				wsglvls = tapply(X = dataset$Weight, INDEX = interaction(dataset[names(dataset) %in% c('Genotype', 'Sex')]), function(x) {
 					length(na.omit(x))
 				}, default = 0)
 				message0(
-					'Total `Weight` data points for Genotype/Sex interaction.\n\t Level(frequency): ',
-					pasteComma(paste0(names(wsglvls), '(', wsglvls, ')'), truncate = FALSE)
+					'Total `Weight` data points for Genotype/Sex interaction.\n\t Level(frequency): \n\t ',
+					pasteComma(
+						paste0(names(wsglvls), '(', wsglvls, ')'),
+						truncate = FALSE,
+						sep = ',\n\t '
+					)
 				)
 				if (min(wsglvls, na.rm = TRUE) <= 2) {
 					message0(
-						"`Weight` column has (<2) data points for at least one Genotype/Sex interaction, then renamed to `Weight_labels`"
+						"`Weight` column has (<2) data points for at least one Genotype/Sex interaction.\n\t The `Weight` column renamed to `Weight_labels`"
 					)
 					colnames(dataset)[colnames(dataset) == 'Weight'] =
 						'Weight_labels'
@@ -194,7 +206,7 @@ PhenListAgeing =
 			}
 			message0('Successfully performed checks in ',
 							 round(difftime(Sys.time() , sta.time, units = 'sec'), 2),
-							 ' seconds.')
+							 ' second(s).')
 		} else{
 			message0('No check performed on the input data')
 		}
@@ -266,31 +278,35 @@ checkDataset = function(dataset,
 												refGenotype = "+/+")
 {
 	dataset = droplevels(dataset)
-	if (all(c('Genotype', 'Sex') %in% colnames(dataset))) {
-		InGS = interaction(dataset$Genotype, dataset$Sex)
+	if (any(c('Genotype', 'Sex') %in% colnames(dataset))) {
+		InGS = interaction(dataset[names(dataset) %in% c('Genotype', 'Sex')])
 		tbGS = table(InGS)
 		message0(
-			'Total samples in Genotype:Sex interaction.\n\t Level(frequency): ',
-			pasteComma(paste0(names(tbGS), '(', tbGS, ')'), truncate = FALSE)
+			'Total samples in Genotype:Sex interaction: \n\tLevel(frequency): \n\t ',
+			pasteComma(
+				paste0(names(tbGS), '(', tbGS, ')'),
+				truncate = FALSE,
+				sep = '\n\t '
+			)
 		)
 		if (min(tbGS) < 1)
 			message0(
 				'No observations detected in the Genotype:Sex interaction for:\n\t ',
-				pasteComma(names(tbGS[tbGS < 1]), truncate = FALSE)
+				pasteComma(names(tbGS[tbGS < 1]), truncate = FALSE, sep = ',\n\t')
 			)
 		dataset = droplevels(dataset[InGS %in% names(tbGS[tbGS >= 1]), , drop = FALSE])
 		## Check of genotype and sex levels after cleaning
 		if (nlevels(dataset$Genotype) != 2) {
 			message0(
-				"error ~> `Genotype` column must have two levels. Current levels: ",
-				pasteComma(levels(dataset$Genotype))
+				"error ~> `Genotype` column must have two levels. Current levels:\n\t ",
+				pasteComma(levels(dataset$Genotype), sep = ',\n\t')
 			)
 			return(NULL)
 		}
 		if (nlevels(dataset$Sex) > 2) {
 			message0(
-				"error ~> `Sex` column must have one or two levels. Current levels: ",
-				pasteComma(levels(dataset$Sex))
+				"error ~> `Sex` column must have one or two levels. Current levels:\n\t ",
+				pasteComma(levels(dataset$Sex), sep = ',\n\t')
 			)
 			return(NULL)
 		}
@@ -298,14 +314,18 @@ checkDataset = function(dataset,
 		wrong_sex_levels = setdiff(levels(dataset$Sex), c("Female", "Male"))
 		if (!length(wrong_sex_levels) == 0) {
 			message0(
-				'error ~> Sex has undefined levels. See: ',
-				pasteComma(wrong_sex_levels, truncate = FALSE)
+				'error ~> Sex has undefined levels. See:\n\t ',
+				pasteComma(wrong_sex_levels, truncate = FALSE, sep = ',\n\t')
 			)
 			return(NULL)
 		}
 		## Check for reference genotype records
 		if (refGenotype %in% levels(dataset$Genotype))
 			dataset$Genotype = relevel(dataset$Genotype, ref = refGenotype)
+	}else{
+		message0(
+			'error ~ Neither Genotype or Sex found in the input data.')
+		return(NULL)
 	}
 	return(dataset)
 }
@@ -340,15 +360,21 @@ PhenListAgeingBuilder = function(PhenListobject,
 	if (length(LL) != 2 && debug && Ageing) {
 		message0(
 			'Ageing pipeline requires two levels in the LifeStage. Levels: ',
-			pasteComma(LL, replaceNull = FALSE, truncate = FALSE),
+			pasteComma(LL,
+								 replaceNull = FALSE,
+								 truncate = FALSE,
+								 sep = ',\n\t\t'), 
 			'\nNormal pipeline will apply to this data'
 		)
 		#return(NULL)
 	}
 	if (length(LS) != 2 && debug) {
 		message0(
-			'There should be two levels in Sex. Levels: ',
-			pasteComma(LS, replaceNull = FALSE, truncate = FALSE)
+			'There should be two levels in Sex. Levels:\n\t ',
+			pasteComma(LS,
+								 replaceNull = FALSE,
+								 truncate = FALSE,
+								 sep = ',\n\t')
 		)
 		#return(NULL)
 	}
@@ -358,8 +384,11 @@ PhenListAgeingBuilder = function(PhenListobject,
 	
 	if (length(LG) < 2 && debug) {
 		message0(
-			'Genotype must have two levels. Levels: ',
-			pasteComma(LG, replaceNull = FALSE, truncate = FALSE)
+			'Check failed ~> Genotype must have two levels. Levels: \n\t',
+			pasteComma(LG,
+								 replaceNull = FALSE,
+								 truncate = FALSE,
+								 sep = ',\n\t')
 		)
 		return(NULL)
 	}
@@ -416,7 +445,7 @@ SelectVariablesOrDefault = function(data, vars = NULL) {
 	if (is.null(cnamesF) || length(cnamesF) < 1) {
 		message0(
 			'Non of the specified variables exist in the data. See the list below:\n\t',
-			pasteComma(cnames, truncate = FALSE)
+			pasteComma(cnames, truncate = FALSE, sep = ',\n\t')
 		)
 		return(NULL)
 	}

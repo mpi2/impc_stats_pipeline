@@ -137,7 +137,7 @@ crunner = function(object              ,
 					 noteToFinish,
 					 ' executed in ',
 					 round(difftime(Sys.time() , sta.time, units = 'sec'), 2),
-					 ' seconds.')
+					 ' second(s).')
 	OutR = list(
 		output = list(SplitModels = list.clean(lComplete)) ,
 		input  = list(

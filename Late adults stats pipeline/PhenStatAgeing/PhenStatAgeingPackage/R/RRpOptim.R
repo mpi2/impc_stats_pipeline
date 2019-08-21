@@ -118,7 +118,7 @@ RRrunner = function(object              ,
 		)
 		return(r$output$SplitModels)
 	})
-	message0('RR framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds.')
+	message0('RR framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' second(s).')
 	#####
 	SpltResult = lapply(c(Low  = RRresult_low,
 												High = RRresult_high), function(x) {

@@ -299,7 +299,7 @@ M.opt = function(object = NULL            ,
 		OutR$messages  = 'This process fully terminated. No success in recovering the initial model.'
 		return(OutR)
 	}
-	message0('MM framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' seconds.')
+	message0('MM framework executed in ', round(difftime(Sys.time() , sta.time, units = 'sec'), 2), ' second(s).')
 	####
 	OutR = list(
 		output = list(

@@ -43,8 +43,9 @@ pasteComma = function(...,
 											truncate      = TRUE   ,
 											width         = 100    ,
 											trailingSpace = TRUE   ,
-											replaceNullby = 'NULL') {
-	sep = ifelse(trailingSpace, ', ', ',')
+											replaceNullby = 'NULL',
+											sep = ',') {
+	sep = ifelse(trailingSpace && sep %in% ',', paste0(sep, ' '), sep)
 	if (replaceNull)
 		r = paste(
 			replaceNull(list(...), replaceBy = replaceNullby),
@@ -3241,9 +3242,9 @@ PhenListAgeingRelabling = function(dataset, col, l1, rel1, l2, rel2) {
 		lbls = c(rel1, rel2)
 		if (!is.null(lbls) && any(!levels(dataset[, col]) %in% lbls)) {
 			message0(
-				'There are some unused levels in ',
+				'There are some unused levels in `',
 				col,
-				' that will be removed. \n\t Levels: ',
+				'` that will be removed. \n\t Levels: ',
 				pasteComma(levels(dataset[, col]))
 			)
 			dataset = droplevels(subset(dataset, dataset[, col] %in% lbls))
@@ -3260,11 +3261,12 @@ checkSummary = function(dataset, var, ...) {
 		return(lvls)
 	
 	if (is.factor(dataset[, var]) || is.character(dataset[, var]))
-		lvls = paste0('\tLevels: ', pasteComma(levels(as.factor(dataset[, var])), width = 60))
+		lvls = paste0('\t Levels: \n\t  ',
+									pasteComma(levels(as.factor(dataset[, var])), width = 250, sep = '\n\t  '))
 	else
-		lvls = paste0('\tSummary: mean = ',
+		lvls = paste0('\t Summary:\n\t  mean = ',
 									mean(dataset[, var], na.rm = TRUE),
-									', sd = ',
+									'\n\t  sd   = ',
 									sd0(dataset[, var], na.rm = TRUE))
 	message0(lvls)
 	return(invisible(lvls))
@@ -3277,7 +3279,7 @@ checkPhenlistColumns = function(dataset, vars) {
 			r = v %in% names(dataset)
 			message0('checking whether variable `',
 							 v,
-							 '` exists in the data. Result = ',
+							 '` exists in the data. \n\tResult = ',
 							 r)
 			if (r)
 				checkSummary(dataset = dataset, var = v)
@@ -3320,9 +3322,16 @@ fIsBecome = function(dataset,
 	return(dataset)
 }
 
-
+is.df.empty = function(x) {
+	if (is.null(x) || any(dim(x) < 1))
+		return(TRUE)
+	else
+		return(FALSE)
+}
 
 CleanEmptyRecords = function(x, vars) {
+	if(is.df.empty(x))
+		return(NULL)
 	vars1 = vars[vars %in% names(x)]
 	if (length(vars1)) {
 		x = x[all(!is.na(x[, vars1])) && all(x[, vars1] != ""), ]
