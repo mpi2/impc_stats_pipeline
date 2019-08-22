@@ -10,18 +10,20 @@ vectorOutputCont =	function(object,
 	depVariable    = all_vars0(frm)[1]
 	equation       = ifelse(
 		Labels$Weight %in% all_vars0(frm),
-		paste0('equation with'   , Labels$Weight),
-		paste0('equation without', Labels$Weight)
+		paste0('included '    , Labels$Weight),
+		paste0('not included ', Labels$Weight)
 	)
 	formula        = printformula(frm)
 	#modelContrast  = modelContrasts(formula = frm,data = object$input$data)
 	framework      = switch(
-		object$output$Final.Model.Tag                                  ,
+		#object$output$Final.Model.Tag 
+		class(object$output$Final.Model),
 		lme  = "Linear Mixed Model framework"                          ,
 		gls  = "Linear Model Using Generalized Least Squares framework",
 		glm  = "Generalized Linear Model framework"
 	)
-	fittingMethod    = toupper(object$output$Final.Model.Tag)
+	#fittingMethod    = toupper(object$output$Final.Model.Tag)
+	fittingMethod    = toupper(class(object$output$Final.Model))
 	#####################################################################
 	x                = object$input$PhenListAgeing@datasetPL
 	columnOfInterest = x[, c(depVariable)]

@@ -26,15 +26,16 @@ M.opt = function(object = NULL            ,
 	# Start from here
 	sta.time    = Sys.time()
 	lCont       = lmeControl (opt       = 'optim',
-														maxIter   = 1000   ,
-														msMaxIter = 1000)
+														maxIter   = 1500   ,
+														msMaxIter = 1500   
+														)
 	gCont       = glsControl (
 		opt         = 'optim',
 		singular.ok = TRUE,
-		maxIter     = 1000,
-		msMaxIter   = 1000
+		maxIter     = 1500,
+		msMaxIter   = 1500
 	)  
-	glCont        = glm.control(epsilon = 10 ^ -36, maxit = 1000)
+	glCont        = glm.control(epsilon = 10 ^ -36, maxit = 1500)
 	G.Model       = FV.Model  = I.Model = SplitModels = F.Model = OutR = NULL
 	VarHomo       = TRUE
 	data          = RemoveDuplicatedColumnsFromDf(x = object@datasetPL, formula = fixed)

@@ -188,16 +188,16 @@ PhenListAgeing =
 					length(na.omit(x))
 				}, default = 0)
 				message0(
-					'Total `Weight` data points for Genotype/Sex interaction.\n\t Level(frequency): \n\t ',
+					'Total `Weight` data points for (possible) Genotype:Sex interaction:\n\t Level(frequency): \n\t  ',
 					pasteComma(
 						paste0(names(wsglvls), '(', wsglvls, ')'),
 						truncate = FALSE,
-						sep = ',\n\t '
+						sep = ',\n\t  '
 					)
 				)
 				if (min(wsglvls, na.rm = TRUE) <= 2) {
 					message0(
-						"`Weight` column has (<2) data points for at least one Genotype/Sex interaction.\n\t The `Weight` column renamed to `Weight_labels`"
+						"`Weight` column has (<2) data points for at least one (possible) Genotype:Sex interaction.\n\t The `Weight` column renamed to `Weight_labels`"
 					)
 					colnames(dataset)[colnames(dataset) == 'Weight'] =
 						'Weight_labels'
@@ -282,7 +282,7 @@ checkDataset = function(dataset,
 		InGS = interaction(dataset[names(dataset) %in% c('Genotype', 'Sex')])
 		tbGS = table(InGS)
 		message0(
-			'Total samples in Genotype:Sex interaction: \n\tLevel(frequency): \n\t ',
+			'Total samples in (possible) Genotype:Sex interaction: \n\tLevel(frequency): \n\t ',
 			pasteComma(
 				paste0(names(tbGS), '(', tbGS, ')'),
 				truncate = FALSE,
@@ -291,7 +291,7 @@ checkDataset = function(dataset,
 		)
 		if (min(tbGS) < 1)
 			message0(
-				'No observations detected in the Genotype:Sex interaction for:\n\t ',
+				'No observations detected in (possible) Genotype:Sex interaction for:\n\t ',
 				pasteComma(names(tbGS[tbGS < 1]), truncate = FALSE, sep = ',\n\t')
 			)
 		dataset = droplevels(dataset[InGS %in% names(tbGS[tbGS >= 1]), , drop = FALSE])
@@ -303,7 +303,8 @@ checkDataset = function(dataset,
 			)
 			return(NULL)
 		}
-		if (nlevels(dataset$Sex) > 2) {
+		if ('Sex'  %in% names(dataset) && 
+				nlevels(dataset$Sex) > 2) {
 			message0(
 				"error ~> `Sex` column must have one or two levels. Current levels:\n\t ",
 				pasteComma(levels(dataset$Sex), sep = ',\n\t')
@@ -312,7 +313,8 @@ checkDataset = function(dataset,
 		}
 		## Check for sex levels - we want to have 'Female' and/or 'Male' only
 		wrong_sex_levels = setdiff(levels(dataset$Sex), c("Female", "Male"))
-		if (!length(wrong_sex_levels) == 0) {
+		if ('Sex'  %in% names(dataset) && 
+				!length(wrong_sex_levels) < 1) {
 			message0(
 				'error ~> Sex has undefined levels. See:\n\t ',
 				pasteComma(wrong_sex_levels, truncate = FALSE, sep = ',\n\t')
@@ -324,7 +326,7 @@ checkDataset = function(dataset,
 			dataset$Genotype = relevel(dataset$Genotype, ref = refGenotype)
 	}else{
 		message0(
-			'error ~ Neither Genotype or Sex found in the input data.')
+			'error ~ Neither `Genotype` or `Sex` found in the input data.')
 		return(NULL)
 	}
 	return(dataset)

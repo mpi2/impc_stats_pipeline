@@ -62,7 +62,7 @@ SmoothWin = function(object                                           ,
     msg(argg)
   }
   ### 1. Determining l
-  message0('Step 1|3 Searching for the optimal l ...')
+  message0('Step 1|3. Searching for the optimal bandwidth ...')
   rl = gridSearchModel(
     object = object                       ,
     data = data                           ,
@@ -97,7 +97,7 @@ SmoothWin = function(object                                           ,
   }
     
   ### 2. Determining k
-  message0('Step 2|3 Searching for the optimal k ...')
+  message0('Step 2|3. Searching for the optimal shape ...')
   rk = gridSearchModel(
     object = object                       ,
     data = data                           ,
@@ -131,7 +131,7 @@ SmoothWin = function(object                                           ,
     finalk$score = NA
   }
   ##### final model
-  message0('Step 3|3 Forming the final model ...')
+  message0('Step 3|3. Forming the final model ...')
   finalr = gridSearchModel(
     object = object                       ,
     data = data                           ,

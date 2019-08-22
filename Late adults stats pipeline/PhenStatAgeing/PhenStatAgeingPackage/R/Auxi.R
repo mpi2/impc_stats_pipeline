@@ -239,7 +239,7 @@ variablesInData = function(df, names, debug = TRUE) {
 
 ComplementaryFeasibleTermsInContFormula = function(formula, data) {
 	message0(
-		'Checking for the feasibility of terms and interactions.\n\t Formula: ',
+		'Checking for the feasibility of terms and interactions ...\n\t Formula: ',
 		printformula(formula)
 	)
 	fbm = FeasibleTermsInContFormula(formula = formula, data = data)
@@ -2224,7 +2224,7 @@ intervalsCon = function(object, lvls, ...) {
 				}
 			)
 			if (!is.null(intv)) {
-				message0('\tCI for `', citerm, '` term(s) successfully estimated')
+				message0('\t CI for `', citerm, '` term(s) successfully estimated')
 				break
 			} else if (!citerm %in% tail(citerms, 1)) {
 				message0('\tAdjustment applied. Retrying ....')
@@ -3247,7 +3247,14 @@ PhenListAgeingRelabling = function(dataset, col, l1, rel1, l2, rel2) {
 				'` that will be removed. \n\t Levels: ',
 				pasteComma(levels(dataset[, col]))
 			)
-			dataset = droplevels(subset(dataset, dataset[, col] %in% lbls))
+			RowIndFromCol = dataset[, col] %in% lbls
+			if (sum(RowIndFromCol) < 1) {
+				message0('\t  Preprocessing variable leads to an empty column \n\t   The variable renamed to `',
+								 paste0(col, '_labels`'))
+				names(dataset)[names(dataset) %in% col] = paste0(col, '_labels')
+			} else{
+				dataset = droplevels(subset(dataset, RowIndFromCol))
+			}
 		}
 	}
 	return(dataset)
@@ -3261,13 +3268,19 @@ checkSummary = function(dataset, var, ...) {
 		return(lvls)
 	
 	if (is.factor(dataset[, var]) || is.character(dataset[, var]))
-		lvls = paste0('\t Levels: \n\t  ',
-									pasteComma(levels(as.factor(dataset[, var])), width = 250, sep = '\n\t  '))
+		lvls = paste0(
+			'\t Levels (Total levels = ',
+			nlevels(as.factor(dataset[, var])),
+			'): \n\t  ',
+			pasteComma(levels(as.factor(dataset[, var])), width = 250, sep = '\n\t  ')
+		)
 	else
-		lvls = paste0('\t Summary:\n\t  mean = ',
-									mean(dataset[, var], na.rm = TRUE),
-									'\n\t  sd   = ',
-									sd0(dataset[, var], na.rm = TRUE))
+		lvls = paste0(
+			'\t Summary:\n\t  mean = ',
+			mean(dataset[, var], na.rm = TRUE),
+			'\n\t  sd   = ',
+			sd0(dataset[, var], na.rm = TRUE)
+		)
 	message0(lvls)
 	return(invisible(lvls))
 }
@@ -3279,7 +3292,7 @@ checkPhenlistColumns = function(dataset, vars) {
 			r = v %in% names(dataset)
 			message0('checking whether variable `',
 							 v,
-							 '` exists in the data. \n\tResult = ',
+							 '` exists in the data ... \n\tResult = ',
 							 r)
 			if (r)
 				checkSummary(dataset = dataset, var = v)

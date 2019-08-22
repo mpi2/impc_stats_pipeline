@@ -137,6 +137,7 @@ plot.PhenStatAgeingMM = function (x                   ,
 	predR            = predict(fm)
 	residR           = resid(fm)
 	residShapiroTest = shapiro.test0(residR)
+	n                = length(na.omit(residR))
 	plot(
 		predR ,
 		residR,
@@ -172,10 +173,11 @@ plot.PhenStatAgeingMM = function (x                   ,
 		...
 	)
 	#qqline(residR, ...)
-	
-	densityPlot(transData$data[, transData$names[1]],
-			 main = 'Density of the response',
-			 xlab = transData$names[1],
-			 ...)
+	densityPlot(
+		transData$data[, transData$names[1]],
+		main = 'Density of the response',
+		xlab = paste0(transData$names[1], ' (n = ', n, ')'),
+		...
+	)
 	par(ask = p$ask, mfrow = p$mfrow)
 }
