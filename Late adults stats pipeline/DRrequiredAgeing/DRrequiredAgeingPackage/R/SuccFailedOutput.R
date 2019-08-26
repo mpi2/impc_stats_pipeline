@@ -4,6 +4,7 @@ SuccessfulOutput = function(args) {
   ### 1 Experiment detail
   experiment_details      = list(
     ####
+    StatPacketCreationDate= as.character(Sys.time())                                             , #0
     status                =  ifelse(
       !NullOrError(args$c.ww0$NormalObj)      &&
         NullOrError(args$c.ww0$NormalObj$messages),
@@ -30,7 +31,7 @@ SuccessfulOutput = function(args) {
 
   ######## 2 JSON
   message0('Forming the list before applying JSON transformation ...')
-  args$note$'Experiment detail' = experiment_details
+  args$note$'Experiment detail' = experiment_details[-1]
   listDetails                   = list('Details' = sortList(args$note))
   listVectorOutput              = list('Vector output' = args$c.ww.vec$list)
   FinalList                     = list('Result' = c(listVectorOutput, listDetails))

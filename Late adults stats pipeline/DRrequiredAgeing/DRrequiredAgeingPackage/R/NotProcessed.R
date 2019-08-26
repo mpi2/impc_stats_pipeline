@@ -78,6 +78,7 @@ NotProcessedOutput = function(args) {
   ### 2 Experiment detail
   experiment_details      = list(
     ####
+    StatPacketCreationDate= as.character(Sys.time())                                            , #0
     status                = 'NotProcessed'                                                      , #1
     procedure_group       = args$procedure                                                      , #2
     procedure_stable_id   = UniqueAndNNull(args$n3.5$procedure_stable_id,removeSpecials = FALSE), #3
@@ -99,7 +100,7 @@ NotProcessedOutput = function(args) {
 
   ### 3 JSON
   message0('Forming the list before applying JSON transformation ...')
-  args$note$'Experiment detail'  = experiment_details
+  args$note$'Experiment detail'  = experiment_details[-1]
   listDetails                    = list('Details' = sortList(c(
     NotProcessedLogics,
     args$note

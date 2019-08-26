@@ -360,7 +360,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   .verbose = verbose                        ,
                   .inorder = inorder
                 ) %activemulticore% {
-                # for (i in  1:length(colonys)){
+                  #for (i in  1:length(colonys)){
                   message0('*~*~*~*~*~* ', i, '|', length(colonys), ' *~*~*~*~*~*')
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
@@ -391,8 +391,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     depVar      = depVariable$column
                     message0('Dependent variable: ', depVar)
                     note$'Response type  '       = paste0(depVar,
-                                                      '_of_type_',
-                                                      paste(depVariable$lbl, sep = '.'))
+                                                          '_of_type_',
+                                                          paste(depVariable$lbl, sep = '.'))
                     note$'Observation type'    =
                       if (!is.null(unique(n3.5$observation_type))) {
                         paste(unique(n3.5$observation_type),
@@ -613,7 +613,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     },
                     reference = wd)
                     note$'Readme file'         = relativePath(path = if (storeRawData &&
-                                                                        !compressRawData) {
+                                                                         !compressRawData) {
                       ReadMeFile
                     } else{
                       NULL
