@@ -543,15 +543,11 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
     message0(nrow(LA_data), ' data point added to the dataset')
   }
   ######################################
-  #library(gtools)
+  library(plyr)
   message0('Binding the EA and LA data ...')
-  #df = smartbind(EA_data, LA_data,verbose = FALSE)
-  df = rbind(
-    data.frame(c(EA_data, sapply(setdiff(names(LA_data), names(EA_data)), function(x) NA))),
-    data.frame(c(LA_data, sapply(setdiff(names(EA_data), names(LA_data)), function(x) NA)))
-  )
+  df = rbind.fill(EA_data, LA_data)
   ######################################
-  plist = c(EA_parameter_stable_id, plist)
+  plist = unique(c(EA_parameter_stable_id, plist))
   ######################################
   f = function(str, cut = 1, split = '_') {
     r = sapply(str, function(x) {
