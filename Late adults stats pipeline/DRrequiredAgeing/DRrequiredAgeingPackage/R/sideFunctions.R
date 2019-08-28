@@ -512,7 +512,7 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
                                                EA_data     = NULL,
                                                solrBaseURL = 'http://hx-noah-74-10:8090') {
   message0('LA binding in progress ...')
-  plist = map$LA_parameter[map$EA_parameter %in% EA_parameter_stable_id]
+  plist = unique(map$LA_parameter[map$EA_parameter %in% EA_parameter_stable_id])
   if (length(plist) < 1) {
     message0('No match for the LA corresponded to this parameter, ',
              EA_parameter_stable_id)
@@ -531,7 +531,7 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
     EA_parameter_stable_id,
     '\n\t => ',
     paste(plist, sep = ', ', collapse = ', '),
-    '\n\t Q: => ',
+    '\n\t => ',
     q
   )
   ######################################
