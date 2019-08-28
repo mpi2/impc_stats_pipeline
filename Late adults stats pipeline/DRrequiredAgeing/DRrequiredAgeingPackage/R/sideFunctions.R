@@ -513,19 +513,12 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
                                                solrBaseURL = 'http://hx-noah-74-10:8090') {
   message0('LA binding in progress ...')
   plist = map$LA_parameter[map$EA_parameter %in% EA_parameter_stable_id]
-  if (length(plist) < 1){
+  if (length(plist) < 1) {
     message0('No match for the LA corresponded to this parameter, ',
              EA_parameter_stable_id)
     return(EA_data)
   }
-  message0(
-    'LA data found for the parameter: ',
-    EA_parameter_stable_id,
-    '\n',
-    paste(plist, sep = ', ')
-  )
-  ######################################
-  LA_data = read.csv(
+  q = URLencode(
     paste0(
       solrBaseURL,
       '/solr/experiment/select?fq=parameter_stable_id:(',
@@ -533,6 +526,16 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
       ')&q=*:*&rows=500000000&wt=csv'
     )
   )
+  message0(
+    'LA data found for the parameter: ',
+    EA_parameter_stable_id,
+    '\n',
+    paste(plist, sep = ', ', collapse = ', '),
+    ', Q:\n\t => ',
+    q
+  )
+  ######################################
+  LA_data = read.csv(q)
   if (any(dim(LA_data) < 1)) {
     message0('No LA data')
   } else{
