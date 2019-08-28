@@ -96,6 +96,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   CategoryMap                    = readConf('CategoryMap.conf')
   initial                        = readConf('Initialize.conf')
   exceptionList                  = readFile(file = 'ExceptionMap.list')
+  EA2LAMApping                   = read.csv(file = file.path(local(),'EA2LA_parameter_mappings_2019-06-21.csv'))
   # CategoricalCategoryBlackList   = readFile(file = 'CategoricalCategoryBlackList.list')
   # Main subdirectory/working directory
   message0('Preparing the working directory ...')
@@ -186,6 +187,12 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
       counter   = 1
       outP      = list()
       n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
+      ############## Read The Ageing parameters from Solr
+      if(BatchProducer)
+        n3.0 = getLateAdultsFromParameterStableIds(EA_parameter_stable_id = parameter,
+                                                   map      = EA2LAMApping,
+                                                   EA_data  =  n3.0)
+      ##############
       centers   = as.character(unique(na.omit(n3.0$phenotyping_center)))
       for (center in centers) {
         n3.1     = base::subset(n3.0, n3.0$phenotyping_center %in% center)

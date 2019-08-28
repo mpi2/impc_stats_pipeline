@@ -442,7 +442,7 @@ percentageChangeCont = function(model                ,
 }
 
 optimM = function(optimise) {
-	paste0(c('Fixed term = ', 'Weight term = ', 'Random term = '),
+	paste0(c('Fixed term = ', 'Weight term = ', 'Random effect term = '),
 				 optimise,
 				 collapse = ', ')
 }
@@ -2450,8 +2450,8 @@ extractFERRTerms = function(object) {
 	)
 	final$formula = printformula(RightFormula2LeftFormula(object$extra$Cleanedformula),
 															 message = FALSE)
-	out = list('Initial model' = lnitial,
-						 'Final model'   = final)
+	out = list('Initial formula' = lnitial,
+						 'Final formula'   = final)
 	
 	if (!is.null(object$input$RRprop))
 		out$'RR quantile' = unlist(object$input$RRprop)
@@ -2727,7 +2727,7 @@ shapiro.test0 = function(x, ...) {
 		r = list(
 			'P-value'  = shapiro.test(x)$p.value   ,
 			'N'        = length(x)                 ,
-			'Unique n' = length(unique(na.omit(x))),
+			'Unique N' = length(unique(na.omit(x))),
 			'SD'       = sd0(x, na.rm = TRUE)      ,
 			'Test'     = 'Shapiro'
 		)
@@ -2735,7 +2735,7 @@ shapiro.test0 = function(x, ...) {
 		r = list(
 			'P-value'  = NULL                                                               ,
 			'N'        = length(x)                                                          ,
-			'Unique n' = length(unique(na.omit(x)))                                         ,
+			'Unique N' = length(unique(na.omit(x)))                                         ,
 			'SD'       = sd0(x, na.rm = TRUE)                                               ,
 			'Test'     = 'Not possible (Possible cause:n < 3 or n > 5000 unique data points'
 		)
@@ -3260,6 +3260,7 @@ PhenListAgeingRelabling = function(dataset, col, l1, rel1, l2, rel2) {
 	return(dataset)
 }
 
+
 checkSummary = function(dataset, var, ...) {
 	lvls = NULL
 	if (is.null(dataset) ||
@@ -3271,15 +3272,21 @@ checkSummary = function(dataset, var, ...) {
 		lvls = paste0(
 			'\t Levels (Total levels = ',
 			nlevels(as.factor(dataset[, var])),
-			'): \n\t  ',
+			', missings = ',
+			round(sum(is.na(dataset[, var])) / length(dataset[, var]) * 100),
+			'%): \n\t  ',
 			pasteComma(levels(as.factor(dataset[, var])), width = 250, sep = '\n\t  ')
 		)
 	else
 		lvls = paste0(
-			'\t Summary:\n\t  mean = ',
+			'\t Summary:\n',
+			'\t  mean      = ',
 			mean(dataset[, var], na.rm = TRUE),
-			'\n\t  sd   = ',
-			sd0(dataset[, var], na.rm = TRUE)
+			'\n\t  sd        = ',
+			sd0(dataset[, var], na.rm = TRUE),
+			'\n\t  Missings  = ',
+			round(sum(is.na(dataset[, var])) / length(dataset[, var]) * 100),
+			'%'
 		)
 	message0(lvls)
 	return(invisible(lvls))

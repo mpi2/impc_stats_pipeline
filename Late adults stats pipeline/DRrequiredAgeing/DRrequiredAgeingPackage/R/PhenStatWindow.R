@@ -122,7 +122,7 @@ PhenStatWindow = function (phenlistObject                                ,
           maxPeaks,
           ' modes. A random sample of ',
           maxPeaks,
-          ' would be used. total modes: ',
+          ' will be used. total modes: ',
           length(unique(mm))
         )
         sa            = sample(unique(tt[mm]), maxPeaks)

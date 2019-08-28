@@ -184,11 +184,14 @@ PhenListAgeing =
 					colnames(dataset)[colnames(dataset) == 'Weight'] =
 						'Weight_labels'
 				}
-				wsglvls = tapply(X = dataset$Weight, INDEX = interaction(dataset[names(dataset) %in% c('Genotype', 'Sex')]), function(x) {
+				coNames = names(dataset) %in% c('Genotype', 'Sex', 'LifeStage')
+				wsglvls = tapply(X = dataset$Weight, INDEX = interaction(dataset[,coNames]), function(x) {
 					length(na.omit(x))
 				}, default = 0)
 				message0(
-					'Total `Weight` data points for (possible) Genotype:Sex interaction:\n\t Level(frequency): \n\t  ',
+					'Total `Weight` data points for ',
+					MakeCaptionFromNamesAndIndecis(name = names(dataset), index = coNames),
+					':\n\t Level(frequency): \n\t  ',
 					pasteComma(
 						paste0(names(wsglvls), '(', wsglvls, ')'),
 						truncate = FALSE,
@@ -197,11 +200,12 @@ PhenListAgeing =
 				)
 				if (min(wsglvls, na.rm = TRUE) <= 2) {
 					message0(
-						"`Weight` column has (<2) data points for at least one (possible) Genotype:Sex interaction.\n\t The `Weight` column renamed to `Weight_labels`"
+						'`Weight` column has (<2) data points for at least one level of ',
+						MakeCaptionFromNamesAndIndecis(name = names(dataset), index = coNames),
+						'.\n\t The `Weight` column renamed to `Weight_labels`'
 					)
 					colnames(dataset)[colnames(dataset) == 'Weight'] =
 						'Weight_labels'
-					
 				}
 			}
 			message0('Successfully performed checks in ',
@@ -279,22 +283,28 @@ checkDataset = function(dataset,
 {
 	dataset = droplevels(dataset)
 	if (any(c('Genotype', 'Sex') %in% colnames(dataset))) {
-		InGS = interaction(dataset[names(dataset) %in% c('Genotype', 'Sex')])
-		tbGS = table(InGS)
+		coNames = names(dataset) %in% c('Genotype', 'Sex', 'LifeStage')
+		InGS    = interaction(dataset[,coNames])
+		tbGSL   = table(InGS)
+		
 		message0(
-			'Total samples in (possible) Genotype:Sex interaction: \n\tLevel(frequency): \n\t ',
+			'Total samples in ',
+			MakeCaptionFromNamesAndIndecis(name = names(dataset), index = coNames),
+			': \n\tLevel(frequency): \n\t ',
 			pasteComma(
-				paste0(names(tbGS), '(', tbGS, ')'),
+				paste0(names(tbGSL), '(', tbGSL, ')'),
 				truncate = FALSE,
 				sep = '\n\t '
 			)
 		)
-		if (min(tbGS) < 1)
+		if (min(tbGSL) < 1)
 			message0(
-				'No observations detected in (possible) Genotype:Sex interaction for:\n\t ',
-				pasteComma(names(tbGS[tbGS < 1]), truncate = FALSE, sep = ',\n\t')
+				'No observations detected in ',
+				MakeCaptionFromNamesAndIndecis(name = names(dataset), index = coNames),
+				' for:\n\t ',
+				pasteComma(names(tbGSL[tbGSL < 1]), truncate = FALSE, sep = ',\n\t')
 			)
-		dataset = droplevels(dataset[InGS %in% names(tbGS[tbGS >= 1]), , drop = FALSE])
+		dataset = droplevels(dataset[InGS %in% names(tbGSL[tbGSL >= 1]), , drop = FALSE])
 		## Check of genotype and sex levels after cleaning
 		if (nlevels(dataset$Genotype) != 2) {
 			message0(
@@ -399,7 +409,6 @@ PhenListAgeingBuilder = function(PhenListobject,
 	return(PhenListobject)
 }
 
-
 summary.PhenListAgeing = function(object,
 																	vars = NULL,
 																	...) {
@@ -410,7 +419,6 @@ summary.PhenListAgeing = function(object,
 		r  = summarytools::dfSummary (df, ...)
 	return(r)
 }
-
 
 plot.PhenListAgeing = function(x,
 															 vars = NULL,
@@ -427,7 +435,6 @@ plot.PhenListAgeing = function(x,
 		return(NULL)
 	}
 }
-
 
 SelectVariablesOrDefault = function(data, vars = NULL) {
 	cnames = c('Genotype'     ,
@@ -458,5 +465,14 @@ varExistsInDF = function(data = NULL, vars = NULL) {
 	if (is.null(vars) || is.null(data))
 		return(NULL)
 	r = vars[vars %in% names(data)]
+	return(r)
+}
+
+MakeCaptionFromNamesAndIndecis = function(name, index) {
+	r = if (length(name[index]) > 1) {
+		paste0(paste(name[index], collapse = ':', sep = ':'), ' interactions')
+	} else{
+		name[index]
+	}
 	return(r)
 }

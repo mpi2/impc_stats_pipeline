@@ -500,6 +500,97 @@ getEquation =  function(var,
   return(equation)
 }
 
+local =  function(x=NULL){
+  r= system.file("extdata", package = "DRrequiredAgeing")
+  return(r)
+}
+
+
+getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
+                                               map         = read.csv(file = file.path(local(),
+                                                                                       'EA2LA_parameter_mappings_2019-06-21.csv')),
+                                               EA_data     = NULL,
+                                               solrBaseURL = 'http://hx-noah-74-10:8090') {
+  message0('LA binding in progress ...')
+  plist = map$LA_parameter[map$EA_parameter %in% EA_parameter_stable_id]
+  if (length(plist) < 1){
+    message0('No match for the LA corresponded to this parameter, ',
+             EA_parameter_stable_id)
+    return(EA_data)
+  }
+  message0(
+    'LA data found for the parameter: ',
+    EA_parameter_stable_id,
+    '\n',
+    paste(plist, sep = ', ')
+  )
+  ######################################
+  LA_data = read.csv(
+    paste0(
+      solrBaseURL,
+      '/solr/experiment/select?fq=parameter_stable_id:(',
+      paste('"', plist, '"', collapse = ' OR ', sep = ''),
+      ')&q=*:*&rows=500000000&wt=csv'
+    )
+  )
+  if (any(dim(LA_data) < 1)) {
+    message0('No LA data')
+  } else{
+    message0(nrow(LA_data), ' data point added to the dataset')
+  }
+
+  ######################################
+  df = rbind(EA_data, LA_data)
+  ######################################
+  plist = c(EA_parameter_stable_id, plist)
+  ######################################
+  f = function(str, cut = 1, split = '_') {
+    r = sapply(str, function(x) {
+      s = unlist(strsplit(x, split = split))
+      paste(head(s, length(s) - cut),
+            sep = '_',
+            collapse = '_')
+    })
+    return(unique(r))
+  }
+  ######################################
+  df$LifeStage = ifelse(grepl(pattern = '(IP_)|(LA_)', df$parameter_stable_id),
+                        'Late',
+                        'Early')
+  df$LifeStage = as.factor(df$LifeStage)
+  ######################################
+  df$parameter_stable_id_renamed = df$parameter_stable_id
+  df$parameter_stable_id = gsub(
+    pattern = paste0('(', paste(f(plist, cut = 0), collapse  = ')|('), ')'),
+    replacement = f(plist[1], cut = 0),
+    df$parameter_stable_id
+  )
+
+  df$procedure_stable_id_renamed = df$procedure_stable_id
+  df$procedure_stable_id         = gsub(
+    pattern = paste0('(', paste(f(plist, cut = 2), collapse  = ')|('), ')'),
+    replacement = f(plist[1], cut = 2),
+    df$procedure_stable_id
+  )
+
+  df$procedure_group_renames = df$procedure_group
+  df$procedure_group         = gsub(
+    pattern = paste0('(', paste(f(plist, cut = 2), collapse  = ')|('), ')'),
+    replacement = f(plist[1], cut = 2),
+    df$procedure_group
+  )
+  if (sum(df$age_in_weeks <= 16 & df$LifeStage %in% 'Late')) {
+    message0('LA must have age_in_weeks > 16')
+    write(
+      x = paste(Sys.Date(), EA_parameter_stable_id, sep = '\t'),
+      file = 'LAWithAgeLessThan16Weeks.txt',
+      append = TRUE
+    )
+  }
+
+  return(df)
+}
+
 
 # Read config files
 readConf = function(file, path = NULL, ...) {
@@ -1568,7 +1659,7 @@ cores0 = function(coreRatio = .7,
     detectCores(),
     '; and ',
     crs,
-    ' would be used.'
+    ' will be used.'
   )
   return(crs)
 }
@@ -1865,7 +1956,7 @@ WriteToDB = function(df,
   requireNamespace("DBI")
   dbname  = RemoveSpecialChars(dbname, what = '[^0-9A-Za-z/.]')
   message0('Writting to the SQLite ...')
-  message0('DB name: ', dbname)
+  message0('\tDB name: ', dbname)
   dbtemp                = df
   names(dbtemp)[names(dbtemp) %in% '']  =  'Results'
   dbtemp                = as.data.frame(as.list(dbtemp))
@@ -1902,8 +1993,9 @@ WriteToDB = function(df,
     )
 
     if (is.null(res)) {
-      message0('Retrying ...')
-      Sys.sleep(RandomRegardSeed(1, max = maxdelay))
+      sleepTime = RandomRegardSeed(1, max = maxdelay)
+      message0('\t',i, '. Retrying ', sleepTime, 's ...')
+      Sys.sleep(sleepTime)
       if (i %% steptry == 0) {
         newBase = sub(pattern = '.*(_Dup_)', '' , basename(dbpath), perl = TRUE)
         dbpath  = file.path(dirname(dbpath), paste0(counter, '_Dup_', newBase))
@@ -1911,11 +2003,11 @@ WriteToDB = function(df,
       }
 
     } else{
-      message0('Writting to the database successful ...')
+      message0('\tWritting to the database successful ...')
       break
     }
     if (i >= maxtry) {
-      stop('something wrong with the data or the database')
+      stop('\tsomething wrong with the data or the database')
     }
   }
 }

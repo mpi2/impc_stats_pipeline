@@ -130,7 +130,7 @@ M.opt = function(object = NULL            ,
 				printformula(fixed)
 			)
 		} else{
-			message0('The full model successfully applied.')
+			message0('\tThe full model successfully applied.')
 			break
 		}
 	}
