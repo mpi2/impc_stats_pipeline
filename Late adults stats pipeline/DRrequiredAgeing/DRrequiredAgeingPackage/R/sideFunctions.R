@@ -543,7 +543,9 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   }
 
   ######################################
-  df = rbind(EA_data, LA_data)
+  library(gtools)
+  message0('Binding the EA and LA data ...')
+  df = smartbind(EA_data, LA_data,verbose = TRUE)
   ######################################
   plist = c(EA_parameter_stable_id, plist)
   ######################################

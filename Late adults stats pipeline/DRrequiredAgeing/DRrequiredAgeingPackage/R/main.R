@@ -115,7 +115,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   ##################
   set.seed(seed)
   # Read file
-  message0('Reading the input file ...\n\t ~>', file)
+  message0('Reading the input file ...\n\t ~> ', file)
   if (!file.exists(file))
     message0('File is not local or does not exist!')
 
