@@ -529,23 +529,27 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   message0(
     'LA data found for the parameter: ',
     EA_parameter_stable_id,
-    '\n',
+    '\n\t => ',
     paste(plist, sep = ', ', collapse = ', '),
-    ', Q:\n\t => ',
+    '\n\t Q: => ',
     q
   )
   ######################################
   LA_data = read.csv(q)
   if (any(dim(LA_data) < 1)) {
     message0('No LA data')
+    return(EA_data)
   } else{
     message0(nrow(LA_data), ' data point added to the dataset')
   }
-
   ######################################
-  library(gtools)
+  #library(gtools)
   message0('Binding the EA and LA data ...')
-  df = smartbind(EA_data, LA_data,verbose = TRUE)
+  #df = smartbind(EA_data, LA_data,verbose = FALSE)
+  df = rbind(
+    data.frame(c(EA_data, sapply(setdiff(names(LA_data), names(EA_data)), function(x) NA))),
+    data.frame(c(LA_data, sapply(setdiff(names(EA_data), names(LA_data)), function(x) NA)))
+  )
   ######################################
   plist = c(EA_parameter_stable_id, plist)
   ######################################
