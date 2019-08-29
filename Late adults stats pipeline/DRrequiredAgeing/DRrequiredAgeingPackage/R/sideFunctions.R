@@ -506,16 +506,17 @@ local =  function(x=NULL){
 }
 
 
-getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
+getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
                                                map         = read.csv(file = file.path(local(),
                                                                                        'EA2LA_parameter_mappings_2019-06-21.csv')),
-                                               EA_data     = NULL,
+                                               LA_data     = NULL,
                                                solrBaseURL = 'http://hx-noah-74-10:8090') {
-  message0('LA binding in progress ...')
-  plist = as.character(unique(map$LA_parameter[map$EA_parameter %in% EA_parameter_stable_id]))
-  if (length(plist) < 1 || grepl(pattern = '(IP_)|(LA_)',x = EA_parameter_stable_id)) {
-    message0('Skip this parameter. The data is actually from LA pipeline or no match for the LA corresponded to this parameter, ',
-             EA_parameter_stable_id)
+  message0('EA-LA binding in progress ...')
+  plist = as.character(unique(map$EA_parameter[map$LA_parameter %in% LA_parameter_stable_id]))
+
+  if (length(plist) < 1) {
+    message0('Skip this parameter. No match for the EA corresponded to this parameter, ',
+             LA_parameter_stable_id)
     return(NULL)
   }
   q = URLencode(
@@ -530,21 +531,21 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
     )
   )
   message0(
-    'LA data found for the parameter: ',
-    EA_parameter_stable_id,
+    'EA data found for the parameter: ',
+    LA_parameter_stable_id,
     '\n\t => ',
     paste(plist, sep = ', ', collapse = ', '),
     '\n\t => ',
     q
   )
   ######################################
-  LA_data = read.csv(q)
+  EA_data = read.csv(q)
   EA_data = subset(EA_data,EA_data$colony_id %in% LA_data$colony_id )
   if (any(dim(LA_data) < 1) || any(dim(EA_data) < 1)) {
-    message0('Skip this parameter. No LA data')
+    message0('Skip this parameter. No EA data to match')
     return(NULL)
   } else{
-    message0(nrow(LA_data), ' data point added to the dataset')
+    message0(nrow(EA_data), ' data point added to the dataset')
   }
   ######################################
   library(plyr)
@@ -554,7 +555,7 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   message0('Remove any possible duplicate from the combined EA & LA dataset.')
   df = df[!duplicated(df),]
   ######################################
-  plist = unique(c(EA_parameter_stable_id, plist))
+  plist = unique(c(plist,LA_parameter_stable_id))
   ######################################
   f = function(str,
                cut = 1,
@@ -606,7 +607,7 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   if (sum(df$age_in_weeks <= 16 & df$LifeStage %in% 'Late')) {
     message0('LA must have age_in_weeks > 16')
     write(
-      x = paste(Sys.Date(), EA_parameter_stable_id, sep = '\t'),
+      x = paste(Sys.Date(), LA_parameter_stable_id, sep = '\t'),
       file = 'LAWithAgeLessThan16Weeks.txt',
       append = TRUE
     )

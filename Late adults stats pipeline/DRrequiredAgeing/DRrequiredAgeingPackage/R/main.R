@@ -170,9 +170,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
       n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
       ############## Read The Ageing parameters from Solr
       if(BatchProducer)
-        n3.0 = getLateAdultsFromParameterStableIds(EA_parameter_stable_id = parameter,
+        n3.0 = getEarlyAdultsFromParameterStableIds(LA_parameter_stable_id = parameter,
                                                    map      = EA2LAMApping,
-                                                   EA_data  =  n3.0)
+                                                   LA_data  =  n3.0)
       if(is.null(n3.0))
         next
       ##############
