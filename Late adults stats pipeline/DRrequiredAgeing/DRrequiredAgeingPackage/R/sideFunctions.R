@@ -522,15 +522,20 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
   q = URLencode(
     paste0(
       solrBaseURL,
-      '/solr/experiment/select?',
+      '/solr/experiment/select?q=*:*',
       '&fl=',
       paste(sort(DRrequired:::requiredDataColumns(0)), collapse = ','),
-      '&fq=parameter_stable_id:(',
+      '&fq=datasource_name:IMPC*&fq=observation_type:(',
+      paste(
+        '"',
+        unique(LA_data$observation_type),
+        '"',
+        collapse = ' OR ',
+        sep = ''
+      ),
+      ')&fq=parameter_stable_id:(',
       paste('"', plist, '"', collapse = ' OR ', sep = ''),
-      ')&q=*:*&rows=500000000&wt=csv',
-      '&fq=colony_id:(',
-      paste('"', unique(LA_data$colony_id), '"', collapse = ' OR ', sep = ''),
-      ')'
+      ')&rows=500000000&wt=csv'
     )
   )
   message0(
@@ -554,6 +559,9 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
   library(plyr)
   message0('Binding the EA and LA data ...')
   df      = rbind.fill(EA_data, LA_data)
+  ######################################
+  df      = df[df$colony_id %in%
+                 unique(c(LA_data$colony_id, EA_data$colony_id[EA_data$biological_sample_group %in% 'control'])), ]
   ######################################
   message0('Remove any possible duplicate from the combined EA & LA dataset.')
   df = df[!duplicated(df),]
