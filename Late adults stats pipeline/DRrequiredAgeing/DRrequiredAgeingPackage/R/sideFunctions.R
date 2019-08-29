@@ -521,7 +521,10 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   q = URLencode(
     paste0(
       solrBaseURL,
-      '/solr/experiment/select?fq=parameter_stable_id:(',
+      '/solr/experiment/select?',
+      '&fl=',
+      paste(sort(DRrequired:::requiredDataColumns(0)), collapse = ','),
+      '&fq=parameter_stable_id:(',
       paste('"', plist, '"', collapse = ' OR ', sep = ''),
       ')&q=*:*&rows=500000000&wt=csv'
     )
