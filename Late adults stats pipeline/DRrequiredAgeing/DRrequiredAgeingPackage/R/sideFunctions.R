@@ -512,7 +512,7 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
                                                EA_data     = NULL,
                                                solrBaseURL = 'http://hx-noah-74-10:8090') {
   message0('LA binding in progress ...')
-  plist = unique(map$LA_parameter[map$EA_parameter %in% EA_parameter_stable_id])
+  plist = as.character(unique(map$LA_parameter[map$EA_parameter %in% EA_parameter_stable_id]))
   if (length(plist) < 1 || grepl(pattern = '(IP_)|(LA_)',x = EA_parameter_stable_id)) {
     message0('The data is actually from LA pipeline or no match for the LA corresponded to this parameter, ',
              EA_parameter_stable_id)
@@ -555,12 +555,22 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   ######################################
   plist = unique(c(EA_parameter_stable_id, plist))
   ######################################
-  f = function(str, cut = 1, split = '_') {
+  f = function(str,
+               cut = 1,
+               split = '_',
+               partIndex = NULL) {
     r = sapply(str, function(x) {
       s = unlist(strsplit(x, split = split))
-      paste(head(s, length(s) - cut),
-            sep = '_',
-            collapse = '_')
+      if (is.null(partIndex)) {
+        r0 = paste(head(s, length(s) - cut),
+                   sep = '_',
+                   collapse = '_')
+      } else{
+        r0 = paste(s[partIndex],
+                   sep = '_',
+                   collapse = '_')
+      }
+      return(r0)
     })
     return(unique(r))
   }
@@ -572,15 +582,15 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   ######################################
   df$parameter_stable_id_renamed = df$parameter_stable_id
   df$parameter_stable_id = gsub(
-    pattern = paste0('(', paste(f(plist, cut = 0), collapse  = ')|('), ')'),
+    pattern     = paste0('(', paste(f(plist, cut = 0), collapse  = ')|('), ')'),
     replacement = f(plist[1], cut = 0),
-    df$parameter_stable_id
+    x           = df$parameter_stable_id
   )
 
   df$procedure_stable_id_renamed = df$procedure_stable_id
   df$procedure_stable_id         = gsub(
-    pattern = paste0('(', paste(f(plist, cut = 2), collapse  = ')|('), ')'),
-    replacement = f(plist[1], cut = 2),
+    pattern = paste0('(', paste(f(plist, partIndex = c(1,2,4)), collapse  = ')|('), ')'),
+    replacement = f(plist[1], partIndex = c(1,2,4)),
     df$procedure_stable_id
   )
 
@@ -598,7 +608,10 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
       append = TRUE
     )
   }
-
+  # Return them into factors ...
+  df$parameter_stable_id  = as.factor(df$parameter_stable_id)
+  df$procedure_stable_id  = as.factor(df$procedure_stable_id)
+  df$procedure_group      = as.factor(df$procedure_group )
   return(df)
 }
 
