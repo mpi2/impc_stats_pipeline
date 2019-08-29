@@ -527,7 +527,9 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
       paste(sort(DRrequired:::requiredDataColumns(0)), collapse = ','),
       '&fq=parameter_stable_id:(',
       paste('"', plist, '"', collapse = ' OR ', sep = ''),
-      ')&q=*:*&rows=500000000&wt=csv'
+      ')&q=*:*&rows=500000000&wt=csv',
+      '&fq=colony_id:(',
+      paste('"', unique(LA_data$colony_id), '"', collapse = ' OR ', sep = '')
     )
   )
   message0(
@@ -540,7 +542,7 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
   )
   ######################################
   EA_data = read.csv(q)
-  EA_data = subset(EA_data,EA_data$colony_id %in% LA_data$colony_id )
+  #EA_data = subset(EA_data,EA_data$colony_id %in% LA_data$colony_id )
   if (any(dim(LA_data) < 1) || any(dim(EA_data) < 1)) {
     message0('Skip this parameter. No EA data to match')
     return(NULL)
