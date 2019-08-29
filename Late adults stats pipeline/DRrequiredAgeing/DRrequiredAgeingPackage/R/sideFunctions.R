@@ -529,7 +529,8 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
       paste('"', plist, '"', collapse = ' OR ', sep = ''),
       ')&q=*:*&rows=500000000&wt=csv',
       '&fq=colony_id:(',
-      paste('"', unique(LA_data$colony_id), '"', collapse = ' OR ', sep = '')
+      paste('"', unique(LA_data$colony_id), '"', collapse = ' OR ', sep = ''),
+      ')'
     )
   )
   message0(
