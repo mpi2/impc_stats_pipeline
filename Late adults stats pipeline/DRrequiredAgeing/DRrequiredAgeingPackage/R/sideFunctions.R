@@ -513,8 +513,8 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
                                                solrBaseURL = 'http://hx-noah-74-10:8090') {
   message0('LA binding in progress ...')
   plist = unique(map$LA_parameter[map$EA_parameter %in% EA_parameter_stable_id])
-  if (length(plist) < 1) {
-    message0('No match for the LA corresponded to this parameter, ',
+  if (length(plist) < 1 || grepl(pattern = '(IP_)|(LA_)',x = EA_parameter_stable_id)) {
+    message0('The data is actually from LA pipeline or no match for the LA corresponded to this parameter, ',
              EA_parameter_stable_id)
     return(EA_data)
   }
@@ -549,6 +549,9 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   library(plyr)
   message0('Binding the EA and LA data ...')
   df = rbind.fill(EA_data, LA_data)
+  ######################################
+  message0('Remove any possible duplicate from the combined EA & LA dataset.')
+  df = df[!duplicated(df),]
   ######################################
   plist = unique(c(EA_parameter_stable_id, plist))
   ######################################
