@@ -514,9 +514,9 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   message0('LA binding in progress ...')
   plist = as.character(unique(map$LA_parameter[map$EA_parameter %in% EA_parameter_stable_id]))
   if (length(plist) < 1 || grepl(pattern = '(IP_)|(LA_)',x = EA_parameter_stable_id)) {
-    message0('The data is actually from LA pipeline or no match for the LA corresponded to this parameter, ',
+    message0('Skip this parameter. The data is actually from LA pipeline or no match for the LA corresponded to this parameter, ',
              EA_parameter_stable_id)
-    return(EA_data)
+    return(NULL)
   }
   q = URLencode(
     paste0(
@@ -539,16 +539,17 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
   )
   ######################################
   LA_data = read.csv(q)
-  if (any(dim(LA_data) < 1)) {
-    message0('No LA data')
-    return(EA_data)
+  EA_data = subset(EA_data,EA_data$colony_id %in% LA_data$colony_id )
+  if (any(dim(LA_data) < 1) || any(dim(EA_data) < 1)) {
+    message0('Skip this parameter. No LA data')
+    return(NULL)
   } else{
     message0(nrow(LA_data), ' data point added to the dataset')
   }
   ######################################
   library(plyr)
   message0('Binding the EA and LA data ...')
-  df = rbind.fill(EA_data, LA_data)
+  df      = rbind.fill(EA_data, LA_data)
   ######################################
   message0('Remove any possible duplicate from the combined EA & LA dataset.')
   df = df[!duplicated(df),]
@@ -589,9 +590,11 @@ getLateAdultsFromParameterStableIds = function(EA_parameter_stable_id,
 
   df$procedure_stable_id_renamed = df$procedure_stable_id
   df$procedure_stable_id         = gsub(
-    pattern = paste0('(', paste(f(plist, partIndex = c(1,2,4)), collapse  = ')|('), ')'),
-    replacement = f(plist[1], partIndex = c(1,2,4)),
-    df$procedure_stable_id
+    pattern     = paste0('(', paste(f(plist, cut = 2), collapse  = ')|('), ')'),
+    replacement =  df$procedure_stable_id[grepl(pattern = f(str = plist[1],
+                                                            cut = 2),
+                                                x = df$procedure_stable_id)][1],
+   x            =  df$procedure_stable_id
   )
 
   df$procedure_group_renames = df$procedure_group

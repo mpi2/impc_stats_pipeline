@@ -173,6 +173,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
         n3.0 = getLateAdultsFromParameterStableIds(EA_parameter_stable_id = parameter,
                                                    map      = EA2LAMApping,
                                                    EA_data  =  n3.0)
+      if(is.null(n3.0))
+        next
       ##############
       centers   = as.character(unique(na.omit(n3.0$phenotyping_center)))
       for (center in centers) {
