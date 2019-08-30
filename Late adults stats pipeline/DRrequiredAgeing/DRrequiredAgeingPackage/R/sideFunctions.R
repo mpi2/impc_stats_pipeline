@@ -140,6 +140,18 @@ getNotEmptyValue = function(x, head = Inf) {
   return(as.character(r))
 }
 
+sortDataset = function(x = NULL, BatchCol = NULL) {
+  if (is.null(x)        ||
+      is.null(BatchCol) ||
+      length(BatchCol) < 1 ||
+      any(dim(x) < 1))
+    return(x)
+  if (BatchCol %in% names(x)) {
+    message0('Sorting dataset based on ', BatchCol, '...')
+    x = x[order(Date2Integer(x[, BatchCol])),]
+  }
+  return(x)
+}
 # Only works for the data from Solr
 # Automatic select the corresponding column for the type of data (only for category and data_point)
 getResponseColumn = function(x, activate = TRUE) {
@@ -152,9 +164,9 @@ getResponseColumn = function(x, activate = TRUE) {
       if (length(lbl) > 1)
         accepted = FALSE
 
-      if (lbl == 'categorical')
+      if (lbl %in% 'categorical')
         column = 'category'
-      else if (lbl == 'unidimensional')
+      else if (lbl %in% c('unidimensional','time_series'))
         column = 'data_point'
       else
         accepted = FALSE
@@ -556,9 +568,9 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
     message0(nrow(EA_data), ' data point added to the dataset')
   }
   ######################################
-  library(plyr)
+  requireNamespace("plyr")
   message0('Binding the EA and LA data ...')
-  df      = rbind.fill(EA_data, LA_data)
+  df      = plyr::rbind.fill(EA_data, LA_data)
   ######################################
   df      = df[df$colony_id %in%
                  unique(c(LA_data$colony_id, EA_data$colony_id[EA_data$biological_sample_group %in% 'control'])), ]

@@ -57,8 +57,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       controlSize            = 1500        ,
                       ### Just for Ageing Batch GEnerator  ,
                       combineEAandLA        = FALSE        ,
+                      solrBaseURL           = 'http://hx-noah-74-10:8090' ,
                       ### Just for debuging
-                      superDebug             = FALSE       ,
+                      superDebug             = FALSE                      ,
                       extraBatchParameters   = '-m "rh7-hosts-ebi5-12 rh7-hosts-ebi5-13 rh7-hosts-ebi5-14 rh7-hosts-ebi5-15 rh7-hosts-ebi5-16 rh7-hosts-ebi5-17 rh7-hosts-ebi5-18 rh7-hosts-ebi5-19 rh7-hosts-ebi5-20 rh7-hosts-ebi5-24 rh7-hosts-ebi5-25 rh7-hosts-ebi5-26 rh7-hosts-ebi5-27 rh7-hosts-ebi6-00 rh7-hosts-ebi6-01 rh7-hosts-ebi6-02 rh7-hosts-ebi6-03 rh7-hosts-ebi6-04 rh7-hosts-ebi6-05 rh7-hosts-ebi6-06 rh7-hosts-ebi6-07 rh7-hosts-ebi6-08 rh7-hosts-ebi6-09 rh7-hosts-ebi6-10 rh7-hosts-ebi6-11 rh7-hosts-ebi6-12 rh7-hosts-ebi6-13 rh7-hosts-ebi6-14 rh7-hosts-ebi6-15 rh7-hosts-ebi6-16 rh7-hosts-ebi6-17"',
                       ...) {
   message0('DRrequiredAgeing loaded')
@@ -172,9 +173,12 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
       n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
       ############## Read The Ageing parameters from Solr
       if(BatchProducer && combineEAandLA)
-        n3.0 = getEarlyAdultsFromParameterStableIds(LA_parameter_stable_id = parameter,
-                                                    map      = EA2LAMApping,
-                                                    LA_data  =  n3.0)
+        n3.0 = DRrequiredAgeing:::getEarlyAdultsFromParameterStableIds(
+          LA_parameter_stable_id = parameter    ,
+          map                    = EA2LAMApping ,
+          LA_data                =  n3.0        ,
+          solrBaseURL            = solrBaseURL
+        )
       if(is.null(n3.0))
         next
       ##############
@@ -363,7 +367,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     message0('Current colony: ',colony)
 
                     n3.4 = base::subset(n3.3.m_zyg,	n3.3.m_zyg$colony_id %in% c(colony))
-                    n3.5 = rbind (n3.4, n3.3.c)
+                    n3.5 = sortDataset(x = rbind (n3.4, n3.3.c), BatchCol = 'date_of_experiment')
                     note = c(note,
                              list(
                                'Bodyweight included in the input data' = CheckIfNameExistInDataFrame(

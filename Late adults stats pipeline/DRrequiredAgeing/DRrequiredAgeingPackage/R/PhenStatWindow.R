@@ -39,8 +39,17 @@ PhenStatWindow = function (phenlistObject                                ,
   requireNamespace('PhenStatAgeing')
   requireNamespace('nlme')
   set.seed(seed)
+  if (method %in% 'MM' &&
+      phenlistObject@datasetPL$observation_type %in% 'time_series') {
+    RandEffTerm = as.formula('~ 1 | external_sample_id')
+    CorrEffect  = nlme::corSymm()
+  } else{
+    RandEffTerm = as.formula('~ 1 | Batch')
+    CorrEffect  = nlme::corCompSymm()
+  }
   # Do not remove line below (necessary for windowing)
-  phenlistObject@datasetPL = phenlistObject@datasetPL[order(Date2Integer(phenlistObject@datasetPL$Batch)), ]
+  phenlistObject@datasetPL = sortDataset(x = phenlistObject@datasetPL, BatchCol =
+                                           'Batch')
   ###########################
   # Run normal (not windowed) models
   ###########################
@@ -49,9 +58,11 @@ PhenStatWindow = function (phenlistObject                                ,
   message0(method, ' in progress ....')
   object0 =   PhenStatAgeing::testDatasetAgeing(
     phenListAgeing = phenlistObject,
-    method = method,
+    method      = method,
+    MM_random   = RandEffTerm,
+    correlation = CorrEffect,
     MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-    debug = TRUE
+    debug       = TRUE
   )
   note$'Normal analysis'$'Step 1-1 messages' = object0$messages
   # If not possible use MM (only for ABR)
@@ -64,7 +75,9 @@ PhenStatWindow = function (phenlistObject                                ,
       phenListAgeing = phenlistObject,
       method = method,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-      debug = TRUE
+      MM_random   = RandEffTerm,
+      correlation = CorrEffect,
+      debug       = TRUE
     )
     note$'Normal analysis'$'Step 1-2 Mixed Model messages' = object0$messages
   }
@@ -78,7 +91,9 @@ PhenStatWindow = function (phenlistObject                                ,
       phenListAgeing = phenlistObject,
       method = method,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-      debug = TRUE
+      MM_random   = RandEffTerm,
+      correlation = CorrEffect,
+      debug       = TRUE
     )
     note$'Normal analysis'$'Step 1-3 Mixed Model with added Jitter messages' = object0$messages
   }
@@ -102,7 +117,11 @@ PhenStatWindow = function (phenlistObject                                ,
     objectNorm = testDatasetAgeing(
       phenListAgeing = phenlistObject,
       method = method,
-      MM_optimise = c(0, 1, 1)
+      MM_random   = RandEffTerm,
+      correlation = CorrEffect,
+      MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+      MM_optimise = c(0, 1, 1),
+      debug       = TRUE
     )
     windowingNote$'Windowing analysis'$'Fully loaded model' = objectNorm$messages
     #######################################################
@@ -223,9 +242,13 @@ PhenStatWindow = function (phenlistObject                                ,
       objectf = testDatasetAgeing(
         phenListAgeing = phenlistObject,
         method = method,
-        MM_weight = nlme::varComb(
+        MM_random   = RandEffTerm,
+        correlation = CorrEffect,
+        MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+        MM_weight   = nlme::varComb(
          nlme:: varFixed( ~ 1 / AllModelWeights)
-        )
+        ),
+        debug       = TRUE
       )
 
       windowingNote$'Windowing analysis'$'Final model' = objectf$messages
@@ -253,10 +276,14 @@ PhenStatWindow = function (phenlistObject                                ,
       objectfulw = testDatasetAgeing(
         phenListAgeing = phenlistObject,
         method = method,
+        MM_random   = RandEffTerm,
+        correlation = CorrEffect,
+        MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
         MM_weight = nlme::varComb(
           nlme:: varFixed( ~ 1 / AllModelWeights)
         ),
-        MM_optimise = c(0,1,1)
+        MM_optimise = c(0,1,1),
+        debug       = TRUE
       )
       windowingNote$'Windowing analysis'$'Full model windowed result' = objectfulw$messages
       # Plotting
