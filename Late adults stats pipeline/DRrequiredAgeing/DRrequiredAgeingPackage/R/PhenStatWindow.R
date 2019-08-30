@@ -42,7 +42,7 @@ PhenStatWindow = function (phenlistObject                                ,
   if (method %in% 'MM' &&
       phenlistObject@datasetPL$observation_type %in% 'time_series') {
     RandEffTerm = as.formula('~ 1 | external_sample_id')
-    CorrEffect  = nlme::corSymm()
+    CorrEffect  = nlme::corAR1() #corSymm()
   } else{
     RandEffTerm = as.formula('~ 1 | Batch')
     CorrEffect  = nlme::corCompSymm()
@@ -109,26 +109,25 @@ PhenStatWindow = function (phenlistObject                                ,
   {
     # Full model
     message0('Running the full model before applying windowing ... ')
-    # objectNorm = ModelAgeingWithErrorsAndMessages(
-    #   m2ethod  = method,
-    #   key = 'Initial full model before appliying the windowing',
-    #   name = 'Windowing analysis'
+    # objectNorm = testDatasetAgeing(
+    #   phenListAgeing = phenlistObject,
+    #   method = method,
+    #   MM_random   = RandEffTerm,
+    #   correlation = CorrEffect,
+    #   MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+    #   MM_optimise = c(0, 1, 1),
+    #   debug       = TRUE
     # )
-    objectNorm = testDatasetAgeing(
-      phenListAgeing = phenlistObject,
-      method = method,
-      MM_random   = RandEffTerm,
-      correlation = CorrEffect,
-      MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-      MM_optimise = c(0, 1, 1),
-      debug       = TRUE
-    )
+    ############################### Be careful about this section!
+    objectNorm = object0
+    objectNorm$output$Final.Model = objectNorm$output$Initial.Model
+    ###############################
     windowingNote$'Windowing analysis'$'Fully loaded model' = objectNorm$messages
     #######################################################
     message0('Start windowing ... ')
     #######################################################
     if (is.null(objectNorm$messages)) {
-      obj = objectNorm$output$Final.Model
+      obj = objectNorm$output$Initial.Model
       phenlistObject@datasetPL = nlme::getData(obj) # !important
       ###
       tt = Date2Integer(phenlistObject@datasetPL$Batch)
@@ -227,18 +226,6 @@ PhenStatWindow = function (phenlistObject                                ,
         #we2[-mm] = we2[-mm] * VControls
       }
       message0('Fitting the windowing weights into the optimized PhenStat model ...')
-      # objectf = ModelAgeingWithErrorsAndMessages(
-      #   m2ethod = method,
-      #   key = 'Final windowing model',
-      #   method = method,
-      #   phenList = phenlistObject,
-      #   depVariable = depVariable,
-      #   modelWeight = we2,
-      #   threshold = threshold,
-      #   check = check,
-      #   equation = equation,
-      #   name = 'Windowing analysis'
-      # )
       objectf = testDatasetAgeing(
         phenListAgeing = phenlistObject,
         method = method,
@@ -250,41 +237,25 @@ PhenStatWindow = function (phenlistObject                                ,
         ),
         debug       = TRUE
       )
-
       windowingNote$'Windowing analysis'$'Final model' = objectf$messages
       # Full model windowing
       message0('Fitting the windowing weights into the full PhenStat model ...')
-      # objectfulw = ModelAgeingWithErrorsAndMessages(
-      #   m2ethod = method,
-      #   key = 'Full model windowing',
+        # objectfulw = testDatasetAgeing(
+      #   phenListAgeing = phenlistObject,
       #   method = method,
-      #   phenList = phenlistObject,
-      #   depVariable = depVariable,
-      #   modelWeight = we2,
-      #   threshold = threshold,
-      #   check    = check,
-      #   equation = equation,
-      #   name     = 'Windowing analysis',
-      #   keepList =  c(
-      #     keep_batch        = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Batch', checkLevels = FALSE),
-      #     keep_equalvar     = TRUE,
-      #     keep_weight       = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Weight'),
-      #     keep_sex          = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Sex'),
-      #     keep_interaction  = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Sex')
-      #   )
+      #   MM_random   = RandEffTerm,
+      #   correlation = CorrEffect,
+      #   MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+      #   MM_weight = nlme::varComb(
+      #     nlme:: varFixed( ~ 1 / AllModelWeights)
+      #   ),
+      #   MM_optimise = c(0,1,1),
+      #   debug       = TRUE
       # )
-      objectfulw = testDatasetAgeing(
-        phenListAgeing = phenlistObject,
-        method = method,
-        MM_random   = RandEffTerm,
-        correlation = CorrEffect,
-        MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-        MM_weight = nlme::varComb(
-          nlme:: varFixed( ~ 1 / AllModelWeights)
-        ),
-        MM_optimise = c(0,1,1),
-        debug       = TRUE
-      )
+      ############################### Be careful about this section!
+      objectfulw = objectf
+      objectfulw$output$Final.Model = objectfulw$output$Initial.Model
+      ###############################
       windowingNote$'Windowing analysis'$'Full model windowed result' = objectfulw$messages
       # Plotting
       args = list(
