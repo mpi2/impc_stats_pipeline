@@ -609,7 +609,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         RawoutputFile0 = comRes$file
                       }
                     }
-                    note$'Input file'           = relativePath(path = file, reference  = wd)
+                    note$'Input file'             = relativePath(path = file, reference  = wd)
                     note$'Exported raw data file' = relativePath(path = if (storeRawData) {
                       RawoutputFile0
                     } else{

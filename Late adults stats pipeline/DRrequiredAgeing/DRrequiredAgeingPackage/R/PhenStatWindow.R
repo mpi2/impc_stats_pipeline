@@ -56,14 +56,24 @@ PhenStatWindow = function (phenlistObject                                ,
   ## I checked the source and the messaging mechanism is written using the non-standard functioning in R
   note = windowingNote = graphFileName = object0 = NULL
   message0(method, ' in progress ....')
-  object0 =   PhenStatAgeing::testDatasetAgeing(
-    phenListAgeing = phenlistObject,
-    method      = method,
-    MM_random   = RandEffTerm,
-    correlation = CorrEffect,
-    MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-    debug       = TRUE
-  )
+  if (!method %in% 'FE') {
+    object0 =   PhenStatAgeing::testDatasetAgeing(
+      phenListAgeing = phenlistObject,
+      method      = method,
+      MM_random   = RandEffTerm,
+      correlation = CorrEffect,
+      MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+      debug       = TRUE
+    )
+  } else{
+    object0 =   PhenStatAgeing::testDatasetAgeing(
+      phenListAgeing = phenlistObject,
+      method      = method,
+      MM_random   = RandEffTerm,
+      MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+      debug       = TRUE
+    )
+  }
   note$'Normal analysis'$'Step 1-1 messages' = object0$messages
   # If not possible use MM (only for ABR)
   if (is.ABR  (x            = parameter) &&
