@@ -412,7 +412,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       ifelse(
                         is.numeric(n3.5[, depVar]),
                         as.numeric(initial$min_num_mut_each_sex),
-                        2
+                        0
                       )
                     )
 
