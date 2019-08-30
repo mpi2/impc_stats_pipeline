@@ -55,6 +55,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       ChunkSize              = 24          ,
                       MinColoniesInChunks    = 32          ,
                       controlSize            = 1500        ,
+                      ### Just for Ageing Batch GEnerator  ,
+                      combineEAandLA        = FALSE        ,
                       ### Just for debuging
                       superDebug             = FALSE       ,
                       extraBatchParameters   = '-m "rh7-hosts-ebi5-12 rh7-hosts-ebi5-13 rh7-hosts-ebi5-14 rh7-hosts-ebi5-15 rh7-hosts-ebi5-16 rh7-hosts-ebi5-17 rh7-hosts-ebi5-18 rh7-hosts-ebi5-19 rh7-hosts-ebi5-20 rh7-hosts-ebi5-24 rh7-hosts-ebi5-25 rh7-hosts-ebi5-26 rh7-hosts-ebi5-27 rh7-hosts-ebi6-00 rh7-hosts-ebi6-01 rh7-hosts-ebi6-02 rh7-hosts-ebi6-03 rh7-hosts-ebi6-04 rh7-hosts-ebi6-05 rh7-hosts-ebi6-06 rh7-hosts-ebi6-07 rh7-hosts-ebi6-08 rh7-hosts-ebi6-09 rh7-hosts-ebi6-10 rh7-hosts-ebi6-11 rh7-hosts-ebi6-12 rh7-hosts-ebi6-13 rh7-hosts-ebi6-14 rh7-hosts-ebi6-15 rh7-hosts-ebi6-16 rh7-hosts-ebi6-17"',
@@ -169,10 +171,10 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
       outP      = list()
       n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
       ############## Read The Ageing parameters from Solr
-      if(BatchProducer)
+      if(BatchProducer && combineEAandLA)
         n3.0 = getEarlyAdultsFromParameterStableIds(LA_parameter_stable_id = parameter,
-                                                   map      = EA2LAMApping,
-                                                   LA_data  =  n3.0)
+                                                    map      = EA2LAMApping,
+                                                    LA_data  =  n3.0)
       if(is.null(n3.0))
         next
       ##############
@@ -319,7 +321,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     length(colonys),
                     sep = ']~>['
                   ),
-                  ']\n'
+                  ']'
                 )
                 ### Single or multiple cores?
                 `%activemulticore%` = ifelse (activateMulticore &&
@@ -454,7 +456,15 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                                                              depVar = depVar,
                                                              label  = 'Raw data summary statistics')
                     note         = c(note, n3.5_summary)
-
+                    if (CheckIfNameExistInDataFrame(n3.5, 'LifeStage')) {
+                      LifeStageTable = table(n3.5$LifeStage)
+                      message0('LifeStage Summary: ',paste(
+                        names(LifeStageTable),
+                        LifeStageTable       ,
+                        sep      = ':'       ,
+                        collapse = ', '
+                      ))
+                    }
                     # Remove zero frequency categories
                     n3.5.1_F_list = RemoveZeroFrequencyCategories(
                       x               = n3.5,
