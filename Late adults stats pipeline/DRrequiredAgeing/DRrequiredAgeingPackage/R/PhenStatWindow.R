@@ -56,7 +56,7 @@ PhenStatWindow = function (phenlistObject                                ,
   ## I checked the source and the messaging mechanism is written using the non-standard functioning in R
   note = windowingNote = graphFileName = object0 = NULL
   message0(method, ' in progress ....')
-  if (!method %in% 'FE') {
+  if (method %in% 'MM') {
     object0 =   PhenStatAgeing::testDatasetAgeing(
       phenListAgeing = phenlistObject,
       method      = method,
