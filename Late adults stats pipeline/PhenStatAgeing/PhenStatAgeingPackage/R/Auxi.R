@@ -1032,10 +1032,10 @@ checkTableForFisherTest = function(xtb, asset = NULL) {
 		}
 	}
 	if (length(dim0(xtb)) < 2                      ||
-			sum(margin.table(xtb, margin = 2) > 0) < 2 ||
-			sum(margin.table(xtb, margin = 1) > 0) < 2) {
+			(sum(margin.table(xtb, margin = 2) > 0) < 2 &&
+			 sum(margin.table(xtb, margin = 1) > 0) < 2)) {
 		message = c(message,
-								'No variation in al least two levels of one or more categories')
+								'Contingency table with one level only or sum of margins less than 2')
 		return(list(passed   = FALSE  ,
 								note     = message))
 	}
