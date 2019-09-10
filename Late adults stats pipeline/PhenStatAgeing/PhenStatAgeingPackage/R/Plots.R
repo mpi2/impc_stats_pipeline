@@ -136,7 +136,7 @@ plot.PhenStatAgeingMM = function (x                   ,
 	
 	predR            = predict(fm)
 	residR           = resid(fm)
-	residShapiroTest = shapiro.test0(residR)
+	residShapiroTest = normality.test0(residR)
 	n                = length(na.omit(residR))
 	plot(
 		predR ,

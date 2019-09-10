@@ -2527,7 +2527,7 @@ SummaryStats = function(x,
 				'Count' = c                       ,
 				'Mean' = m                        ,
 				'SD' = sd                         ,
-				'Normality test' = head(shapiro.test0(xx), 3)
+				'Normality test' = head(normality.test0(xx), 3)
 			)
 		} else{
 			c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
@@ -2716,28 +2716,51 @@ rndProce = function(procedure = NULL) {
 	return(random)
 }
 
-shapiro.test0 = function(x, ...) {
+
+
+normality.test0 = function(x, ...) {
 	if (!is.null(x)                     &&
 			is.numeric(x)                   &&
-			length(x)           > 3         &&
-			length(x)         < 5000        &&
-			length(unique(na.omit(x))) > 3  &&
+			length(x)         > 3           &&
 			!is.na(sd0(x, na.rm = TRUE))    &&
+			length(unique(na.omit(x))) > 3  &&
 			sd0(x, na.rm = TRUE)             > 0) {
-		r = list(
-			'P-value'  = shapiro.test(x)$p.value   ,
-			'N'        = length(x)                 ,
-			'Unique N' = length(unique(na.omit(x))),
-			'SD'       = sd0(x, na.rm = TRUE)      ,
-			'Test'     = 'Shapiro'
-		)
+		#################### Shapiro
+		if (length(x) < 5000) {
+			r = list(
+				'P-value'  = shapiro.test(x, ...)$p.value   ,
+				'N'        = length(x)                      ,
+				'Unique N' = length(unique(na.omit(x)))     ,
+				'SD'       = sd0(x, na.rm = TRUE)           ,
+				'Test'     = 'Shapiro'                      ,
+				'Note'     = 'Caution requires when too many duplicates found in data'
+			)
+		} else {
+			#################### Kolmogorov-Smirnov
+			r = list(
+				'P-value'  = ks.test(
+					x = jitter(
+						x      = x,
+						amount = 6 + PhenStatAgeing:::decimalplaces(x = min(x, na.rm = TRUE))
+					)                                       ,
+					y = 'pnorm'                             ,
+					alternative = 'two.sided'               ,
+					...
+				)$p.value                                 ,
+				'N'        = length(x)                    ,
+				'Unique N' = length(unique(na.omit(x)))   ,
+				'SD'       = sd0(x, na.rm = TRUE)         ,
+				'Test'     = 'Kolmogorov-Smirnov'         ,
+				'Note'     = 'Small jitter (6 + minimum precision) added to possible ties (duplicates)'
+			)
+		}
 	} else{
 		r = list(
-			'P-value'  = NULL                                                               ,
-			'N'        = length(x)                                                          ,
-			'Unique N' = length(unique(na.omit(x)))                                         ,
-			'SD'       = sd0(x, na.rm = TRUE)                                               ,
-			'Test'     = 'Not possible (Possible cause:n < 3 or n > 5000 unique data points'
+			'P-value'  = NULL                           ,
+			'N'        = length(x)                      ,
+			'Unique N' = length(unique(na.omit(x)))     ,
+			'SD'       = sd0(x, na.rm = TRUE)           ,
+			'Test'     = 'No test applied to this data. Please check the data for possible QC issues'
 		)
 	}
 	return(r)
@@ -2770,7 +2793,7 @@ QuyalityTests = function(object,
 			cmb = combn(x = levels, i)
 			for (j in 1:ncol(cmb)) {
 				result = tapply(r, as.list(d[, cmb[, j], drop = FALSE]), function(x) {
-					shapiro.test0(x)
+					normality.test0(x)
 				})
 				if (!is.null(result)) {
 					flst[[counter]] = result
@@ -2779,7 +2802,7 @@ QuyalityTests = function(object,
 				}
 			}
 		}
-		flst$Overall =  shapiro.test0(x = r)
+		flst$Overall =  normality.test0(x = r)
 		if (list) {
 			flst = as.list(lapply(flst, function(f) {
 				r = f
