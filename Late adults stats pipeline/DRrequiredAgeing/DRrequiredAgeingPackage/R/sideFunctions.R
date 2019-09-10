@@ -2063,7 +2063,7 @@ WriteToDB = function(df,
   }
 }
 
-FinalJsonBobectCreator = function(FinalList,
+FinalJson2ObjectCreator = function(FinalList,
                                   null = 'null',
                                   na = 'null' ,
                                   auto_unbox = TRUE,
@@ -2081,6 +2081,18 @@ FinalJsonBobectCreator = function(FinalList,
       }
     }
   )
+
+  FinalList = replaceInList(
+    FinalList,
+    FUN  = function(x) {
+      if (!is.null(x) && any(is.infinite(x))) {
+        x[is.infinite(x)] = sign(x[is.infinite(x)])*10^16
+      } else{
+        x
+      }
+    }
+  )
+
   if (removeSpecialsFromNames)
     FinalList = LowerandRemoveSpecials(FinalList)
   for (i in 1:rep) {

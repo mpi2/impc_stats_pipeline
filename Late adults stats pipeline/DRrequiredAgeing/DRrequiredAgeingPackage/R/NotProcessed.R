@@ -107,7 +107,7 @@ NotProcessedOutput = function(args) {
   )))
   listVectorOutput        = list('Vector output' = NULL)
   FinalList               = list('Result' = c(listVectorOutput, cleanNULLkeys(listDetails)))
-  JsonObj                 = FinalJsonBobectCreator(FinalList = FinalList)
+  JsonObj                 = FinalJson2ObjectCreator(FinalList = FinalList)
   ######## 3 CSV
   optFail =   c(
     unlist(experiment_details),
