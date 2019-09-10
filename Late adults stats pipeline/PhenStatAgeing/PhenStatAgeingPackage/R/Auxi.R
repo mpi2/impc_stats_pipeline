@@ -750,13 +750,27 @@ colExists = function(name, data) {
 	}
 }
 
-listFun = function(list, FUN, debug = FALSE) {
+listFun = function(list                    ,
+									 FUN                     ,
+									 debug = FALSE           ,
+									 messageUnusedArgs = FALSE) {
 	if (debug)
 		message0('\tApplied model: ', FUN)
 	fArgs = names(list) %in% formalArgs(args(FUN))
+	if (messageUnusedArgs &&
+			debug             &&
+			!identical(list[names(list)[fArgs]], list)) {
+		message0(
+			'Unused argument(s) in the function input. See:\n\t',
+			pasteComma(names(list)[!fArgs],
+								 truncate = TRUE    ,
+								 width    = 75)
+		)
+	}
 	l     = list[names(list)[fArgs]]
 	return(l)
 }
+
 RandomEffectCheck = function(formula, data) {
 	if (is.null(formula) || is.null(data))
 		return(NULL)
@@ -1046,8 +1060,10 @@ checkTableForFisherTest = function(xtb, asset = NULL) {
 # Bulletproof fisher.test
 fisher.test0 = function(x, formula, ci_levels, ...) {
 	r = tryCatch(
-		fisher.test(x,
-								...),
+		do.call(fisher.test, listFun(
+			list = list(x = x, ...),
+			FUN  = fisher.test
+		)),
 		error = function(e) {
 			message0(e, breakLine = FALSE)
 			return(NULL)
@@ -2209,17 +2225,17 @@ intervalsCon = function(object, lvls, ...) {
 					...
 				),
 				error = function(e) {
-					message0('\t\t ~> Error in estimating the confidence intervals for `',
+					message0('\t  ~> Error in estimating the confidence intervals for `',
 									 citerm,
 									 '` term(s)')
-					#message0('\t\t ~> ', e, breakLine = FALSE)
+					#message0('\t ~> ', e, breakLine = FALSE)
 					return(NULL)
 				} ,
 				warning = function(w) {
-					message0('\t\t ~> Error in estimating the confidence intervals for `',
+					message0('\t  ~> Error in estimating the confidence intervals for `',
 									 citerm,
 									 '` term(s)')
-					#message0('\t\t ~> ', w, breakLine = FALSE)
+					#message0('\t ~> ', w, breakLine = FALSE)
 					return(NULL)
 				}
 			)
@@ -2741,7 +2757,7 @@ normality.test0 = function(x, ...) {
 				'P-value'  = ks.test(
 					x = jitter(
 						x      = x,
-						amount = 6 + PhenStatAgeing:::decimalplaces(x = min(x, na.rm = TRUE))
+						amount = 6 + decimalplaces(x = min(x, na.rm = TRUE))
 					)                                       ,
 					y = 'pnorm'                             ,
 					alternative = 'two.sided'               ,

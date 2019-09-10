@@ -22,7 +22,7 @@ importFrom("nlme", "lme","gls","getData","lmeControl","glsControl")
 importFrom("stats", "qqline")
 importFrom("stats", "coef", "dist", "glm.control", "quantile", "runif",
                "setNames", "shapiro.test", "update.formula", "var")
-importFrom("stats", "delete.response", "terms.formula")
+importFrom("stats", "delete.response", "terms.formula", "ks.test")
 importFrom("MASS", "stepAIC","addterm")
 importFrom("stats", "deviance", "extractAIC", "factor.scope", "nobs")
 importFrom("stats", "drop.scope","model.matrix")

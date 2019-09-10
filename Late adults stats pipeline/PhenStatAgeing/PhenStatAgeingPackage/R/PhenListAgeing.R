@@ -301,7 +301,7 @@ checkDataset = function(dataset,
 			message0(
 				'No observations detected in ',
 				MakeCaptionFromNamesAndIndecis(name = names(dataset), index = coNames),
-				' for:\n\t ',
+				' for:\n\t',
 				pasteComma(names(tbGSL[tbGSL < 1]), truncate = FALSE, sep = ',\n\t')
 			)
 		dataset = droplevels(dataset[InGS %in% names(tbGSL[tbGSL >= 1]), , drop = FALSE])

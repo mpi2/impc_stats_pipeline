@@ -56,24 +56,14 @@ PhenStatWindow = function (phenlistObject                                ,
   ## I checked the source and the messaging mechanism is written using the non-standard functioning in R
   note = windowingNote = graphFileName = object0 = NULL
   message0(method, ' in progress ....')
-  if (method %in% 'MM') {
-    object0 =   PhenStatAgeing::testDatasetAgeing(
-      phenListAgeing = phenlistObject,
-      method      = method,
-      MM_random   = RandEffTerm,
-      correlation = CorrEffect,
-      MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-      debug       = TRUE
-    )
-  } else{
-    object0 =   PhenStatAgeing::testDatasetAgeing(
-      phenListAgeing = phenlistObject,
-      method      = method,
-      MM_random   = RandEffTerm,
-      MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-      debug       = TRUE
-    )
-  }
+  object0 =   PhenStatAgeing::testDatasetAgeing(
+    phenListAgeing = phenlistObject,
+    method      = method,
+    MM_random   = RandEffTerm,
+    correlation = CorrEffect,
+    MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+    debug       = TRUE
+  )
   note$'Normal analysis'$'Step 1-1 messages' = object0$messages
   # If not possible use MM (only for ABR)
   if (is.ABR  (x            = parameter) &&
@@ -243,14 +233,14 @@ PhenStatWindow = function (phenlistObject                                ,
         correlation = CorrEffect,
         MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
         MM_weight   = nlme::varComb(
-         nlme:: varFixed( ~ 1 / AllModelWeights)
+          nlme:: varFixed( ~ 1 / AllModelWeights)
         ),
         debug       = TRUE
       )
       windowingNote$'Windowing analysis'$'Final model' = objectf$messages
       # Full model windowing
       message0('Fitting the windowing weights into the full PhenStat model ...')
-        # objectfulw = testDatasetAgeing(
+      # objectfulw = testDatasetAgeing(
       #   phenListAgeing = phenlistObject,
       #   method = method,
       #   MM_random   = RandEffTerm,
