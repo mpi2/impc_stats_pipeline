@@ -536,7 +536,7 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
       solrBaseURL,
       '/solr/experiment/select?q=*:*',
       '&fl=',
-      paste(sort(DRrequired:::requiredDataColumns(0)), collapse = ','),
+      paste(sort(DRrequiredAgeing:::requiredDataColumns(0)), collapse = ','),
       '&fq=datasource_name:IMPC*&fq=observation_type:(',
       paste(
         '"',
@@ -1156,21 +1156,16 @@ SummaryStatisticsOriginal = function(x,
   isNumeric = is.numeric(x[, depVar])
   summaryT   = as.list(tapply(x[, depVar], INDEX = lvls, function(xx) {
     if (isNumeric) {
-      c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
-      m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE) , NA)
-      sd = ifelse(length(na.omit(xx)) > 0, sd0(xx, na.rm = TRUE)  , NA)
+      c        = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
+      m        = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE) , NA)
+      sd       = ifelse(length(na.omit(xx)) > 0, sd0(xx, na.rm = TRUE)  , NA)
+      NormTest = head(PhenStatAgeing:::normality.test0(xx), 3)
       r = list(
-        'Count' = c                       ,
-        'Mean' = m                        ,
-        'SD' = sd                         ,
-        'Normality test p-val' = ifelse(
-          length(xx)           > 3    &&
-            length(unique(xx)) > 3    &&
-            length(xx)         < 5000 &&
-            var(xx,na.rm = TRUE)!= 0,
-          shapiro.test(xx)$p.value,
-          'Not possible(Possible cause: n<3 or n>5000 unique data points'
-        )
+        'Count' = c                                 ,
+        'Mean'  = m                                 ,
+        'SD'    = sd                                ,
+        'Normality test p-val' = NormTest$`P-value` ,
+        'Test' = NormTest$Test
       )
     } else{
       c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
@@ -1179,17 +1174,17 @@ SummaryStatisticsOriginal = function(x,
     return(r)
   }, default = -999.991233210123))
   ##
-  fTmp = function(isNum) {
-    if (isNum) {
-      r = list('Count' = 0,
-               'Mean' = NA,
-               'SD' = NA)
-    } else{
-      r = list('Count' = 0)
-    }
-    return(r)
-  }
-  summaryT[summaryT %in% c(-999.991233210123)] = fTmp(isNum = isNumeric)
+  # fTmp = function(isNum) {
+  #   if (isNum) {
+  #     r = list('Count' = 0,
+  #              'Mean' = NA,
+  #              'SD' = NA)
+  #   } else{
+  #     r = list('Count' = 0)
+  #   }
+  #   return(r)
+  # }
+  # summaryT[summaryT %in% c(-999.991233210123)] = fTmp(isNum = isNumeric)
 
   if (lower)
     nnames = tolower(names(summaryT))

@@ -2747,6 +2747,7 @@ normality.test0 = function(x, ...) {
 				'P-value'  = shapiro.test(x, ...)$p.value   ,
 				'N'        = length(x)                      ,
 				'Unique N' = length(unique(na.omit(x)))     ,
+				'Mean'     = mean(x,na.rm = TRUE)           ,
 				'SD'       = sd0(x, na.rm = TRUE)           ,
 				'Test'     = 'Shapiro'                      ,
 				'Note'     = 'Caution requires when too many duplicates found in data'
@@ -2765,6 +2766,7 @@ normality.test0 = function(x, ...) {
 				)$p.value                                 ,
 				'N'        = length(x)                    ,
 				'Unique N' = length(unique(na.omit(x)))   ,
+				'Mean'     = mean(x,na.rm = TRUE)         ,
 				'SD'       = sd0(x, na.rm = TRUE)         ,
 				'Test'     = 'Kolmogorov-Smirnov'         ,
 				'Note'     = 'Small jitter (6 + minimum precision) added to possible ties (duplicates)'
@@ -2775,7 +2777,8 @@ normality.test0 = function(x, ...) {
 			'P-value'  = NULL                           ,
 			'N'        = length(x)                      ,
 			'Unique N' = length(unique(na.omit(x)))     ,
-			'SD'       = sd0(x, na.rm = TRUE)           ,
+			'Mean'     = ifelse(is.numeric(x), mean(x, na.rm = TRUE), NULL), 
+			'SD'       = ifelse(is.numeric(x), sd0 (x, na.rm = TRUE), NULL), 
 			'Test'     = 'No test applied to this data. Please check the data for possible QC issues'
 		)
 	}
