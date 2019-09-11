@@ -2539,11 +2539,12 @@ SummaryStats = function(x,
 			c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
 			m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE), NA)
 			sd = ifelse(length(na.omit(xx)) > 0, sd0 (xx, na.rm = TRUE), NA)
+			normTest = normality.test0(xx)
 			r = list(
 				'Count' = c                       ,
 				'Mean' = m                        ,
 				'SD' = sd                         ,
-				'Normality test' = head(normality.test0(xx), 3)
+				'Normality test' = normTest
 			)
 		} else{
 			c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
@@ -2745,8 +2746,8 @@ normality.test0 = function(x, ...) {
 		if (length(x) < 5000) {
 			r = list(
 				'P-value'  = shapiro.test(x, ...)$p.value   ,
-				'N'        = length(x)                      ,
 				'Unique N' = length(unique(na.omit(x)))     ,
+				'N'        = length(x)                      ,
 				'Mean'     = mean(x,na.rm = TRUE)           ,
 				'SD'       = sd0(x, na.rm = TRUE)           ,
 				'Test'     = 'Shapiro'                      ,
@@ -2764,8 +2765,8 @@ normality.test0 = function(x, ...) {
 					alternative = 'two.sided'               ,
 					...
 				)$p.value                                 ,
-				'N'        = length(x)                    ,
 				'Unique N' = length(unique(na.omit(x)))   ,
+				'N'        = length(x)                    ,
 				'Mean'     = mean(x,na.rm = TRUE)         ,
 				'SD'       = sd0(x, na.rm = TRUE)         ,
 				'Test'     = 'Kolmogorov-Smirnov'         ,
@@ -2775,11 +2776,12 @@ normality.test0 = function(x, ...) {
 	} else{
 		r = list(
 			'P-value'  = NULL                           ,
-			'N'        = length(x)                      ,
 			'Unique N' = length(unique(na.omit(x)))     ,
+			'N'        = length(x)                      ,
 			'Mean'     = ifelse(is.numeric(x), mean(x, na.rm = TRUE), NULL), 
 			'SD'       = ifelse(is.numeric(x), sd0 (x, na.rm = TRUE), NULL), 
-			'Test'     = 'No test applied to this data. Please check the data for possible QC issues'
+			'Test'     = 'No test applied to this data. Please check the data for possible QC issues',
+			'Note'     = NULL
 		)
 	}
 	return(r)
