@@ -1165,7 +1165,7 @@ SummaryStatisticsOriginal = function(x,
         'Mean'  = m                                 ,
         'SD'    = sd                                ,
         'Normality test p-val' = NormTest$`P-value` ,
-        'Test' = NormTest$Test
+        'Test' = NormTest$`Test`
       )
     } else{
       c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
@@ -1185,7 +1185,6 @@ SummaryStatisticsOriginal = function(x,
   #   return(r)
   # }
   # summaryT[summaryT %in% c(-999.991233210123)] = fTmp(isNum = isNumeric)
-
   if (lower)
     nnames = tolower(names(summaryT))
   else
