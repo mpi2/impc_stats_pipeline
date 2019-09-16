@@ -28,7 +28,7 @@ M.opt = function(object = NULL            ,
 	lCont       = lmeControl (opt       = 'optim',
 														maxIter   = 1500   ,
 														msMaxIter = 1500   
-														)
+	)
 	gCont       = glsControl (
 		opt         = 'optim',
 		singular.ok = TRUE,
@@ -41,111 +41,123 @@ M.opt = function(object = NULL            ,
 	data          = RemoveDuplicatedColumnsFromDf(x = object@datasetPL, formula = fixed)
 	n             = nrow(data)
 	fixed         = ModelChecks(fixed = fixed,
-														data  = data  ,
-														checks = checks)
+															data  = data  ,
+															checks = checks)
 	CheckedRandom = RandomEffectCheck(formula = random,
 																		data    = data)
 	allVars       = all_vars0(fixed)
 	LifeStage     = 'LifeStage' %in% allVars
+	##################
 	Batch_exist   = !categorical && !is.null(CheckedRandom) 
-	mdl           = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls'))
-	message0(mdl, ': Fitting the full model ... ')
-	# Just for rounding the full model errors
 	initialFixed  = fixed
-	fixedTerms    = formulaTerms(initialFixed)
-	for (i in 1:length(fixedTerms)) {
-		I.Model    = tryCatch(
-			expr     = do.call(mdl,
-												 listFun(
-												 	list = list(
-												 		model     = if (mdl == 'glm') {
-												 			TRUE
-												 		} else{
-												 			fixed
-												 		},
-												 		fixed     = fixed  ,
-												 		formula   = fixed  ,
-												 		family    = family ,
-												 		random    = CheckedRandom ,
-												 		data      = data   ,
-												 		na.action = na.omit,
-												 		method    = ifelse(mdl == 'glm', 'glm.fit', 'ML'),
-												 		weights   = if    (mdl != 'glm') {
-												 			weight
-												 		} else{
-												 			NULL
-												 		},
-												 		control   = if (Batch_exist) {
-												 			lCont
-												 		} else{
-												 			if (categorical)
-												 				glCont
-												 			else
-												 				gCont
-												 		},
-												 		...
-												 	),
-												 	FUN = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls')),
-												 	debug = TRUE
-												 )),
-			warning = function(war) {
-				message0('* The full model failed with the warning (see below): ')
-				message0('\t', war, breakLine = FALSE)
-				return(NULL)
-			},
-			error = function(err) {
-				message0('* The full model failed with the error (see below): ')
-				message0('\t', err, breakLine = FALSE)
-				return(NULL)
-			}
-		)
-		###########
-		if (is.null(I.Model)) {
-			removedTerm = fixedTerms[length(fixedTerms) -	(i - 1)]
-			ltemp       = ModelInReference(model = lower, reference = fixed)
-			if (!is.null(lower) &&
-					!is.null(fixed) &&
-					!is.null(ltemp) &&
-					removedTerm %in% formulaTerms(ltemp)) {
-				message0(
-					'The following term did not removed: ',
-					removedTerm,
-					'\n\t the terms below will not remove from the model:\n\t ',
-					printformula(formulaTerms(ltemp))
-				)
-				next
-			}
-			fixed       = update.formula(old         = initialFixed       ,
-																	 new         = reformulate0(
-																	 	response   = '.'                ,
-																	 	termlabels = c('.', removedTerm),
-																	 	sep        = '-'
-																	 ))
-			message0(
-				'Round ',
-				i,
-				' of fixing the error. The followeing term will be removed: ',
-				removedTerm,
-				'\n\tNew formula: ',
-				printformula(fixed)
+	Imdl          = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls'))
+	##################
+	for(mdl in unique(c(Imdl, 'gls'))) {
+		message0(mdl, ': Fitting the full model ... ')
+		fixed         = initialFixed
+		fixedTerms    = formulaTerms(initialFixed)
+		for (i in 1:length(fixedTerms)) {
+			I.Model    = tryCatch(
+				expr     = do.call(mdl,
+													 listFun(
+													 	list = list(
+													 		model     = if (mdl == 'glm') {
+													 			TRUE
+													 		} else{
+													 			fixed
+													 		},
+													 		fixed     = fixed  ,
+													 		formula   = fixed  ,
+													 		family    = family ,
+													 		random    = CheckedRandom ,
+													 		data      = data   ,
+													 		na.action = na.omit,
+													 		method    = ifelse(mdl == 'glm', 'glm.fit', 'ML'),
+													 		weights   = if (mdl != 'glm') {
+													 			weight
+													 		} else{
+													 			NULL
+													 		},
+													 		control   = if (Batch_exist) {
+													 			lCont
+													 		} else{
+													 			if (categorical)
+													 				glCont
+													 			else
+													 				gCont
+													 		},
+													 		...
+													 	),
+													 	FUN = ifelse(Batch_exist, 'lme', ifelse(categorical, 'glm', 'gls')),
+													 	debug = TRUE
+													 )),
+				warning = function(war) {
+					message0('* The full model failed with the warning (see below): ')
+					message0('\t', war, breakLine = FALSE)
+					return(NULL)
+				},
+				error = function(err) {
+					message0('* The full model failed with the error (see below): ')
+					message0('\t', err, breakLine = FALSE)
+					return(NULL)
+				}
 			)
-		} else{
-			message0('\tThe full model successfully applied.')
+			###########
+			if (is.null(I.Model)) {
+				removedTerm = fixedTerms[length(fixedTerms) -	(i - 1)]
+				ltemp       = ModelInReference(model = lower, reference = fixed)
+				if (!is.null(lower) &&
+						!is.null(fixed) &&
+						!is.null(ltemp) &&
+						removedTerm %in% formulaTerms(ltemp)) {
+					message0(
+						'The following term did not removed: ',
+						removedTerm,
+						'\n\t the terms below will not remove from the model:\n\t ',
+						printformula(formulaTerms(ltemp))
+					)
+					next
+				}
+				fixed       = update.formula(old         = initialFixed       ,
+																		 new         = reformulate0(
+																		 	response   = '.'                ,
+																		 	termlabels = c('.', removedTerm),
+																		 	sep        = '-'
+																		 ))
+				message0(
+					'Round ',
+					i,
+					' of fixing the error. The followeing term will be removed: ',
+					removedTerm,
+					'\n\tNew formula: ',
+					printformula(fixed)
+				)
+			} else{
+				message0('\tThe full model successfully applied.')
+				break
+			}
+		}
+		if (!is.null(I.Model))
 			break
+		if (Batch_exist && is.null(I.Model) && mdl %in% 'lme') {
+			message0(mdl, ' failed. Retrying with a different model ...')
+			Batch_exist = FALSE
 		}
 	}
 	###########
 	if (is.null(I.Model))
 		message0('Full model failed ...')
-	###########
-	I.Model  = intervalsCon (object = I.Model, lvls = ci_levels)
-	###########
-	message0('The specified "lower" model: \n\t',
-					 ifelse(!is.null(lower), printformula(lower), 'Null lower'))
-	lowerCorrected = ModelInReference(model = lower, reference = fixed)
-	###########
-	optimiseMessage (optimise)
-	if (optimise[1] && !is.null(I.Model) && !is.null(lowerCorrected)) {
+	else{
+		###########
+		I.Model  = intervalsCon (object = I.Model, lvls = ci_levels)
+		###########
+		message0('The specified "lower" model: \n\t',
+						 ifelse(!is.null(lower), printformula(lower), 'Null lower'))
+		lowerCorrected = ModelInReference(model = lower, reference = fixed)
+		###########
+		optimiseMessage (optimise)
+	}
+	if (!is.null(I.Model) && optimise[1] && !is.null(lowerCorrected)) {
 		message0('\tThe direction of the optimisation (backward, forward, both): ', direction)
 		message0('\tOptimising the model ... ')
 		F.Model = tryCatch(

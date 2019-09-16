@@ -40,8 +40,8 @@ PhenStatWindow = function (phenlistObject                                ,
   requireNamespace('nlme')
   set.seed(seed)
   if (method %in% 'MM' &&
-      phenlistObject@datasetPL$observation_type %in% 'time_series') {
-    RandEffTerm = as.formula('~ 1 | external_sample_id')
+      unique(phenlistObject@datasetPL$observation_type) %in% 'time_series') {
+    RandEffTerm = as.formula('~ 1 | external_sample_id/Batch')
     CorrEffect  = nlme::corAR1() #corSymm()
   } else{
     RandEffTerm = as.formula('~ 1 | Batch')
@@ -126,7 +126,7 @@ PhenStatWindow = function (phenlistObject                                ,
     #######################################################
     message0('Start windowing ... ')
     #######################################################
-    if (is.null(objectNorm$messages)) {
+    if (!is.null(objectNorm$output$Initial.Model)) {
       obj = objectNorm$output$Initial.Model
       phenlistObject@datasetPL = nlme::getData(obj) # !important
       ###

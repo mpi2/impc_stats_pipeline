@@ -175,7 +175,7 @@ TypicalModel = function(depVariable,
 		fixed = update(fixed,  reformulate(response = NULL,	termlabels = c('.', others)))
 	####
 	if (debug)
-		message0('Initial  model: ', printformula(fixed))
+		message0('Initial model: ', printformula(fixed))
 	return(fixed)
 }
 
