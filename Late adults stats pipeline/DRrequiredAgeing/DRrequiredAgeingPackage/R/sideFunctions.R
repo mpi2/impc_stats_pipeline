@@ -1511,11 +1511,15 @@ addBitsToFileName = function(file,
 
 # plot analised data with window
 plot_win = function(phenlistObject, r, depVariable, check, ...) {
-  col = pch = as.factor(interaction(
-    phenlistObject@datasetPL$Genotype,
-    phenlistObject@datasetPL$Sex
-  ))
-  par(mar = c(5.1, 4.1, 4.1, 8.1))
+  requireNamespace('rlist')
+  col = pch = as.factor(interaction(rlist::list.clean(
+    list(
+      phenlistObject@datasetPL$Genotype,
+      phenlistObject@datasetPL$Sex,
+      phenlistObject@datasetPL$LifeStage
+    )
+  )))
+  par(mar = c(5.1, 4.1, 4.1, 9.0))
   requireNamespace('SmoothWin')
   plot(r,
        col = as.integer(col),
@@ -1527,7 +1531,7 @@ plot_win = function(phenlistObject, r, depVariable, check, ...) {
     legend = unique(col),
     col = as.integer(unique(col)),
     pch = as.integer(unique(pch)),
-    inset = c(-.24, 0),
+    inset = c(-.3, 0),
     xpd = TRUE,
     cex = .7
   )
