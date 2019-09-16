@@ -41,11 +41,19 @@ PhenStatWindow = function (phenlistObject                                ,
   set.seed(seed)
   if (method %in% 'MM' &&
       unique(phenlistObject@datasetPL$observation_type) %in% 'time_series') {
-    RandEffTerm = as.formula('~ 1 | external_sample_id/Batch')
+    RandEffTerm =     ifelse(
+      CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'LifeStage'),
+      as.formula('~ 1 | LifeStage/external_sample_id/Batch'),
+      as.formula('~ 1 | external_sample_id/Batch')
+    )
     CorrEffect  = nlme::corAR1() #corSymm()
   } else{
-    RandEffTerm = as.formula('~ 1 | Batch')
-    CorrEffect  = nlme::corCompSymm()
+    RandEffTerm = ifelse(
+      CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'LifeStage'),
+      as.formula('~ 1 | LifeStage/Batch'),
+      as.formula('~ 1 | Batch')
+    )
+    CorrEffect  = NULL
   }
   # Do not remove line below (necessary for windowing)
   phenlistObject@datasetPL = sortDataset(x = phenlistObject@datasetPL, BatchCol =
