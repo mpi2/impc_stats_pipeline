@@ -82,7 +82,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   message0('Machine info:  ', paste(Sys.info(), collapse = ', '))
   message0('Loading dependent packages ...')
   requireNamespace('PhenStat')
-  requireNamespace('PhenStatAgeing'     )
+  requireNamespace('OpenStats'     )
   requireNamespace('doParallel')
   requireNamespace('parallel')
   requireNamespace('foreach')
@@ -348,7 +348,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     'nlme'        ,
                     'RJSONIO'     ,
                     'jsonlite'    ,
-                    'PhenStatAgeing'  ,
+                    'OpenStats'  ,
                     'DRrequiredAgeing',
                     'DBI'
                   ),
@@ -664,7 +664,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     ) {
                       message0('Analysing the dataset in progress ...')
                       message0('Creating PhenListAgeing object ...')
-                      a = PhenStatAgeing::PhenListAgeing(
+                      a = OpenStats::OpenStatsList(
                         n3.5.2,
                         testGenotype             = 'experimental',
                         refGenotype              = 'control',

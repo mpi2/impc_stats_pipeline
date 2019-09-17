@@ -5,7 +5,7 @@
 			'\n >===============================================================================<',
 			'\n OpenStats is developed by International Mouse Phenotyping Consortium (IMPC) '     ,
 			'\n More details           : https://www.mousephenotype.org/                         ',
-			'\n Source code and issues : https://git.io/fj9W3                                    ',
+			'\n Source code and issues : https://git.io/JeOVN                                    ',
 			'\n Contact us             : hamedhm@ebi.ac.uk                                       ',
 			'\n >===============================================================================<'
 		),

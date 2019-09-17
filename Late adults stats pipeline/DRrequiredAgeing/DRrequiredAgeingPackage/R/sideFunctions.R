@@ -334,10 +334,10 @@ concurrentContSelect = function(activate = TRUE,
             message0 ('Concurrent control selection in progress ...')
             PhenListObj@datasetPL = m1
             note$'Concurrent control selection' = paste0(LogicalToNote(activate),
-                                                       ". Single Batch in use")
+                                                         ". Single Batch in use")
           } else{
             note$'Concurrent control selection' = paste0(LogicalToNote(activate),
-                                                       '. Single Batch possible')
+                                                         '. Single Batch possible')
           }
         } else{
           note$'Concurrent control selection' = paste0(
@@ -365,13 +365,13 @@ concurrentContSelect = function(activate = TRUE,
     tb  = table(PhenListObj@datasetPL[, BatchColName])
     if (length(tb) > 1) {
       note$'Concurrent control selection' = paste0(LogicalToNote(activate),
-                                                 '. Multi batch found in data (categorical data)')
+                                                   '. Multi batch found in data (categorical data)')
     } else if (length(tb) == 1) {
       note$'Concurrent control selection' = paste0(LogicalToNote(activate),
-                                                 '. Original mutants in single batch (categorical data)')
+                                                   '. Original mutants in single batch (categorical data)')
     } else{
       note$'Concurrent control selection' = paste0(LogicalToNote(activate),
-                                                 '. But batch not clear. Please check data')
+                                                   '. But batch not clear. Please check data')
     }
   }
   # Part 2 extra checks
@@ -385,7 +385,7 @@ concurrentContSelect = function(activate = TRUE,
       genotype = GenotypeColName
     )
     #PhenListObj@datasetPL = checkNoZeroVar$x
-    PhenListObj = PhenStatAgeing::PhenListAgeing(
+    PhenListObj = OpenStats::OpenStatsList(
       dataset = checkNoZeroVar$x,
       testGenotype = PhenListObjBck@testGenotype,
       refGenotype = PhenListObjBck@refGenotype
@@ -519,10 +519,10 @@ local =  function(x=NULL){
 
 
 getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
-                                               map         = read.csv(file = file.path(local(),
-                                                                                       'EA2LA_parameter_mappings_2019-06-21.csv')),
-                                               LA_data     = NULL,
-                                               solrBaseURL = 'http://hx-noah-74-10:8090') {
+                                                map         = read.csv(file = file.path(local(),
+                                                                                        'EA2LA_parameter_mappings_2019-06-21.csv')),
+                                                LA_data     = NULL,
+                                                solrBaseURL = 'http://hx-noah-74-10:8090') {
   message0('EA-LA binding in progress ...')
   plist = as.character(unique(map$EA_parameter[map$LA_parameter %in% LA_parameter_stable_id]))
 
@@ -618,7 +618,7 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
     replacement =  df$procedure_stable_id[grepl(pattern = f(str = plist[1],
                                                             cut = 2),
                                                 x = df$procedure_stable_id)][1],
-   x            =  df$procedure_stable_id
+    x            =  df$procedure_stable_id
   )
 
   df$procedure_group_renames = df$procedure_group
@@ -1159,7 +1159,7 @@ SummaryStatisticsOriginal = function(x,
       c        = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
       m        = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE) , NA)
       sd       = ifelse(length(na.omit(xx)) > 0, sd0(xx, na.rm = TRUE)  , NA)
-      NormTest = PhenStatAgeing:::normality.test0(xx)
+      NormTest = OpenStats:::normality.test0(xx)
       r = list(
         'Count' = c                                 ,
         'Mean'  = m                                 ,
@@ -1497,9 +1497,9 @@ file.exists0 = function(file, overwrite = FALSE, ...) {
 
 # add bits to file name
 addBitsToFileName = function(file,
-                            bit = '',
-                            sep = '_',
-                            fullpath = TRUE) {
+                             bit = '',
+                             sep = '_',
+                             fullpath = TRUE) {
   if (fullpath)
     file = paste(dirname(file), bit, basename(file), sep = sep)
   else
@@ -1786,26 +1786,26 @@ VectorOutput0 = function(c.ww0,
                          null = 'null') {
   ####
   p1 = if (!NullOrError(c.ww0$NormalObj))
-    PhenStatAgeing::vectorOutputAgeing(c.ww0$NormalObj,
-                                       othercolumns = ExtraCols,
-                                       JSON = FALSE,
-                                       Null = TRUE)
+    OpenStats::OpenStatsReport(c.ww0$NormalObj,
+                               othercolumns = ExtraCols,
+                               JSON = FALSE,
+                               Null = TRUE)
   else
     NULL
   # The second piece (Windowing results)
   if (activeWindowing && !NullOrError(c.ww0$WindowedObj)) {
-    p2 =  PhenStatAgeing::vectorOutputAgeing(c.ww0$WindowedObj  ,
-                                             othercolumns = ExtraCols,
-                                             JSON = FALSE,
-                                             Null = TRUE)
-    p3 =  PhenStatAgeing::vectorOutputAgeing(c.ww0$FullObj  ,
-                                             othercolumns = ExtraCols,
-                                             JSON = FALSE,
-                                             Null = TRUE)
-    p4 =  PhenStatAgeing::vectorOutputAgeing(c.ww0$FullWindowedObj  ,
-                                             othercolumns = ExtraCols,
-                                             JSON = FALSE,
-                                             Null = TRUE)
+    p2 =  OpenStats::OpenStatsReport(c.ww0$WindowedObj  ,
+                                     othercolumns = ExtraCols,
+                                     JSON = FALSE,
+                                     Null = TRUE)
+    p3 =  OpenStats::OpenStatsReport(c.ww0$FullObj  ,
+                                     othercolumns = ExtraCols,
+                                     JSON = FALSE,
+                                     Null = TRUE)
+    p4 =  OpenStats::OpenStatsReport(c.ww0$FullWindowedObj  ,
+                                     othercolumns = ExtraCols,
+                                     JSON = FALSE,
+                                     Null = TRUE)
   } else{
     p2 = p3 = p4 = NULL
   }
@@ -2061,12 +2061,12 @@ WriteToDB = function(df,
 }
 
 FinalJson2ObjectCreator = function(FinalList,
-                                  null = 'null',
-                                  na = 'null' ,
-                                  auto_unbox = TRUE,
-                                  SpecialString = '==!!(:HAMED:)!!==',
-                                  rep = 3,
-                                  removeSpecialsFromNames = FALSE) {
+                                   null = 'null',
+                                   na = 'null' ,
+                                   auto_unbox = TRUE,
+                                   SpecialString = '==!!(:HAMED:)!!==',
+                                   rep = 3,
+                                   removeSpecialsFromNames = FALSE) {
   message0('Forming the JSON object ...')
   FinalList = replaceInList(
     FinalList,
@@ -2134,8 +2134,8 @@ LowerandRemoveSpecials <- function(x)
 
 UnzipAndfilePath = function(file, quiet = TRUE, order = TRUE) {
   if (!grepl(x = basename(file),
-            pattern = '.zip',
-            fixed = TRUE)) {
+             pattern = '.zip',
+             fixed = TRUE)) {
     message0('It is not a zip file:')
     message0('\t', file)
     return(file)

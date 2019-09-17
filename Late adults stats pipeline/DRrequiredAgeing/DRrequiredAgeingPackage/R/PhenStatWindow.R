@@ -36,7 +36,7 @@ PhenStatWindow = function (phenlistObject                                ,
 {
   requireNamespace('PhenStat')
   requireNamespace('SmoothWin')
-  requireNamespace('PhenStatAgeing')
+  requireNamespace('OpenStats')
   requireNamespace('nlme')
   set.seed(seed)
   if (method %in% 'MM' &&
@@ -64,13 +64,13 @@ PhenStatWindow = function (phenlistObject                                ,
   ## I checked the source and the messaging mechanism is written using the non-standard functioning in R
   note = windowingNote = graphFileName = object0 = NULL
   message0(method, ' in progress ....')
-  object0 =   PhenStatAgeing::testDatasetAgeing(
-    phenListAgeing = phenlistObject,
-    method      = method,
-    MM_random   = RandEffTerm,
-    correlation = CorrEffect,
+  object0 =   OpenStats::OpenStatsAnalysis(
+    OpenStatsListObject   = phenlistObject,
+    method                = method,
+    MM_random             = RandEffTerm,
+    correlation           = CorrEffect,
     MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-    debug       = TRUE
+    debug                 = TRUE
   )
   note$'Normal analysis'$'Step 1-1 messages' = object0$messages
   # If not possible use MM (only for ABR)
@@ -79,9 +79,9 @@ PhenStatWindow = function (phenlistObject                                ,
   {
     method = 'MM'
     message0('Running the MM (only ABR) ... ')
-    object0 =   PhenStatAgeing::testDatasetAgeing(
-      phenListAgeing = phenlistObject,
-      method = method,
+    object0 =   OpenStats::OpenStatsAnalysis(
+      OpenStatsListObject = phenlistObject,
+      method              = method,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
       MM_random   = RandEffTerm,
       correlation = CorrEffect,
@@ -95,9 +95,9 @@ PhenStatWindow = function (phenlistObject                                ,
     message0('Running the MM+Jitter (only ABR) ... ')
     method = 'MM'
     phenlistObject@datasetPL[, depVariable] = jitter(phenlistObject@datasetPL[, depVariable], 0.1)
-    object0 =   PhenStatAgeing::testDatasetAgeing(
-      phenListAgeing = phenlistObject,
-      method = method,
+    object0 =   OpenStats::OpenStatsAnalysis(
+      OpenStatsListObject   = phenlistObject,
+      method                = method,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
       MM_random   = RandEffTerm,
       correlation = CorrEffect,
@@ -117,9 +117,9 @@ PhenStatWindow = function (phenlistObject                                ,
   {
     # Full model
     message0('Running the full model before applying windowing ... ')
-    # objectNorm = testDatasetAgeing(
-    #   phenListAgeing = phenlistObject,
-    #   method = method,
+    # objectNorm = OpenStatsAnalysis(
+    #   OpenStatsListObject = phenlistObject,
+    #   method              = method,
     #   MM_random   = RandEffTerm,
     #   correlation = CorrEffect,
     #   MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
@@ -234,11 +234,11 @@ PhenStatWindow = function (phenlistObject                                ,
         #we2[-mm] = we2[-mm] * VControls
       }
       message0('Fitting the windowing weights into the optimized PhenStat model ...')
-      objectf = testDatasetAgeing(
-        phenListAgeing = phenlistObject,
-        method = method,
-        MM_random   = RandEffTerm,
-        correlation = CorrEffect,
+      objectf = OpenStatsAnalysis(
+        OpenStatsListObject = phenlistObject,
+        method              = method,
+        MM_random   = RandEffTerm   ,
+        correlation = CorrEffect    ,
         MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
         MM_weight   = nlme::varComb(
           nlme:: varFixed( ~ 1 / AllModelWeights)
@@ -248,9 +248,9 @@ PhenStatWindow = function (phenlistObject                                ,
       windowingNote$'Windowing analysis'$'Final model' = objectf$messages
       # Full model windowing
       message0('Fitting the windowing weights into the full PhenStat model ...')
-      # objectfulw = testDatasetAgeing(
-      #   phenListAgeing = phenlistObject,
-      #   method = method,
+      # objectfulw = OpenStatsAnalysis(
+      #   OpenStatsListObject = phenlistObject,
+      #   method              = method,
       #   MM_random   = RandEffTerm,
       #   correlation = CorrEffect,
       #   MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),

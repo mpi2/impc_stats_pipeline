@@ -14,7 +14,7 @@ importFrom("parallel", "detectCores","makeCluster","makeForkCluster","stopCluste
 importFrom("foreach", "registerDoSEQ", "foreach","%do%","%dopar%")
 importFrom("doParallel", "registerDoParallel", "stopImplicitCluster")
 importFrom("PhenStat"      , "vectorOutput"      ,"PhenList"      ,"testDataset")
-importFrom("PhenStatAgeing", "vectorOutputAgeing","PhenListAgeing","testDatasetAgeing")
+importFrom("OpenStats", "OpenStatsReport","OpenStatsList","OpenStatsAnalysis")
 importFrom("SmoothWin", "expWeight","SmoothWin")
 importFrom("graphics", "plot")
 importFrom("stringi", "stri_rand_strings")
