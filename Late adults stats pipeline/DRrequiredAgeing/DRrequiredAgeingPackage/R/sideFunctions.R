@@ -1159,13 +1159,12 @@ SummaryStatisticsOriginal = function(x,
       c        = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
       m        = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE) , NA)
       sd       = ifelse(length(na.omit(xx)) > 0, sd0(xx, na.rm = TRUE)  , NA)
-      NormTest = head(PhenStatAgeing:::normality.test0(xx), 3)
+      NormTest = PhenStatAgeing:::normality.test0(xx)
       r = list(
         'Count' = c                                 ,
         'Mean'  = m                                 ,
         'SD'    = sd                                ,
-        'Normality test p-val' = NormTest$`P-value` ,
-        'Test' = NormTest$`Test`
+        'Normality test p-val' = NormTest
       )
     } else{
       c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)

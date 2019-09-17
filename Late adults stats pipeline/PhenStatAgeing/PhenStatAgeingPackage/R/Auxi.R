@@ -1855,10 +1855,12 @@ RRCut = function(object                     ,
 	)
 	if (sum(duplicated(qntl))) {
 		message0(
-			'\t* duplicates in quantiles detected, then small (dependes on the data precision) jitters will be added to quantiles.\n\t\tQauntiles: ',
-			pasteComma(round(qntl,5), replaceNull = FALSE)
+			'\t* duplicates in quantiles detected, then small '    ,
+			'(precision = 4 + minimum data precision) '            ,
+			'jitters will be added to quantiles.\n\t\tQauntiles: ' ,
+			pasteComma(round(qntl, 5), replaceNull = FALSE)
 		)
-		message0('\tJitter precision (decimal) = ', JitterPrecision)
+		message0('\tJitter max precision (decimals) = ', JitterPrecision)
 		qntl[duplicated(qntl)] = jitter0(
 			x = qntl[duplicated(qntl)],
 			amount = 10 ^	-JitterPrecision,
@@ -2755,22 +2757,23 @@ normality.test0 = function(x, ...) {
 			)
 		} else {
 			#################### Kolmogorov-Smirnov
+			precision = 4 + decimalplaces(x = min(x, na.rm = TRUE))
 			r = list(
 				'P-value'  = ks.test(
-					x = jitter(
-						x      = x,
-						amount = 6 + decimalplaces(x = min(x, na.rm = TRUE))
-					)                                       ,
+					x = jitter(x      = x,
+										 amount = precision)          ,
 					y = 'pnorm'                             ,
 					alternative = 'two.sided'               ,
 					...
 				)$p.value                                 ,
 				'Unique N' = length(unique(na.omit(x)))   ,
 				'N'        = length(x)                    ,
-				'Mean'     = mean(x,na.rm = TRUE)         ,
+				'Mean'     = mean(x, na.rm = TRUE)         ,
 				'SD'       = sd0(x, na.rm = TRUE)         ,
 				'Test'     = 'Kolmogorov-Smirnov'         ,
-				'Note'     = 'Small jitter (6 + minimum precision) added to possible ties (duplicates)'
+				'Note'     = paste0('Small jitter (precision = ',
+				precision,
+				' decimals) added to possible ties (duplicates)')
 			)
 		}
 	} else{
