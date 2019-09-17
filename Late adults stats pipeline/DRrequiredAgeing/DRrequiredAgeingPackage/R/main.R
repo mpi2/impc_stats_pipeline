@@ -386,7 +386,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     depVariable = getResponseColumn(n3.5$observation_type)
                     depVar      = depVariable$column
                     message0('Dependent variable: ', depVar)
-                    note$'Response type  '       = paste0(depVar,
+                    note$'Response type'         = paste0(depVar,
                                                           '_of_type_',
                                                           paste(depVariable$lbl, sep = '.'))
                     note$'Observation type'    =
