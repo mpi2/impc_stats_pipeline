@@ -1,11 +1,11 @@
-\name{testDatasetAgeing}
-\alias{testDatasetAgeing}
+\name{OpenStatsAnalysis}
+\alias{OpenStatsAnalysis}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Method "testDatasetAgeing"
+Method "OpenStatsAnalysis"
 }
 \description{
-The driver function in the PhenStatAgeing package for running statisical analysis on phenotypic data. \cr
+The driver function in the OpenStats package for running statisical analysis on phenotypic data. \cr
 
 ~> It performs several checks on the data and the input model before performing the analysis. This function supports three main analysis frameworks precisely, Linear Mix model (MM), Fisher Exact test (FE) and Reference Range plus (RR).\cr 
 
@@ -15,46 +15,46 @@ The driver function in the PhenStatAgeing package for running statisical analysi
 
 }
 \usage{
-testDatasetAgeing(
-	phenListAgeing = NULL,
-	method         = NULL,
-	MM_fixed       = TypicalModel(
-		depVariable = "data_point",
-		withWeight  = MM_BodyWeightIncluded,
-		Sex         = TRUE,
-		LifeStage   = TRUE,
-		data   = phenListAgeing@datasetPL,
-		others = NULL,
+OpenStatsAnalysis(
+	OpenStatsListObject    = NULL                  ,
+	method                 = NULL                  ,
+	MM_fixed               = TypicalModel(
+		depVariable          = "data_point"          ,
+		withWeight           = MM_BodyWeightIncluded ,
+		Sex                  = TRUE                  ,
+		LifeStage            = TRUE                  ,
+		data   = OpenStatsListObject @datasetPL      ,
+		others = NULL                                ,
 		debug  = debug
 	),
-	MM_random             = rndProce("TYPICAL"),
+	MM_random             = rndProce("TYPICAL")    ,
 	MM_BodyWeightIncluded = TRUE,
-	MM_lower              = ~ Genotype + 1,
+	MM_lower              = ~ Genotype + 1         ,
 	MM_weight = if (TermInModelAndnLevels(
-		model = MM_fixed, 
-		data = phenListAgeing@datasetPL))
+		model = MM_fixed                             , 
+		data = OpenStatsListObject@datasetPL))
 		varIdent(form = ~ 1 |
 						 	LifeStage)
 	else
 		varIdent(form = ~ 1 |
 						 	Genotype),
 	MM_direction = "both",
-	MM_checks    = c(TRUE, TRUE, TRUE),
-	MM_optimise  = c(TRUE, TRUE, TRUE),
-	FE_formula   = category ~ Genotype + Sex + LifeStage,
-	RR_formula   = data_point ~ Genotype + Sex + LifeStage,
-	RRrefLevel = 'control',
-	RR_prop      = 0.95   ,
-	FERR_rep     = 1500   ,
-	MMFERR_conf.level = 0.95 ,
-	seed         = NULL,
-	debug        = TRUE,
+	MM_checks    = c(TRUE, TRUE, TRUE)             ,
+	MM_optimise  = c(TRUE, TRUE, TRUE)             ,
+	FE_formula   = category ~   Genotype + Sex + LifeStage ,
+	RR_formula   = data_point ~ Genotype + Sex + LifeStage ,
+	RRrefLevel = 'control'                                 ,
+	RR_prop      = 0.95                                    ,
+	FERR_rep     = 1500                                    ,
+	MMFERR_conf.level = 0.95                               ,
+	seed         = NULL                                    ,
+	debug        = TRUE                                    ,
 	...
 )
 }
 \arguments{
-  \item{phenListAgeing}{
-	 An instance of the PhenListAgeing or PhenList class; mandatory argument.
+  \item{OpenStatsListObject}{
+	 An instance of the 'OpenStatsList' or 'PhenList' (former from the `PhenStat` package) class; mandatory argument.
 }
   \item{method}{
 		A character string ("MM", "FE" or "RR") defining the method to use for model building.
@@ -133,7 +133,7 @@ testDatasetAgeing(
 Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 }
 \seealso{
-\code{\link{PhenListAgeing}}, \code{\link{plot}}, \code{\link{summary}}
+\code{\link{OpenStatsList}}, \code{\link{plot}}, \code{\link{summary}}
 }
 \examples{
 	library(nlme)
@@ -141,10 +141,10 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	# 1 Data preparation
 	####################################################################
 	#################
-	# 1.1 Continuous data - Creating PhenListAgeing object
+	# 1.1 Continuous data - Creating OpenStatsList object
 	#################
-	fileCon = system.file("extdata", "test_continuous.csv", package = "PhenStatAgeing")
-	test_Cont = PhenListAgeing(
+	fileCon = system.file("extdata", "test_continuous.csv", package = "OpenStats")
+	test_Cont = OpenStatsList(
 		dataset = read.csv(fileCon),
 		testGenotype = 'experimental',
 		refGenotype  = 'control',
@@ -155,10 +155,10 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		dataset.colname.sex = 'sex'
 	)
 	#################
-	# 1.2 Categorical data - Creating PhenListAgeing object
+	# 1.2 Categorical data - Creating OpenStatsList object
 	#################
-	fileCat   = system.file("extdata", "test_categorical.csv", package = "PhenStatAgeing")
-	test_Cat = PhenListAgeing(
+	fileCat   = system.file("extdata", "test_categorical.csv", package = "OpenStats")
+	test_Cat = OpenStatsList(
 		dataset = read.csv(fileCat, na.strings = '-'),
 		testGenotype = 'Aff3/Aff3',
 		refGenotype = '+/+',
@@ -175,12 +175,12 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	#################
 	# 2.1 Optimised Mixed model (MM) framework
 	#################
-	MM1_result = testDatasetAgeing(
-		phenListAgeing = test_Cont,
+	MM1_result = OpenStatsAnalysis(
+		OpenStatsList = test_Cont,
 		method = 'MM',
 		MM_fixed = data_point ~ Genotype  + Weight
 	)
-	VO_MM1 = vectorOutputAgeing(MM1_result)
+	VO_MM1 = OpenStatsReport(MM1_result)
 	plot(MM1_result, col = 2, main = 'Optimised model')
 	summary(MM1_result)
 	
@@ -189,27 +189,27 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	# 2.2 Mixed model (MM) with NO optimisation
 	# for the fixed effects but random/weight effects
 	#################
-	MM2_result = testDatasetAgeing(
-		phenListAgeing = test_Cont,
+	MM2_result = OpenStatsAnalysis(
+		OpenStatsList = test_Cont,
 		method = 'MM',
 		MM_fixed = data_point ~ Genotype  + Weight,
 		MM_lower =            ~ Genotype  + Weight + 1
 		# Or simply MM_optimised = c(0, 1, 1)
 	)
-	VO_MM2 = vectorOutputAgeing(MM2_result)
+	VO_MM2 = OpenStatsReport(MM2_result)
 	plot(MM2_result, col = 8, main = 'No optimisation on the fixed effects')
 	summary(MM2_result)
 	
 	#################
 	# 2.3 Mixed model (MM) with NO optimisation at all
 	#################
-	MM3_result = testDatasetAgeing(
-		phenListAgeing = test_Cont,
+	MM3_result = OpenStatsAnalysis(
+		OpenStatsList = test_Cont,
 		method = 'MM',
 		MM_fixed = data_point ~ Genotype  + Weight,,
 		MM_optimise = c(0, 0, 0)
 	)
-	VO_MM3 = vectorOutputAgeing(MM3_result)
+	VO_MM3 = OpenStatsReport(MM3_result)
 	plot(MM3_result, col = 3, main = 'Not optimised model')
 	summary(MM3_result)
 	
@@ -217,12 +217,12 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	#################
 	# 2.3 Reference range model
 	#################
-	RR_result = testDatasetAgeing(
-		phenListAgeing = test_Cont,
+	RR_result = OpenStatsAnalysis(
+		OpenStatsList = test_Cont,
 		method = 'RR',
 		RR_formula  = data_point ~ Genotype + Sex
 	)
-	VO_RR = vectorOutputAgeing(RR_result)
+	VO_RR = OpenStatsReport(RR_result)
 	plot(RR_result, col = 3:4)
 	summary(RR_result)
 	
@@ -230,13 +230,13 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	#################
 	# 2.4 Fisher exact model
 	#################
-	FE_result = testDatasetAgeing(
-		phenListAgeing = test_Cat,
+	FE_result = OpenStatsAnalysis(
+		OpenStatsList = test_Cat,
 		method = "FE",
 		FE_formula =  Thoracic.Processes ~ Genotype + Sex + Weight
 	)
-	VO_FE = vectorOutputAgeing(FE_result)
+	VO_FE = OpenStatsReport(FE_result)
 	plot(FE_result, col = 1:2)
 	summary(FE_result)
 }
-\keyword{ ~PhenStatAgeing }
+\keyword{ ~OpenStats }

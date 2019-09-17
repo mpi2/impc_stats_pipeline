@@ -1,18 +1,18 @@
-\name{PhenListAgeing}
-\alias{PhenListAgeing}
+\name{OpenStatsList}
+\alias{OpenStatsList}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Method "PhenListAgeing"
+Method "OpenStatsList"
 }
 \description{
-Function to create `PhenListAgeing` object from a data frame.
+Function to create `OpenStatsList` object from a data frame.
 
-~> The mandatory variables for creating a `standard` PhenListAgeing objects are `response variable` and `Genotype`. Having two levels in the `Genotype` is mandatory. The function further checks for the `Sex` with two levels (Male/Female), LifeStage` with two levels (Early/Late), `Batch` (defined as date_of experiment in the IMPC) and `Weight` (defined as mice body weight in the IMPC) and reports any abnormality in the data. \cr
+~> The mandatory variables for creating a `standard` OpenStatsList objects are `response variable` and `Genotype`. Having two levels in the `Genotype` is mandatory. The function further checks for the `Sex` with two levels (Male/Female), LifeStage` with two levels (Early/Late), `Batch` (defined as date_of experiment in the IMPC) and `Weight` (defined as mice body weight in the IMPC) and reports any abnormality in the data. \cr
 
-~> For advance applications, the function is capable of creating a `PhenListAgeing` object without performing  checks. To do this, set clean.dataset = FALSE.\cr
+~> For advance applications, the function is capable of creating a `OpenStatsList` object without performing  checks. To do this, set clean.dataset = FALSE.\cr
 }
 \usage{
-PhenListAgeing(
+OpenStatsList(
 	dataset                                                 ,
 	testGenotype                = 'experimental'            ,
 	refGenotype                 = 'control'                 ,
@@ -23,10 +23,10 @@ PhenListAgeing(
 	dataset.colname.batch       = 'date_of_experiment'      ,
 	dataset.colname.lifestage   = 'LifeStage'               ,
 	dataset.colname.weight      = 'weight'                  ,
-	dataset.values.missingValue = " "  ,
-	dataset.values.male         = NULL ,
-	dataset.values.female       = NULL ,
-	dataset.values.early        = NULL ,
+	dataset.values.missingValue = c(' ','')                 ,
+	dataset.values.male         = NULL                      ,
+	dataset.values.female       = NULL                      ,
+	dataset.values.early        = NULL                      ,
 	dataset.values.late         = NULL
 )
 }
@@ -79,22 +79,22 @@ PhenListAgeing(
 }
 }
 \value{
-an instance of the PhenListAgeing class.
+an instance of the OpenStatsList class.
 }
 
 \author{
 Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 }
 \seealso{
-	\code{\link{testDatasetAgeing}}
+	\code{\link{OpenStatsAnalysis}}
 }
 \examples{
   ####################################################################
-  df = read.csv(system.file("extdata", "test_continuous.csv", package = "PhenStatAgeing"))
+  df = read.csv(system.file("extdata", "test_continuous.csv", package = "OpenStats"))
   ####################################################################
-  # PhenListAgeing object
+  # OpenStatsList object
   ####################################################################
-  PhenListAgeing   = PhenListAgeing(
+  OpenStatsList   = OpenStatsList(
   	dataset   = df,
   	testGenotype = 'experimental',
   	refGenotype = 'control',
@@ -103,11 +103,12 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
   	dataset.colname.sex = 'sex',
   	dataset.colname.weight = 'weight'
   )
-  plot   (PhenListAgeing)
-  summary(PhenListAgeing, style = 'grid')
-  class  (PhenListAgeing)
-  # str(PhenListAgeing@datasetPL)
+  plot   (OpenStatsList)
+  summary(OpenStatsList, style = 'grid')
+  class  (OpenStatsList)
+  rm     (OpenStatsList)
+  # str(OpenStatsList@datasetPL)
 }
 
-\keyword{ PhenListAgeing }% use one of  RShowDoc("KEYWORDS")
-\keyword{ testDatasetAgeing }% __ONLY ONE__ keyword per line
+\keyword{ OpenStatsList }% use one of  RShowDoc("KEYWORDS")
+\keyword{ OpenStatsAnalysis }% __ONLY ONE__ keyword per line

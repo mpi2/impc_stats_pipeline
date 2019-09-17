@@ -1,5 +1,5 @@
 setClass(
-	'PhenListAgeing',
+	'OpenStatsList'                                 ,
 	representation(
 		datasetPL                   = 'data.frame'    ,
 		refGenotype                 = 'character'     ,
@@ -11,7 +11,7 @@ setClass(
 		dataset.colname.batch       = 'character'     ,
 		dataset.colname.lifestage   = 'character'     ,
 		dataset.colname.weight      = 'character'     ,
-		dataset.values.missingValue = 'character'  ,
+		dataset.values.missingValue = 'character'     ,
 		dataset.values.male         = 'character'     ,
 		dataset.values.female       = 'character'     ,
 		dataset.values.early        = 'character'     ,
@@ -21,26 +21,26 @@ setClass(
 )
 
 
-PhenListAgeing =
+OpenStatsList =
 	function(dataset,
-					 testGenotype                = 'experimental',
-					 refGenotype                 = 'control'     ,
-					 hemiGenotype                = NULL          ,
-					 clean.dataset               = TRUE          ,
+					 testGenotype                = 'experimental'           ,
+					 refGenotype                 = 'control'                ,
+					 hemiGenotype                = NULL                     ,
+					 clean.dataset               = TRUE                     ,
 					 dataset.colname.genotype    = 'biological_sample_group',
 					 dataset.colname.sex         = 'sex'                    ,
 					 dataset.colname.batch       = 'date_of_experiment'     ,
 					 dataset.colname.lifestage   = 'LifeStage'              ,
 					 dataset.colname.weight      = 'weight'                 ,
-					 dataset.values.missingValue = " ",
-					 dataset.values.male         = NULL,
-					 dataset.values.female       = NULL,
-					 dataset.values.early        = NULL,
+					 dataset.values.missingValue = c(' ','')                ,
+					 dataset.values.male         = NULL                     ,
+					 dataset.values.female       = NULL                     ,
+					 dataset.values.early        = NULL                     ,
 					 dataset.values.late         = NULL)
 	{
 		testGenotype = as.character(testGenotype)
 		refGenotype  = as.character(refGenotype)
-		if (is.null(dataset) || class(dataset) != "data.frame") {
+		if (is.null(dataset) || !is(dataset, "data.frame")) {
 			message0('error ~> Null dataset or not a data.frame.')
 			return(NULL)
 		}
@@ -57,9 +57,8 @@ PhenListAgeing =
 				)
 				dataset[dataset %in%  dataset.values.missingValue] = NA
 			}
-			dataset  [dataset == ""]     = NA
 			dataset                      = droplevels0(dataset)
-			chkcols = checkPhenlistColumns(
+			chkcols = checkOpenStatsColumns(
 				dataset = dataset,
 				vars    = c(
 					dataset.colname.genotype   ,
@@ -107,7 +106,7 @@ PhenListAgeing =
 			dataset = factorise  (dataset, c('Genotype', 'Sex', 'Batch', 'LifeStage'))
 			dataset = droplevels0(dataset)
 			## Renew levels
-			dataset = PhenListAgeingRelabling(
+			dataset = OpenStatsListRelabling(
 				dataset = dataset,
 				col = 'Sex',
 				l1 = dataset.values.female,
@@ -115,7 +114,7 @@ PhenListAgeing =
 				l2 = dataset.values.male,
 				rel2 = 'Male'
 			)
-			dataset = PhenListAgeingRelabling(
+			dataset = OpenStatsListRelabling(
 				dataset = dataset,
 				col = 'LifeStage',
 				l1 = dataset.values.early,
@@ -215,7 +214,7 @@ PhenListAgeing =
 			message0('No check performed on the input data')
 		}
 		r = new(
-			"PhenListAgeing",
+			"OpenStatsList",
 			datasetPL = as.data.frame(dataset),
 			refGenotype = as.character(refGenotype),
 			testGenotype = as.character(testGenotype),
@@ -342,11 +341,11 @@ checkDataset = function(dataset,
 	return(dataset)
 }
 
-PhenListAgeingBuilder = function(PhenListobject,
-																 DOE = NULL,
-																 DOB = NULL,
-																 d.threshold = 16 * 7,
-																 debug       = TRUE) {
+OpenStatsListBuilder = function(PhenListobject,
+																DOE = NULL,
+																DOB = NULL,
+																d.threshold = 16 * 7,
+																debug       = TRUE) {
 	#### Negative age will be removed
 	PhenListobject@datasetPL           = droplevels(PhenListobject@datasetPL)
 	
@@ -404,27 +403,26 @@ PhenListAgeingBuilder = function(PhenListobject,
 		)
 		return(NULL)
 	}
-	PhenListobject        = unclass(PhenListobject)
-	class(PhenListobject) = 'PhenListAgeing'
-	return(PhenListobject)
+	OpenStatsList        = unclass(PhenListobject)
+	class(OpenStatsList) = 'OpenStatsList'
+	return(OpenStatsList)
 }
 
-summary.PhenListAgeing = function(object,
-																	vars = NULL,
-																	...) {
+summary.OpenStatsList = function(object,
+																 vars = NULL,
+																 ...) {
 	requireNamespace("summarytools")
 	r  = NULL
 	df = SelectVariablesOrDefault(data = object@datasetPL, vars)
 	if (!is.null(df))
-		r  = summarytools::dfSummary (df, ...)
+		r  = summarytools::dfSummary (df, justify = 'l',...)
 	return(r)
 }
 
-plot.PhenListAgeing = function(x,
-															 vars = NULL,
-															 ...) {
+plot.OpenStatsList = function(x,
+															vars = NULL,
+															...) {
 	requireNamespace("Hmisc")
-	#options(grType = 'plotly')
 	df = SelectVariablesOrDefault(data = x@datasetPL, vars)
 	if (!is.null(df)) {
 		r    = Hmisc::describe (df)
@@ -444,7 +442,7 @@ SelectVariablesOrDefault = function(data, vars = NULL) {
 						 'age_in_weeks' ,
 						 'phenotyping_center',
 						 'metadata_group'
-						 )
+	)
 	###################
 	cnamesF = varExistsInDF(data = data, if (is.null(vars)) {
 		cnames

@@ -141,7 +141,7 @@ crunner = function(object              ,
 	OutR = list(
 		output = list(SplitModels = list.clean(lComplete)) ,
 		input  = list(
-			PhenListAgeing  = object                         ,
+			OpenStatsList    = object                         ,
 			data            = data                           ,
 			depVariable     = allTerms[1]                    ,
 			rep             = rep                            ,
@@ -156,6 +156,6 @@ crunner = function(object              ,
 			Cleanedformula  = newFormula
 		)
 	)
-	class(OutR) <- 'PhenStatAgeingFE'
+	class(OutR) <- 'OpenStatsFE'
 	return(OutR)
 }

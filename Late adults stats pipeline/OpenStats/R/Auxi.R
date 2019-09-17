@@ -3,7 +3,7 @@
 	packageStartupMessage(
 		paste0(
 			'\n >===============================================================================<',
-			'\n PhenStatAgeing is developed by International Mouse Phenotyping Consortium (IMPC) ',
+			'\n OpenStats is developed by International Mouse Phenotyping Consortium (IMPC) '     ,
 			'\n More details           : https://www.mousephenotype.org/                         ',
 			'\n Source code and issues : https://git.io/fj9W3                                    ',
 			'\n Contact us             : hamedhm@ebi.ac.uk                                       ',
@@ -1573,18 +1573,18 @@ as.numeric01 = function(x) {
 		return(NULL)
 }
 
-PhenListAgeingLevels = function(object, sep = '') {
+OpenStatsListLevels = function(object, sep = '') {
 	l = NULL
 	SexLab    = 'Sex'
 	FemaleLab = ifelse(
-		is.na(object$input$PhenListAgeing@dataset.values.female),
+		is.na(object$input$OpenStatsList@dataset.values.female),
 		'Female',
-		object$input$PhenListAgeing@dataset.values.female
+		object$input$OpenStatsList@dataset.values.female
 	)
 	MaleLab = ifelse(
-		is.na(object$input$PhenListAgeing@dataset.values.male),
+		is.na(object$input$OpenStatsList@dataset.values.male),
 		'Male',
-		object$input$PhenListAgeing@dataset.values.male
+		object$input$OpenStatsList@dataset.values.male
 	)
 	SexLevels = as.list(paste(SexLab, sort(c(
 		FemaleLab, MaleLab
@@ -1594,14 +1594,14 @@ PhenListAgeingLevels = function(object, sep = '') {
 	##########
 	GenotypeLab = 'Genotype'
 	ControlLab = ifelse(
-		is.na(object$input$PhenListAgeing@refGenotype),
+		is.na(object$input$OpenStatsList@refGenotype),
 		'control',
-		object$input$PhenListAgeing@refGenotype
+		object$input$OpenStatsList@refGenotype
 	)
 	MutantLab = ifelse(
-		is.na(object$input$PhenListAgeing@testGenotype),
+		is.na(object$input$OpenStatsList@testGenotype),
 		'experimental',
-		object$input$PhenListAgeing@testGenotype
+		object$input$OpenStatsList@testGenotype
 	)
 	GenotypeLevels = as.list(paste(GenotypeLab, sort(c(
 		ControlLab, MutantLab
@@ -1804,7 +1804,7 @@ RRGetTheLeveLWithMaxFrequency = function(data, lower) {
 }
 
 ExtractDatasetPLIfPossible = function(x) {
-	if (class(x) %in% c('PhenList', 'PhenListAgeing')) {
+	if (class(x) %in% c('PhenList', 'OpenStatsList')) {
 		x     = x@datasetPL
 	}
 	return(x)
@@ -1820,7 +1820,7 @@ RRCut = function(object                     ,
 								 lower        = 'Genotype'
 ) {
 	data     = object
-	if (class(data) %in% c('PhenList', 'PhenListAgeing')) {
+	if (class(data) %in% c('PhenList', 'OpenStatsList')) {
 		refLevel = data@refGenotype
 		data     = data@datasetPL
 	}
@@ -3276,7 +3276,7 @@ factorise = function(dataset, variables) {
 	return(dataset)
 }
 
-PhenListAgeingRelabling = function(dataset, col, l1, rel1, l2, rel2) {
+OpenStatsListRelabling = function(dataset, col, l1, rel1, l2, rel2) {
 	if (col %in% names(dataset)) {
 		dataset[, col] = as.factor(dataset[, col])
 		levels(dataset[, col]) = capitalise(levels(dataset[, col]))
@@ -3339,7 +3339,7 @@ checkSummary = function(dataset, var, ...) {
 	return(invisible(lvls))
 }
 
-checkPhenlistColumns = function(dataset, vars) {
+checkOpenStatsColumns = function(dataset, vars) {
 	allExist = NULL
 	if (length(vars)) {
 		for (v in vars) {

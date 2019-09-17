@@ -1,4 +1,4 @@
-testDatasetAgeing = function(phenListAgeing = NULL                 ,
+OpenStatsAnalysis = function(OpenStatsListObject   = NULL          ,
 														 method         = NULL                 ,
 														 ### MM
 														 MM_fixed = TypicalModel(
@@ -6,7 +6,7 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 														 	withWeight = MM_BodyWeightIncluded   ,
 														 	Sex = TRUE                           ,
 														 	LifeStage = TRUE                     ,
-														 	data = phenListAgeing@datasetPL      ,
+														 	data = OpenStatsListObject@datasetPL ,
 														 	others = NULL                        ,
 														 	debug = debug
 														 )                                     ,
@@ -14,7 +14,7 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 														 MM_BodyWeightIncluded = TRUE          ,
 														 MM_lower  =  ~ Genotype + 1           ,
 														 MM_weight = if (TermInModelAndnLevels(model = MM_fixed,
-														 																			data = phenListAgeing@datasetPL))
+														 																			data   = OpenStatsListObject@datasetPL))
 														 	varIdent(form =  ~ 1 |
 														 					 	LifeStage)
 														 else
@@ -39,25 +39,25 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 	s = tryCatch(
 		expr = {
 			suppressMessagesANDWarnings(
-				testDatasetAgeing0(
-					phenListAgeing = phenListAgeing,
-					method = method ,
-					#### MM
-					MM_fixed = MM_fixed                   ,
-					MM_random = MM_random                 ,
-					MM_lower = MM_lower                   ,
-					MM_weight = MM_weight                 ,
-					MM_direction = MM_direction           ,
-					MM_checks   = MM_checks               ,
-					MM_optimise = MM_optimise             ,
-					#### FE     
-					FE_formula = FE_formula               ,
-					RR_formula = RR_formula               ,
-					RR_prop = RR_prop                     ,
-					RRrefLevel = RRrefLevel               ,
-					FERR_rep = FERR_rep                   ,
-					debug = debug                         ,
-					MMFERR_conf.level = MMFERR_conf.level ,
+				OpenStatsAnalysis0(
+					OpenStatsListObject = OpenStatsListObject ,
+					method = method                           ,
+					#### MM    
+					MM_fixed = MM_fixed                       ,
+					MM_random = MM_random                     ,
+					MM_lower = MM_lower                       ,
+					MM_weight = MM_weight                     ,
+					MM_direction = MM_direction               ,
+					MM_checks   = MM_checks                   ,
+					MM_optimise = MM_optimise                 ,
+					#### FE         
+					FE_formula = FE_formula                   ,
+					RR_formula = RR_formula                   ,
+					RR_prop = RR_prop                         ,
+					RRrefLevel = RRrefLevel                   ,
+					FERR_rep = FERR_rep                       ,
+					debug = debug                             ,
+					MMFERR_conf.level = MMFERR_conf.level     ,
 					...
 				),
 				sup.messages = !debug,
@@ -83,33 +83,33 @@ testDatasetAgeing = function(phenListAgeing = NULL                 ,
 		return(s)
 }
 
-testDatasetAgeing0 = function(phenListAgeing = NULL     ,
-															method                    ,
-															#### MM   
-															MM_fixed                  ,
-															MM_random                 ,
-															MM_lower                  ,
-															MM_weight                 ,
-															MM_direction = 'both'     ,
-															MM_checks                 ,
-															MM_optimise               ,
-															##### FE or RR   
-															FE_formula                ,
-															RR_formula                ,
-															RR_prop                   ,
-															RRrefLevel                ,
-															FERR_rep                  ,
-															MMFERR_conf.level = 0.95  ,
-															##### Others
-															debug = TRUE              ,
+OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
+															method                           ,
+															#### MM          
+															MM_fixed                         ,
+															MM_random                        ,
+															MM_lower                         ,
+															MM_weight                        ,
+															MM_direction = 'both'            ,
+															MM_checks                        ,
+															MM_optimise                      ,
+															##### FE or RR          
+															FE_formula                       ,
+															RR_formula                       ,
+															RR_prop                          ,
+															RRrefLevel                       ,
+															FERR_rep                         ,
+															MMFERR_conf.level = 0.95         ,
+															##### Others       
+															debug = TRUE                     ,
 															...) {
-	message0('PhenStatAgeing loaded.')
-	if(is.null(phenListAgeing))
+	message0('OpenStats loaded.')
+	if(is.null(OpenStatsListObject))
 		stop('\n ~> The input dataset cannot be NULL')
-	if (!is(phenListAgeing, 'PhenList') &&
-			!is(phenListAgeing, 'PhenListAgeing'))
-		stop('\n ~> function expects "PhenList" or "PhenListAgeing" object \n')
-	if (noVariation(data = phenListAgeing@datasetPL))
+	if (!is(OpenStatsListObject, 'PhenList') &&
+			!is(OpenStatsListObject, 'OpenStatsList'))
+		stop('\n ~> function expects "PhenList" or "OpenStatsList" object \n')
+	if (noVariation(data = OpenStatsListObject@datasetPL))
 		stop('\n ~> There is no variation in Genotype.\n')
 	if (MMFERR_conf.level >= 1   ||
 			MMFERR_conf.level <= 0   ||
@@ -121,17 +121,17 @@ testDatasetAgeing0 = function(phenListAgeing = NULL     ,
 	if (method %in% 'MM') {
 		message0('Linear Mixed Model (MM framework) in progress ...')
 		output =    M.opt(
-			fixed     = MM_fixed          ,
-			random    = MM_random         ,
-			object    = phenListAgeing    ,
-			lower     = MM_lower          ,
-			direction = MM_direction      ,
-			weight    = MM_weight         ,
-			checks    = MM_checks         ,
-			optimise  = MM_optimise       ,
-			trace     = FALSE             ,
-			method    = 'MM'              ,
-			ci_levels = MMFERR_conf.level ,
+			fixed     = MM_fixed             ,
+			random    = MM_random            ,
+			object    = OpenStatsListObject  ,
+			lower     = MM_lower             ,
+			direction = MM_direction         ,
+			weight    = MM_weight            ,
+			checks    = MM_checks            ,
+			optimise  = MM_optimise          ,
+			trace     = FALSE                ,
+			method    = 'MM'                 ,
+			ci_levels = MMFERR_conf.level    ,
 			...
 		)
 		# Important!
@@ -141,9 +141,9 @@ testDatasetAgeing0 = function(phenListAgeing = NULL     ,
 	} else if (method %in% 'FE') {
 		message0('Fisher Exact Test (FE framework) in progress ...')
 		output = crunner(
-			object = phenListAgeing                                                    ,
+			object = OpenStatsListObject                                               ,
 			formula = MoveResponseToRightOfTheFormula(FE_formula)                      ,
-			#expandDottedFormula(formula = FE_formula, data = phenListAgeing@datasetPL),
+			#expandDottedFormula(formula = FE_formula, data = OpenStatsListObject@datasetPL)  ,
 			rep = FERR_rep                                                             ,
 			method = 'FE'                                                              ,
 			fullComparisions = TRUE                                                    ,
@@ -157,9 +157,9 @@ testDatasetAgeing0 = function(phenListAgeing = NULL     ,
 	} else if (method %in% 'RR') {
 		message0('Reference Range Plus (RR framework) in progress ...')
 		output = RRrunner(
-			object = phenListAgeing                                                     ,
+			object  = OpenStatsListObject                                               ,
 			formula = MoveResponseToRightOfTheFormula(RR_formula)                       ,
-			#expandDottedFormula(formula = RR_formula, data = phenListAgeing@datasetPL) ,
+			#expandDottedFormula(formula = RR_formula, data = OpenStatsListObject@datasetPL) ,
 			rep = FERR_rep                                                              ,
 			method = 'RR'                                                               ,
 			RRprop = RR_prop                                                            ,

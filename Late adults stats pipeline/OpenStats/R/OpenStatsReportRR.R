@@ -1,9 +1,9 @@
-vectorOutputRR =	function(object)
+OpenStatsReportRR =	function(object)
 {
 	if (!is.null(object$messages))
 		return (NULL)
 	#####################################################################
-	Labels         = PhenListAgeingLevels(object = object)
+	Labels         = OpenStatsListLevels(object = object)
 	Fmodel         = object$extra$Cleanedformula
 	frm            = formula(Fmodel)
 	depVariable    = all_vars0(frm)[1]
@@ -112,7 +112,7 @@ vectorOutputRR =	function(object)
 	#####################################################################
 	percentageChanges = NULL
 	#####################################################################
-	vectorOutput      = list(
+	OpenStatsReportRR0      = list(
 		'Applied method'                         = 	framework   ,
 		'Dependent variable'                     =	depVariable ,
 		'Batch included'                         =	 NULL       ,
@@ -367,5 +367,5 @@ vectorOutputRR =	function(object)
 		'Additional information'                      =	addInfo
 	)
 	
-	return(vectorOutput)
+	return(OpenStatsReportRR0)
 }

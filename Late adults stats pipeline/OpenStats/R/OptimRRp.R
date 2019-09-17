@@ -127,7 +127,7 @@ RRrunner = function(object              ,
 	OutR = list(
 		output = list(SplitModels = list.clean(SpltResult)) ,
 		input  = list(
-			PhenListAgeing  = object                          ,
+			OpenStatsList    = object                          ,
 			data            = object@datasetPL                ,
 			depVariable     = allTerms[1]                     ,
 			rep             = rep                             ,
@@ -139,6 +139,6 @@ RRrunner = function(object              ,
 		),
 		extra  = list(Cleanedformula           = cleanFormulaForOutput)
 	)
-	class(OutR) <- 'PhenStatAgeingRR'
+	class(OutR) <- 'OpenStatsRR'
 	return(OutR)
 }

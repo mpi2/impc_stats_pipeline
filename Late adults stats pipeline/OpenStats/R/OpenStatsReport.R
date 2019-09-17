@@ -1,9 +1,9 @@
-vectorOutputAgeing = function(object,
-															othercolumns       = NULL,
-															JSON               = FALSE,
-															RemoveNullKeys     = FALSE,
-															ReportNullSchema   = FALSE,
-															...) {
+OpenStatsReport = function(object                    ,
+													 othercolumns       = NULL ,
+													 JSON               = FALSE,
+													 RemoveNullKeys     = FALSE,
+													 ReportNullSchema   = FALSE,
+													 ...) {
 	requireNamespace("rlist")
 	debug = FALSE
 	if ((is.null(object) ||
@@ -21,34 +21,34 @@ vectorOutputAgeing = function(object,
 			out = NULL
 			suppressMessagesANDWarnings(
 				if (is(object,
-							 'PhenStatAgeingMM')) {
-					out = vectorOutputCont(object = object,
+							 'OpenStatsMM')) {
+					out = OpenStatsReportCont(object = object,
 																 debug = debug)
-				} else if (is(object, 'PhenStatAgeingFE')) {
-					out = vectorOutputCat(object = object)
-				} else if (is(object, 'PhenStatAgeingRR')) {
-					out = vectorOutputRR(object = object)
+				} else if (is(object, 'OpenStatsFE')) {
+					out = OpenStatsReportCat(object = object)
+				} else if (is(object, 'OpenStatsRR')) {
+					out = OpenStatsReportRR(object = object)
 				} else{
 					if (RemoveNullKeys) {
 						message0('`RemoveNullKeys` does not apply to the NULL schema.')
 						RemoveNullKeys = FALSE
 					}
-					out = vectorOutputNULL(object = NULL)
+					out = OpenStatsReportNULL(object = NULL)
 					out$`Additional information`$messages = UnlistCall(object$messages)
 				},
 				sup.messages = !debug,
 				sup.warnings = FALSE
 			)
 			#########
-			if (!is.null(object$input$PhenListAgeing)) {
+			if (!is.null(object$input$OpenStatsList)) {
 				NewNames = variablesInData(
-					df = object$input$PhenListAgeing@datasetPL,
+					df = object$input$OpenStatsList@datasetPL,
 					names = othercolumns,
 					debug = debug
 				)
 				if (!is.null(out)    &&
 						!is.null(NewNames)) {
-					out$othercolumns = as.list(object$input$PhenListAgeing@datasetPL[, NewNames, drop = FALSE])
+					out$othercolumns = as.list(object$input$OpenStatsList@datasetPL[, NewNames, drop = FALSE])
 				} else{
 					out$othercolumns = NULL
 				}

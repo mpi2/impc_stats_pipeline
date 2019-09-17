@@ -1,4 +1,4 @@
-vectorOutputNULL = function(object) {
+OpenStatsReportNULL = function(object) {
 	VO      = list(
 		'Applied method'                       = 	NULL,
 		'Dependent variable'                   =	NULL,

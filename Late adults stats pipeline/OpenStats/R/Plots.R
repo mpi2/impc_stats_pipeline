@@ -16,7 +16,7 @@ plotFERR = function(x, l1, l2, main, ...) {
 ###############################################
 # Plot RR
 ###############################################
-plot.PhenStatAgeingRR = function(x,
+plot.OpenStatsRR = function(x,
 																 main = 'Mosaic plot',
 																 ask = FALSE         ,
 																 mfrow = c(2, 2)     ,
@@ -29,7 +29,7 @@ plot.PhenStatAgeingRR = function(x,
 	p = par()
 	par(ask = ask, mfrow = mfrow)
 	
-	Labels  = PhenListAgeingLevels(x)
+	Labels  = OpenStatsListLevels(x)
 	LowRes  = pastedot('Low' , Labels$response, 'Genotype')
 	HighRes = pastedot('High', Labels$response, 'Genotype')
 	
@@ -68,7 +68,7 @@ plot.PhenStatAgeingRR = function(x,
 ###############################################
 # Plot FE
 ###############################################
-plot.PhenStatAgeingFE = function(x,
+plot.OpenStatsFE = function(x,
 																 main = 'Mosaic plot',
 																 ask = FALSE         ,
 																 mfrow = c(2, 2)     ,
@@ -81,7 +81,7 @@ plot.PhenStatAgeingFE = function(x,
 	p = par()
 	par(ask = ask, mfrow = mfrow)
 	
-	Labels = PhenListAgeingLevels(x)
+	Labels = OpenStatsListLevels(x)
 	plotFERR (
 		x = x,
 		l1 = Labels$response,
@@ -116,7 +116,7 @@ plot.PhenStatAgeingFE = function(x,
 ###############################################
 # Plot MM
 ###############################################
-plot.PhenStatAgeingMM = function (x                   ,
+plot.OpenStatsMM = function (x                   ,
 																	main = 'Final Model',
 																	ask = FALSE         ,
 																	mfrow = c(2, 2)     ,

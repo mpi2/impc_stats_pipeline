@@ -1,10 +1,10 @@
-vectorOutputCont =	function(object,
-														debug = FALSE)
+OpenStatsReportCont =	function(object,
+															 debug = FALSE)
 {
 	if (!is.null(object$messages))
 		return (NULL)
 	#####################################################################
-	Labels         = PhenListAgeingLevels(object = object)
+	Labels         = OpenStatsListLevels(object = object)
 	Fmodel         = object$output$Final.Model
 	frm            = formula(Fmodel)
 	depVariable    = all_vars0(frm)[1]
@@ -25,7 +25,7 @@ vectorOutputCont =	function(object,
 	#fittingMethod    = toupper(object$output$Final.Model.Tag)
 	fittingMethod    = toupper(class(object$output$Final.Model))
 	#####################################################################
-	x                = object$input$PhenListAgeing@datasetPL
+	x                = object$input$OpenStatsList@datasetPL
 	columnOfInterest = x[, c(depVariable)]
 	#####################################################################
 	variability      = list('Value' = length(unique(columnOfInterest)) / max(length(columnOfInterest), 1), 
@@ -89,7 +89,7 @@ vectorOutputCont =	function(object,
 		pcO
 	}
 	#####################################################################
-	vectorOutput      = list(
+	OpenStatsReportMM0      = list(
 		'Applied method'                       = 	paste0(framework, ", ", fittingMethod, ', ', format(equation)),
 		'Dependent variable'                   =	depVariable              ,
 		'Batch included'                       =	object$output$BatchIn    ,
@@ -660,5 +660,5 @@ vectorOutputCont =	function(object,
 		'Additional information'               =	addInfo
 	)
 	
-	return(vectorOutput)
+	return(OpenStatsReportMM0)
 }

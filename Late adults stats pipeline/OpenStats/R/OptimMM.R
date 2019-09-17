@@ -340,7 +340,7 @@ M.opt = function(object = NULL            ,
 			optimised = optimise
 		)                                                              ,
 		input = list(
-			PhenListAgeing      = object                                 ,
+			OpenStatsList        = object                                 ,
 			fixed               = initialFixed                           ,
 			random              = random                                 ,
 			data                = data                                   ,
@@ -357,6 +357,6 @@ M.opt = function(object = NULL            ,
 		extra = list(Cleanedformula  = fixed,
 								 lowerCorrected  = lowerCorrected)
 	)
-	class(OutR) <- 'PhenStatAgeingMM'
+	class(OutR) <- 'OpenStatsMM'
 	return(OutR)
 }

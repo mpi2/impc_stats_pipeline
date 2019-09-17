@@ -1,7 +1,7 @@
 summary.NULL = function(object, ...) {
 	message0('No summary available for a NULL object')
 }
-summary.PhenStatAgeingRR = function(object, format = 'rst', ...) {
+summary.OpenStatsRR = function(object, format = 'rst', ...) {
 	if (!is.null(object$messages) || is.null(object)) {
 		message0('Due to error(s), no plot available')
 		message0(object$messages)
@@ -10,7 +10,7 @@ summary.PhenStatAgeingRR = function(object, format = 'rst', ...) {
 	summaryCore(object, procedure = 'RR', format = format, ...)
 }
 
-summary.PhenStatAgeingFE = function(object, format = 'rst', ...) {
+summary.OpenStatsFE = function(object, format = 'rst', ...) {
 	if (!is.null(object$messages) || is.null(object)) {
 		message0('Due to error(s), no plot available')
 		message0(object$messages)
@@ -19,7 +19,7 @@ summary.PhenStatAgeingFE = function(object, format = 'rst', ...) {
 	summaryCore(object, procedure = 'FE', format = format, ...)
 }
 
-summary.PhenStatAgeingMM = function(object, format = 'rst', ...) {
+summary.OpenStatsMM = function(object, format = 'rst', ...) {
 	if (!is.null(object$messages) || is.null(object)) {
 		message0('Due to error(s), no plot available')
 		message0(object$messages)
@@ -34,7 +34,7 @@ summaryCore = function(x,
 											 format = 'rst',
 											 ...) {
 	requireNamespace("knitr")
-	vo = vectorOutputAgeing(object           = x    ,
+	vo = OpenStatsReport(object           = x    ,
 													JSON             = FALSE,
 													ReportNullSchema = FALSE,
 													RemoveNullKeys   = FALSE )

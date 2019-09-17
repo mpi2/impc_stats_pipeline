@@ -31,16 +31,16 @@ importFrom("graphics", "mosaicplot")
 importFrom("car"     , "qqPlot", "densityPlot")
 
 
-S3method(summary   , PhenListAgeing)
-S3method(summary   , PhenStatAgeingMM)
-S3method(summary   , PhenStatAgeingRR)
-S3method(summary   , PhenStatAgeingFE)
+S3method(summary   , OpenStatsList)
+S3method(summary   , OpenStatsMM)
+S3method(summary   , OpenStatsRR)
+S3method(summary   , OpenStatsFE)
 S3method(summary   , NULL)
 
-S3method(plot      , PhenListAgeing)
-S3method(plot      , PhenStatAgeingMM)
-S3method(plot      , PhenStatAgeingRR)
-S3method(plot      , PhenStatAgeingFE)
+S3method(plot      , OpenStatsList)
+S3method(plot      , OpenStatsMM)
+S3method(plot      , OpenStatsRR)
+S3method(plot      , OpenStatsFE)
 S3method(plot      , NULL)
 
 
@@ -49,8 +49,8 @@ S3method(plot      , NULL)
 
 #exportPattern("^[^\\.]")
 export(
-	PhenListAgeing     ,
-	testDatasetAgeing  ,
-	vectorOutputAgeing
+	OpenStatsList      ,
+	OpenStatsAnalysis  ,
+	OpenStatsReport
 )
 

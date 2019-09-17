@@ -1,14 +1,14 @@
-\name{vectorOutputAgeing}
-\alias{	vectorOutputAgeing}
+\name{OpenStatsReport}
+\alias{OpenStatsReport}
 
 \title{
-	Method "vectorOutputAgeing"
+	Method "OpenStatsReport"
 }
 \description{
-	Wrapper for the output of 'testDatasetAgeing'. Returns model fitting and results in a list or JSON format (StatPacket).
+	Wrapper for the output of 'OpenStatsAnalysis'. Returns model fitting and results in a list or JSON format (StatPacket).
 }
 \usage{
-vectorOutputAgeing(
+OpenStatsReport(
 	object                   ,
 	othercolumns = NULL      ,
 	JSON = FALSE             ,
@@ -20,7 +20,7 @@ vectorOutputAgeing(
 %-maybe also 'usage' for other objects documented here.
 \arguments{
 	\item{object}{
-		'mandatory argument'. An instance of the testDatasetAgeing result
+		'Mandatory argument'. An instance of the OpenStatsAnalysis result object
 	}
 	\item{othercolumns}{
 		A list of column names that must be included in the results. Default NULL
@@ -32,7 +32,7 @@ vectorOutputAgeing(
 		Logical flag. Setting to TRUE will remove all NULL elements from the output. Default is FALSE
 	}
 	\item{ReportNullSchema}{
-		logical flag. Setting to TRUE forces the function to return results even if the testDatasetAgeing returns a failure message
+		logical flag. Setting to TRUE forces the function to return results even if the OpenStatsAnalysis returns a failure message
 	}
 	\item{\dots}{
 		Other parameters that can be passed to `toJSON()` function in the "jsonlite" library
@@ -48,9 +48,9 @@ vectorOutputAgeing(
 }
 
 \seealso{
-	\code{\link{testDatasetAgeing}}
+	\code{\link{OpenStatsAnalysis}}
 }
 \examples{
-	example(testDatasetAgeing)
+	example(OpenStatsAnalysis)
 }
 

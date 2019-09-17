@@ -1,19 +1,19 @@
-\name{plot.PhenListAgeing}
-\alias{plot.PhenListAgeing}
+\name{plot.OpenStatsList}
+\alias{plot.OpenStatsList}
 
 \title{
-	plot for a PhenListAgeing object
+	plot for a `OpenStatsList` object
 }
 \description{
-	This function visualises a PhenListAgeing object
+	This function visualises a `OpenStatsList` object
 }
 \usage{
-	\method{plot}{PhenListAgeing}(x, vars = NULL, ...)
+	\method{plot}{OpenStatsList}(x, vars = NULL, ...)
 }
 
 \arguments{
 	\item{x}{
-		PhenListAgeing object 
+		OpenStatsList object 
 	}
 	\item{vars}{
 		Variable(s) of interest. The default is 'Batch', 'Genotype', 'Sex and 'LifeStage' if exists in the data
@@ -29,9 +29,9 @@
 }
 
 \seealso{
-	\code{\link{PhenListAgeing}}
+	\code{\link{OpenStatsList}}
 }
 
 \examples{
-	example(PhenListAgeing)
+	example(OpenStatsList)
 }
