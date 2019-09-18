@@ -693,16 +693,50 @@ diff0 = function(x) {
 	return(r)
 }
 
+summary1 = function(x, ...) {
+	r = tryCatch(
+		expr = summary(x, ...),
+		warning = function(war) {
+			message0('\t * The summary failed with the warning (see below): ')
+			message0('\t', war, breakLine = FALSE)
+			return(NULL)
+		},
+		error = function(err) {
+			message0('\t * The summary failed with the error (see below): ')
+			message0('\t   ', err, breakLine = FALSE)
+			return(NULL)
+		}
+	)
+	return(r)
+}
+
+anova0 = function(x, ...) {
+	r = tryCatch(
+		expr = anova(x, ...),
+		warning = function(war) {
+			message0('\t * The ANOVA failed with the warning (see below): ')
+			message0('\t', war, breakLine = FALSE)
+			return(NULL)
+		},
+		error = function(err) {
+			message0('\t * The ANOVA failed with the error (see below): ')
+			message0('\t   ', err, breakLine = FALSE)
+			return(NULL)
+		}
+	)
+	return(r)
+}
+
 summary0 = function(x, ...) {
 	if (is.null(x) || length(x) < 1) {
 		message0('Null column found in the data!')
 		return(x)
 	}
 	if (is.numeric(x)) {
-		r  = summary(diff0(x), ...)
+		r  = summary1(diff0(x), ...)
 	} else{
 		xx = as.factor(x)
-		r  = c(sort(levels(xx)), summary(diff0(as.integer(xx)), ...))
+		r  = c(sort(levels(xx)), summary1(diff0(as.integer(xx)), ...))
 	}
 	return(r)
 }
@@ -2332,6 +2366,17 @@ removeSingleLevelFactors = function(formula, data) {
 }
 
 
+InteractionAndValue = function(x, VName = 'p-value') {
+	r = list()
+	if (!is.null(x)) {
+		r[VName] = x
+		r['Criteria'] = TRUE
+	} else{
+		r$Criteria = FALSE
+	}
+	return(r)
+}
+
 modelSummaryPvalueExtract = function(x,
 																		 variable   = 'Genotype'                          ,
 																		 anova      = TRUE                                ,
@@ -2342,12 +2387,12 @@ modelSummaryPvalueExtract = function(x,
 		return(NULL)
 	if (anova) {
 		if (any(class(x) %in% 'glm')) {
-			mOrg = anova(x, test = 'LRT')
+			mOrg = anova0(x, test = 'LRT')
 		} else{
-			mOrg = anova(x)
+			mOrg = anova0(x)
 		}
 	} else{
-		mOrg  = coef(summary(x))
+		mOrg  = coef(summary1(x))
 	}
 	mOrg  = as.data.frame(mOrg)
 	if (debug)

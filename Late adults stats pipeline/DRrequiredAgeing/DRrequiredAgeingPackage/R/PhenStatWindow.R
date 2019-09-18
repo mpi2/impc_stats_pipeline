@@ -42,13 +42,13 @@ PhenStatWindow = function (phenlistObject                                ,
   if (method %in% 'MM' &&
       unique(phenlistObject@datasetPL$observation_type) %in% 'time_series') {
     RandEffTerm = if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'LifeStage'))
-      as.formula('~ 1 | LifeStage/external_sample_id/Batch')
+      as.formula('~ 1 | external_sample_id')
     else
-      as.formula('~ 1 | external_sample_id/Batch')
+      as.formula('~ 1 | Batch')
     CorrEffect  = nlme::corAR1() #corSymm()
   } else{
     RandEffTerm = if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'LifeStage'))
-      as.formula('~ 1 | LifeStage/Batch')
+      as.formula('~ 1 | Batch')
     else
       as.formula('~ 1 | Batch')
     CorrEffect  = NULL

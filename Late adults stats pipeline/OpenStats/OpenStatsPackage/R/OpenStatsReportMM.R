@@ -65,7 +65,7 @@ OpenStatsReportCont =	function(object,
 			'Further models' = if (!is.null(object$output$SplitModels)) {
 				lapply(object$output$SplitModels, function(v) {
 					if (class(v) %in% c('lme', 'gls', 'glm')) {
-						r          = as.list(unmatrix0(summary(v)$tTable))
+						r          = as.list(unmatrix0(summary1(v)$tTable))
 						r$Model    = printformula(v$SplitFormula)
 						r$Method   = pasteComma(class(v),truncate = FALSE)
 					} else{
