@@ -14,6 +14,27 @@
 	)
 }
 
+ML2REML = function(x, debug = FALSE) {
+	if (!is.null(x)       &&
+			is(x, c('lme', 'gls'))) {
+		if (debug)
+			message0('\tRecovering the REML object from ML ...')
+		x = update(x, method = 'REML')
+	}
+	return(x)
+}
+
+REML2ML = function(x, debug = FALSE) {
+	if (!is.null(x)       &&
+			is(x, c('lme', 'gls')))
+	{
+		if (debug)
+			message0('\tCoverting REML object to ML ...')
+		x = update(x, method = 'ML')
+	}
+	return(x)
+}
+
 Matrix2List = function(x, ...) {
 	if (is.null(x))
 		return(NULL)
@@ -589,7 +610,7 @@ eff.size = function(object,
 				'Variable'            = effOfInd                            ,
 				'Model'               = printformula(formula(NModel))       ,
 				'Type'                = 'Standardized coefficient'          ,
-				'Percentage change' = PerChange
+				'Percentage change'   = PerChange
 			)
 		} else{
 			# For categorical covariates it is the mean difference

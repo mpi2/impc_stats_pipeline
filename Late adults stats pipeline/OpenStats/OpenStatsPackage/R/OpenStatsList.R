@@ -51,9 +51,11 @@ OpenStatsList =
 			## Replace missing values specified in the user format with NA
 			if (!is.null(dataset.values.missingValue)) {
 				message0(
-					'Checking the specified missing values (`',
-					pasteComma(dataset.values.missingValue),
-					'`) ...'
+					'Checking the specified missing values [x',
+					length(dataset.values.missingValue),
+					'] (',
+					pasteComma(paste0('`', dataset.values.missingValue, '`')),
+					') ...'
 				)
 				dataset[dataset %in%  dataset.values.missingValue] = NA
 			}

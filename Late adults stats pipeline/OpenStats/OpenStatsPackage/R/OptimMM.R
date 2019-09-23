@@ -72,7 +72,7 @@ M.opt = function(object = NULL            ,
 													 		random    = CheckedRandom ,
 													 		data      = data   ,
 													 		na.action = na.omit,
-													 		method    = ifelse(mdl == 'glm', 'glm.fit', 'ML'),
+													 		method    = ifelse(mdl == 'glm', 'glm.fit', 'REML'),
 													 		weights   = if (mdl != 'glm') {
 													 			weight
 													 		} else{
@@ -162,7 +162,8 @@ M.opt = function(object = NULL            ,
 		message0('\tOptimising the model ... ')
 		F.Model = tryCatch(
 			expr = stepAIC0(
-				I.Model                           ,
+				# stepAIC must have ML fit as the input
+				REML2ML(I.Model)                  ,
 				trace     = trace                 ,
 				direction = direction             ,
 				scope     = list(lower = lowerCorrected) ,
@@ -188,6 +189,7 @@ M.opt = function(object = NULL            ,
 			optimise[1] = FALSE
 		} else{
 			message0('\tOptimised model: ', printformula(formula(F.Model)))
+			F.Model     = ML2REML(F.Model)
 			F.Model     = intervalsCon (object = F.Model, lvls = ci_levels)
 			optimise[1] = TRUE
 		}
@@ -218,7 +220,7 @@ M.opt = function(object = NULL            ,
 			if (!is.null(F.Model ) &&
 					!is.null(FV.Model) &&
 					# k is useless here
-					AICc(FV.Model, k = log(n)) <= AICc(F.Model, k = log(n))) {
+					AICc(REML2ML(FV.Model), k = log(n)) <= AICc(REML2ML(F.Model), k = log(n))) {
 				# = is important
 				F.Model  = FV.Model
 				VarHomo  = FALSE
@@ -237,7 +239,7 @@ M.opt = function(object = NULL            ,
 						model     = formula(F.Model)    ,
 						data      = data                ,
 						na.action = na.omit             ,
-						method    = "ML"                ,
+						method    = "REML"                ,
 						weights   = F.Model$call$weights,
 						control   = gCont
 					)
@@ -259,7 +261,7 @@ M.opt = function(object = NULL            ,
 			if (!is.null(G.Model) &&
 					!is.null(F.Model) &&
 					# k is useless here
-					AICc(G.Model, k = log(n)) <= AICc(F.Model, k = log(n))) {
+					AICc(REML2ML(G.Model), k = log(n)) <= AICc(REML2ML(F.Model), k = log(n))) {
 				F.Model = G.Model
 				message0('\tBatch checked out ... ')
 			}

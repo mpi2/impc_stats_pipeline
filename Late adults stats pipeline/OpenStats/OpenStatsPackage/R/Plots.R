@@ -139,13 +139,13 @@ plot.OpenStatsMM = function (x                   ,
 	residShapiroTest = normality.test0(residR)
 	n                = length(na.omit(residR))
 	plot(
-		predR ,
-		residR,
-		xlab = 'Fitted values',
-		ylab = 'Residuals'    ,
-		main = main           ,
-		#ellipse = TRUE        ,
-		#reset.par = FALSE     ,
+		predR                                               ,
+		residR                                              ,
+		xlab = 'Fitted values'                              ,
+		ylab = 'Residuals'                                  ,
+		main = main                                         ,
+		#ellipse = TRUE                                     ,
+		#reset.par = FALSE                                  ,
 		...
 	)
 	abline(h = 0, lwd = 3, lty = 2)
@@ -153,30 +153,32 @@ plot.OpenStatsMM = function (x                   ,
 		residR,
 		xlab = ifelse(
 			is.null(residShapiroTest$'P-value'),
-			'Residuals'              ,
-			paste0(
-				'Residual - '          ,
-				residShapiroTest$'Test',
-				' p-value = '          ,
-				round(residShapiroTest$'P-value', 8)
-			)
-		),
-		main = paste0(main, ': Density of the residuals'),
+			'Residuals'                                       ,
+			paste0( 
+				'Residual - ['                                  ,
+				residShapiroTest$'Test'                         ,
+				'] p-value = '                                  ,
+				round(residShapiroTest$'P-value', 8) 
+			) 
+		)                                                   ,
+		main = paste0(main, ': Density of the residuals')   ,
+		rug  = FALSE                                        ,
 		...
 	)
 	qqPlot(
-		as.vector(residR),
-		ylab = 'Residuals',
+		as.vector(residR)                                   ,
+		ylab = 'Residuals'                                  ,
 		main = paste0(main, ': Normal Q-Q of the residuals'),
-		grid = FALSE ,
-		col.lines = 1,
+		grid = FALSE                                        ,
+		col.lines = 1                                       ,
 		...
 	)
 	#qqline(residR, ...)
 	densityPlot(
-		transData$data[, transData$names[1]],
-		main = 'Density of the response',
-		xlab = paste0(transData$names[1], ' (n = ', n, ')'),
+		transData$data[, transData$names[1]]                ,
+		main = 'Density of the response'                    ,
+		xlab = paste0(transData$names[1], ' (n = ', n, ')') ,
+		rug  = TRUE                                         ,
 		...
 	)
 	par(ask = p$ask, mfrow = p$mfrow)
