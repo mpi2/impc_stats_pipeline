@@ -39,6 +39,13 @@ PhenStatWindow = function (phenlistObject                                ,
   requireNamespace('OpenStats')
   requireNamespace('nlme')
   set.seed(seed)
+  # Do not remove line below (necessary for windowing)
+  if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Batch')) {
+    message0('Sorting the dataset on Batch')
+    phenlistObject@datasetPL = sortDataset(x        = phenlistObject@datasetPL,
+                                           BatchCol = 'Batch')
+  }
+  ###########################
   if (method %in% 'MM' &&
       unique(phenlistObject@datasetPL$observation_type) %in% 'time_series') {
     RandEffTerm = if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'LifeStage'))
@@ -53,9 +60,6 @@ PhenStatWindow = function (phenlistObject                                ,
       as.formula('~ 1 | Batch')
     CorrEffect  = NULL
   }
-  # Do not remove line below (necessary for windowing)
-  phenlistObject@datasetPL = sortDataset(x = phenlistObject@datasetPL, BatchCol =
-                                           'Batch')
   ###########################
   # Run normal (not windowed) models
   ###########################
