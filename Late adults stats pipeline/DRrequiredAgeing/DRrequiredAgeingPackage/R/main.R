@@ -99,7 +99,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   CategoryMap                    = readConf('CategoryMap.conf')
   initial                        = readConf('Initialize.conf')
   exceptionList                  = readFile(file = 'ExceptionMap.list')
-  EA2LAMApping                   = read.csv(file = file.path(local(),'EA2LA_parameter_mappings_2019-06-21.csv'))
+  EA2LAMApping                   = read.csv(file = file.path(local(),'EA2LA_parameter_mappings_2019-09-24.csv'))
   # CategoricalCategoryBlackList   = readFile(file = 'CategoricalCategoryBlackList.list')
   # Main subdirectory/working directory
   message0('Preparing the working directory ...')

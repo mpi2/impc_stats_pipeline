@@ -520,7 +520,7 @@ local =  function(x=NULL){
 
 getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
                                                 map         = read.csv(file = file.path(local(),
-                                                                                        'EA2LA_parameter_mappings_2019-06-21.csv')),
+                                                                                        'EA2LA_parameter_mappings_2019-09-24.csv')),
                                                 LA_data     = NULL,
                                                 solrBaseURL = 'http://hx-noah-74-10:8090') {
   message0('EA-LA binding in progress ...')
