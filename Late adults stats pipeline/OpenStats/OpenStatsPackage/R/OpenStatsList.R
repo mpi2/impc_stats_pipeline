@@ -44,6 +44,13 @@ OpenStatsList =
 			message0('error ~> Null dataset or not a data.frame.')
 			return(NULL)
 		}
+		message0('Input data of the dimensions, ',
+						 paste(
+						 	c('rows', 'columns'),
+						 	dim(dataset),
+						 	sep = ' = ',
+						 	collapse = ', '
+						 ))
 		dataset_unfiltered = dataset
 		if (clean.dataset) {
 			sta.time    = Sys.time()
