@@ -6,6 +6,7 @@ RRrunner = function(object              ,
 										RRrefLevel    = NULL                                   ,
 										RRprop        = .05                                    ,
 										ci_levels     = 0.95                                   ,
+										fullComparisions = TRUE                                ,
 										...)
 {
 	requireNamespace("rlist")
@@ -76,7 +77,7 @@ RRrunner = function(object              ,
 				formula  = x$newFormula                   ,
 				rep      = rep                            ,
 				method   = 'RR'                           ,
-				fullComparisions = TRUE                   ,
+				fullComparisions = fullComparisions       ,
 				noteToFinish     = 'in Low vs NormalHigh' ,
 				ci_levels        = ci_levels              ,
 				RRextraResults   = list(
@@ -101,7 +102,7 @@ RRrunner = function(object              ,
 				formula  = x$newFormula                   ,
 				rep      = rep                            ,
 				method   = 'RR'                           ,
-				fullComparisions = TRUE                   ,
+				fullComparisions = fullComparisions       ,
 				noteToFinish     = 'in LowNormal vs High' ,
 				ci_levels        = ci_levels              ,
 				RRextraResults   = list(

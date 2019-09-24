@@ -8,7 +8,7 @@ OpenStatsReportNULL = function(object) {
 		'Residual variances homogeneity p-value' =  NULL,
 		#####################################################################
 		'Genotype contribution' =	list(
-			Overal               = NULL,
+			'Overall'            = NULL,
 			'Sex FvKO p-value'   = NULL,
 			'Sex MvKO p-value'   = NULL	,
 			'Sexual dimorphism detected' = NULL

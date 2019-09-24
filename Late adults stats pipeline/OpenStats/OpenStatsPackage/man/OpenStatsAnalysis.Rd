@@ -39,13 +39,14 @@ OpenStatsAnalysis(
 		varIdent(form = ~ 1 |
 						 	Genotype),
 	MM_direction = "both",
-	MM_checks    = c(TRUE, TRUE, TRUE)             ,
-	MM_optimise  = c(TRUE, TRUE, TRUE)             ,
+	MM_checks    = c(TRUE, TRUE, TRUE)                     ,
+	MM_optimise  = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)   ,
 	FE_formula   = category ~   Genotype + Sex + LifeStage ,
 	RR_formula   = data_point ~ Genotype + Sex + LifeStage ,
 	RRrefLevel = 'control'                                 ,
 	RR_prop      = 0.95                                    ,
 	FERR_rep     = 1500                                    ,
+	FERR_FullComparisions = TRUE                           ,
 	MMFERR_conf.level = 0.95                               ,
 	seed         = NULL                                    ,
 	debug        = TRUE                                    ,
@@ -86,7 +87,7 @@ OpenStatsAnalysis(
 	* Regardless of the `check`, the function always checks for the existence of the `MM_random` terms in the input data
 }
 	\item{MM_optimise}{
-	Only applies to the "MM" framework. A vector of three binary values such as c(1,1,1) or c(TRUE,TRUE,TRUE) default. The first element of the vector activates the fixed effect optimisation. The algorithm uses AICc to optimise the fixed effects (Check AICcmodavg package for more details about AICc). The second and third elements of the vector activate optimisation on 'weight' and 'random effects' respectively. The optimisation of weight and random effects refers to comparing the AICc between a model with and without those effects.
+	Only applies to the "MM" framework. A vector of six binary values such as c(1,1,1,1,1,1) or c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE) (default). The first element of the vector activates the fixed effect optimisation. The algorithm uses AICc to optimise the fixed effects (Check `AICcmodavg` package for more details about AICc). The second and third elements of the vector activate optimisation on 'weight' and 'random effects' respectively. The optimisation of weight and random effects refers to comparing the AICc between a model with and without those effects. The fourth element activates the Split model effects (for example, separate male and female effects) (see `SplitModels` in the output object). The fifth effect activates the effect size estimation (see `Effect sizes` in the output object). The sixth element activates the normality tests on the residuals (see `ResidualNormalityTests` in the output object).
 	}
   \item{FE_formula}{
   Only applies to the "FE" framework. The model for analysing the categorical data. The default is: category ~ Genotype + Sex + LifeStage. \cr
@@ -104,8 +105,12 @@ OpenStatsAnalysis(
 	Only applies to the "RR" framework. A single value between (0.5,1) not including the boundaries. The threshold for the variation ranges in the RR framework. The default value is 0.95. 
 }
   \item{FERR_rep}{
-  Only applies to the "RR" or "FE" framework. The number of repetition for the Bayesian fisher exact test. See "B" parameter in `fisher.test()` function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
-}  \item{MMFERR_conf.level}{
+  Only applies to the "RR" or "FE" frameworks. The number of repetition for the Bayesian fisher exact test. See "B" parameter in `fisher.test()` function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
+} 
+  \item{FERR_FullComparisions}{
+  Only applies to the "RR" or "FE" frameworks. A single logical flag (default TRUE). If set to TRUE then all combinations of the effects (all levels of factors - for example Male_LifeStage, Male_Genotype, Male_Mutant, Male_control, Female_control, Female_Mutant, Female_LifeStage and so on) will be tested. Otherwise only main effects (no sub level - for example Sex_LifeStage) will be tested. 
+} 
+	\item{MMFERR_conf.level}{
   Applies to all frameworks (MM, FE, RR). Single numeric value for the interval confidence level. Default is 0.95
 }
  \item{seed}{
@@ -194,20 +199,20 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 		method = 'MM',
 		MM_fixed = data_point ~ Genotype  + Weight,
 		MM_lower =            ~ Genotype  + Weight + 1
-		# Or simply MM_optimised = c(0, 1, 1)
+		# Or simply MM_optimise = c(0, 1, 1, 1, 1, 1)
 	)
 	VO_MM2 = OpenStatsReport(MM2_result)
 	plot(MM2_result, col = 8, main = 'No optimisation on the fixed effects')
 	summary(MM2_result)
 	
 	#################
-	# 2.3 Mixed model (MM) with NO optimisation at all
+	# 2.3 Mixed model (MM) with NO optimisation on the model
 	#################
 	MM3_result = OpenStatsAnalysis(
 		OpenStatsList = test_Cont,
 		method = 'MM',
 		MM_fixed = data_point ~ Genotype  + Weight,,
-		MM_optimise = c(0, 0, 0)
+		MM_optimise = c(0, 0, 0, 1, 1, 1)
 	)
 	VO_MM3 = OpenStatsReport(MM3_result)
 	plot(MM3_result, col = 3, main = 'Not optimised model')

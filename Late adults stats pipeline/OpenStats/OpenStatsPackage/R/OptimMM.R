@@ -7,9 +7,9 @@ M.opt = function(object = NULL            ,
 								 trace       = TRUE       ,
 								 weight                   ,
 								 checks      = c(1, 1, 1) ,
-								 method      = 'MM'       ,
-								 optimise    = c(TRUE,TRUE,TRUE) ,
-								 ci_levels   = .95               ,
+								 method      = 'MM'                                ,
+								 optimise    = c(TRUE,TRUE,TRUE, TRUE, TRUE, TRUE) ,
+								 ci_levels   = .95                                 ,
 								 ...) {
 	if (!method %in% c('MM')        ||
 			is.null(all_vars0(fixed))   ||
@@ -36,7 +36,7 @@ M.opt = function(object = NULL            ,
 		msMaxIter   = 1500
 	)  
 	glCont        = glm.control(epsilon = 10 ^ -36, maxit = 1500)
-	G.Model       = FV.Model  = I.Model = SplitModels = F.Model = OutR = NULL
+	G.Model       = FV.Model  = I.Model = SplitModels = EffectSizes = F.Model = OutR = ResidualNormalityTest = NULL
 	VarHomo       = TRUE
 	data          = RemoveDuplicatedColumnsFromDf(x = object@datasetPL, formula = fixed)
 	n             = nrow(data)
@@ -148,15 +148,13 @@ M.opt = function(object = NULL            ,
 	if (is.null(I.Model))
 		message0('Full model failed ...')
 	else{
-		###########
 		I.Model  = intervalsCon (object = I.Model, lvls = ci_levels)
-		###########
 		message0('The specified "lower" model: \n\t',
 						 ifelse(!is.null(lower), printformula(lower), 'Null lower'))
 		lowerCorrected = ModelInReference(model = lower, reference = fixed)
-		###########
-		optimiseMessage (optimise)
+		optimiseMessage (head(optimise, 3))
 	}
+	###########
 	if (!is.null(I.Model) && optimise[1] && !is.null(lowerCorrected)) {
 		message0('\tThe direction of the optimisation (backward, forward, both): ', direction)
 		message0('\tOptimising the model ... ')
@@ -229,7 +227,7 @@ M.opt = function(object = NULL            ,
 		}else{
 			optimise[2] = FALSE
 		}
-		# Batch test
+		###########
 		if (optimise[3] && Batch_exist && !(mdl %in% 'glm')) {
 			message0('Testing Batch ... ')
 			G.Model =  tryCatch(
@@ -268,47 +266,55 @@ M.opt = function(object = NULL            ,
 		}else{
 			optimise[3] = FALSE
 		}
-		SplitModels = SplitEffect(
-			finalformula = formula(F.Model),
-			fullModelFormula = fixed     ,
-			F.Model          = F.Model   ,
-			data             = data      ,
-			depVariable      = allVars[1],
-			ci_levels        = ci_levels
-		)
-		message0('Estimating effect sizes ... ')
-		EffectSizes = c(suppressMessages(
-			AllEffSizes(
-				object      = F.Model    ,
-				depVariable = allVars[1],
-				effOfInd    = allVars[-1],
-				data        = data
+		###########
+		if (optimise[4]) 
+			SplitModels = SplitEffect(
+				finalformula = formula(F.Model),
+				fullModelFormula = fixed     ,
+				F.Model          = F.Model   ,
+				data             = data      ,
+				depVariable      = allVars[1],
+				ci_levels        = ci_levels
 			)
-		),
-		'Combined effect sizes' = suppressMessages(if (!is.null(SplitModels)) {
-			lapply(SplitModels, function(x) {
-				percentageChangeCont(
-					model = x,
-					data = getData(x),
-					variable = NULL,
-					depVar = allVars[1],
-					individual = FALSE,
-					mainEffsOnlyWhenIndivi = x$MainEffect
+		###########
+		if(optimise[5]){
+			message0('Estimating effect sizes ... ')
+			EffectSizes = c(suppressMessages(
+				AllEffSizes(
+					object      = F.Model    ,
+					depVariable = allVars[1],
+					effOfInd    = allVars[-1],
+					data        = data
 				)
-			})
-		} else{
-			NULL
-		}))
-		message0(
-			'\tTotal effect sizes estimated: ',
-			ifelse(
-				!is.null(EffectSizes),
-				length  (EffectSizes),
-				'Not possible because of errors!'
+			),
+			'Combined effect sizes' = suppressMessages(if (!is.null(SplitModels)) {
+				lapply(SplitModels, function(x) {
+					percentageChangeCont(
+						model = x,
+						data = getData(x),
+						variable = NULL,
+						depVar = allVars[1],
+						individual = FALSE,
+						mainEffsOnlyWhenIndivi = x$MainEffect
+					)
+				})
+			} else{
+				NULL
+			}))
+			message0(
+				'\tTotal effect sizes estimated: ',
+				ifelse(
+					!is.null(EffectSizes),
+					length  (EffectSizes),
+					'Not possible because of errors!'
+				)
 			)
-		)
-		message0('Quality tests in progress ... ')
-		ResidualNormalityTest = QuyalityTests(F.Model, levels = allVars[-1])
+		}
+		###########
+		if(optimise[6]){
+			message0('Quality tests in progress ... ')
+			ResidualNormalityTest = QuyalityTests(F.Model, levels = allVars[-1])
+		}
 	} else{
 		message0('This process fully terminated. No success in recovering the initial model.')
 		OutR$messages  = 'This process fully terminated. No success in recovering the initial model.'

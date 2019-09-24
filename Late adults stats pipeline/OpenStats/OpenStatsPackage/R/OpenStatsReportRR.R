@@ -121,7 +121,7 @@ OpenStatsReportRR =	function(object)
 		'Residual variances homogeneity p-value' =   NULL       ,
 		#####################################################################
 		'Genotype contribution' =	list(
-			Overal = lowHighList(
+			'Overall' = lowHighList(
 				extractFisherSubTableResults1(VsplitLow$Genotype$result),
 				extractFisherSubTableResults1(VsplitHig$Genotype$result),
 				'Details'  = GenotypeDiscLabel

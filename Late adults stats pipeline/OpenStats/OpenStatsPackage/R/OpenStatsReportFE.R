@@ -76,7 +76,7 @@ OpenStatsReportCat =	function(object)
 		'Residual variances homogeneity p-value' =  NULL       ,
 		#####################################################################
 		'Genotype contribution' =	list(
-			'Overal'             =  extractFisherSubTableResults(objRes$Genotype$result)       ,
+			'Overall'            =  extractFisherSubTableResults(objRes$Genotype$result)       ,
 			'Sex FvKO p-value'   =	extractFisherSubTableResults(objRes$Genotype_Female$result),
 			'Sex MvKO p-value'   =  extractFisherSubTableResults(objRes$Genotype_Male$result)  ,
 			'Sexual dimorphism detected' = 'Sex specific results are always reported'

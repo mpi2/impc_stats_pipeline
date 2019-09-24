@@ -1969,7 +1969,7 @@ ReadMe = function(obj, URL = NULL, skip = NULL) {
                ReadMeTxt[-skip]
              },
              collapse =  ']~>['),
-             ']\n')
+             ']')
   } else{
     ReadMeTxt = 'Not found!'
   }

@@ -18,20 +18,21 @@ OpenStatsAnalysis = function(OpenStatsListObject   = NULL          ,
 														 	varIdent(form =  ~ 1 |
 														 					 	LifeStage)
 														 else
-														 	varIdent(form =  ~ 1 |	Genotype),
-														 MM_direction = 'both',
-														 MM_checks    = c(TRUE, TRUE, TRUE),
-														 MM_optimise  = c(TRUE, TRUE, TRUE),
+														 	varIdent(form =  ~ 1 |	Genotype)            ,
+														 MM_direction = 'both'                         ,
+														 MM_checks    = c(TRUE, TRUE, TRUE)            ,
+														 MM_optimise  = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE),
 														 ### FE or RR
 														 FE_formula = category   ~ Genotype + Sex + LifeStage,
 														 RR_formula = data_point ~ Genotype + Sex + LifeStage,
 														 RRrefLevel = 'control',
 														 RR_prop    = 0.95     ,
 														 FERR_rep   = 1500     ,
+														 FERR_FullComparisions = TRUE  ,
 														 ##### Others
-														 MMFERR_conf.level = 0.95 ,
-														 seed       = NULL        ,
-														 debug      = TRUE        ,
+														 MMFERR_conf.level = 0.95      ,
+														 seed       = NULL             ,
+														 debug      = TRUE             ,
 														 ...) {
 	if(!is.null(seed))
 		set.seed(seed)
@@ -50,14 +51,16 @@ OpenStatsAnalysis = function(OpenStatsListObject   = NULL          ,
 					MM_direction = MM_direction               ,
 					MM_checks   = MM_checks                   ,
 					MM_optimise = MM_optimise                 ,
-					#### FE         
+					#### FE & RR        
 					FE_formula = FE_formula                   ,
 					RR_formula = RR_formula                   ,
 					RR_prop = RR_prop                         ,
 					RRrefLevel = RRrefLevel                   ,
 					FERR_rep = FERR_rep                       ,
-					debug = debug                             ,
-					MMFERR_conf.level = MMFERR_conf.level     ,
+					FERR_FullComparisions = FERR_FullComparisions ,
+					####
+					debug = debug                                 ,
+					MMFERR_conf.level = MMFERR_conf.level         ,
 					...
 				),
 				sup.messages = !debug,
@@ -99,6 +102,8 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 															RR_prop                          ,
 															RRrefLevel                       ,
 															FERR_rep                         ,
+															FERR_FullComparisions            ,
+															#####
 															MMFERR_conf.level = 0.95         ,
 															##### Others       
 															debug = TRUE                     ,
@@ -119,6 +124,8 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 		stop('\n ~> `method` must be one of `MM`, `FE` or `RR`')
 	
 	if (method %in% 'MM') {
+		if(length(MM_optimise)!=6)
+			stop('\n ~> `MM_optimise` must be a vector of 6 TRUE/FALSE elements. Example:\n\t c(TRUE,TRUE,TRUE,TRUE,TRUE,TRUE)')
 		message0('Linear Mixed Model (MM framework) in progress ...')
 		output =    M.opt(
 			fixed     = MM_fixed             ,
@@ -140,14 +147,15 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 		
 	} else if (method %in% 'FE') {
 		message0('Fisher Exact Test (FE framework) in progress ...')
+		message0('\tEstimation of all factor combination effects = ', FERR_FullComparisions)
 		output = crunner(
 			object = OpenStatsListObject                                               ,
 			formula = MoveResponseToRightOfTheFormula(FE_formula)                      ,
 			#expandDottedFormula(formula = FE_formula, data = OpenStatsListObject@datasetPL)  ,
-			rep = FERR_rep                                                             ,
-			method = 'FE'                                                              ,
-			fullComparisions = TRUE                                                    ,
-			ci_levels = MMFERR_conf.level                                              ,
+			rep              = FERR_rep                                                       ,
+			method           = 'FE'                                                           ,
+			fullComparisions = FERR_FullComparisions                                          ,
+			ci_levels        = MMFERR_conf.level                                              ,
 			...
 		)
 		# Important!
@@ -156,6 +164,7 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 		
 	} else if (method %in% 'RR') {
 		message0('Reference Range Plus (RR framework) in progress ...')
+		message0('\tEstimation of all factor combination effects = ', FERR_FullComparisions)
 		output = RRrunner(
 			object  = OpenStatsListObject                                               ,
 			formula = MoveResponseToRightOfTheFormula(RR_formula)                       ,
@@ -165,6 +174,7 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 			RRprop = RR_prop                                                            ,
 			ci_levels = MMFERR_conf.level                                               ,
 			RRrefLevel = RRrefLevel                                                     ,
+			fullComparisions = FERR_FullComparisions                                    ,
 			...
 		)
 		# Important!

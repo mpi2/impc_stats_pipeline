@@ -98,7 +98,7 @@ OpenStatsReportCont =	function(object,
 		'Residual variances homogeneity p-value' =  NULL                     ,
 		#####################################################################
 		'Genotype contribution' =	list(
-			Overal = TermInFormulaReturn(
+			Overall = TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
 				term = CombineLevels(Labels$Genotype$Genotype,Labels$Sex$Sex,debug = debug),
