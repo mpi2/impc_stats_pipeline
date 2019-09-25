@@ -622,7 +622,7 @@ eff.size = function(object,
 																			 	sd > 0, abs(MDiff) / sd, NA),
 				'Variable'            = effOfInd                            ,
 				'Model'               = printformula(formula(NModel))       ,
-				'Type'                = 'Mean difference'                   ,
+				'Type'                = 'Mean differences'                   ,
 				'Percentage change' = PerChange
 			)
 		}
@@ -2819,7 +2819,7 @@ normality.test0 = function(x, ...) {
 				'Mean'     = mean(x,na.rm = TRUE)           ,
 				'SD'       = sd0(x, na.rm = TRUE)           ,
 				'Test'     = 'Shapiro'                      ,
-				'Note'     = 'Caution requires when too many duplicates found in data'
+				'Note'     = 'Cautions required when too many duplicates found in data'
 			)
 		} else {
 			#################### Kolmogorov-Smirnov
