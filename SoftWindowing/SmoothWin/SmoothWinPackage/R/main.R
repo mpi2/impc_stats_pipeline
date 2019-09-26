@@ -34,6 +34,7 @@ SmoothWin = function(object                                           ,
                        predict(x)
                      }                                                ,
                      weightORthreshold = 'weight'                     ,
+                     externalWeight    = 1                            , 
                      cdf = plogis                                     ,
                      check = 2                                        ,
                      sensitivity   = c(1, 1, 1, 0)                    ,
@@ -79,6 +80,7 @@ SmoothWin = function(object                                           ,
     zeroCompensation = zeroCompensation   ,
     weightOrthreshold = weightORthreshold ,
     direction = direction                 , 
+    externalWeight  = externalWeight      ,
     ...
   )
   finall = tv.test(
@@ -114,6 +116,7 @@ SmoothWin = function(object                                           ,
     zeroCompensation = zeroCompensation   ,
     weightOrthreshold = weightORthreshold ,
     direction = direction                 ,
+    externalWeight = externalWeight       ,
     ...
   )
   finalk = tv.test(
@@ -148,6 +151,7 @@ SmoothWin = function(object                                           ,
     zeroCompensation = zeroCompensation   ,
     weightOrthreshold = weightORthreshold ,
     direction = direction                 ,
+    externalWeight = externalWeight       ,
     ...
   )
   if (simple.output) {

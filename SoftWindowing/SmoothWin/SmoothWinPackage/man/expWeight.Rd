@@ -17,6 +17,7 @@
       zeroCompensation = 0     ,
       cdf   = plogis           ,
       progress         = FALSE ,
+      multiplier       = 1     ,
       ...
 )
 }
@@ -55,6 +56,9 @@
   }
   \item{progress}{
   Logical flag. Setting to TRUE shows the progress of the function
+  }
+   \item{multiplier}{
+  Single value or vector of values the same length as weights. A multiplier for weights as simple as weight*multiplier. Note that `zeroCompensation` and the downstream normalisations will apply to the (weight*multiplier). 
   }
   \item{\dots}{
     Other parameters that can be passed to the `plot()` function such as pch, colour etc.

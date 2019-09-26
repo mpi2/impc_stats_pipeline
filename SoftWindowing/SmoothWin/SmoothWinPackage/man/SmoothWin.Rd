@@ -48,6 +48,7 @@ SmoothWin(object                                          ,
            predict(x)
          }                                                ,
          weightORthreshold = 'weight'                     ,
+         externalWeight    = 1                            , 
          cdf = plogis                                     ,
          check = 2                                        ,
          sensitivity   = c(1, 1, 1, 0)                    ,
@@ -102,6 +103,9 @@ SmoothWin(object                                          ,
   }
   \item{weightORthreshold}{
   select between 'weight' (default) or 'threshold'. If set to 'weight' then the sum of weights (Sum Weight Score (SWS)) would be used as the total number of (active) observations in the window, otherwise, total number of weights (count of weights) that are greater than a threshold (see `threshold` below) (count weights>=threshold) would be used for the total number of samples in the window (see `threshold`).
+  } 
+  \item{externalWeight}{
+  Single value or a vector of values as same length as the windowing weights. There are some use cases where one requires a precalculated weight interacts with windowing weights. This parameter allows a external weight being included in the windowing weight calculations. The windowing algorithm in each step multiplies the weights by the specified values from this arguments (windowingWeight*externalWeight). Default 1 (1*windowingWeights)
   }
   \item{cdf}{
   A cdf function preferably symmetric. The cdf function is used for the (window) weight generating function (WGF). The cdf function must have two parameters precisely a location such as mean and a scale. Standard cdf functions such as `pnorm`, `pcauchy` and `plogis` (default) can be used. For an example of custom made function we define uniform function as below:\cr\cr

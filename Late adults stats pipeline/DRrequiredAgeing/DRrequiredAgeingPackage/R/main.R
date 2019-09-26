@@ -55,6 +55,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       ChunkSize              = 24          ,
                       MinColoniesInChunks    = 32          ,
                       controlSize            = 1500        ,
+                      ### Just for outlier detection
+                      outlierDetection       = TRUE        ,
                       ### Just for Ageing Batch GEnerator  ,
                       combineEAandLA        = FALSE        ,
                       solrBaseURL           = 'http://hx-noah-74-10:8090' ,
@@ -173,7 +175,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
       n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
       ############## Read The Ageing parameters from Solr
       if(BatchProducer && combineEAandLA)
-        n3.0 = DRrequiredAgeing:::getEarlyAdultsFromParameterStableIds(
+        n3.0 = getEarlyAdultsFromParameterStableIds(
           LA_parameter_stable_id = parameter    ,
           map                    = EA2LAMApping ,
           LA_data                =  n3.0        ,
@@ -784,7 +786,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         predFunction = predFunction,
                         residFunction = residFunction,
                         weightORthreshold = weightORthreshold,
-                        direction  = direction
+                        direction  = direction,
+                        outlierDetection = outlierDetection
                       )
                       note = c(
                         note                               ,

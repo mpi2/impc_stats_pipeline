@@ -536,7 +536,7 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
       solrBaseURL,
       '/solr/experiment/select?q=*:*',
       '&fl=',
-      paste(sort(DRrequiredAgeing:::requiredDataColumns(0)), collapse = ','),
+      paste(sort(requiredDataColumns(0)), collapse = ','),
       '&fq=datasource_name:IMPC*&fq=observation_type:(',
       paste(
         '"',
@@ -1665,7 +1665,80 @@ PlotWindowingResult = function(args, overwrite = FALSE, ...) {
   }
 }
 
+## outlier detection
+PhenListOutlierDetection = function(pl                       ,
+                                    alpha   = .9             ,
+                                    wgtFUN  = "sm2.adaptive" ,
+                                    plot    = TRUE           ,
+                                    active  = TRUE) {
+  requireNamespace("robustbase")
+  if (is.null(pl) || !is.numeric(pl@datasetPL$data_point))
+    return(pl)
+  if(!active){
+    message0('\t  Outlier detection is disabled ...')
+    pl@datasetPL$outlierWeight= 1
+    return(pl)
+  }
+  #######
+  message0('\tApplying the outlier detection algorithm ...')
+  df   = pl@datasetPL
+  cols = c('BatchInt', 'data_point','Weight')
+  #######
+  if (CheckIfNameExistInDataFrame(obj = df, 'Batch',checkLevels = TRUE))
+    df$BatchInt = Date2Integer(df$Batch)
 
+  # if (CheckIfNameExistInDataFrame(obj = df, 'LifeStage',checkLevels = TRUE))
+  #   df$LifeStageInt  = as.integer(df$LifeStage)
+  #
+  # if (CheckIfNameExistInDataFrame(obj = df, 'Sex',checkLevels = TRUE))
+  #   df$SexInt  = as.integer(df$Sex)
+
+  plC      =  subset(df, df$Genotype %in% 'control')
+  message0(
+    '\tOutlier detection based on the following variables:\n\t  ',
+    paste(cols[cols %in% names(df)], sep = ', ', collapse = ', ')
+  )
+  plOutSet =	plC[, cols[cols %in% names(df)]]
+
+  oat = tryCatch(
+    expr = {
+      ouObj = robustbase::covMcd(data.matrix(plOutSet), alpha = alpha, wgtFUN = wgtFUN)
+    },
+    warning = function(war) {
+      message0('Ops! outlier detection algorithm failed! no outlier will be marked ...')
+      message0(war)
+      return(1)
+    },
+    error   = function(err) {
+      message0('Ops! outlier detection algorithm failed! no outlier will be marked ...')
+      message0(err)
+      return(1)
+    }
+  )
+  if (plot && is(oat,'mcd'))
+    plot(
+      plOutSet[, 1],
+      plOutSet[, 2],
+      col = oat$mcd.wt * 1 + 2,
+      pch =  2 + (1 - oat$mcd.wt) * 10
+    )
+  #################
+  plC$outlierWeight     = as.vector(oat$mcd.wt)
+  #################
+  plC$UniqueId          = paste0(plC$external_sample_id, plC$discrete_point)
+  pl@datasetPL$UniqueId = paste0(pl@datasetPL$external_sample_id,
+                                 pl@datasetPL$discrete_point)
+  #################
+  pl@datasetPL = merge(
+    x   = pl@datasetPL                          ,
+    y   = plC[, c('outlierWeight', 'UniqueId')] ,
+    by  = 'UniqueId'                            ,
+    all = TRUE
+  )
+  pl@datasetPL$outlierWeight[is.na(pl@datasetPL$outlierWeight)] = 1
+  pl@datasetPL$UniqueId = NULL
+  return(pl)
+}
 ## date to integer
 Date2Integer = function(x) {
   dates = as.Date(x)

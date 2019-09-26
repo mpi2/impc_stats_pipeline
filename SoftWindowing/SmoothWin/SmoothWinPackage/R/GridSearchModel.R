@@ -15,6 +15,7 @@ gridSearchModel = function(object                                     ,
                            zeroCompensation = 0                       ,
                            weightOrthreshold = 'weight'               ,
                            direction         = c(1, 1)                ,
+                           externalWeight    = 1                      ,
                            ...) {
   lk     = length(k)
   ll     = length(l)
@@ -44,7 +45,8 @@ gridSearchModel = function(object                                     ,
         cdf  = cdf                          ,
         zeroCompensation = zeroCompensation ,
         direction = direction               ,
-        progress = FALSE                    
+        progress = FALSE                    ,
+        multiplier = externalWeight
       )
       wi      = checkWeightsN(
         w         = weight    ,

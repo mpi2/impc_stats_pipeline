@@ -15,7 +15,7 @@ PhenStatWindow = function (phenlistObject                                ,
                              #               nlme::varFixed(~ 1 /
                              #                                ModelWeight))
                              nlme::varFixed(~ 1 /
-                                              (ModelWeight*outlierWeight))
+                                              (ModelWeight))
                            },
                            check = 2                                     ,
                            messages = FALSE                              ,
@@ -32,6 +32,8 @@ PhenStatWindow = function (phenlistObject                                ,
                            weightORthreshold = 'weight'                  ,
                            maxPeaks = 15                                 ,
                            direction = direction                         ,
+                           ########
+                           outlierDetection = TRUE                       ,
                            ...)
 {
   requireNamespace('PhenStat')
@@ -157,23 +159,11 @@ PhenStatWindow = function (phenlistObject                                ,
         mm            = mm[which(tt[mm] %in% sa)]
       }
       ###
-      pl = phenlistObject
-      pl@datasetPL$Btch2 = as.integer(as.Date(pl@datasetPL$Batch))
-      pl@datasetPL$Sex2  = as.integer(pl@datasetPL$Sex)
-      pl2 = subset(pl@datasetPL, pl@datasetPL$Genotype == 'control')
-      pl3 =	pl2[, c('Btch2', 'data_point', 'Sex2')]
-      a = robustbase::covMcd(data.matrix(pl3), alpha = 0.90, wgtFUN = "sm2.adaptive")
-      plot(
-        pl3[, 1],
-        pl3[, 2],
-        col = a$mcd.wt * 1 + 2,
-        pch = as.integer(pl2$Genotype) + 2 + (1 - a$mcd.wt) * 10
-      )
-      pl2$outlierWeight = as.vector(a$mcd.wt)
-      phenlistObject@datasetPL = merge(x = phenlistObject@datasetPL,
-                                       y = pl2[, c('outlierWeight', 'external_sample_id')],
-                                       by = 'external_sample_id',all = TRUE)
-      phenlistObject@datasetPL$outlierWeight[is.na(phenlistObject@datasetPL$outlierWeight)] = 1
+      message0('Outlier detection in progress ...')
+      phenlistObject = PhenListOutlierDetection(phenlistObject     ,
+                                                plot   = !storeplot,
+                                                active = outlierDetection)
+      outlierWeight  = phenlistObject@datasetPL$outlierWeight
       ####
       message0('Windowing algorithm in progress ...')
       r = SmoothWin(
@@ -206,7 +196,8 @@ PhenStatWindow = function (phenlistObject                                ,
           message0('min.obs =  ', r)
           return(r)
         },
-        zeroCompensation = threshold*10^-3
+        zeroCompensation = threshold*10^-3,
+        externalWeight   = outlierWeight
       )
       ##############################
       phenlistObject@datasetPL$AllModelWeights = we = we2 =  r$finalModel$FullWeight

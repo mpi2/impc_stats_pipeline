@@ -70,6 +70,7 @@ expWeight = function(t                         ,
                      zeroCompensation = 0      ,
                      cdf              = plogis ,
                      progress         = FALSE  ,
+                     multiplier       = 1      ,
                      ...) {
   requireNamespace('Rfast')
   check_version(pkg_name = 'Rfast',min_version = '1.9.3')
@@ -97,7 +98,7 @@ expWeight = function(t                         ,
   })
   ############################################################
   # Begin. Just process the rows that are not zero!
-  FinalS = rowsums(r)
+  FinalS = rowsums(r)*multiplier
   r = r[FinalS > zeroCompensation, , drop = FALSE]
   ############################################################
   s = 0
