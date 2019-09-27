@@ -1507,23 +1507,39 @@ addBitsToFileName = function(file,
   return(file)
 }
 ###
-na.lomf <- function(x) {
-  na.lomf.0 <- function(x) {
-    non.na.idx <- which(!is.na(x))
-    if (is.na(x[1L])) {
-      non.na.idx <- c(1L, non.na.idx)
-    }
-    rep.int(x[non.na.idx], diff(c(non.na.idx, length(x) + 1L)))
+fillNAgaps <- function(x, firstBack=FALSE) {
+  ## NA's in a vector or factor are replaced with last non-NA values
+  ## If firstBack is TRUE, it will fill in leading NA's with the first
+  ## non-NA value. If FALSE, it will not change leading NA's.
+
+  # If it's a factor, store the level labels and convert to integer
+  lvls <- NULL
+  if (is.factor(x)) {
+    lvls <- levels(x)
+    x    <- as.integer(x)
   }
 
-  dim.len <- length(dim(x))
+  goodIdx <- !is.na(x)
 
-  if (dim.len == 0L) {
-    na.lomf.0(x)
-  } else {
-    apply(x, dim.len, na.lomf.0)
+  # These are the non-NA values from x only
+  # Add a leading NA or take the first good value, depending on firstBack
+  if (firstBack)   goodVals <- c(x[goodIdx][1], x[goodIdx])
+  else             goodVals <- c(NA,            x[goodIdx])
+
+  # Fill the indices of the output vector with the indices pulled from
+  # these offsets of goodVals. Add 1 to avoid indexing to zero.
+  fillIdx <- cumsum(goodIdx)+1
+
+  x <- goodVals[fillIdx]
+
+  # If it was originally a factor, convert it back
+  if (!is.null(lvls)) {
+    x <- factor(x, levels=seq_along(lvls), labels=lvls)
   }
+
+  x
 }
+
 
 # plot analised data with window
 plot_win = function(phenlistObject, r, depVariable, check, ...) {
@@ -1538,10 +1554,10 @@ plot_win = function(phenlistObject, r, depVariable, check, ...) {
   if (!is.null(r) &&
       !is.null(r$finalModel$data$outlierWeight)) {
     r$finalModel$FullWeight[r$finalModel$data$outlierWeight < 1] = NA
-    r$finalModel$FullWeight  =  na.lomf(r$finalModel$FullWeight)
+    r$finalModel$FullWeight  =  fillNAgaps(r$finalModel$FullWeight, firstBack = TRUE)
     lwd = phenlistObject@datasetPL$outlierWeight
     lwd[is.na(lwd)] = 0
-    lwd = (2-lwd)^2
+    lwd = (2 - lwd) ^ 2
   } else{
     lwd = 1
   }
