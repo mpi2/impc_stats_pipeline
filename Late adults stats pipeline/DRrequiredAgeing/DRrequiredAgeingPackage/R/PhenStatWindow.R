@@ -41,6 +41,15 @@ PhenStatWindow = function (phenlistObject                                ,
   requireNamespace('OpenStats')
   requireNamespace('nlme')
   set.seed(seed)
+  ### Outliwe detection
+  if (outlierDetection && method %in% 'MM') {
+    message0('Outlier detection in progress ...')
+    phenlistObject = PhenListOutlierDetection(phenlistObject     ,
+                                              plot   = !storeplot,
+                                              active = outlierDetection)
+  } else{
+    phenlistObject@datasetPL$outlierWeight = 1
+  }
   # Do not remove line below (necessary for windowing)
   if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Batch')) {
     message0('Sorting the dataset on Batch')
@@ -158,12 +167,6 @@ PhenStatWindow = function (phenlistObject                                ,
         sa            = sample(unique(tt[mm]), maxPeaks)
         mm            = mm[which(tt[mm] %in% sa)]
       }
-      ###
-      message0('Outlier detection in progress ...')
-      phenlistObject = PhenListOutlierDetection(phenlistObject     ,
-                                                plot   = !storeplot,
-                                                active = outlierDetection)
-      outlierWeight  = phenlistObject@datasetPL$outlierWeight
       ####
       message0('Windowing algorithm in progress ...')
       r = SmoothWin(
@@ -197,7 +200,7 @@ PhenStatWindow = function (phenlistObject                                ,
           return(r)
         },
         zeroCompensation = threshold*10^-3,
-        externalWeight   = outlierWeight
+        externalWeight   = phenlistObject@datasetPL$outlierWeight
       )
       ##############################
       phenlistObject@datasetPL$AllModelWeights = we = we2 =  r$finalModel$FullWeight
@@ -254,7 +257,8 @@ PhenStatWindow = function (phenlistObject                                ,
         MM_weight   = nlme::varComb(
           nlme:: varFixed( ~ 1 / AllModelWeights)
         ),
-        debug       = TRUE
+        debug       = TRUE,
+        MM_optimise = c(1, 0, 1, 1, 1, 1)
       )
       windowingNote$'Windowing analysis'$'Final model' = objectf$messages
       # Full model windowing

@@ -1506,7 +1506,24 @@ addBitsToFileName = function(file,
     file = paste(bit, basename(file), sep = sep)
   return(file)
 }
+###
+na.lomf <- function(x) {
+  na.lomf.0 <- function(x) {
+    non.na.idx <- which(!is.na(x))
+    if (is.na(x[1L])) {
+      non.na.idx <- c(1L, non.na.idx)
+    }
+    rep.int(x[non.na.idx], diff(c(non.na.idx, length(x) + 1L)))
+  }
 
+  dim.len <- length(dim(x))
+
+  if (dim.len == 0L) {
+    na.lomf.0(x)
+  } else {
+    apply(x, dim.len, na.lomf.0)
+  }
+}
 
 # plot analised data with window
 plot_win = function(phenlistObject, r, depVariable, check, ...) {
@@ -1518,12 +1535,23 @@ plot_win = function(phenlistObject, r, depVariable, check, ...) {
       phenlistObject@datasetPL$LifeStage
     )
   )))
+  if (!is.null(r) &&
+      !is.null(r$finalModel$data$outlierWeight)) {
+    r$finalModel$FullWeight[r$finalModel$data$outlierWeight < 1] = NA
+    r$finalModel$FullWeight  =  na.lomf(r$finalModel$FullWeight)
+    lwd = phenlistObject@datasetPL$outlierWeight
+    lwd[is.na(lwd)] = 0
+    lwd = (2-lwd)^2
+  } else{
+    lwd = 1
+  }
   par(mar = c(5.1, 4.1, 4.1, 9.0))
   requireNamespace('SmoothWin')
   plot(r,
        col = as.integer(col),
        pch = as.integer(pch),
        cex.main = .7,
+       lwd = lwd    ,
        ...)
   legend(
     'topright',
