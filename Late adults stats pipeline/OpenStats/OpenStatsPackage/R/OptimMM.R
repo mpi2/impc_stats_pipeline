@@ -334,7 +334,7 @@ M.opt = function(object = NULL            ,
 			Final.Model.Tag     = class(F.Model)[1]        ,
 			Initial.Model.Tag   = mdl                      ,
 			VarHomoIn           = VarHomo                  ,
-			BatchIn             = Batch_exist  && is(F.Model %in% 'lme') ,
+			BatchIn             = Batch_exist  && is(F.Model, 'lme')     ,
 			SexIn               = termInTheModel(
 				model = formula(F.Model)                                   ,
 				term = 'Sex'                                               ,
