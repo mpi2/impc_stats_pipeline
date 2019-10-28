@@ -524,6 +524,11 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
                                                 LA_data     = NULL,
                                                 solrBaseURL = 'http://hx-noah-74-10:8090') {
   message0('EA-LA binding in progress ...')
+  if (!any(c('LA_parameter', 'EA_parameter') %in% names(map))) {
+    stop(
+      'Check the LA/EA mapping column names! It must have at least two columns: EA_parameter and LA_parameter '
+    )
+  }
   plist = as.character(unique(map$EA_parameter[map$LA_parameter %in% LA_parameter_stable_id]))
 
   if (length(plist) < 1) {
