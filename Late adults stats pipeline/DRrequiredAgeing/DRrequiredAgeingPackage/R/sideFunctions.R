@@ -1764,7 +1764,7 @@ PhenListOutlierDetection = function(pl                       ,
       return(1)
     }
   )
-  if (plot && is(oat,'mcd'))
+  if (plot && is(oat,'mcd') && active)
     plot(
       plOutSet[, 1],
       plOutSet[, 2],

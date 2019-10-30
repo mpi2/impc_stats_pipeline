@@ -19,7 +19,19 @@ ML2REML = function(x, debug = FALSE) {
 			is(x, c('lme', 'gls'))) {
 		if (debug)
 			message0('\tRecovering the REML object from ML ...')
-		x = update(x, method = 'REML')
+		x =	tryCatch(
+			expr = update(x, method = 'REML'),
+			error = function(e) {
+				message0('\t\tError(s) in updating ML object to REML. See: ')
+				message0('\t\t', e, breakLine = FALSE)
+				return(NULL)
+			} ,
+			warning = function(w) {
+				message0('\t\tWarning(s) in updating ML object to REML. See: ')
+				message0('\t\t', w, breakLine = FALSE)
+				return(NULL)
+			}
+		)
 	}
 	return(x)
 }
@@ -30,10 +42,24 @@ REML2ML = function(x, debug = FALSE) {
 	{
 		if (debug)
 			message0('\tCoverting REML object to ML ...')
-		x = update(x, method = 'ML')
+		x =	tryCatch(
+			expr = update(x, method = 'ML'),
+			error = function(e) {
+				message0('\t\tError(s) in updating REML object to ML. See: ')
+				message0('\t\t', e, breakLine = FALSE)
+				return(NULL)
+			} ,
+			warning = function(w) {
+				message0('\t\tWarning(s) in updating REML object to ML. See: ')
+				message0('\t\t', w, breakLine = FALSE)
+				return(NULL)
+			}
+		)
 	}
 	return(x)
 }
+
+
 
 Matrix2List = function(x, ...) {
 	if (is.null(x))
@@ -2838,8 +2864,8 @@ normality.test0 = function(x, ...) {
 				'SD'       = sd0(x, na.rm = TRUE)         ,
 				'Test'     = 'Kolmogorov-Smirnov'         ,
 				'Note'     = paste0('Small jitter (precision = ',
-				precision,
-				' decimals) added to possible ties (duplicates)')
+														precision,
+														' decimals) added to possible ties (duplicates)')
 			)
 		}
 	} else{
@@ -3011,6 +3037,10 @@ stepAIC0 = function (object,
 										 k = 2,
 										 ...)
 {
+	if(is.null(object)){
+		message0('Null object in optimisation ...')
+		return(object)
+	}
 	mydeviance <- function(x, ...) {
 		dev <- deviance(x)
 		if (!is.null(dev))

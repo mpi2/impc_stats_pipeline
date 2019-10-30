@@ -214,11 +214,15 @@ M.opt = function(object = NULL            ,
 			)
 			########
 			FV.Model  = intervalsCon (object = FV.Model, lvls = ci_levels)
-			########
+			######## following two lines are important
+			FV.ML = REML2ML(FV.Model)
+			F.ML  = REML2ML(F.Model)
 			if (!is.null(F.Model ) &&
 					!is.null(FV.Model) &&
+					!is.null(FV.ML   ) &&
+					!is.null(F.ML    ) &&
 					# k is useless here
-					AICc(REML2ML(FV.Model), k = log(n)) <= AICc(REML2ML(F.Model), k = log(n))) {
+					AICc(FV.ML, k = log(n)) <= AICc(F.ML, k = log(n))) {
 				# = is important
 				F.Model  = FV.Model
 				VarHomo  = FALSE
@@ -255,11 +259,15 @@ M.opt = function(object = NULL            ,
 			)
 			########
 			G.Model  = intervalsCon (object = G.Model, lvls = ci_levels)
-			########
+			######## following two lines are important
+			G.ML = REML2ML(G.Model)
+			F.ML = REML2ML(F.Model)
 			if (!is.null(G.Model) &&
 					!is.null(F.Model) &&
+					!is.null(G.ML   ) &&
+					!is.null(F.ML   ) &&
 					# k is useless here
-					AICc(REML2ML(G.Model), k = log(n)) <= AICc(REML2ML(F.Model), k = log(n))) {
+					AICc(G.ML, k = log(n)) <= AICc(F.ML, k = log(n))) {
 				F.Model = G.Model
 				message0('\tBatch checked out ... ')
 			}
