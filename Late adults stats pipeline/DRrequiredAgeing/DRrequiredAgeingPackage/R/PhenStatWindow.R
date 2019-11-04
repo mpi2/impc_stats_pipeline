@@ -34,6 +34,9 @@ PhenStatWindow = function (phenlistObject                                ,
                            direction = direction                         ,
                            ########
                            outlierDetection = TRUE                       ,
+                           #######
+                           FERROptimise                                  ,
+                           MMOptimise                                    ,
                            ...)
 {
   requireNamespace('PhenStat')
@@ -82,6 +85,8 @@ PhenStatWindow = function (phenlistObject                                ,
     method                = method,
     MM_random             = RandEffTerm,
     correlation           = CorrEffect,
+    MM_optimise           = MMOptimise,
+    FERR_FullComparisions = FERROptimise,
     MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
     debug                 = TRUE
   )

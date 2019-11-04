@@ -18,6 +18,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       MultiCoreErrorHandling  = 'pass'     ,
                       inorder                 = FALSE      ,
                       verbose                 = TRUE       ,
+                      # OpenStats
+                      MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
+                      FERROptimise            = TRUE                ,
                       # Only for simulations
                       simulation              = FALSE      ,
                       Simulation.iteration    = 1          ,
@@ -787,7 +790,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         residFunction = residFunction,
                         weightORthreshold = weightORthreshold,
                         direction  = direction,
-                        outlierDetection = outlierDetection
+                        outlierDetection = outlierDetection,
+                        FERROptimise = FERROptimise,
+                        MMOptimise = MMOptimise
                       )
                       note = c(
                         note                               ,
