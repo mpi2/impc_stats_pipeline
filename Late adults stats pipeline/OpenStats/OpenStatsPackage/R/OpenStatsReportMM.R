@@ -539,7 +539,7 @@ OpenStatsReportCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStageSexGenotype FvEvKO effect size'        = object$output$'Effect sizes'$Genotype_Female.Early ,
+		'LifeStageSexGenotype FvEvKO effect size'        = object$output$'Effect sizes'$'Genotype_Female Early' ,
 		# 2.
 		'LifeStageSexGenotype MvEvKO estimate'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
@@ -577,7 +577,7 @@ OpenStatsReportCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStageSexGenotype MvEvKO effect size'        = object$output$'Effect sizes'$Genotype_Male.Early ,
+		'LifeStageSexGenotype MvEvKO effect size'        = object$output$'Effect sizes'$'Genotype_Male Early' ,
 		# 3.
 		'LifeStageSexGenotype FvLvKO estimate'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
@@ -615,7 +615,7 @@ OpenStatsReportCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStageSexGenotype FvLvKO effect size'        = object$output$'Effect sizes'$Genotype_Female.Late ,
+		'LifeStageSexGenotype FvLvKO effect size'        = object$output$'Effect sizes'$'Genotype_Female Late' ,
 		#4.
 		'LifeStageSexGenotype MvLvKO estimate'           =	modelSummaryPvalueExtract(
 			x = object$output$SplitModels$Genotype_Sex.LifeStage,
@@ -653,7 +653,7 @@ OpenStatsReportCont =	function(object,
 			anova = FALSE,
 			debug = debug
 		),
-		'LifeStageSexGenotype MvLvKO effect size'        = object$output$'Effect sizes'$Genotype_Male.Late ,
+		'LifeStageSexGenotype MvLvKO effect size'        = object$output$'Effect sizes'$'Genotype_Male Late' ,
 		################
 		'Classification tag'                   =	NULL,
 		'Transformation'                       =	NULL,

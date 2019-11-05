@@ -155,7 +155,7 @@ plot.OpenStatsMM = function (x                   ,
 			is.null(residShapiroTest$'P-value'),
 			'Residuals'                                       ,
 			paste0( 
-				'Residual - ['                                  ,
+				'Residuals - ['                                  ,
 				residShapiroTest$'Test'                         ,
 				'] p-value = '                                  ,
 				round(residShapiroTest$'P-value', 8) 
