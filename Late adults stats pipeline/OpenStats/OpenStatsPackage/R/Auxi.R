@@ -940,19 +940,20 @@ SplitEffect = 	function(finalformula     ,
 									 '. Split on ',
 									 paste0(arg, collapse = ' & '),
 									 ' ...')
-					newModel = reformulate(
-						response = depVariable,
-						termlabels = c(
-							arg              ,
-							paste(
-								mandatoryVar   ,
-								arg            ,
-								collapse = ':' ,
-								sep = ':'
-							),
-							argsCon
+					newModel = update(
+						reformulate(
+							response = depVariable,
+							termlabels = c(#arg              ,
+								paste(
+									mandatoryVar   ,
+									arg            ,
+									collapse = '*' ,
+									sep = '*'
+								),
+								argsCon),
+							intercept = TRUE
 						),
-						intercept = TRUE
+						paste0('.~.-', mandatoryVar)
 					)
 					message0('Checking the split model:\n\t',
 									 printformula(newModel))

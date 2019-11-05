@@ -81,8 +81,8 @@ OpenStatsReportCont =	function(object,
 		)
 	)
 	#####################################################################
-	pcS = object$output$'Effect sizes'$'Combined effect sizes.Genotype_Sex'$'percentage change'
-	pcO = object$output$'Effect sizes'$Genotype$'percentage change'
+	pcS = object$output$'Effect sizes'$'Combined effect sizes.Genotype_Sex'$'Percentage change'
+	pcO = object$output$'Effect sizes'$Genotype$'Percentage change'
 	percentageChanges = if (!is.null(pcS)) {
 		pcS
 	} else{
