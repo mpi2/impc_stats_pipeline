@@ -65,8 +65,11 @@ PhenStatWindow = function (phenlistObject                                ,
     RandEffTerm = if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'LifeStage'))
       as.formula('~ 1 | external_sample_id')
     else
-      as.formula('~ 1 | Batch')
+      as.formula('~ 1 | external_sample_id/Batch')
     CorrEffect  = nlme::corAR1() #corSymm()
+    # windowing does not apply to time series
+    message0('Time series detected! Windowing does not apply to the time series ...')
+    windowing = FALSE
   } else{
     RandEffTerm = if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'LifeStage'))
       as.formula('~ 1 | Batch')
