@@ -2264,7 +2264,7 @@ warning0 = function(...,
 extractFisherSubTableResults = function(x, what = 'p.value') {
 	r = lapply0(x, function(y)
 		y[what])
-	return(r)
+	return(as.list0(r))
 }
 
 lapply0 = function(X, FUN, ...) {
@@ -2492,7 +2492,12 @@ CatEstimateAndCI = function(object) {
 			'Level'   = v$level
 		))
 	} else{
-		return('Only available for 2x2 tables')
+		return(list(
+			'Value' = 'Only available for 2x2 tables' ,
+			'Confidence' = list('Lower' = NULL        ,
+													'Upper' = NULL)       ,
+			'Level'   = NULL
+		))
 	}
 }
 
