@@ -7,6 +7,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       seed = 123456                        ,
                       readCategoriesFromFile  = TRUE       ,
                       OverwriteExistingFiles  = FALSE      ,
+                      ignoreSkipList          = FALSE      ,
                       onlyFillNotExisitingResults = FALSE  ,
                       WhiteListMethods  = NULL             ,
                       # Carefully use this option!
@@ -633,7 +634,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       item = c(parameter, procedure),
                       list = exceptionList,
                       message = 'Value found in the skip list'
-                    )
+                    ) && !ignoreSkipList
                     n3.5.2  = droplevels0(n3.5.1)
                     MergLev = MergeLevels(x = n3.5.2[, depVar],
                                           listOfLevelMaps = CategoryMap)
