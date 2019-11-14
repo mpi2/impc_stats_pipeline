@@ -1742,7 +1742,7 @@ PhenListOutlierDetection = function(pl                       ,
   # if (CheckIfNameExistInDataFrame(obj = df, 'Sex',checkLevels = TRUE))
   #   df$SexInt  = as.integer(df$Sex)
 
-  plC      =  subset(df, df$Genotype %in% 'control')
+  plC      =  subset(df, df$Genotype %in% pl@refGenotype)
   message0(
     '\tOutlier detection based on the following variables:\n\t  ',
     paste(cols[cols %in% names(df)], sep = ', ', collapse = ', ')
