@@ -2851,7 +2851,7 @@ normality.test0 = function(x, ...) {
 				'Mean'     = mean(x,na.rm = TRUE)           ,
 				'SD'       = sd0(x, na.rm = TRUE)           ,
 				'Test'     = 'Shapiro'                      ,
-				'Note'     = 'Cautions required when too many duplicates exist in data'
+				'Note'     = 'Cautions require when too many duplicates exist in data'
 			)
 		} else {
 			#################### Kolmogorov-Smirnov
