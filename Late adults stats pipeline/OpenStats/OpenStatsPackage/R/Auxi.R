@@ -388,6 +388,19 @@ order0 = function(x, levels = FALSE) {
 }
 
 
+FormulaContainsFunction = function(formula) {
+	if (is.null(formula)) {
+		message0('Blank formula!')
+		return(NULL)
+	}
+	#
+	fFull     = all_vars0(formula, functions = TRUE)
+	FAbstract = all_vars0(formula, functions = FALSE)
+	r = !identical(fFull    [grepl(pattern = '[0-9A-Za-z]', x = fFull)],
+								 FAbstract[grepl(pattern = '[0-9A-Za-z]', x = FAbstract)])
+	
+	return(r)
+}
 
 percentageChangeCont = function(model                ,
 																data                 ,

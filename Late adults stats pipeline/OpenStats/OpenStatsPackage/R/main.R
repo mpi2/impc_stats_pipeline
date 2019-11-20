@@ -122,10 +122,15 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 		stop('\n ~> Confidence level must be a single value in (0,1) interval')
 	if (length(method) > 1 || !method %in% c('MM', 'FE', 'RR'))
 		stop('\n ~> `method` must be one of `MM`, `FE` or `RR`')
-	
+	#####
 	if (method %in% 'MM') {
 		if(length(MM_optimise)!=6)
 			stop('\n ~> `MM_optimise` must be a vector of 6 TRUE/FALSE elements. Example:\n\t c(TRUE,TRUE,TRUE,TRUE,TRUE,TRUE)')
+		if (FormulaContainsFunction(MM_fixed)) {
+			stop(
+				'\n ~> Function detected in `MM_fixed`.\n\t	Please apply the function to the dataset prior to the analysis.'
+			)
+		}
 		message0('Linear Mixed Model (MM framework) in progress ...')
 		output =    M.opt(
 			fixed     = MM_fixed             ,
@@ -146,6 +151,11 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 			output$input$fixed = MM_fixed
 		
 	} else if (method %in% 'FE') {
+		if (FormulaContainsFunction(FE_formula)) {
+			stop(
+				'\n ~> Function detected in `FE_formula`.\n\t	Please apply the function to the dataset prior to the analysis.'
+			)
+		}
 		message0('Fisher Exact Test (FE framework) in progress ...')
 		message0('\tEstimation of all factor combination effects = ', FERR_FullComparisions)
 		output = crunner(
@@ -163,6 +173,11 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 			output$input$formula = FE_formula
 		
 	} else if (method %in% 'RR') {
+		if (FormulaContainsFunction(RR_formula)) {
+			stop(
+				'\n ~> Function detected in `RR_formula`.\n\t	Please apply the function to the dataset prior to the analysis.'
+			)
+		}
 		message0('Reference Range Plus (RR framework) in progress ...')
 		message0('\tEstimation of all factor combination effects = ', FERR_FullComparisions)
 		output = RRrunner(
