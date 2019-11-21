@@ -46,7 +46,6 @@ M.opt = function(object = NULL            ,
 	CheckedRandom = RandomEffectCheck(formula = random,
 																		data    = data)
 	allVars       = all_vars0(fixed)
-	fullVars      = formulaTerms(fixed,response = TRUE)
 	LifeStage     = 'LifeStage' %in% allVars
 	##################
 	Batch_exist   = !categorical && !is.null(CheckedRandom) 
@@ -279,21 +278,20 @@ M.opt = function(object = NULL            ,
 		if (optimise[4]) 
 			SplitModels = SplitEffect(
 				finalformula = formula(F.Model),
-				fullModelFormula = fixed       ,
-				F.Model          = F.Model     ,
-				data             = data        ,
-				depVariable      = fullVars[1] ,
+				fullModelFormula = fixed     ,
+				F.Model          = F.Model   ,
+				data             = data      ,
+				depVariable      = allVars[1],
 				ci_levels        = ci_levels
 			)
 		###########
-		print(1:1000)
 		if(optimise[5]){
 			message0('Estimating effect sizes ... ')
 			EffectSizes = c(suppressMessages(
 				AllEffSizes(
-					object      = F.Model     ,
-					depVariable = fullVars[1] ,
-					effOfInd    = fullVars[-1],
+					object      = F.Model    ,
+					depVariable = allVars[1],
+					effOfInd    = allVars[-1],
 					data        = data
 				)
 			),

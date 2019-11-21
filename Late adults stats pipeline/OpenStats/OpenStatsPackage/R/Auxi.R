@@ -146,7 +146,7 @@ checkModelTermsInData = function(formula,
 			'\n\t Initial  model: ',
 			printformula(formula)
 		)
-		ft      = vars [!In]
+		ft  = vars [!In]
 		formula = update.formula(formula,
 														 reformulate0(
 														 	termlabels = c('.', ft, paste0(ft, ':.')),
@@ -402,39 +402,27 @@ FormulaContainsFunction = function(formula) {
 	return(r)
 }
 
-ExtractElementsFromFunctionalTerms = function(term) {
-	if (is.null(term))
-		return(NULL)
-	r = reformulate(termlabels = term,
-									response = '.',
-									intercept = TRUE)
-	return(all_vars0(r)[-1])
-}
-
 percentageChangeCont = function(model                ,
 																data                 ,
 																variable             ,
 																depVar               ,
 																individual = TRUE    ,
 																mainEffsOnlyWhenIndivi = 'Sex',
-																FUN = range0         ,
+																FUN = range0,
 																sep = ' ') {
 	if (!(
 		!is.null(data)                                           &&
-		!is.null(depVar)                                         &&
 		(!is.null(variable) || !is.null(mainEffsOnlyWhenIndivi)) &&
 		!is.null(model)                                          &&
-		!is.null(FUN(data[, ExtractElementsFromFunctionalTerms(depVar)])) &&
-		FUN(data[, ExtractElementsFromFunctionalTerms(depVar)]) != 0
+		!is.null(FUN(data[, depVar]))                            &&
+		FUN(data[, depVar]) != 0
 	))
 		return(NULL)
 	####
-	NormaliseData = !FormulaContainsFunction(formula(model))
-	model         =
+	model       =
 		tryCatch(
 			expr = update(model                          ,
-										data   = NormaliseDataFrame(data,
-																								active = NormaliseData)),
+										data = NormaliseDataFrame(data)),
 			error = function(e) {
 				message0(
 					'\t\tError(s) in the (combined) effect size estimation for',
@@ -456,7 +444,6 @@ percentageChangeCont = function(model                ,
 		)
 	if (is.null(model))
 		return(NULL)
-	
 	coefs = unlist(
 		suppressMessagesANDWarnings(
 			summary(model, verbose = FALSE)$tTable[, 1],
@@ -465,24 +452,23 @@ percentageChangeCont = function(model                ,
 		)
 	)
 	######
-	ran   = FUN(data[, ExtractElementsFromFunctionalTerms(depVar)])
+	ran   = FUN(data[, depVar])
 	if (is.null(coefs) || is.null(ran) || is.nan(ran))
 		return(NULL)
 	######
 	if (individual) {
 		out   = sapply(variable, function(x) {
-			xNoFunctional = ExtractElementsFromFunctionalTerms(x)
 			message0('\tCalculating the percentage change for: ',
 							 pasteComma(x))
-			if (is.numeric(data[, xNoFunctional])) {
+			if (is.numeric(data[, x])) {
 				r = coefs[-1]
 				names(r) = NULL
 			} else{
 				r  = coefs
 				lr = length(r)
-				ol = order0(levels(data[, xNoFunctional]))
+				ol = order0(levels(data[, x]))
 				##########
-				if (lr != nlevels(data[, xNoFunctional])) {
+				if (lr != nlevels(data[, x])) {
 					message0(
 						'\tCare reguired for the percentage change calculation for: ',
 						x,
@@ -508,9 +494,8 @@ percentageChangeCont = function(model                ,
 				'Value'               = as.list(out)                             ,
 				'Variable'            = mainEffsOnlyWhenIndivi                   ,
 				'Model'               = printformula(formula(model))             ,
-				'Type'                = 'Interaction coefficients '              ,
-				'Percentage change'   = Matrix2List(out / ran * 100, sep = sep)  ,
-				'Data normalised'     = NormaliseData
+				'Type'                = 'Standardized interaction coefficients ' ,
+				'Percentage change' = Matrix2List(out / ran * 100, sep = sep)
 			)
 		)
 	}
@@ -600,19 +585,13 @@ eff.size = function(object,
 										effOfInd    = 'Genotype'  ,
 										errorReturn = NULL        ,
 										debug       = FALSE) {
-	
-	f    = reformulate(termlabels = effOfInd, depVariable)
-	NormaliseData = !FormulaContainsFunction(f)
-	###
 	if (all(is.null(data)))
-		data = getData(object)
-	###
-	data = NormaliseDataFrame(data, active = NormaliseData)
+		data = NormaliseDataFrame(getData(object))
+	f    = reformulate(termlabels = effOfInd, depVariable)
 	# Remove NAs
-	data        = data[complete.cases(data[, all_vars0(f)]), ]
-	depVarTemp  = all_vars0(f)[1]
-	if (!(depVarTemp %in% names(data)          &&
-				length(na.omit(data[, depVarTemp])) > 1))
+	data = data[complete.cases(data[, all_vars0(f)]), ]
+	if (!(depVariable %in% names(data)          &&
+				length(na.omit(data[, depVariable])) > 1))
 		return(NULL)
 	
 	agr  = aggregate(f, data = data, FUN = function(x){mean(x,na.rm = TRUE)})
@@ -656,7 +635,7 @@ eff.size = function(object,
 			}
 		)
 	if (!is.null(NModel)) {
-		CoefEffSizes = sapply(data[, all_vars0(f)[-1], drop = FALSE], FUN = is.numeric)
+		CoefEffSizes = sapply(data[, effOfInd, drop = FALSE], FUN = is.numeric)
 		PerChange = percentageChangeCont(
 			model    = NModel    ,
 			data     = data      ,
@@ -669,9 +648,8 @@ eff.size = function(object,
 				'Value'               = as.list(coef(NModel))[[effOfInd]][1],
 				'Variable'            = effOfInd                            ,
 				'Model'               = printformula(formula(NModel))       ,
-				'Type'                = 'Coefficient magnitude'             ,
-				'Percentage change'   = PerChange                           ,
-				'Data normalised'     = NormaliseData
+				'Type'                = 'Standardized coefficient'          ,
+				'Percentage change'   = PerChange
 			)
 		} else{
 			# For categorical covariates it is the mean difference
@@ -683,9 +661,8 @@ eff.size = function(object,
 																			 	sd > 0, abs(MDiff) / sd, NA),
 				'Variable'            = effOfInd                            ,
 				'Model'               = printformula(formula(NModel))       ,
-				'Type'                = 'Mean differences'                  ,
-				'Percentage change'   = PerChange                           ,
-				'Data normalised'     = NormaliseData
+				'Type'                = 'Mean differences'                   ,
+				'Percentage change' = PerChange
 			)
 		}
 	} else{
@@ -945,16 +922,12 @@ SplitEffect = 	function(finalformula     ,
 												depVariable       ,
 												mandatoryVar = 'Genotype',
 												ci_levels    = .95) {
-	data2       = applyFormulaToData(formula = fullModelFormula ,
-																	 data = data                ,
-																	 add = TRUE)$data
-	fterms      = formulaTerms(fullModelFormula,response = TRUE,intercept =  FALSE)
-	Allargs     = fterms[!fterms %in% c(depVariable, mandatoryVar)]
+	Allargs  = all_vars0(fullModelFormula)[!all_vars0(fullModelFormula) %in% c(depVariable, mandatoryVar)]
 	if (is.null(Allargs)) {
 		message0 ('Nothing to split on ...')
 		return(NULL)
 	}
-	isCat    = !sapply(data2[, Allargs, drop = FALSE], is.numeric)
+	isCat    = !sapply(data[, Allargs, drop = FALSE], is.numeric)
 	args     = Allargs[isCat]
 	argsCon  = if (length(Allargs[!isCat]) > 0) {
 		Allargs[!isCat]
@@ -982,8 +955,8 @@ SplitEffect = 	function(finalformula     ,
 									 ' ...')
 					newModel = update(
 						reformulate(
-							response   = getResponseFromFormula(fullModelFormula),
-							termlabels = c(#arg,
+							response = depVariable,
+							termlabels = c(#arg              ,
 								paste(
 									mandatoryVar   ,
 									arg            ,
@@ -1385,16 +1358,9 @@ getResponseFromFormula = function(formula) {
 	if (is.null(formula))
 		return(NULL)
 	if (attr(terms(as.formula(formula))    , which = 'response'))
-		getResponse(as.formula(formula))
+		all_vars0(formula)[1]
 	else
 		NULL
-}
-
-getResponse <- function(formula) {
-	tt       = terms(formula)
-	vars     = as.character(attr(tt, "variables"))[-1] ## [1] is the list call
-	response = attr(tt, "response") # index of response var
-	return(vars[response])
 }
 
 
@@ -2549,8 +2515,7 @@ CatEstimateAndCI = function(object) {
 }
 
 NormaliseDataFrame = function(data           ,
-															colnames = NULL, 
-															active   = TRUE) {
+															colnames = NULL) {
 	message0('Normalising the data.frame in progress ...')
 	
 	if (!is.null(colnames)) {
@@ -2565,11 +2530,6 @@ NormaliseDataFrame = function(data           ,
 			'No variable selected for normalisation. All numerical variables will be normalised.'
 		)
 		colnames = names(data)
-	}
-	######
-	if(!active){
-		message0('\tDataset did not normalised. It could be dut to the existence of the a function in the input model, example log(y)~x')
-		return(data)
 	}
 	######
 	data  [, colnames] = as.data.frame(lapply(
@@ -3005,26 +2965,18 @@ as.list0 = function(x, ...) {
 }
 
 AllEffSizes = function(object, depVariable, effOfInd, data) {
-	if (length(effOfInd) < 1   ||
-			(length(effOfInd) == 1 &&	effOfInd ==   1)) {
+	if (length(effOfInd) < 1 ||
+			effOfInd ==   1) {
 		message0('\tSkipped . No variable found for the effect size ...')
 		return(NULL)
 	}
-	if(is.null(object))
-		return(NULL)
-	lst        = flst = olst = NULL
-	####
-	#data      = NormaliseDataFrame(data)
-	data2      = applyFormulaToData(
-		formula = reformulate(termlabels = effOfInd, response = depVariable),
-		data    = data,
-		add     = 1
-	)$data
-	effOfInd   = effOfInd[effOfInd %in% names(data2)]
-	cats       = effOfInd[sapply(
+	lst       = flst = olst = NULL
+	data      = NormaliseDataFrame(data)
+	effOfInd  = effOfInd[effOfInd %in% names(data)]
+	cats      = effOfInd[sapply(
 		effOfInd,
 		FUN = function(cl) {
-			!is.numeric(data2[, cl])
+			!is.numeric(data[, cl])
 		}
 	)]
 	counter1 = counter2  = 1
@@ -3033,11 +2985,11 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 			message0('\tLevel:', pasteComma(unlist(eff)))
 			# 1. Main effect
 			lstTmp = eff.size(
-				object      = object     ,
+				object      = object,
 				depVariable = depVariable,
-				effOfInd    = eff        ,
-				errorReturn = NULL       ,
-				data        = data2
+				effOfInd    = eff,
+				errorReturn = NULL,
+				data        = data
 			)
 			if (!is.null(lstTmp)) {
 				lst[[counter1]]      = lstTmp
@@ -3049,12 +3001,12 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 				for (j in 1:length(cats)) {
 					cmbn = combn(x = cats, m = j)
 					for (k in 1:ncol(cmbn)) {
-						interact = interaction(data2[, cmbn[, k] , drop = FALSE], sep = ' ', drop = TRUE)
+						interact = interaction(data[, cmbn[, k] , drop = FALSE], sep = ' ', drop = TRUE)
 						for (lvl in levels(interact)) {
 							message0('\tLevel:', pasteComma(unlist(lvl)))
 							olstTmp = eff.size(
 								object      = object,
-								data        = droplevels0(data2[interact %in% lvl, , drop = FALSE]),
+								data        = droplevels0(data[interact %in% lvl, , drop = FALSE]),
 								depVariable = depVariable,
 								errorReturn = NULL,
 								effOfInd    = eff

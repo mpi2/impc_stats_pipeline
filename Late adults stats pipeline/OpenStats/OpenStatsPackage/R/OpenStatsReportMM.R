@@ -10,8 +10,8 @@ OpenStatsReportCont =	function(object,
 	depVariable    = all_vars0(frm)[1]
 	equation       = ifelse(
 		Labels$Weight %in% all_vars0(frm),
-		paste0('including '    , Labels$Weight),
-		paste0('not including ', Labels$Weight)
+		paste0('included '    , Labels$Weight),
+		paste0('not included ', Labels$Weight)
 	)
 	formula        = printformula(frm)
 	#modelContrast  = modelContrasts(formula = frm,data = object$input$data)
