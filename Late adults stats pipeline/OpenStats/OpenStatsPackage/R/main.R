@@ -127,7 +127,7 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 		if(length(MM_optimise)!=6)
 			stop('\n ~> `MM_optimise` must be a vector of 6 TRUE/FALSE elements. Example:\n\t c(TRUE,TRUE,TRUE,TRUE,TRUE,TRUE)')
 		if (FormulaContainsFunction(MM_fixed)) {
-			stop(
+			message0(
 				'\n ~> Function detected in `MM_fixed`.\n\t	Please apply the function to the dataset prior to the analysis.'
 			)
 		}
