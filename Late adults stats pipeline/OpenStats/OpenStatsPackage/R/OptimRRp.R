@@ -128,7 +128,7 @@ RRrunner = function(object              ,
 	OutR = list(
 		output = list(SplitModels = list.clean(SpltResult)) ,
 		input  = list(
-			OpenStatsList    = object                          ,
+			OpenStatsList    = object                         ,
 			data            = object@datasetPL                ,
 			depVariable     = allTerms[1]                     ,
 			rep             = rep                             ,

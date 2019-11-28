@@ -1235,6 +1235,7 @@ ncombn = function(n,x,total = TRUE){
 		return(exp(r))
 }
 
+
 # Change with super extra care
 # This is a complicated function for modeling all variation of the variables
 AllTables = function(dframe        = NULL,
@@ -1247,7 +1248,11 @@ AllTables = function(dframe        = NULL,
 										 # response name in the beginning of each variable name [only]
 										 cols          = NULL,
 										 # filter on the columns of interest : works only if shrinke = TRUE
-										 shrink        = FALSE) {
+										 shrink        = FALSE,
+										 # Dichotomiing the final tables
+										 Dichotomise   = TRUE,
+										 # This parameter is added for the MM! framework, adj = 0
+										 adj           = 1) {
 	# remove no variation levels (columns)
 	if (is.null(dframe)) {
 		message0('Null data frame ')
@@ -1259,7 +1264,7 @@ AllTables = function(dframe        = NULL,
 	# Make all tables
 	l2     = list()
 	message0('\tSplitting in progress ...')
-	for (i in unique(pmax(1, 1:(lcat - 1)))) {
+	for (i in unique(pmax(1, 1:(lcat - adj)))) {
 		cb = combn(cat, i)
 		for (j in 1:ncol(cb)) {
 			message0('\tspliting on ', pasteComma(cb[, j], replaceNull = FALSE))
@@ -1269,8 +1274,8 @@ AllTables = function(dframe        = NULL,
 		}
 	}
 	# Remove fixed value columns
-	message0('\tShrinking in progress ...')
-	if (shrink)
+	if (shrink) {
+		message0('\tShrinking in progress ...')
 		l2 = lapply(l2, function(x) {
 			# remove fixed value columns
 			NonZeroFreq = c(apply(x, 2, function(xx) {
@@ -1280,9 +1285,10 @@ AllTables = function(dframe        = NULL,
 			r = x[, NonZeroFreq , drop = FALSE]
 			return(r)
 		})
+	}
 	
-	message0('\tKeeping variables of interest ...')
-	if (!is.null(cols))
+	if (!is.null(cols)) {
+		message0('\tKeeping variables of interest ...')
 		l2 = l2[as.logical(lapply(
 			# keep certain columns
 			l2,
@@ -1290,6 +1296,7 @@ AllTables = function(dframe        = NULL,
 				all(cols %in% colnames(x))
 			}
 		))]
+	}
 	
 	# You do not want to get split on all combinations!
 	if (all(cl > 0))
@@ -1301,44 +1308,47 @@ AllTables = function(dframe        = NULL,
 			}
 		) == TRUE)]
 	
-	# Split the big tables into 2x2 tables
-	message0('\tDichotomising the final tables ...')
-	oblCols = c(response.name, 'Freq')
-	l3 = lapply(
-		names(l2),
-		FUN = function(z) {
-			x  = l2[[z]]
-			r  = list()
-			nl = names(x)[!names(x) %in% oblCols]
-			if (length(nl) > 1) {
-				cmbn = combn(nl, length(nl) - 1)
-				for (i in 1:ncol(cmbn)) {
-					r[[i]] = lapply(i, function(y) {
-						x[, -which(names(x) %in% cmbn[, y]), drop = FALSE]
-					})
-					names(r[[i]]) = paste(z, paste0(cmbn[, i], collapse = '....'), sep = '....')
+	if (Dichotomise) {
+		# Split the big tables into 2x2 tables
+		message0('\tDichotomising the final tables ...')
+		oblCols = c(response.name, 'Freq')
+		l3 = lapply(
+			names(l2),
+			FUN = function(z) {
+				x  = l2[[z]]
+				r  = list()
+				nl = names(x)[!names(x) %in% oblCols]
+				if (length(nl) > 1) {
+					cmbn = combn(nl, length(nl) - 1)
+					for (i in 1:ncol(cmbn)) {
+						r[[i]] = lapply(i, function(y) {
+							x[, -which(names(x) %in% cmbn[, y]), drop = FALSE]
+						})
+						names(r[[i]]) = paste(z, paste0(cmbn[, i], collapse = '....'), sep = '....')
+					}
+					return(unlist(r, recursive = FALSE))
+				} else{
+					return(x)
 				}
-				return(unlist(r, recursive = FALSE))
-			} else{
-				return(x)
 			}
+		)
+		names(l3)     = names(l2)
+		# Which sublists are sublevels?
+		message0('\tFinalising the tables ....')
+		k = unlist(lapply(l3, function(x) {
+			all(sapply(x, is.list))
+		}), recursive = FALSE)
+		f = function(l) {
+			names(l) = NULL
+			r = unlist(l, recursive = FALSE, use.names = TRUE)
+			return(r)
 		}
-	)
-	names(l3)     = names(l2)
-	# Which sublists are sublevels?
-	message0('\tFinalising the tables ....')
-	k = unlist(lapply(l3, function(x) {
-		all(sapply(x, is.list))
-	}), recursive = FALSE)
-	f = function(l) {
-		names(l) = NULL
-		r = unlist(l, recursive = FALSE, use.names = TRUE)
-		return(r)
+		if (any(k)) {
+			l3           = c(l3[!k], f(l3[k]))
+		}
+	} else{
+		l3 = l2
 	}
-	if (any(k)) {
-		l3           = c(l3[!k], f(l3[k]))
-	}
-	
 	return(l3)
 }
 

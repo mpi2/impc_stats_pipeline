@@ -51,6 +51,7 @@ S3method(plot      , NULL)
 export(
 	OpenStatsList      ,
 	OpenStatsAnalysis  ,
-	OpenStatsReport
+	OpenStatsReport    ,
+ OpenStatsComplementarySplit
 )
 
