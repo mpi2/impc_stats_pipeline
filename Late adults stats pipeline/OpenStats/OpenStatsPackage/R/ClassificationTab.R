@@ -1,10 +1,13 @@
-classificationTag = function(object             = NULL,
-														 phenotypeThreshold = 0.01,
-														 userMode           = "summaryOutput")
+classificationTag = function(object               = NULL,
+														 phenotypeThreshold   = 0.0001,
+														 SexSpecificThreshold = .05,
+														 userMode             = "summaryOutput")
 {
-	if (is.null(object) ||
-			!is.null(object$messages))
-		stop('~> The input object is missing or a failure object.')
+	if (is.null(object)          ||
+			!is.null(object$messages)) {
+		message0('~> The input object is missing or a failure object.')
+		return(NULL)
+	}
 	
 	if (!(userMode %in% c("summaryOutput", "vectorOutput"))) {
 		stop(
@@ -94,8 +97,8 @@ classificationTag = function(object             = NULL,
 							"- both sexes equally"
 						)
 					}
-				} else if (v$`Sex FvKO p-value` >= phenotypeThreshold &&
-									 v$`Sex MvKO p-value` >= phenotypeThreshold) {
+				} else if (v$`Sex FvKO p-value` >= SexSpecificThreshold &&
+									 v$`Sex MvKO p-value` >= SexSpecificThreshold) {
 					ChangeClassification = paste0(
 						"With phenotype threshold value ",
 						phenotypeThreshold               ,
@@ -105,16 +108,16 @@ classificationTag = function(object             = NULL,
 						", Genotype Female pvalue = "    ,
 						v$`Sex FvKO p-value`             ,
 						", Genotype Male pvalue = "      ,
-						v$`Sex MvKO p-value`,
+						v$`Sex MvKO p-value`,            
 						']'
 					)
-				} else if (v$`Sex FvKO p-value` <	 phenotypeThreshold &&
-									 v$`Sex MvKO p-value` >= phenotypeThreshold) {
+				} else if (v$`Sex FvKO p-value` <	 SexSpecificThreshold &&
+									 v$`Sex MvKO p-value` >= SexSpecificThreshold) {
 					ChangeClassification = paste("With phenotype threshold value",
 																			 phenotypeThreshold,
 																			 "- females only")
-				} else if (v$`Sex FvKO p-value` >= phenotypeThreshold	&&
-									 v$`Sex MvKO p-value` <  phenotypeThreshold) {
+				} else if (v$`Sex FvKO p-value` >= SexSpecificThreshold	&&
+									 v$`Sex MvKO p-value` <  SexSpecificThreshold) {
 					ChangeClassification = paste("With phenotype threshold value",
 																			 phenotypeThreshold,
 																			 "- males only")
@@ -156,8 +159,8 @@ classificationTag = function(object             = NULL,
 						paste("If phenotype is significant - both sexes equally")
 				}
 			} else
-				if (v$`Sex FvKO p-value` >=	phenotypeThreshold	&&
-						v$`Sex MvKO p-value` >= phenotypeThreshold) {
+				if (v$`Sex FvKO p-value` >=	SexSpecificThreshold	&&
+						v$`Sex MvKO p-value` >= SexSpecificThreshold) {
 					ChangeClassification =
 						paste0(
 							"If phenotype is significant ",
@@ -171,12 +174,12 @@ classificationTag = function(object             = NULL,
 							']'
 							
 						)
-				} else if (v$`Sex FvKO p-value` <	phenotypeThreshold	&&
-									 v$`Sex MvKO p-value` >= phenotypeThreshold) {
+				} else if (v$`Sex FvKO p-value` <	SexSpecificThreshold	&&
+									 v$`Sex MvKO p-value` >= SexSpecificThreshold) {
 					ChangeClassification =
 						paste("If phenotype is significant - females only")
-				} else if (v$`Sex FvKO p-value` >= phenotypeThreshold	&&
-									 v$`Sex MvKO p-value` < phenotypeThreshold) {
+				} else if (v$`Sex FvKO p-value` >= SexSpecificThreshold	&&
+									 v$`Sex MvKO p-value` < SexSpecificThreshold) {
 					ChangeClassification =
 						paste("If phenotype is significant - males only")
 				} else
@@ -479,11 +482,16 @@ classificationTag = function(object             = NULL,
 			ChangeClassification = NA
 		}
 	}
-	if (!SexInTheCleanedInputModel      &&
-			!is.na(ChangeClassification)) {
-		ChangeClassification = paste0('Sex is not included in the input model. ',
-																	ChangeClassification)
+	if (!is.na(ChangeClassification)) {
+		outList = list(
+			'Classification tag'                 = ChangeClassification     ,
+			'Sex in the input model'             = SexInTheCleanedInputModel,
+			'Overal p-value threshold'           = phenotypeThreshold       ,
+			'Sex specific p-value threshold'     = SexSpecificThreshold     
+		)
+	} else{
+		outList = NULL
 	}
-	return(ChangeClassification)
+	return(outList)
 }
 ##------------------------------------------------------------------------------
