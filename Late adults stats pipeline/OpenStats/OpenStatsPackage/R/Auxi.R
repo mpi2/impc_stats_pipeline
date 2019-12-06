@@ -1679,6 +1679,8 @@ as.numeric01 = function(x) {
 }
 
 OpenStatsListLevels = function(object, sep = '') {
+	if (is.null(object))
+		return(NULL)
 	l = NULL
 	SexLab    = 'Sex'
 	FemaleLab = ifelse(
@@ -1750,6 +1752,12 @@ CombineLevels = function(..., debug = TRUE) {
 	if (debug)
 		print(r)
 	return(r)
+}
+
+NullOrValue = function(x, ReplaveValue = 10) {
+	if (is.null(x))
+		x = ReplaveValue
+	return(x)
 }
 
 RRNewObjectAndFormula = function(object              ,

@@ -211,7 +211,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	MM3_result = OpenStatsAnalysis(
 		OpenStatsList = test_Cont,
 		method = 'MM',
-		MM_fixed = data_point ~ Genotype  + Weight,,
+		MM_fixed = data_point ~ Genotype  + Weight,
 		MM_optimise = c(0, 0, 0, 1, 1, 1)
 	)
 	VO_MM3 = OpenStatsReport(MM3_result)

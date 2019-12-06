@@ -23,7 +23,7 @@ OpenStatsReport = function(object                    ,
 				if (is(object,
 							 'OpenStatsMM')) {
 					out = OpenStatsReportCont(object = object,
-																 debug = debug)
+																		debug = debug)
 				} else if (is(object, 'OpenStatsFE')) {
 					out = OpenStatsReportCat(object = object)
 				} else if (is(object, 'OpenStatsRR')) {
