@@ -1756,23 +1756,29 @@ PhenListOutlierDetection = function(pl                       ,
     warning = function(war) {
       message0('Ops! outlier detection algorithm failed! no outlier will be marked ...')
       message0(war)
-      return(1)
+      return(NULL)
     },
     error   = function(err) {
       message0('Ops! outlier detection algorithm failed! no outlier will be marked ...')
       message0(err)
-      return(1)
+      return(NULL)
     }
   )
-  if (plot && is(oat,'mcd') && active)
+  #################
+  if (!is.null(oat)   &&
+      plot            &&
+      is(oat, 'mcd')  &&
+      active) {
     plot(
       plOutSet[, 1],
       plOutSet[, 2],
       col = oat$mcd.wt * 1 + 2,
       pch =  2 + (1 - oat$mcd.wt) * 10
     )
-  #################
-  plC$outlierWeight     = as.vector(oat$mcd.wt)
+    plC$outlierWeight     = as.vector(oat$mcd.wt)
+  } else{
+    plC$outlierWeight     = 1
+  }
   #################
   plC$UniqueId          = paste0(plC$external_sample_id, plC$discrete_point)
   pl@datasetPL$UniqueId = paste0(pl@datasetPL$external_sample_id,
@@ -1907,27 +1913,34 @@ VectorOutput0 = function(c.ww0,
                          na = 'string',
                          null = 'null') {
   ####
-  p1 = if (!NullOrError(c.ww0$NormalObj))
-    OpenStats::OpenStatsReport(c.ww0$NormalObj,
-                               othercolumns = ExtraCols,
-                               JSON = FALSE,
-                               Null = TRUE)
-  else
-    NULL
+  if (!NullOrError(c.ww0$NormalObj)) {
+    p1 = OpenStats::OpenStatsReport(
+      c.ww0$NormalObj,
+      othercolumns = ExtraCols,
+      JSON = FALSE,
+      ReportNullSchema = TRUE
+    )
+    p1$`Classification tag` = OpenStats:::classificationTag(c.ww0$NormalObj)
+  } else{
+    p1 = NULL
+  }
   # The second piece (Windowing results)
   if (activeWindowing && !NullOrError(c.ww0$WindowedObj)) {
     p2 =  OpenStats::OpenStatsReport(c.ww0$WindowedObj  ,
                                      othercolumns = ExtraCols,
                                      JSON = FALSE,
-                                     Null = TRUE)
+                                     ReportNullSchema = TRUE )
     p3 =  OpenStats::OpenStatsReport(c.ww0$FullObj  ,
                                      othercolumns = ExtraCols,
                                      JSON = FALSE,
-                                     Null = TRUE)
+                                     ReportNullSchema = TRUE)
     p4 =  OpenStats::OpenStatsReport(c.ww0$FullWindowedObj  ,
                                      othercolumns = ExtraCols,
                                      JSON = FALSE,
-                                     Null = TRUE)
+                                     ReportNullSchema = TRUE)
+    p2$`Classification tag` = OpenStats:::classificationTag(c.ww0$WindowedObj)
+    p3$`Classification tag` = OpenStats:::classificationTag(c.ww0$FullObj)
+    p4$`Classification tag` = OpenStats:::classificationTag(c.ww0$FullWindowedObj)
   } else{
     p2 = p3 = p4 = NULL
   }

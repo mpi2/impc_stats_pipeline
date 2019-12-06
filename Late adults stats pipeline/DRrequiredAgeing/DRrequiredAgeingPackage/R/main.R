@@ -60,7 +60,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       MinColoniesInChunks    = 32          ,
                       controlSize            = 1500        ,
                       ### Just for outlier detection
-                      outlierDetection       = TRUE        ,
+                      outlierDetection       = FALSE       ,
                       ### Just for Ageing Batch GEnerator  ,
                       combineEAandLA        = FALSE        ,
                       solrBaseURL           = 'http://hx-noah-74-10:8090' ,
