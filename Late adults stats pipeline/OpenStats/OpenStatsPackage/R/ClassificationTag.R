@@ -136,11 +136,11 @@ classificationTag = function(object               = NULL,
 					ChangeClassification = paste("With phenotype threshold value",
 																			 phenotypeThreshold,
 																			 "- males only")
-				} else if (v$`Sex FvKO estimate`$Value >	0 &&
-									 v$`Sex MvKO estimate`$Value >	0 ||
-									 v$`Sex FvKO estimate`$Value <  0 &&
-									 v$`Sex MvKO estimate`$Value <	0) {
-					if (abs(v$`Sex FvKO estimate`$Value) > abs(v$`Sex MvKO estimate`$Value)) {
+				} else if (as.list(v$`Sex FvKO estimate`)$Value >	0 &&
+									 as.list(v$`Sex MvKO estimate`)$Value >	0 ||
+									 as.list(v$`Sex FvKO estimate`)$Value < 0 &&
+									 as.list(v$`Sex MvKO estimate`)$Value <	0) {
+					if (abs(as.list(v$`Sex FvKO estimate`)$Value) > abs(as.list(v$`Sex MvKO estimate`)$Value)) {
 						ChangeClassification =
 							paste(
 								"With phenotype threshold value",
@@ -201,11 +201,11 @@ classificationTag = function(object               = NULL,
 					ChangeClassification =
 						paste("If phenotype is significant - males only")
 				} else
-					if (v$`Sex FvKO estimate` >	0 &&
-							v$`Sex MvKO estimate` >	0 ||
-							v$`Sex FvKO estimate` <	0 &&
-							v$`Sex MvKO estimate` <	0) {
-						if (abs(v$`Sex FvKO estimate`) > abs(v$`Sex MvKO estimate`)) {
+					if (as.list(v$`Sex FvKO estimate`)$Value >	0 &&
+							as.list(v$`Sex MvKO estimate`)$Value >	0 ||
+							as.list(v$`Sex FvKO estimate`)$Value <	0 &&
+							as.list(v$`Sex MvKO estimate`)$Value <	0) {
+						if (abs(as.list(v$`Sex FvKO estimate`)$Value) > abs(as.list(v$`Sex MvKO estimate`)$Value)) {
 							ChangeClassification =
 								paste("If phenotype is significant - different size as females greater")
 						} else{

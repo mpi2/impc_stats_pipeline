@@ -1752,13 +1752,23 @@ pasteCollon = function(x){
 	return(r)
 }
 
-CombineLevels = function(..., debug = TRUE, revStr = TRUE) {
-	x = c(...)
+CombineLevels = function(...,
+												 debug  = TRUE,
+												 revStr = TRUE,
+												 len    = 2) {
+	x  = c(...)
 	if (length(x) < 1)
-		return(NULL)
-	r = c(pasteCollon(x))
-	if (revStr)
-		r = c(r, pasteCollon(rev(x)))
+		return(x)
+	cb = combn(x, len)
+	r = sapply(1:ncol(cb), function(i) {
+		xx = cb[, i]
+		if (length(xx) < 1)
+			return(NULL)
+		r = c(pasteCollon(xx))
+		if (revStr)
+			r = c(r, pasteCollon(rev(xx)))
+	})
+	r = as.vector(unlist(r))
 	if (debug)
 		print(r)
 	return(r)

@@ -114,7 +114,11 @@ OpenStatsReportCont =	function(object,
 			'Sex FvKO p-value'   =	TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
-				term = Labels$Sex$Sex,
+				term = CombineLevels(
+					Labels$Sex$Sex,
+					Labels$Genotype$Genotype,
+					debug = debug
+				),
 				not = NULL,
 				return = modelSummaryPvalueExtract(
 					x = object$output$SplitModels$Genotype_Sex,
@@ -132,7 +136,11 @@ OpenStatsReportCont =	function(object,
 			'Sex MvKO p-value'  =	TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
-				term = Labels$Sex$Sex,
+				term = CombineLevels(
+					Labels$Sex$Sex,
+					Labels$Genotype$Genotype,
+					debug = debug
+				),
 				not = NULL,
 				return = modelSummaryPvalueExtract(
 					x = object$output$SplitModels$Genotype_Sex,
