@@ -1473,7 +1473,7 @@ TermInFormulaReturn = function(formula,
 	terms  = formulaTerms(formula = formula)
 	if (debug)
 		message0(printformula(terms))
-	if (active && (term %in% terms)) {
+	if (active && any(term %in% terms)) {
 		return(return)
 	} else{
 		return(not)
@@ -1747,8 +1747,18 @@ OpenStatsListLevels = function(object, sep = '') {
 	return(l)
 }
 
-CombineLevels = function(..., debug = TRUE) {
-	r = c(paste(..., sep = ':'))
+pasteCollon = function(x){
+	r = paste(x, collapse  = ':', sep = ':')
+	return(r)
+}
+
+CombineLevels = function(..., debug = TRUE, revStr = TRUE) {
+	x = c(...)
+	if (length(x) < 1)
+		return(NULL)
+	r = c(pasteCollon(x))
+	if (revStr)
+		r = c(r, pasteCollon(rev(x)))
 	if (debug)
 		print(r)
 	return(r)

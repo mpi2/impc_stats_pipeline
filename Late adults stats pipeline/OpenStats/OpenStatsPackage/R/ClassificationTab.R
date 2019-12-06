@@ -24,17 +24,24 @@ classificationTag = function(object               = NULL,
 	ChangeClassification = NA
 	asFactorAndSelectVariable = function(x = NULL, col = NULL) {
 		x = droplevels0(x)
-		if (!is.null(x))
-			r  = as.factor(x[, col])
-		else
+		if (!is.null(x)    &&
+				!is.null(col)  &&
+				col %in% names(x)) {
+			if (length(col) > 1)
+				message0('Only one element of the `col` parameter will be used.')
+			r  = as.factor(x[, col[1]])
+		}	else{
 			r = NULL
+		}
 		return(r)
 	}
-	SexInTheCleanedInputModel = 'Sex' %in% all_vars0(object$extra$Cleanedformula)
 	csex   = asFactorAndSelectVariable(
 		object$input$OpenStatsList@datasetUNF         ,
 		object$input$OpenStatsList@dataset.colname.sex
 	)
+	SexInTheCleanedInputModel = 'Sex' %in% all_vars0(object$extra$Cleanedformula)
+	if (!SexInTheCleanedInputModel)
+		csex = NULL
 	nsex   = nlevels(csex)
 	lsex   = pasteComma(levels(csex))
 	v      = OpenStatsReport(object)
@@ -44,7 +51,9 @@ classificationTag = function(object               = NULL,
 		SexInteraction  = TermInFormulaReturn(
 			active  = TRUE,
 			formula = formula(object$output$Final.Model),
-			term    = Labels$Sex$Sex,
+			term    = CombineLevels(Labels$Sex$Sex,
+															Labels$Genotype$Genotype,
+															debug = debug),
 			not     = NULL,
 			return  = modelSummaryPvalueExtract(
 				x     = object$output$SplitModels$Genotype_Sex,
@@ -62,7 +71,7 @@ classificationTag = function(object               = NULL,
 				ChangeClassification <- NA
 			} else if (v$`Genotype p-value`         > phenotypeThreshold &&
 								 ifelse(length(SexInteraction) > 0,
-								 			 SexInteraction         > phenotypeThreshold,
+								 			 SexInteraction          > phenotypeThreshold,
 								 			 TRUE)) {
 				if (nsex == 1) {
 					ChangeClassification = paste(
@@ -90,11 +99,17 @@ classificationTag = function(object               = NULL,
 								lsex,
 								") tested"
 							)
-					} else {
+					} else if(nsex == 2){
 						ChangeClassification = paste(
 							"With phenotype threshold value",
 							phenotypeThreshold,
 							"- both sexes equally"
+						)
+					}else{
+						ChangeClassification = paste(
+							"With phenotype threshold value",
+							phenotypeThreshold,
+							"- regardless of gender"
 						)
 					}
 				} else if (v$`Sex FvKO p-value` >= SexSpecificThreshold &&
@@ -154,9 +169,12 @@ classificationTag = function(object               = NULL,
 						paste("If phenotype is significant it is for the one sex (",
 									lsex,
 									") tested")
-				} else {
+				} else if(nsex == 2){
 					ChangeClassification =
 						paste("If phenotype is significant - both sexes equally")
+				}else{
+					ChangeClassification =
+						paste("If phenotype is significant - regardless of gender")
 				}
 			} else
 				if (v$`Sex FvKO p-value` >=	SexSpecificThreshold	&&
@@ -462,8 +480,7 @@ classificationTag = function(object               = NULL,
 							") dataset only",
 							sep = ""
 						)
-			}
-			else {
+			} else {
 				if (all_p.value < phenotypeThreshold) {
 					ChangeClassification =
 						paste0(
@@ -487,7 +504,8 @@ classificationTag = function(object               = NULL,
 			'Classification tag'                 = ChangeClassification     ,
 			'Sex in the input model'             = SexInTheCleanedInputModel,
 			'Overal p-value threshold'           = phenotypeThreshold       ,
-			'Sex specific p-value threshold'     = SexSpecificThreshold     
+			'Sex specific p-value threshold'     = SexSpecificThreshold     ,
+			'Sex levels'                         = lsex                     
 		)
 	} else{
 		outList = NULL
