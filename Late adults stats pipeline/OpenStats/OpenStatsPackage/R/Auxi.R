@@ -14,6 +14,20 @@
 	)
 }
 
+asFactorAndSelectVariable = function(x = NULL, col = NULL) {
+	x = droplevels0(x)
+	if (!is.null(x)    &&
+			!is.null(col)  &&
+			col %in% names(x)) {
+		if (length(col) > 1)
+			message0('Only one element of the `col` parameter will be used.')
+		r  = as.factor(x[, col[1]])
+	}	else{
+		r = NULL
+	}
+	return(r)
+}
+
 ML2REML = function(x, debug = FALSE) {
 	if (!is.null(x)       &&
 			is(x, c('lme', 'gls'))) {

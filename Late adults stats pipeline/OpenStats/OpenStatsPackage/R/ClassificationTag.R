@@ -22,28 +22,20 @@ classificationTag = function(object               = NULL  ,
 	######################
 	debug                = FALSE
 	ChangeClassification = NA
-	asFactorAndSelectVariable = function(x = NULL, col = NULL) {
-		x = droplevels0(x)
-		if (!is.null(x)    &&
-				!is.null(col)  &&
-				col %in% names(x)) {
-			if (length(col) > 1)
-				message0('Only one element of the `col` parameter will be used.')
-			r  = as.factor(x[, col[1]])
-		}	else{
-			r = NULL
-		}
-		return(r)
-	}
+	OpenStatListObj = object$input$OpenStatsList
+	tbl             = apply(table(OpenStatListObj@datasetUNF[, OpenStatListObj@dataset.colname.sex],
+																OpenStatListObj@datasetUNF[, OpenStatListObj@dataset.colname.genotype]),
+													1,
+													prod)
 	csex   = asFactorAndSelectVariable(
-		object$input$OpenStatsList@datasetUNF         ,
-		object$input$OpenStatsList@dataset.colname.sex
+		OpenStatListObj@datasetUNF         ,
+		OpenStatListObj@dataset.colname.sex
 	)
 	SexInTheCleanedInputModel = 'Sex' %in% all_vars0(object$extra$Cleanedformula)
 	if (!SexInTheCleanedInputModel)
 		csex = NULL
-	nsex   = nlevels(csex)
-	lsex   = pasteComma(levels(csex))
+	nsex   = sum(tbl > 0 )*!is.null(csex)    # nlevels(csex)
+	lsex   = names(tbl)[tbl>0]               # pasteComma(levels(csex))
 	v      = OpenStatsReport(object)
 	Labels = OpenStatsListLevels(object = object)
 	SexInteraction = NULL
@@ -75,10 +67,10 @@ classificationTag = function(object               = NULL  ,
 								 			 SexInteraction          > phenotypeThreshold,
 								 			 TRUE)) {
 				if (nsex == 1) {
-					ChangeClassification = paste(
-						"With phenotype threshold value",
+					ChangeClassification = paste0(
+						"With phenotype threshold value ",
 						phenotypeThreshold,
-						"- no significant change for the one sex (",
+						" - no significant change for the one sex (",
 						lsex,
 						") tested"
 					)
@@ -93,10 +85,10 @@ classificationTag = function(object               = NULL  ,
 				if (length(SexInteraction) < 1) {
 					if (nsex == 1) {
 						ChangeClassification =
-							paste(
-								"With phenotype threshold value",
+							paste0(
+								"With phenotype threshold value ",
 								phenotypeThreshold,
-								"- a significant change for the one sex (",
+								" - a significant change for the one sex (",
 								lsex,
 								") tested"
 							)
@@ -167,7 +159,7 @@ classificationTag = function(object               = NULL  ,
 			if (length(SexInteraction) < 1) {
 				if (nsex == 1) {
 					ChangeClassification =
-						paste("If phenotype is significant it is for the one sex (",
+						paste0("If phenotype is significant it is for the one sex (",
 									lsex,
 									") tested")
 				} else if(nsex == 2){
@@ -507,8 +499,8 @@ classificationTag = function(object               = NULL  ,
 			'Sex in the input model'             = SexInTheCleanedInputModel,
 			'Overall p-value threshold'          = phenotypeThreshold       ,
 			'Sex specific p-value threshold'     = SexSpecificThreshold     ,
-			'Sex levels'                         = lsex                     #,
-			#'Genotype Sex interaction p-value'   = SexInteraction           
+			'Active Sex levels'                  = lsex                     #,
+			#'Genotype Sex interaction p-value'  = SexInteraction           
 		)
 	} else{
 		outList = NULL
