@@ -1,6 +1,6 @@
-classificationTag = function(object               = NULL,
+classificationTag = function(object               = NULL  ,
 														 phenotypeThreshold   = 0.0001,
-														 SexSpecificThreshold = .05,
+														 SexSpecificThreshold = .05   ,
 														 userMode             = "summaryOutput")
 {
 	if (is.null(object)          ||
@@ -500,26 +500,15 @@ classificationTag = function(object               = NULL,
 			ChangeClassification = NA
 		}
 	}
+	##############
 	if (!is.na(ChangeClassification)) {
-		outList = list(
+		outList = c(
 			'Classification tag'                 = ChangeClassification     ,
 			'Sex in the input model'             = SexInTheCleanedInputModel,
 			'Overall p-value threshold'          = phenotypeThreshold       ,
 			'Sex specific p-value threshold'     = SexSpecificThreshold     ,
-			'Sex levels'                         = lsex                     ,
-			'Genotype Sex interaction p-value'   = SexInteraction           ,
-			'Overall Genotype p-value'            = NullOrValue(
-				v$`Genotype contribution`$Overall$`Complete table`$p.value,
-				ReplaveValue = 1
-			)            ,
-			'Sex FvKO p-value'                   = NullOrValue(
-				v$`Genotype contribution`$`Sex FvKO p-value`$`Complete table`$p.value,
-				ReplaveValue = 1
-			) ,
-			'Sex MvKO p-value'                   = NullOrValue(
-				v$`Genotype contribution`$`Sex MvKO p-value`$`Complete table`$p.value,
-				ReplaveValue = 1
-			)
+			'Sex levels'                         = lsex                     #,
+			#'Genotype Sex interaction p-value'   = SexInteraction           
 		)
 	} else{
 		outList = NULL

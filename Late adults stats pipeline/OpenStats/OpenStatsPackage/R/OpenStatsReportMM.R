@@ -101,7 +101,9 @@ OpenStatsReportCont =	function(object,
 			Overall = TermInFormulaReturn(
 				active = TRUE,
 				formula = frm,
-				term = CombineLevels(Labels$Genotype$Genotype,Labels$Sex$Sex,debug = debug),
+				term = CombineLevels(Labels$Genotype$Genotype,
+														 Labels$Sex$Sex,
+														 debug = debug),
 				return = NULL,
 				not = modelSummaryPvalueExtract(
 					x = Fmodel,
