@@ -502,7 +502,7 @@ classificationTag = function(object               = NULL  ,
 	}
 	##############
 	if (!is.na(ChangeClassification)) {
-		outList = c(
+		outList = list(
 			'Classification tag'                 = ChangeClassification     ,
 			'Sex in the input model'             = SexInTheCleanedInputModel,
 			'Overall p-value threshold'          = phenotypeThreshold       ,
