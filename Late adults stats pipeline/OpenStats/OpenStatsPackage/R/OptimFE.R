@@ -7,7 +7,8 @@ crunner = function(object              ,
 									 noteToFinish     = NULL            ,
 									 ci_levels        = .95             ,
 									 RRextraResults   = NULL            ,
-									 overalTableName  = 'Complete table', 
+									 overallTableName = 'Complete table', 
+									 InterLevelComparisions = TRUE      ,
 									 ...)
 {
 	requireNamespace   ("rlist")
@@ -65,15 +66,16 @@ crunner = function(object              ,
 			message0('\tTesting for the main effect: ',
 							 pasteComma(vars[j], replaceNull = FALSE))
 			lt = ctest(
-				x = newObject                         ,
+				x = newObject                                   ,
 				formula = reformulate(
-					termlabels = c(depVariable, vars[j]),
+					termlabels = c(depVariable, vars[j])          ,
 					response = NULL
-				)                                     ,
-				rep = rep                             ,
-				ci_levels = ci_levels                 ,
-				RRextraResults   = RRextraResults     ,
-				overalTableName  = overalTableName    , 
+				)                                               ,
+				rep = rep                                       ,
+				ci_levels = ci_levels                           ,
+				RRextraResults    = RRextraResults              ,
+				overallTableName  = overallTableName            , 
+				InterLevelComparisions = InterLevelComparisions , 
 				...
 			)
 			
@@ -104,7 +106,8 @@ crunner = function(object              ,
 					rep       = rep                                ,
 					ci_levels = ci_levels                          ,
 					RRextraResults   = RRextraResults              ,
-					overalTableName  = overalTableName             , 
+					overallTableName  = overallTableName           , 
+					InterLevelComparisions = InterLevelComparisions,
 					...
 				)
 			}))
@@ -112,7 +115,7 @@ crunner = function(object              ,
 				names(lcomb) = paste(lapply(
 					names(lcomb),
 					FUN = function(nam) {
-						#n1 = names(dimnames(lcomb[[nam]]$result[[overalTableName]]$table))
+						#n1 = names(dimnames(lcomb[[nam]]$result[[overallTableName]]$table))
 						n1 = all_vars0(lcomb[[nam]]$formula)[-1]
 						n2 = paste0(n1[!n1 %in% depVariable], collapse = '.')
 						return(n2)
@@ -141,13 +144,14 @@ crunner = function(object              ,
 	OutR = list(
 		output = list(SplitModels = list.clean(lComplete)) ,
 		input  = list(
-			OpenStatsList    = object                         ,
+			OpenStatsList    = object                        ,
 			data            = data                           ,
 			depVariable     = allTerms[1]                    ,
 			rep             = rep                            ,
 			method          = method                         ,
 			formula         = formula                        ,
-			ci_level        = ci_levels            
+			ci_level        = ci_levels                      ,
+			full_comparisions = c(fullComparisions, InterLevelComparisions)
 		),
 		extra  = list(
 			missings        = Obj$missings                   ,

@@ -1082,8 +1082,9 @@ ctest = function(x,
 								 asset     = NULL  ,
 								 rep       = 1500  ,
 								 ci_levels = 0.95  ,
-								 RRextraResults   = NULL             ,
-								 overalTableName  = 'Complete table' ,
+								 RRextraResults    = NULL             ,
+								 overallTableName  = 'Complete table' ,
+								 InterLevelComparisions = TRUE        ,
 								 ...) {
 	xtb = xtabs(
 		formula = formula        ,
@@ -1092,16 +1093,25 @@ ctest = function(x,
 		na.action = 'na.omit'
 	)
 	
-	checkRes = checkTableForFisherTest(xtb = xtb, asset = asset)
+	checkRes              = checkTableForFisherTest(xtb   = xtb,
+																									asset = asset,
+																									check = c(1, 0))
+	checkResZeroVariation = checkTableForFisherTest(xtb   = xtb,
+																									asset = asset,
+																									check = c(0, 1))
 	if (!checkRes$passed) {
-		r        = setNames(list(overal = list(
-			p.value = NULL, effect = NULL
-		)), overalTableName)
+		r        = setNames(list(overall = list(
+			p.value = NULL,
+			effect = NULL
+		)),
+		overallTableName)
 	} else{
-		if (any(dim(xtb) < 2)) {
-			r        = setNames(list(overal = list(
-				p.value = 1, effect = 1
-			)), overalTableName)
+		if (!checkResZeroVariation$passed || any(dim(xtb) < 2)) {
+			r      = setNames(list(overall = list(
+				p.value = 1,
+				effect = NULL
+			)),
+			overallTableName)
 		} else{
 			r = fisher.test1(
 				x           = xtb            ,
@@ -1111,15 +1121,16 @@ ctest = function(x,
 				conf.int    = TRUE           ,
 				conf.level  = ci_levels      ,
 				B           = rep            ,
-				overalTableName = overalTableName ,
+				overallTableName = overallTableName            ,
+				InterLevelComparisions = InterLevelComparisions,
 				...
 			)
 		}
 	}
 	return(
 		list(
-			result      = r               ,
-			note        = checkRes$message,
+			result      = r                                                ,
+			note        = c(checkRes$message, checkResZeroVariation$message),
 			table       = xtb             ,
 			input       = x               ,
 			formula     = formula         ,
@@ -1129,7 +1140,9 @@ ctest = function(x,
 }
 
 # check table for fisher.test
-checkTableForFisherTest = function(xtb, asset = NULL) {
+checkTableForFisherTest = function(xtb,
+																	 asset = NULL,
+																	 check = c(1, 0)) {
 	message = NULL
 	if (!is.null(asset)) {
 		if (asset <= dim(xtb)[3]) {
@@ -1140,14 +1153,24 @@ checkTableForFisherTest = function(xtb, asset = NULL) {
 									note       = message))
 		}
 	}
-	if (length(dim0(xtb)) < 2                      ||
-			(sum(margin.table(xtb, margin = 2) > 0) < 2 &&
-			 sum(margin.table(xtb, margin = 1) > 0) < 2)) {
+	if (check[1]                                    &&
+			(length(dim0(xtb)) < 2                      ||
+			 (sum(margin.table(xtb, margin = 2) > 0) < 2 &&
+			  sum(margin.table(xtb, margin = 1) > 0) < 2))) {
 		message = c(message,
 								'Contingency table with one level only or sum of margins less than 2')
 		return(list(passed   = FALSE  ,
 								note     = message))
 	}
+	
+	if (check[2]                &&
+			sum(colSums(xtb) > 0) < 2) {
+		message = c(message,
+								'Contingency table with one non-zero level')
+		return(list(passed   = FALSE  ,
+								note     = message))
+	}
+	
 	return(list(passed   = TRUE  ,
 							note     = message))
 }
@@ -1179,16 +1202,17 @@ fisher.test0 = function(x, formula, ci_levels, ...) {
 
 # Fisher test with broken table
 fisher.test1 = function(x,
-												formula,
-												ci_levels,
-												overalTableName = 'Complete table',
+												formula                            ,
+												ci_levels                          ,
+												overallTableName = 'Complete table',
+												InterLevelComparisions = TRUE      ,
 												...) {
 	if (is.null(x))
 		return(NULL)
 	
 	nrx = nrow(x)
 	outList = NULL
-	if (nrx > 2) {
+	if (InterLevelComparisions && nrx > 2) {
 		message0(
 			'\t\t testing sub tables in progress ...\n\t\t\t Total tests: ',
 			ncombn(n = nrx, x = 2:nrx),
@@ -1206,7 +1230,7 @@ fisher.test1 = function(x,
 				))
 				if (nrow(cbn[, j, drop = FALSE]) == nrow(x)) {
 					# this name is used in more places!
-					r$data.name = overalTableName
+					r$data.name = overallTableName
 				} else{
 					r$data.name = paste(rownames(x[cbn[, j], ]), sep = '.', collapse = '.')
 				}
@@ -1217,12 +1241,13 @@ fisher.test1 = function(x,
 				x$data.name)))
 		}
 	} else{
-		outList = setNames(list(overal = fisher.test0(
-			x = x,
-			formula = formula,
-			ci_levels = ci_levels,
-			...
-		)), overalTableName)
+		outList = setNames(list(
+			overall   = fisher.test0(
+				x         = x          ,
+				formula   = formula    ,
+				ci_levels = ci_levels  ,
+				...
+			)), overallTableName)
 	}
 	return(outList)
 }
@@ -1630,7 +1655,7 @@ dataSignature = function(formula, data, digits = 10) {
 							 ']')
 		})
 		
-		overal  = mean(rowMeans(apply(data[, v.vars, drop = FALSE], 2, function(x) {
+		overall  = mean(rowMeans(apply(data[, v.vars, drop = FALSE], 2, function(x) {
 			r = if (!is.numeric(x)) {
 				as.integer(as.factor(x))
 			} else{
@@ -1639,7 +1664,7 @@ dataSignature = function(formula, data, digits = 10) {
 			return(r)
 		}), na.rm = TRUE))
 		
-		res0$overal    = paste0('Overall:['  , overal , ']')
+		res0$overall    = paste0('Overall:['  , overall , ']')
 		res0$precision = paste0('Precision:[', digits , ']')
 		res = pasteComma(
 			sort(unlist(res0), decreasing = FALSE) ,
@@ -2162,7 +2187,7 @@ RRextra = function(object,
 	)
 	CclassValue = lapply(XclassValue, length)
 	message0('Creating output tables ...')
-	# Overal Table
+	# Overall Table
 	tbl = rbind(unlist(CclassValue), unlist(MclassValue))
 	dimnames(tbl) = list(c('Control', 'Mutant'), c('Low', 'Normal', 'High'))
 	# Table Low
@@ -2173,8 +2198,8 @@ RRextra = function(object,
 	dimnames(tblHigh) = list(c('Control', 'Mutant'), c('Low/Normal', 'High'))
 	
 	return(list(
-		overall = tbl,
-		tblLow = tblLow,
+		overall = tbl    ,
+		tblLow = tblLow  ,
 		tblHigh = tblHigh
 	))
 }

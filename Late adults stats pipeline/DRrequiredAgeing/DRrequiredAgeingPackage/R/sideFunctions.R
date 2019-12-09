@@ -131,7 +131,9 @@ ObjectsThatMustBeRemovedInEachIteration = function(x = NULL, ...) {
 
 getNotEmptyValue = function(x, head = Inf) {
   ux    = unique(x)
-  neux  = which(ux != '' | !is.null(ux))
+  neux  = which(ux != ''     &
+                !is.na(ux)   &
+                !is.null(ux))
   if (length(neux) > 0) {
     r = head(ux [neux], head)
   } else{

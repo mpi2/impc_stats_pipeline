@@ -46,6 +46,7 @@ classificationTag = function(object               = NULL,
 	lsex   = pasteComma(levels(csex))
 	v      = OpenStatsReport(object)
 	Labels = OpenStatsListLevels(object = object)
+	SexInteraction = NULL
 	######################
 	if (object$input$method %in% c('MM')) {
 		SexInteraction  = TermInFormulaReturn(
@@ -219,9 +220,9 @@ classificationTag = function(object               = NULL,
 		}
 	}	else if (object$input$method == "FE") {
 		if (userMode == "summaryOutput") {
-			male_p.value   = NullOrValue(v$`Genotype contribution`$`Overall`$`Complete table`)
-			female_p.value = NullOrValue(v$`Genotype contribution`$`Sex FvKO p-value`$`Complete table`)
-			all_p.value    = NullOrValue(v$`Genotype contribution`$`Sex MvKO p-value`$`Complete table`)
+			all_p.value    = NullOrValue(v$`Genotype contribution`$`Overall`$`Complete table`$p.value)
+			female_p.value = NullOrValue(v$`Genotype contribution`$`Sex FvKO p-value`$`Complete table`$p.value)
+			male_p.value   = NullOrValue(v$`Genotype contribution`$`Sex MvKO p-value`$`Complete table`$p.value)
 			
 			if (nsex == 1) {
 				ChangeClassification =
@@ -503,9 +504,22 @@ classificationTag = function(object               = NULL,
 		outList = list(
 			'Classification tag'                 = ChangeClassification     ,
 			'Sex in the input model'             = SexInTheCleanedInputModel,
-			'Overal p-value threshold'           = phenotypeThreshold       ,
+			'Overall p-value threshold'          = phenotypeThreshold       ,
 			'Sex specific p-value threshold'     = SexSpecificThreshold     ,
-			'Sex levels'                         = lsex                     
+			'Sex levels'                         = lsex                     ,
+			'Genotype Sex interaction p-value'   = SexInteraction           ,
+			'Overall Genotype p-value'            = NullOrValue(
+				v$`Genotype contribution`$Overall$`Complete table`$p.value,
+				ReplaveValue = 1
+			)            ,
+			'Sex FvKO p-value'                   = NullOrValue(
+				v$`Genotype contribution`$`Sex FvKO p-value`$`Complete table`$p.value,
+				ReplaveValue = 1
+			) ,
+			'Sex MvKO p-value'                   = NullOrValue(
+				v$`Genotype contribution`$`Sex MvKO p-value`$`Complete table`$p.value,
+				ReplaveValue = 1
+			)
 		)
 	} else{
 		outList = NULL

@@ -28,11 +28,11 @@ OpenStatsAnalysis = function(OpenStatsListObject   = NULL          ,
 														 RRrefLevel = 'control',
 														 RR_prop    = 0.95     ,
 														 FERR_rep   = 1500     ,
-														 FERR_FullComparisions = TRUE  ,
+														 FERR_FullComparisions = c(TRUE,TRUE),
 														 ##### Others
-														 MMFERR_conf.level = 0.95      ,
-														 seed       = NULL             ,
-														 debug      = TRUE             ,
+														 MMFERR_conf.level = 0.95            ,
+														 seed       = NULL                   ,
+														 debug      = TRUE                   ,
 														 ...) {
 	if(!is.null(seed))
 		set.seed(seed)
@@ -156,16 +156,22 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 				'\n ~> Function detected in `FE_formula`.\n\t	Please apply the function to the dataset prior to the analysis.'
 			)
 		}
+		if (length(FERR_FullComparisions) != 2)
+			stop(
+				'\n ~> `FERR_FullComparisions` must be a vector of 2 TRUE/FALSE elements. Example:\n\t c(TRUE,TRUE)'
+			)
 		message0('Fisher Exact Test (FE framework) in progress ...')
-		message0('\tEstimation of all factor combination effects = ', FERR_FullComparisions)
+		message0('\tEstimation of all factor combination effects = ', FERR_FullComparisions[1])
 		output = crunner(
 			object = OpenStatsListObject                                               ,
 			formula = MoveResponseToRightOfTheFormula(FE_formula)                      ,
 			#expandDottedFormula(formula = FE_formula, data = OpenStatsListObject@datasetPL)  ,
 			rep              = FERR_rep                                                       ,
 			method           = 'FE'                                                           ,
-			fullComparisions = FERR_FullComparisions                                          ,
+			fullComparisions = FERR_FullComparisions[1]                                       ,
 			ci_levels        = MMFERR_conf.level                                              ,
+			InterLevelComparisions = FERR_FullComparisions[2]                                 ,
+			
 			...
 		)
 		# Important!
@@ -178,8 +184,12 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 				'\n ~> Function detected in `RR_formula`.\n\t	Please apply the function to the dataset prior to the analysis.'
 			)
 		}
+		if (length(FERR_FullComparisions) != 2)
+			stop(
+				'\n ~> `FERR_FullComparisions` must be a vector of 2 TRUE/FALSE elements. Example:\n\t c(TRUE,TRUE)'
+			)
 		message0('Reference Range Plus (RR framework) in progress ...')
-		message0('\tEstimation of all factor combination effects = ', FERR_FullComparisions)
+		message0('\tEstimation of all factor combination effects = ', FERR_FullComparisions[1])
 		output = RRrunner(
 			object  = OpenStatsListObject                                               ,
 			formula = MoveResponseToRightOfTheFormula(RR_formula)                       ,
@@ -189,7 +199,8 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 			RRprop = RR_prop                                                            ,
 			ci_levels = MMFERR_conf.level                                               ,
 			RRrefLevel = RRrefLevel                                                     ,
-			fullComparisions = FERR_FullComparisions                                    ,
+			fullComparisions = FERR_FullComparisions[1]                                 ,
+			InterLevelComparisions = FERR_FullComparisions[2]                           , 
 			...
 		)
 		# Important!

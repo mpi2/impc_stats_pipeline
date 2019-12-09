@@ -46,7 +46,7 @@ OpenStatsAnalysis(
 	RRrefLevel = 'control'                                 ,
 	RR_prop      = 0.95                                    ,
 	FERR_rep     = 1500                                    ,
-	FERR_FullComparisions = TRUE                           ,
+	FERR_FullComparisions = c(TRUE, TRUE)                  ,
 	MMFERR_conf.level = 0.95                               ,
 	seed         = NULL                                    ,
 	debug        = TRUE                                    ,
@@ -108,7 +108,7 @@ OpenStatsAnalysis(
   Only applies to the "RR" or "FE" frameworks. The number of repetition for the Bayesian fisher exact test. See "B" parameter in `fisher.test()` function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
 } 
   \item{FERR_FullComparisions}{
-  Only applies to the "RR" or "FE" frameworks. A single logical flag (default TRUE). If set to TRUE then all combinations of the effects (all levels of factors - for example Male_LifeStage, Male_Genotype, Male_Mutant, Male_control, Female_control, Female_Mutant, Female_LifeStage and so on) will be tested. Otherwise only main effects (no sub level - for example Sex_LifeStage) will be tested. 
+  Only applies to the "RR" or "FE" frameworks. A vector of two logical flags, default c(TRUE,TRUE). Setting the first value to TRUE, then all combinations of the effects (all levels of factors in the input model - for example Male_LifeStage, Male_Genotype, Male_Mutant, Male_control, Female_control, Female_Mutant, Female_LifeStage and so on) will be tested. Otherwise only main effects (no sub levels - for example Sex_LifeStage [not for instance Male_LifeStage]) will be tested. Setting the second element of the vector to TRUE (default TRUE) will force the fisher test to do all comparisions between different levels of the RESPONSE variable. For example, if the respose has three levels such as 1.positive, 2.negative and 3.neutral then the comparisions will be between  1\&2, 1\&3, 2\&3 and 1\&2\&3 (obviously this is the full table).
 } 
 	\item{MMFERR_conf.level}{
   Applies to all frameworks (MM, FE, RR). Single numeric value for the interval confidence level. Default is 0.95

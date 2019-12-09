@@ -21,7 +21,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       verbose                 = TRUE       ,
                       # OpenStats
                       MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
-                      FERROptimise            = TRUE                ,
+                      FERROptimise            = c(TRUE,TRUE)        ,
                       # Only for simulations
                       simulation              = FALSE      ,
                       Simulation.iteration    = 1          ,

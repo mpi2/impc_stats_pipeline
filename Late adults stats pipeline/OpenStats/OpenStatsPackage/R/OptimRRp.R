@@ -7,6 +7,7 @@ RRrunner = function(object              ,
 										RRprop        = .05                                    ,
 										ci_levels     = 0.95                                   ,
 										fullComparisions = TRUE                                ,
+										InterLevelComparisions = TRUE                          ,
 										...)
 {
 	requireNamespace("rlist")
@@ -30,7 +31,7 @@ RRrunner = function(object              ,
 			!is.numeric(RRprop) ||
 			RRprop <= 0.5       ||
 			RRprop >= 1.0) {
-		message0('"RRprop" must be a value greater than 0.5 and less than 1')
+		message0('`RRprop` must be a value greater than 0.5 and less than 1')
 		warnings('Improper value for "RRprop"')
 		return(NULL)
 	}
@@ -73,20 +74,21 @@ RRrunner = function(object              ,
 	RRresult_low = lapply(RRobject_low, function(x) {
 		r = suppressMessages(
 			crunner(
-				object   = x$newobject                    ,
-				formula  = x$newFormula                   ,
-				rep      = rep                            ,
-				method   = 'RR'                           ,
-				fullComparisions = fullComparisions       ,
-				noteToFinish     = 'in Low vs NormalHigh' ,
-				ci_levels        = ci_levels              ,
-				RRextraResults   = list(
-					depVariable      = x$depVariable        ,
-					disdepVariable   = x$newDepVariable     ,
-					RRprop           = x$RRprop             ,
-					RRLabels         = x$labels             ,
-					RRprefix         = x$depVarPrefix       ,
-					RRreferenceLevel = x$refLevel      ,
+				object   = x$newobject                       ,
+				formula  = x$newFormula                      ,
+				rep      = rep                               ,
+				method   = 'RR'                              ,
+				fullComparisions = fullComparisions          ,
+				InterLevelComparisions = InterLevelComparisions ,
+				noteToFinish     = 'in Low vs NormalHigh'    ,
+				ci_levels        = ci_levels                 ,
+				RRextraResults   = list(   
+					depVariable      = x$depVariable           ,
+					disdepVariable   = x$newDepVariable        ,
+					RRprop           = x$RRprop                ,
+					RRLabels         = x$labels                ,
+					RRprefix         = x$depVarPrefix          ,
+					RRreferenceLevel = x$refLevel              ,
 					RRempiricalQuantiles  = x$empiricalQuantiles
 				)                                         ,
 				...
@@ -98,22 +100,23 @@ RRrunner = function(object              ,
 	RRresult_high = lapply(RRobject_high, function(x) {
 		r = suppressMessages(
 			crunner(
-				object   = x$newobject                    ,
-				formula  = x$newFormula                   ,
-				rep      = rep                            ,
-				method   = 'RR'                           ,
-				fullComparisions = fullComparisions       ,
-				noteToFinish     = 'in LowNormal vs High' ,
-				ci_levels        = ci_levels              ,
-				RRextraResults   = list(
-					depVariable      = x$depVariable        ,
-					disdepVariable   = x$newDepVariable     ,
-					RRprop           = x$RRprop             ,
-					RRLabels         = x$labels             ,
-					RRprefix         = x$depVarPrefix       ,
-					RRreferenceLevel = x$refLevel      ,
+				object   = x$newobject                       ,
+				formula  = x$newFormula                      ,
+				rep      = rep                               ,
+				method   = 'RR'                              ,
+				fullComparisions = fullComparisions          ,
+				InterLevelComparisions = InterLevelComparisions ,
+				noteToFinish     = 'in LowNormal vs High'    ,
+				ci_levels        = ci_levels                 ,
+				RRextraResults   = list(   
+					depVariable      = x$depVariable           ,
+					disdepVariable   = x$newDepVariable        ,
+					RRprop           = x$RRprop                ,
+					RRLabels         = x$labels                ,
+					RRprefix         = x$depVarPrefix          ,
+					RRreferenceLevel = x$refLevel              ,
 					RRempiricalQuantiles  = x$empiricalQuantiles
-				)                                         ,
+				)                                            ,
 				...
 			)
 		)
@@ -136,7 +139,8 @@ RRrunner = function(object              ,
 			formula         = formula                         ,
 			prop            = RRprop                          ,
 			ci_level        = ci_levels                       ,
-			refLevel        = RRrefLevel
+			refLevel        = RRrefLevel                      ,
+			full_comparisions = c(fullComparisions, InterLevelComparisions)
 		),
 		extra  = list(Cleanedformula           = cleanFormulaForOutput)
 	)
