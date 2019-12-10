@@ -362,7 +362,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   .verbose = verbose                        ,
                   .inorder = inorder
                 ) %activemulticore% {
-                  #for (i in  1:length(colonys)){
+                  # for (i in  1:length(colonys)){
                   message0('*~*~*~*~*~* ', i, '|', length(colonys), ' *~*~*~*~*~*')
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
@@ -755,7 +755,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         a = normalisePhenList(phenlist = a, colnames = c(depVar, 'Weight'))
                       }
                       message0('Fitting the model ...')
-                      message0('Method: ', method, '\n\t Equation:', equationType)
+                      message0('Method: ', method, ', Equation:', equationType)
                       c.ww0 =	PhenStatWindow(
                         phenlistObject = a,
                         parameter = parameter,
@@ -799,7 +799,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         note                               ,
                         c.ww0$note                         ,
                         'Applied method' = c.ww0$method    ,
-                        'Image url'      = relativePath(
+                        'Image URL'      = relativePath(
                           path = c.ww0$graphFileName ,
                           reference = wd
                         )

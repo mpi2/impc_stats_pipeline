@@ -22,7 +22,11 @@ WindowingDetails = function(args) {
       ),
       'no note available'
     ),
-    'Window weights' = as.vector(unlist(args$we)),
+    'Window weights' = if (!is.null(args$we)) {
+      as.vector(unlist(args$we))
+    } else{
+      rep(1,length(args$external_sample_ids))
+    },
     'external_sample_id' = as.vector(unlist(args$external_sample_ids))
   )
   return(wn)

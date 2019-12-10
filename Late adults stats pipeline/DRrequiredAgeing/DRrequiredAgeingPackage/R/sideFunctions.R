@@ -1669,9 +1669,11 @@ CutFileNameIfTooLong = function(fullPath,
 }
 
 
+
 # plot windowing
 PlotWindowingResult = function(args, overwrite = FALSE, ...) {
-  if (args$plot) {
+  if (args$plot      &&
+      !is.null(args$we)) {
     message0('ploting the results ...')
     file = ifelse(
       is.null(args$PicDir),

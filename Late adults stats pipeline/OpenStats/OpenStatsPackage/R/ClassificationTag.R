@@ -499,8 +499,7 @@ classificationTag = function(object               = NULL  ,
 			'Sex in the input model'             = SexInTheCleanedInputModel,
 			'Overall p-value threshold'          = phenotypeThreshold       ,
 			'Sex specific p-value threshold'     = SexSpecificThreshold     ,
-			'Active Sex levels'                  = lsex                     #,
-			#'Genotype Sex interaction p-value'  = SexInteraction           
+			'Active Sex levels'                  = lsex                           
 		)
 	} else{
 		outList = NULL

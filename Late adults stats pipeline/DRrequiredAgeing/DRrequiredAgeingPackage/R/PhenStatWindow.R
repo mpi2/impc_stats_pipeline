@@ -255,19 +255,31 @@ PhenStatWindow = function (phenlistObject                                ,
         #we2[mm]  = we2[mm] * vMutants
         #we2[-mm] = we2[-mm] * VControls
       }
-      message0('Fitting the windowing weights into the optimized PhenStat model ...')
-      objectf = OpenStatsAnalysis(
-        OpenStatsListObject = phenlistObject,
-        method              = method,
-        MM_random   = RandEffTerm   ,
-        correlation = CorrEffect    ,
-        MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
-        MM_weight   = nlme::varComb(
-          nlme:: varFixed( ~ 1 / AllModelWeights)
-        ),
-        debug       = TRUE,
-        MM_optimise = c(1, 0, 1, 1, 1, 1)
-      )
+
+      if (!is.null(we2)) {
+        message0('Reclaculating an optimised model using the windowing weights ...')
+        objectf = OpenStatsAnalysis(
+          OpenStatsListObject = phenlistObject,
+          method              = method,
+          MM_random   = RandEffTerm   ,
+          correlation = CorrEffect    ,
+          MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+          MM_weight   = nlme::varComb(nlme::varFixed(~ 1 / AllModelWeights)),
+          debug       = TRUE,
+          MM_optimise = c(1, 0, 1, 1, 1, 1)
+        )
+      } else{
+        message0('Ops no, the soft windowing failed! Just a normal full model will be estimated ...')
+        objectf = OpenStatsAnalysis(
+          OpenStatsListObject = phenlistObject,
+          method              = method,
+          MM_random   = RandEffTerm   ,
+          correlation = CorrEffect    ,
+          MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
+          debug       = TRUE,
+          MM_optimise = c(0, 1, 1, 1, 1, 1)
+        )
+      }
       windowingNote$'Windowing analysis'$'Final model' = objectf$messages
       # Full model windowing
       message0('Fitting the windowing weights into the full PhenStat model ...')
