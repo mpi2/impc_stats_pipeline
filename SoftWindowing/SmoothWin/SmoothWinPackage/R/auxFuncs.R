@@ -353,6 +353,42 @@ addJitterifNoVariation = function(x            = NULL,
   }
   return(x)
 }
+
+var.test0 = function(x, y, ...) {
+  vt = tryCatch(
+    expr = {
+      var.test(x = x, y = y, ...)
+    },
+    error = function(e) {
+      return(NULL)
+    } ,
+    warning = function(w) {
+      return(NULL)
+    }
+  )
+  if (is.null(vt))
+    return(list(p.value = 1))
+  else
+    return(vt)
+}
+
+t.test0 = function(x, y, ...) {
+  tt = tryCatch(
+    expr = {
+      var.test(x = x, y = y, ...)
+    },
+    error = function(e) {
+      return(NULL)
+    } ,
+    warning = function(w) {
+      return(NULL)
+    }
+  )
+  if (is.null(tt))
+    return(list(p.value = 1))
+  else
+    return(tt)
+}
 ###########
 tv.test = function(obj                           ,
                    args                          ,
@@ -377,14 +413,14 @@ tv.test = function(obj                           ,
       oim    = obj$weights[[i - 1]]
       thresh = 0 #args$threshold*0
       # Variations
-      vtl  = var.test(addJitterifNoVariation(dfv[[i]][oi >= thresh]),
+      vtl  = var.test0(addJitterifNoVariation(dfv[[i]][oi >= thresh]),
                       addJitterifNoVariation(dfv[[i - 1]][oim >= thresh]))$p.value
-      vtlp = var.test(addJitterifNoVariation(dfp[[i]][oi >= thresh]),
+      vtlp = var.test0(addJitterifNoVariation(dfp[[i]][oi >= thresh]),
                       addJitterifNoVariation(dfp[[i - 1]][oim >= thresh]))$p.value
       # Means
-      ttl  = t.test  (addJitterifNoVariation(dfv[[i]][oi >= thresh]),
+      ttl  = t.test0  (addJitterifNoVariation(dfv[[i]][oi >= thresh]),
                       addJitterifNoVariation(dfv[[i - 1]][oim >= thresh]))$p.value
-      ttlp = t.test  (addJitterifNoVariation(dfp[[i]][oi >= thresh]),
+      ttlp = t.test0  (addJitterifNoVariation(dfp[[i]][oi >= thresh]),
                       addJitterifNoVariation(dfp[[i - 1]][oim >= thresh]))$p.value
       # Normality
       nntp  = shapiro.test0(dfp[[i]][oi >= thresh])

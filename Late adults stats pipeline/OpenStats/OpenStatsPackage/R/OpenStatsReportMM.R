@@ -292,42 +292,71 @@ OpenStatsReportCont =	function(object,
 		),
 		#####################################################################
 		'Interactions included'              =	list(
-			'Genotype Sex'  =  !is.null(
-				modelSummaryPvalueExtract(
-					x = Fmodel,
-					variable = CombineLevels(Labels$Genotype$Genotype, Labels$Sex$Sex,debug = debug),
-					anova = TRUE,
-					debug = debug
-				)
-			),
-			'Genotype LifeStage'  =  !is.null(
-				modelSummaryPvalueExtract(
-					x = Fmodel,
-					variable = CombineLevels(Labels$Genotype$Genotype, Labels$LifeStage$LifeStage,debug = debug),
-					anova = TRUE,
-					debug = debug
-				)
-			),
-			'Sex LifeStage'  =  !is.null(
-				modelSummaryPvalueExtract(
-					x = Fmodel,
-					variable = CombineLevels(Labels$Sex$Sex, Labels$LifeStage$LifeStage,debug = debug),
-					anova = TRUE,
-					debug = debug
-				)
-			),
-			'Genotype Sex LifeStage'  =  !is.null(
-				modelSummaryPvalueExtract(
-					x = Fmodel,
-					variable = CombineLevels(
-						Labels$Genotype$Genotype,
-						Labels$Sex$Sex,
-						Labels$LifeStage$LifeStage,
-						debug = debug
+			'Genotype Sex'  =  TermInFormulaReturn(
+				formula = frm,
+				term = CombineLevels(Labels$Genotype$Genotype, Labels$Sex$Sex, debug = debug),
+				return =
+					!is.null(
+						modelSummaryPvalueExtract(
+							x = Fmodel,
+							variable = CombineLevels(Labels$Genotype$Genotype, Labels$Sex$Sex, debug = debug),
+							anova = TRUE,
+							debug = debug
+						)
 					),
-					anova = TRUE,
+				not = NULL
+			),
+			'Genotype LifeStage'  =  TermInFormulaReturn(
+				formula = frm,
+				term = CombineLevels(Labels$Genotype$Genotype, Labels$LifeStage$LifeStage, debug = debug),
+				return = !is.null(
+					modelSummaryPvalueExtract(
+						x = Fmodel,
+						variable = CombineLevels(Labels$Genotype$Genotype, Labels$LifeStage$LifeStage, debug = debug),
+						anova = TRUE,
+						debug = debug
+					)
+				),
+				not = NULL
+			)
+			,
+			'Sex LifeStage'  =  TermInFormulaReturn(
+				formula = frm,
+				term = CombineLevels(Labels$Sex$Sex, Labels$LifeStage$LifeStage, debug = debug),
+				return = !is.null(
+					modelSummaryPvalueExtract(
+						x = Fmodel,
+						variable = CombineLevels(Labels$Sex$Sex, Labels$LifeStage$LifeStage, debug = debug),
+						anova = TRUE,
+						debug = debug
+					)
+				),
+				not = NULL
+			),
+			'Genotype Sex LifeStage'  =  TermInFormulaReturn(
+				formula = frm,
+				term = CombineLevels(
+					Labels$Genotype$Genotype  ,
+					Labels$Sex$Sex            ,
+					Labels$LifeStage$LifeStage,
+					len   = 3                 ,
 					debug = debug
-				)
+				),
+				return = !is.null(
+					modelSummaryPvalueExtract(
+						x = Fmodel,
+						variable = CombineLevels(
+							Labels$Genotype$Genotype  ,
+							Labels$Sex$Sex            ,
+							Labels$LifeStage$LifeStage,
+							len   = 3                 ,
+							debug = debug
+						),
+						anova = TRUE,
+						debug = debug
+					)
+				),
+				not = NULL
 			)
 		),
 		#####################################################################
@@ -358,10 +387,11 @@ OpenStatsReportCont =	function(object,
 				modelSummaryPvalueExtract(
 					x = Fmodel,
 					variable =  CombineLevels(
-						Labels$Genotype$Genotype,
-						Labels$Sex$Sex,
-						Labels$LifeStage$LifeStage,
-						debug = debug
+						Labels$Genotype$Genotype   ,
+						Labels$Sex$Sex             ,
+						Labels$LifeStage$LifeStage ,
+						debug = debug              ,
+						len = 3
 					),
 					anova = TRUE,
 					debug = debug

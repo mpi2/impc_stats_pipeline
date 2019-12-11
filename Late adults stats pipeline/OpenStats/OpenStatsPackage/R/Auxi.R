@@ -1503,11 +1503,11 @@ ModelInReference = function(model,
 	return(out)
 }
 
-TermInFormulaReturn = function(formula,
-															 term,
-															 return,
-															 active,
-															 not = NA,
+TermInFormulaReturn = function(formula      ,
+															 term         ,
+															 return       ,
+															 active = TRUE,
+															 not = NA     ,
 															 debug = TRUE) {
 	terms  = formulaTerms(formula = formula)
 	if (debug)
@@ -1791,21 +1791,65 @@ pasteCollon = function(x){
 	return(r)
 }
 
+# Modified from permutations in gtools package
+permn = function (n, r, v = 1:n, set = TRUE, repeats.allowed = FALSE) 
+{
+	if (mode(n) != "numeric" || length(n) != 1 || n < 1 || 
+			(n%%1) != 0) 
+		stop("bad value of n")
+	if (mode(r) != "numeric" || length(r) != 1 || r < 1 || 
+			(r%%1) != 0) 
+		stop("bad value of r")
+	if (!is.atomic(v) || length(v) < n) 
+		stop("v is either non-atomic or too short")
+	if ((r > n) & repeats.allowed == FALSE) 
+		stop("r > n and repeats.allowed=FALSE")
+	if (set) {
+		v <- unique(sort(v))
+		if (length(v) < n) 
+			stop("too few different elements")
+	}
+	#v0 <- vector(mode(v), 0)
+	if (repeats.allowed) 
+		sub <- function(n, r, v) {
+			if (r == 1) 
+				matrix(v, n, 1)
+			else if (n == 1) 
+				matrix(v, 1, r)
+			else {
+				inner <- Recall(n, r - 1, v)
+				cbind(rep(v, rep(nrow(inner), n)), matrix(t(inner), 
+																									ncol = ncol(inner), nrow = nrow(inner) * n, 
+																									byrow = TRUE))
+			}
+		}
+	else sub <- function(n, r, v) {
+		if (r == 1) 
+			matrix(v, n, 1)
+		else if (n == 1) 
+			matrix(v, 1, r)
+		else {
+			X <- NULL
+			for (i in 1:n) X <- rbind(X, cbind(v[i], Recall(n - 
+																												1, r - 1, v[-i])))
+			X
+		}
+	}
+	sub(n, r, v[1:n])
+}
 CombineLevels = function(...,
 												 debug  = TRUE,
-												 revStr = TRUE,
 												 len    = 2) {
 	x  = c(...)
 	if (length(x) < 1)
 		return(x)
-	cb = combn(x, len)
-	r = sapply(1:ncol(cb), function(i) {
-		xx = cb[, i]
-		if (length(xx) < 1)
+	pm = t(permn(n = length(x), r = len))
+	r = sapply(1:ncol(pm), function(i) {
+		xx  = pm[, i]
+		nxx = length(xx)
+		if (nxx < 1)
 			return(NULL)
-		r = c(pasteCollon(xx))
-		if (revStr)
-			r = c(r, pasteCollon(rev(xx)))
+		r = c(pasteCollon(x[xx]))
 	})
 	r = as.vector(unlist(r))
 	if (debug)
@@ -2514,6 +2558,7 @@ InteractionAndValue = function(x, VName = 'p-value') {
 	}
 	return(r)
 }
+
 
 modelSummaryPvalueExtract = function(x,
 																		 variable   = 'Genotype'                          ,
