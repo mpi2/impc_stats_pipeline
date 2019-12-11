@@ -27,7 +27,8 @@ OpenStatsList(
 	dataset.values.male         = NULL                      ,
 	dataset.values.female       = NULL                      ,
 	dataset.values.early        = NULL                      ,
-	dataset.values.late         = NULL
+	dataset.values.late         = NULL                      ,
+	debug                       = TRUE
 )
 }
 %- maybe also 'usage' for other objects documented here.
@@ -76,6 +77,9 @@ OpenStatsList(
 }
   \item{dataset.values.late}{
   value used to label "late life stage" in the dataset
+}
+  \item{debug}{
+	A logical flag. Set to TRUE to see more details about the progress of the function. Default TRUE
 }
 }
 \value{

@@ -26,6 +26,7 @@ plot.OpenStatsRR = function(x,
 		message0(x$messages)
 		stop()
 	}
+	message0('Working on the plot ...')
 	p = par()
 	par(ask = ask, mfrow = mfrow)
 	
@@ -78,6 +79,7 @@ plot.OpenStatsFE = function(x,
 		message0(x$messages)
 		stop()
 	}
+	message0('Working on the plot ...')
 	p = par()
 	par(ask = ask, mfrow = mfrow)
 	
@@ -131,6 +133,7 @@ plot.OpenStatsMM = function (x                   ,
 		message0(x$messages)
 		stop()
 	}
+	message0('Working on the plot ...')
 	p = par()
 	par(ask = ask, mfrow = mfrow)
 	

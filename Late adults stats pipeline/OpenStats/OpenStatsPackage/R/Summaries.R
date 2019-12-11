@@ -3,7 +3,7 @@ summary.NULL = function(object, ...) {
 }
 summary.OpenStatsRR = function(object, format = 'rst', ...) {
 	if (!is.null(object$messages) || is.null(object)) {
-		message0('Due to error(s), no plot available')
+		message0('Due to error(s), no summary available')
 		message0(object$messages)
 		stop()
 	}
@@ -12,7 +12,7 @@ summary.OpenStatsRR = function(object, format = 'rst', ...) {
 
 summary.OpenStatsFE = function(object, format = 'rst', ...) {
 	if (!is.null(object$messages) || is.null(object)) {
-		message0('Due to error(s), no plot available')
+		message0('Due to error(s), no summary available')
 		message0(object$messages)
 		stop()
 	}
@@ -21,7 +21,7 @@ summary.OpenStatsFE = function(object, format = 'rst', ...) {
 
 summary.OpenStatsMM = function(object, format = 'rst', ...) {
 	if (!is.null(object$messages) || is.null(object)) {
-		message0('Due to error(s), no plot available')
+		message0('Due to error(s), no summary available')
 		message0(object$messages)
 		stop()
 	}
@@ -33,6 +33,7 @@ summaryCore = function(x,
 											 procedure = 'MM',
 											 format = 'rst',
 											 ...) {
+	message0('Working on the summary table ...')
 	requireNamespace("knitr")
 	vo = OpenStatsReport(object           = x    ,
 													JSON             = FALSE,

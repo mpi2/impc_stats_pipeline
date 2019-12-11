@@ -11,6 +11,7 @@ M.opt = function(object = NULL            ,
 								 optimise    = c(TRUE,TRUE,TRUE, TRUE, TRUE, TRUE) ,
 								 ci_levels   = .95                                 ,
 								 ...) {
+	requireNamespace('nlme')
 	if (!method %in% c('MM')        ||
 			is.null(all_vars0(fixed))   ||
 			is.null(object)) {

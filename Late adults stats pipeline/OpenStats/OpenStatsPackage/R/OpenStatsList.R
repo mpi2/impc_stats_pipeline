@@ -19,9 +19,46 @@ setClass(
 		datasetUNF                  = 'data.frame'
 	)
 )
+OpenStatsList =  function(dataset,
+													testGenotype                = 'experimental'           ,
+													refGenotype                 = 'control'                ,
+													hemiGenotype                = NULL                     ,
+													clean.dataset               = TRUE                     ,
+													dataset.colname.genotype    = 'biological_sample_group',
+													dataset.colname.sex         = 'sex'                    ,
+													dataset.colname.batch       = 'date_of_experiment'     ,
+													dataset.colname.lifestage   = 'LifeStage'              ,
+													dataset.colname.weight      = 'weight'                 ,
+													dataset.values.missingValue = c(' ', '')               ,
+													dataset.values.male         = NULL                     ,
+													dataset.values.female       = NULL                     ,
+													dataset.values.early        = NULL                     ,
+													dataset.values.late         = NULL,
+													debug = TRUE) {
+	r = suppressMessagesANDWarnings(OpenStatsList0(
+		dataset,
+		testGenotype                = testGenotype               ,
+		refGenotype                 = refGenotype                ,
+		hemiGenotype                = hemiGenotype               ,
+		clean.dataset               = clean.dataset              ,
+		dataset.colname.genotype    = dataset.colname.genotype   ,
+		dataset.colname.sex         = dataset.colname.sex        ,
+		dataset.colname.batch       = dataset.colname.batch      ,
+		dataset.colname.lifestage   = dataset.colname.lifestage  ,
+		dataset.colname.weight      = dataset.colname.weight     ,
+		dataset.values.missingValue = dataset.values.missingValue,
+		dataset.values.male         = dataset.values.male        ,
+		dataset.values.female       = dataset.values.female      ,
+		dataset.values.early        = dataset.values.early       ,
+		dataset.values.late         = dataset.values.late
+	),
+	sup.messages = !debug,
+	sup.warnings = FALSE
+	)
+	return(r)
+}
 
-
-OpenStatsList =
+OpenStatsList0 =
 	function(dataset,
 					 testGenotype                = 'experimental'           ,
 					 refGenotype                 = 'control'                ,
@@ -423,8 +460,10 @@ summary.OpenStatsList = function(object,
 	requireNamespace("summarytools")
 	r  = NULL
 	df = SelectVariablesOrDefault(data = object@datasetPL, vars)
-	if (!is.null(df))
+	if (!is.null(df)){
+		message0('Working on the summary table ...')
 		r  = summarytools::dfSummary (df, justify = 'l',...)
+	}
 	return(r)
 }
 
@@ -434,6 +473,7 @@ plot.OpenStatsList = function(x,
 	requireNamespace("Hmisc")
 	df = SelectVariablesOrDefault(data = x@datasetPL, vars)
 	if (!is.null(df)) {
+		message0('Working on the plot ...')
 		r    = Hmisc::describe (df)
 		plot = suppressWarnings(plot(r, ...))
 		return(plot)
