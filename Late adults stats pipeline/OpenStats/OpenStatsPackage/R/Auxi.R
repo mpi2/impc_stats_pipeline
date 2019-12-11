@@ -1503,6 +1503,11 @@ ModelInReference = function(model,
 	return(out)
 }
 
+FERR_FullComparisionsMessage = function(x){
+	message0('\tEstimation of all factor combination effects = '      , x[1])
+	message0('\tEstimation of inter level factors for the response = ', x[2])
+}
+
 TermInFormulaReturn = function(formula      ,
 															 term         ,
 															 return       ,

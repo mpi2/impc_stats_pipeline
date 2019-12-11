@@ -161,8 +161,7 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 				'\n ~> `FERR_FullComparisions` must be a vector of 2 TRUE/FALSE elements. Example:\n\t c(TRUE,TRUE)'
 			)
 		message0('Fisher Exact Test (FE framework) in progress ...')
-		message0('\tEstimation of all factor combination effects = '      , FERR_FullComparisions[1])
-		message0('\tEstimation of inter level factors for the response = ', FERR_FullComparisions[2])
+		FERR_FullComparisionsMessage (FERR_FullComparisions)
 		output = crunner(
 			object = OpenStatsListObject                                               ,
 			formula = MoveResponseToRightOfTheFormula(FE_formula)                      ,
@@ -190,8 +189,7 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 				'\n ~> `FERR_FullComparisions` must be a vector of 2 TRUE/FALSE elements. Example:\n\t c(TRUE,TRUE)'
 			)
 		message0('Reference Range Plus (RR framework) in progress ...')
-		message0('\tEstimation of all factor combination effects = '      , FERR_FullComparisions[1])
-		message0('\tEstimation of inter level factors for the response = ', FERR_FullComparisions[2])
+		FERR_FullComparisionsMessage (FERR_FullComparisions)
 		output = RRrunner(
 			object  = OpenStatsListObject                                               ,
 			formula = MoveResponseToRightOfTheFormula(RR_formula)                       ,
