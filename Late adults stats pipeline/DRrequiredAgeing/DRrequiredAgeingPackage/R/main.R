@@ -946,6 +946,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   \n\n '
                   )
                   counter  = counter  + 1
+                  gc()
                 }
               }
             }
@@ -961,4 +962,6 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   stopImplicitCluster()
   message0('Finished.')
   setwd(cwd)
+  message0('Cleaning the meamory ...')
+  gc()
 }

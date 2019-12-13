@@ -2137,7 +2137,7 @@ replaceInList <- function (x, FUN, ...)
 WriteToDB = function(df,
                      dbname    = 'db' ,
                      TableName = 'DR10',
-                     maxtry    = 6400,
+                     maxtry    = 20000,
                      steptry   = 40,
                      maxdelay  = .30) {
   requireNamespace("DBI")
