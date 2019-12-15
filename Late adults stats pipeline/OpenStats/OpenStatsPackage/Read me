@@ -1,0 +1,22 @@
+This is the developement version of the OpenStats R package, an extensive analysis package for the phenotyping data. 
+
+The tree implemented frameworks are as below.
+
+1. Linear Mixed Model
+This includes and extensive set of optimisation for model selection and fully customised model specifications. The effect sizes, confidence intervals and etc. are also reported. The sub models such as Sex specific, age specific models are also fitted (optional). Summary statistics and the visualisations are also available. Note that the there is an extensive check on the input model to assure the the plausibility of the fitting and also some corrections to the errorneous scenarios.
+
+
+2. Fishers exact test. 
+This includes applying a fully customised Fishers exact test to the data and all possible permutations. The effect sizes, percentage change, summary statistics and the visualisations are also available.
+
+3. Reference range plus
+This is an alternative model for the continuous data when the linear mixed model fails. The algorithm starts by discritizing the data into low/normal/high classes and applying the Fishers exact test to the mutual (LowNormal vs High) and (Low vs NormalHigh) classes. Like Fishers exact test, the model checking, summary, visualisation etc. are available.
+
+
+What is novel in OpenStats:
+
+1. Fully customised input model
+2. Optimisation of the linear mixed model using AICc
+3. Fisher exact test on all possible subset of the data 
+4. Robustness and simplicity of the package
+5. Fully customised Reference Range plus method
