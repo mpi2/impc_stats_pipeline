@@ -174,6 +174,31 @@ checkModelTermsInData = function(formula,
 }
 
 
+
+
+dfNAreplce = function(df                  ,
+											NAsymbol   = NULL   ,
+											replceNaBy = NA) {
+	if (!is.null(NAsymbol) &&
+			length(NAsymbol)    > 0) {
+		message0(
+			'Checking the specified missing values [x',
+			length(NAsymbol),
+			'] (',
+			pasteComma(paste0('`', NAsymbol, '`')),
+			') ...'
+		)
+		#### This is much faster than df %in% NAsymbol
+		n       = length(NAsymbol)
+		for (i in seq_along(NAsymbol)) {
+			NAs   = NAsymbol[i]
+			message0('\t', i, '/', n, '. checking (`', NAs, '`) ...')
+			df[df ==  NAs] = replceNaBy
+		}
+	}
+	return(df)
+}
+
 reformulate0 = function (termlabels,
 												 response = NULL,
 												 intercept = TRUE,

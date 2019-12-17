@@ -58,6 +58,7 @@ OpenStatsList =  function(dataset,
 	return(r)
 }
 
+
 OpenStatsList0 =
 	function(dataset,
 					 testGenotype                = 'experimental'           ,
@@ -93,17 +94,7 @@ OpenStatsList0 =
 			sta.time    = Sys.time()
 			message0('Checking the input data in progress ...')
 			## Replace missing values specified in the user format with NA
-			if (!is.null(dataset.values.missingValue)) {
-				message0(
-					'Checking the specified missing values [x',
-					length(dataset.values.missingValue),
-					'] (',
-					pasteComma(paste0('`', dataset.values.missingValue, '`')),
-					') ...'
-				)
-				dataset[dataset %in%  dataset.values.missingValue] = NA
-			}
-			dataset                      = droplevels0(dataset)
+			dataset = droplevels0(dfNAreplce(df = dataset, NAsymbol = dataset.values.missingValue))
 			chkcols = checkOpenStatsColumns(
 				dataset = dataset,
 				vars    = c(
