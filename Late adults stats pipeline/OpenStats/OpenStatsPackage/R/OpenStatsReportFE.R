@@ -17,7 +17,7 @@ OpenStatsReportCat =	function(object)
 	objRes           = object$output$SplitModels[[depVariable]]
 	#####################################################################
 	variability      =  list('Value' = length(unique(columnOfInterest)) / max(length(columnOfInterest), 1), 
-													 'Type'  = 'Length of unique response divided by total number of response')
+													 'Type'  = 'Total unique response divided by total number of response')
 	#####################################################################
 	DSsize            = SummaryStats(
 		x = x,

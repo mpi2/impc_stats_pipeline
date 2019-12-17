@@ -192,7 +192,7 @@ dfNAreplce = function(df                  ,
 		n       = length(NAsymbol)
 		for (i in seq_along(NAsymbol)) {
 			NAs   = NAsymbol[i]
-			message0('\t', i, '/', n, '. checking (`', NAs, '`) ...')
+			message0('\t', i, '/', n, '. Checking (`', NAs, '`) ...')
 			df[df ==  NAs] = replceNaBy
 		}
 	}
@@ -3611,7 +3611,7 @@ checkOpenStatsColumns = function(dataset, vars) {
 	if (length(vars)) {
 		for (v in vars) {
 			r = v %in% names(dataset)
-			message0('checking whether variable `',
+			message0('Checking whether variable `',
 							 v,
 							 '` exists in the data ... \n\tResult = ',
 							 r)

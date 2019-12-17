@@ -50,7 +50,7 @@ OpenStatsReportRR =	function(object)
 	columnOfInterest = x[, c(depVariable)]
 	#####################################################################
 	variability      =  list('Value' = length(unique(columnOfInterest)) / max(length(columnOfInterest), 1),
-													 'Type'  = 'Length of unique response divided by total number of response')
+													 'Type'  = 'Total unique response divided by total number of response')
 	#####################################################################
 	extractFisherSubTableResults1 = function(x, what = 'p.value') {
 		r = extractFisherSubTableResults(x = x, what = what)
