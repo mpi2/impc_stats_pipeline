@@ -1912,10 +1912,11 @@ sortList = function(x,...){
 }
 # A new vector output for this package only
 VectorOutput0 = function(c.ww0,
-                         ExtraCols,
-                         activeWindowing,
-                         na = 'string',
-                         null = 'null') {
+                         ExtraCols                 ,
+                         activeWindowing           ,
+                         na              = 'string',
+                         null            = 'null',
+                         subBreakColumns = NULL) {
   ####
   if (!NullOrError(c.ww0$NormalObj)) {
     p1 = OpenStats::OpenStatsReport(
@@ -1942,6 +1943,8 @@ VectorOutput0 = function(c.ww0,
                                      othercolumns = ExtraCols,
                                      JSON = FALSE,
                                      ReportNullSchema = TRUE)
+    #### Code for
+    # OpenStats:::OpenStatsComplementarySplit()
     p2$`Classification tag` = OpenStats:::classificationTag(c.ww0$WindowedObj)
     p3$`Classification tag` = OpenStats:::classificationTag(c.ww0$FullObj)
     p4$`Classification tag` = OpenStats:::classificationTag(c.ww0$FullWindowedObj)

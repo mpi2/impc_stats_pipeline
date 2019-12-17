@@ -66,6 +66,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       solrBaseURL           = 'http://hx-noah-74-10:8090' ,
                       ### Just for debuging
                       superDebug             = FALSE                      ,
+                      subBreakColumns        = NULL,
                       extraBatchParameters   = '-m "rh7-hosts-ebi5-12 rh7-hosts-ebi5-13 rh7-hosts-ebi5-14 rh7-hosts-ebi5-15 rh7-hosts-ebi5-16 rh7-hosts-ebi5-17 rh7-hosts-ebi5-18 rh7-hosts-ebi5-19 rh7-hosts-ebi5-20 rh7-hosts-ebi5-24 rh7-hosts-ebi5-25 rh7-hosts-ebi5-26 rh7-hosts-ebi5-27 rh7-hosts-ebi6-00 rh7-hosts-ebi6-01 rh7-hosts-ebi6-02 rh7-hosts-ebi6-03 rh7-hosts-ebi6-04 rh7-hosts-ebi6-05 rh7-hosts-ebi6-06 rh7-hosts-ebi6-07 rh7-hosts-ebi6-08 rh7-hosts-ebi6-09 rh7-hosts-ebi6-10 rh7-hosts-ebi6-11 rh7-hosts-ebi6-12 rh7-hosts-ebi6-13 rh7-hosts-ebi6-14 rh7-hosts-ebi6-15 rh7-hosts-ebi6-16 rh7-hosts-ebi6-17"',
                       ...) {
   message0('DRrequiredAgeing loaded')
@@ -808,9 +809,10 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       ####
                       message0('Preparing the output from VectorOutput function ...')
                       c.ww.vec       = VectorOutput0(
-                        c.ww0     = c.ww0,
-                        ExtraCols    = ExtraCols,
-                        activeWindowing = activeWindowing
+                        c.ww0        = c.ww0                             ,
+                        ExtraCols    = ExtraCols                         ,
+                        activeWindowing = activeWindowing                ,
+                        subBreakColumns = subBreakColumns
                       )
                       ##
                       outP    = SuccessfulOutput(
