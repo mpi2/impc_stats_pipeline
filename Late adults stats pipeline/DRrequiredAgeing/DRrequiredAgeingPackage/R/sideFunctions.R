@@ -1910,6 +1910,41 @@ outMCoreLog = function(wd, dir = 'Multicore_logs', fname = '_MulCoreLog.txt') {
 sortList = function(x,...){
   x[order(names(x),...)]
 }
+
+subModelVectorOutput = function(object ,
+                                subBreakColumns = NULL    ,
+                                ExtraCols = NULL          ,
+                                JSON      = FALSE         ,
+                                ReportNullSchema = TRUE) {
+  if (is.null(object)  ||
+      is.null(ExtraCols))
+    return(NULL)
+  #
+  message0('Submodel estimation in progress ...')
+  o  = OpenStats:::OpenStatsComplementarySplit(object = object, variables = subBreakColumns)
+  #
+  if (is.null(o))
+    return(NULL)
+  #
+  r = lapply(o, function(x) {
+    res = OpenStatsReport(
+      object            = x           ,
+      othercolumns      = ExtraCols   ,
+      JSON              = JSON        ,
+      RemoveNullKeys    = TRUE        ,
+      ReportNullSchema  = ReportNullSchema
+    )
+    if (!is.null(res)) {
+      res$`Classification tag` = OpenStats:::classificationTag(x)
+    }
+    return(res)
+  })
+  if (!is.null(r))
+    names(r) = names(o)
+  return(r)
+}
+
+
 # A new vector output for this package only
 VectorOutput0 = function(c.ww0,
                          ExtraCols                 ,
@@ -1926,28 +1961,75 @@ VectorOutput0 = function(c.ww0,
       ReportNullSchema = TRUE
     )
     p1$`Classification tag` = OpenStats:::classificationTag(c.ww0$NormalObj)
+    #####
+    if (!is.null(subBreakColumns)) {
+      p1$'Sub Models' = subModelVectorOutput(
+        object = c.ww0$NormalObj,
+        subBreakColumns = subBreakColumns,
+        ExtraCols = ExtraCols,
+        JSON = FALSE,
+        ReportNullSchema = TRUE
+      )
+    }
+    #####
   } else{
     p1 = NULL
   }
   # The second piece (Windowing results)
   if (activeWindowing && !NullOrError(c.ww0$WindowedObj)) {
-    p2 =  OpenStats::OpenStatsReport(c.ww0$WindowedObj  ,
-                                     othercolumns = ExtraCols,
-                                     JSON = FALSE,
-                                     ReportNullSchema = TRUE )
-    p3 =  OpenStats::OpenStatsReport(c.ww0$FullObj  ,
-                                     othercolumns = ExtraCols,
-                                     JSON = FALSE,
-                                     ReportNullSchema = TRUE)
-    p4 =  OpenStats::OpenStatsReport(c.ww0$FullWindowedObj  ,
-                                     othercolumns = ExtraCols,
-                                     JSON = FALSE,
-                                     ReportNullSchema = TRUE)
+    p2 =  OpenStats::OpenStatsReport(
+      c.ww0$WindowedObj  ,
+      othercolumns = ExtraCols,
+      JSON = FALSE,
+      ReportNullSchema = TRUE
+    )
+    p3 =  OpenStats::OpenStatsReport(
+      c.ww0$FullObj  ,
+      othercolumns = ExtraCols,
+      JSON = FALSE,
+      ReportNullSchema = TRUE
+    )
+    p4 =  OpenStats::OpenStatsReport(
+      c.ww0$FullWindowedObj  ,
+      othercolumns = ExtraCols,
+      JSON = FALSE,
+      ReportNullSchema = TRUE
+    )
     #### Code for
     # OpenStats:::OpenStatsComplementarySplit()
     p2$`Classification tag` = OpenStats:::classificationTag(c.ww0$WindowedObj)
     p3$`Classification tag` = OpenStats:::classificationTag(c.ww0$FullObj)
     p4$`Classification tag` = OpenStats:::classificationTag(c.ww0$FullWindowedObj)
+    #####
+    if (!is.null(subBreakColumns)) {
+      p2$'Sub Models' =
+        subModelVectorOutput(
+          object = c.ww0$WindowedObj        ,
+          subBreakColumns = subBreakColumns ,
+          ExtraCols = ExtraCols             ,
+          JSON = FALSE                      ,
+          ReportNullSchema = TRUE
+        )
+      ###
+      p3$'Sub Models' =
+        subModelVectorOutput(
+          object = c.ww0$FullObj           ,
+          subBreakColumns = subBreakColumns,
+          ExtraCols = ExtraCols            ,
+          JSON = FALSE                     ,
+          ReportNullSchema = TRUE
+        )
+      ###
+      p4$'Sub Models' =
+        subModelVectorOutput(
+          object = c.ww0$FullWindowedObj    ,
+          subBreakColumns = subBreakColumns ,
+          ExtraCols = ExtraCols             ,
+          JSON = FALSE                      ,
+          ReportNullSchema = TRUE
+        )
+    }
+    #####
   } else{
     p2 = p3 = p4 = NULL
   }
