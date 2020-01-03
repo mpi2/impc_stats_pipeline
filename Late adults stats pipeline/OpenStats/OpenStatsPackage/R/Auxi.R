@@ -289,7 +289,7 @@ FeasibleTermsInContFormula = function(formula, data) {
 							 '. Checking for the feasibility of terms and interactions ...')
 			cmb = combn(vars, i)
 			for (j in 1:ncol(cmb)) {
-				message0('\t\t Checking ', pasteComma(cmb[, j]))
+				message0('\t\t Checking ', pasteComma(cmb[, j]),' ...')
 				xtb = xtabs(
 					formula = paste0('~', paste0(cmb[, j], collapse = '+')),
 					data = data,
@@ -692,7 +692,9 @@ eff.size = function(object,
 			)
 		} else{
 			# For categorical covariates it is the mean difference
-			MDiff        = max(dist(agr[, depVariable, drop = FALSE]), na.rm = TRUE)
+			MDiff        = max(dist(agr[, depVariable, drop = FALSE],
+															method = 'maximum')             ,
+												 na.rm = TRUE)
 			r            = resid(NModel)
 			sd           = sd0(r, na.rm = TRUE)
 			efSi         = list(
@@ -863,7 +865,7 @@ RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 				pasteComma(names(subX)[dcols], truncate = FALSE)
 			)
 		} else{
-			message0('\tNo duplicate found')
+			message0('\tNo duplicate found.')
 		}
 		uniqCols  = subX   [, !dcols  , drop = FALSE]
 		r         = cbind(x[, !colVars, drop = FALSE], uniqCols)

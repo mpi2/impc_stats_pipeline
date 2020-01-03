@@ -370,6 +370,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     ObjectsThatMustBeRemovedInEachIteration()
                     # Initialization before starting the analysis
                     note   = list()
+                    note = c(note,
+                             list('Random seed' = seed))
                     colony = colonys[i]
                     message0('Current colony: ',colony)
 
