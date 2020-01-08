@@ -1333,7 +1333,7 @@ AllTables = function(dframe        = NULL,
 	for (i in unique(pmax(1, 1:(lcat - adj)))) {
 		cb = combn(cat, i)
 		for (j in 1:ncol(cb)) {
-			message0('\tspliting on ', pasteComma(cb[, j], replaceNull = FALSE))
+			message0('\tspliting on ', pasteComma(cb[, j], replaceNull = FALSE),' ...')
 			out = split(dframe,
 									interaction(dframe[cb[, j]]), drop = TRUE)
 			l2   = c(l2, out)
@@ -1531,6 +1531,7 @@ ModelInReference = function(model,
 }
 
 FERR_FullComparisionsMessage = function(x){
+	message0('Optimisation level: ')
 	message0('\tEstimation of all factor combination effects = '      , x[1])
 	message0('\tEstimation of inter level factors for the response = ', x[2])
 }
@@ -2118,12 +2119,12 @@ RRCut = function(object                     ,
 		qntl = sort(qntl)
 	}
 	message0(
-		'\tInitial quantiles for cutting the data ',
-		'[probs = ('                               ,
-		pasteComma(round(prb, 3))                  ,
-		'), n.reference = '                        ,
-		length(controls[, depVariable]),
-		']: '                                    ,
+		'\tInitial quantiles for cutting the data \n',
+		'\t\t\t Probs: '                             ,
+		pasteComma(round(prb, 3))                    ,
+		'\n\t\t\t N.reference: '                    ,
+		length(controls[, depVariable])              ,
+		'\n\t\t\t Quantiles: '                       ,
 		pasteComma(round(qntl, 3), replaceNull = FALSE)
 	)
 	if (length(unique(qntl)) < 2) {
@@ -2212,7 +2213,7 @@ RRDiscretizedEngine = function(data,
 		for (i in 1:lextra) {
 			cbn = combn(extra, i)
 			for (j in 1:ncol(cbn)) {
-				message0('\tspliting on ', pasteComma(cbn[, j], replaceNull = FALSE))
+				message0('\tspliting on ', pasteComma(cbn[, j], replaceNull = FALSE),' ...')
 				out = split(df,
 										interaction(df[cbn[, j]]), drop = TRUE)
 				l2   = c(l2, out)
@@ -3756,3 +3757,13 @@ fastBarnardextest  = function(x,
 	)
 }
 
+USerManualSlotName = function(x, name = 'OpenStats') {
+	message('The structure of an ', name, ':')
+	if (isS4(x))
+		xn = slotNames(x)
+	else
+		xn = names(x)
+	
+	for (i in seq_along(xn))
+		cat('    ', i, '. ', xn[i], '  \n')
+}

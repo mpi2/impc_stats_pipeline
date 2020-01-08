@@ -83,7 +83,7 @@ summaryCore = function(x,
 		'Sexual dimorphism detected?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
 		'............................'   = ifelse(
 			procedure == 'RR',
-			'* Separate p-values for (Low vs NormalHigh), (LowNormal vs High) and (details) ',
+			'* Separate p-values for (Low vs NormalHigh), (LowNormal vs High) and details ',
 			'............................'
 		),
 		'Genotype contribution overall'  = pasteComma2(IfoverallTableExistsThenReturnOne(vo$`Genotype p-value`)),

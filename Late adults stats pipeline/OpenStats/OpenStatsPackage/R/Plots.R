@@ -6,7 +6,7 @@ plotFERR = function(x, l1, l2, main, ...) {
 	if (!is.null(x$output$SplitModels[[l1]][[l2]]$table))
 		mosaicplot(x$output$SplitModels[[l1]][[l2]]$table, main = main, ...)
 	else
-		message0('Did not find [',
+		message0('Can not find [',
 						 l1,
 						 ' X ',
 						 l2,

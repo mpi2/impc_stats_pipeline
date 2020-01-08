@@ -69,7 +69,7 @@ RRrunner = function(object              ,
 	###########################
 	message0('Fisher exact test with '         ,
 					 ifelse(rep > 0, rep, 'No')        ,
-					 ' repetition(s) in progress ...')
+					 ' iteration(s) in progress ...')
 	message0('Analysing Low vs NormalHigh ...')
 	RRresult_low = lapply(RRobject_low, function(x) {
 		r = suppressMessages(

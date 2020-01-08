@@ -25,7 +25,7 @@ OpenStatsComplementarySplit = function(object   = NULL   ,
 	}
 	
 	message0('Split effects in progress ...')
-	message0('Variables to split:\n\t', pasteComma(vars))
+	message0('Variable(s) to split:\n\t', pasteComma(vars))
 	alTbls = AllTables(
 		dframe    = as.data.frame(object$input$data) ,
 		vars   = vars          ,

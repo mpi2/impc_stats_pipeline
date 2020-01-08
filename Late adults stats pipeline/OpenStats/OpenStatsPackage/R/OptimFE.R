@@ -29,7 +29,7 @@ crunner = function(object              ,
 	message0('\tTop framework: ', method)
 	message0('Fisher exact test with ',
 					 ifelse(rep > 0, rep, 'No'),
-					 ' repetition(s) in progress ...')
+					 ' iteration(s) in progress ...')
 	
 	data          = ExtractDatasetPLIfPossible(object)
 	newFormula    = checkModelTermsInData(
