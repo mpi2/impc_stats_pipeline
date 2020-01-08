@@ -278,7 +278,7 @@ FeasibleTermsInContFormula = function(formula, data) {
 	lvars = length(vars)#min(length(vars), sapply(strsplit(formulaTerms(formula = formula), split = ':'), length), na.rm = TRUE)
 	names = r = NULL
 	if (getResponseFromFormula(formula = formula) %in% vars) {
-		message0('\tResponse is included in the checks ....')
+		message0('\t Response is included in the checks ....')
 	}
 	if (lvars > 0) {
 		for (i in 1:lvars) {
@@ -435,8 +435,8 @@ FormulaContainsFunction = function(formula) {
 	#
 	fFull     = all_vars0(formula, functions = TRUE)
 	FAbstract = all_vars0(formula, functions = FALSE)
-	r = !identical(fFull    [grepl(pattern = '[0-9A-Za-z]', x = fFull)],
-								 FAbstract[grepl(pattern = '[0-9A-Za-z]', x = FAbstract)])
+	r = !identical(fFull    [grepl(pattern = '[0-9A-Za-z^]', x = fFull)],
+								 FAbstract[grepl(pattern = '[0-9A-Za-z]' , x = FAbstract)])
 	
 	return(r)
 }
@@ -3766,4 +3766,14 @@ USerManualSlotName = function(x, name = 'OpenStats') {
 	
 	for (i in seq_along(xn))
 		cat('    ', i, '. ', xn[i], '  \n')
+}
+
+
+isVariableCategorical = function(var = NULL, data = NULL) {
+	if (is.null(data) ||
+			is.null(var)  ||
+			!all(var %in% names(data)))
+		return(FALSE)
+	r = ifelse(is.factor(data[, var]), TRUE, FALSE)
+	return(r)
 }

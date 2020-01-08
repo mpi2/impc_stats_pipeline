@@ -51,14 +51,14 @@ OpenStats is fully written in [R](https://cran.r-project.org/) and can be instal
 
 The first layer allows a dataset for the input and an input model. In the second layer, the input data, as well as the model, are checked for feasibility and correctness and OpenStats reports any abnormality in the data or the input model. The successful output of this stage is an OpenStatsList object that is passed to the downstream layers. 
 
-The statistical analysis layer encompasses three analysis framework precisely, Linear Mixed Model and Reference range plus for the continuous and the Fisher's exact test for the categorical data. They are extra checks and on-fly fixes in this stage to assure a successful, correct and comprehensive analysis is applied to the data. More details about this layer are provided in the corresponded section.
+The statistical analysis layer encompasses three analysis framework precisely, Linear Mixed Model (MM) and Reference range plus (RR) for the continuous and the Fisher's exact test (FE) for the categorical data. They are extra checks and on-fly fixes in this stage to assure a successful, correct and comprehensive analysis is applied to the data. More details about this layer are provided in the corresponded section.
 
 The final layer provides feed for the downstream processes and consists of summaries, plots, lists and [JSON](https://www.json.org) objects.
 
 
 ## Input data and model
 
-OpenStats allows a data frame for the input. The input model must be in the standard format of `y~x+z+t+...`. No function is allowed in the formula. For instance, `log(y)~x+z+t+..` or `y~x^2+z+t+...` are invalid inputs.
+**OpenStats** allows a data frame for the input. The input model must be in the standard [R formula](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Formulae-for-statistical-models) format of `y~x+z+t+...`. No function is allowed in the formula. For instance, `log(y)~x+z+t+..` or `y~x^2+z+t+...` are invalid inputs. The model terms must be in the data otherwise will be removed. Depending on the chosen framework, MM allows the continuous covariates on the right hand side of the model whereas RR and FE only allow the categorical variable for covariates. 
 
 ## Data preparation with `OpenStatsList` function
 
@@ -157,7 +157,7 @@ Except for the input data and the framework (MM, RR or FE), the input arguments 
 
 ### Linear mixed model framework
 
-The linear mixed model framework consists of routines to apply a linear mixed model to the data. The input **fix effects term** (`MM_fixed`) must be specified in the standard [R formula](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Formulae-for-statistical-models) for instance, `y~Genotype+Sex+Genotype:Sex + Weight` that defines the following statistical model
+The linear mixed model framework consists of routines to apply a linear mixed model to the data. The input **fix effects term** (`MM_fixed`) must be specified in the standard R formula for instance, `y~Genotype+Sex+Genotype:Sex + Weight` that defines the following statistical model
 
 $$
 y = intercept + \beta_1 Genotype + \beta_2 Sex + \beta_3 Genotype\times Sex + \beta_4 Weight + e
@@ -414,7 +414,7 @@ plot(RR_result, col = 1:2)
 As pointed out in [here](https://github.com/mpi2/stats_working_group/raw/master/PhenStatUserGuide/PhenStatUsersGuide.pdf#54), RR+ should not be used when the control population contains less than 40 observations. Further, one should use test the better option Linear mixed model propr to applying RR+.
 
 
-### Output and report
+### Output and report with `OpenStatsReport`
 #### Output
 The output of `OpenStatsAnalysis` is formalised into three placeholders,
 

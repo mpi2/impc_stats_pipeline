@@ -61,6 +61,11 @@ crunner = function(object              ,
 															 reformulate(termlabels = depVariable, response = NULL))
 		newObject   = Obj$new.data
 		####
+		if(!isVariableCategorical(var = depVariable, data = data)) {
+			message0 ('\tThe response variable (', depVariable, ') is not categorical.')
+			next
+		}
+		####
 		counter  = 1
 		for (j in 1:length(vars)) {
 			message0('\tTesting for the main effect: ',
