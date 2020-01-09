@@ -68,13 +68,13 @@ OpenStatsAnalysis = function(OpenStatsListObject   = NULL          ,
 			)
 		},
 		warning = function(war) {
-			message0('The functions failed with a warning (see below): ')
+			message0('This operation failed with a warning (see below): ')
 			r$messages$warning <<- war
 			warning(war)
 			return(NULL)
 		},
 		error = function(err) {
-			message0('The functions failed with an error (see below): ')
+			message0('This operation failed with an error (see below): ')
 			r$messages$error <<- err
 			message(err)
 			return(NULL)

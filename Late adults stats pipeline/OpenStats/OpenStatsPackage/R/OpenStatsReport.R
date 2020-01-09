@@ -84,12 +84,12 @@ OpenStatsReport = function(object                    ,
 			return(out)
 		},
 		warning = function(war) {
-			message0('The functions failed with a warning (see below): ')
+			message0('This operation failed with a warning (see below): ')
 			warning(war)
 			return(NULL)
 		},
 		error = function(err) {
-			message0('The functions failed with an error (see below): ')
+			message0('This operation failed with an error (see below): ')
 			message(err)
 			return(NULL)
 		}
