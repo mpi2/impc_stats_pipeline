@@ -15,7 +15,7 @@ RRrunner = function(object              ,
 	allTerms    = all_vars0(x = formula)
 	if (!method %in% c('RR')          ||
 			is.null(allTerms)             ||
-			is.null(object)             ||
+			is.null(object)               ||
 			sum(allTerms %in% names(object@datasetPL)) < 2) {
 		#####
 		message0 (

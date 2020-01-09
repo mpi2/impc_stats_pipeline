@@ -62,7 +62,7 @@ crunner = function(object              ,
 		newObject   = Obj$new.data
 		####
 		if(!isVariableCategorical(var = depVariable, data = data)) {
-			message0 ('\tThe response variable (', depVariable, ') is not categorical.')
+			message0 ('\tThe response variable `', depVariable, '` is not categorical.')
 			next
 		}
 		####
