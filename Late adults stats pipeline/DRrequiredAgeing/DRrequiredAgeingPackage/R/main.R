@@ -129,13 +129,19 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   if (!file.exists(file))
     message0('File is not local or does not exist!')
 
-  rdata = read.csv(
-    file = file                                    ,
-    check.names      = checkNamesForMissingColNames,
-    sep              = sep                         ,
-    na.strings       = na.strings                  ,
-    stringsAsFactors = TRUE
-  )
+  if (!grepl(pattern = '.Rdata', x = file, fixed = TRUE)) {
+    rdata = read.csv(
+      file = file                                    ,
+      check.names      = checkNamesForMissingColNames,
+      sep              = sep                         ,
+      na.strings       = na.strings                  ,
+      stringsAsFactors = TRUE
+    )
+  } else{
+    load(file = file)
+    rdata = rdata0
+    rm(rdata0)
+  }
   message0('Input file dimentions: ',
            paste0(dim(rdata), collapse  = ', '))
   rdata                 = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
@@ -170,7 +176,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   procedures   = as.character(unique(na.omit(new.data$procedure_group)))
   for (procedure in procedures) {
     ###
-    n2.9 = base::subset(new.data,  new.data$procedure_group %in% procedures)
+    n2.9 = base::subset(new.data,  new.data$procedure_group %in% procedure)
     parameters  = as.character(unique(na.omit(n2.9$parameter_stable_id)))
     for (parameter in parameters) {
       FactorLevels = ReadFactorLevelsFromSolr(parameter = parameter, CatList = CatList)
