@@ -436,3 +436,13 @@ OpenStats:::USerManualSlotName(RR_result$extra,name = '`extra` object')
 
 #### Report
 There are some predefined effects such as sex effect that are typically used in the phenotypic analysis. A collection of this parameters are already reported in [this document](https://github.com/mpi2/stats_working_group/raw/master/PhenStatUserGuide/PhenStatUsersGuide.pdf#73). `OpenStatsReport` reports this list in [JSON](https://www.json.org/json-en.html) or generic R list format. 
+
+
+# Further questions
+This manual followed by the function manual in the **[OpenStats](https://github.com/mpi2/impc_stats_pipeline/tree/master/Late%20adults%20stats%20pipeline/OpenStats/OpenStatsPackage)** R package address the theories and implementation of the three statistical frameworks in OpenStats. The further questions could be requested by the email of the OpenStats developer, <hamedhm@ebi.ac.uk>.
+
+
+
+&nbsp;
+&nbsp;
+&nbsp;
