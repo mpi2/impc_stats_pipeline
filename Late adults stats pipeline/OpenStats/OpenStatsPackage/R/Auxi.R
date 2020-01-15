@@ -434,8 +434,8 @@ FormulaContainsFunction = function(formula) {
 		return(NULL)
 	}
 	#
-	fFull     = OpenStats:::all_vars0(formula, functions = TRUE)
-	FAbstract = OpenStats:::all_vars0(formula, functions = FALSE)
+	fFull     = all_vars0(formula, functions = TRUE)
+	FAbstract = all_vars0(formula, functions = FALSE)
 	r = !identical(fFull    [grepl(pattern = '[0-9A-Za-z^\\/]', x = fFull)],
 								 FAbstract[grepl(pattern = '[0-9A-Za-z]' , x = FAbstract)])
 	if (r)
