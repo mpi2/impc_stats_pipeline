@@ -233,19 +233,21 @@ OpenStatsComplementarySplit(object = MM_result,variables = 'Sex')
 OpenStats estimates the **normalised effect size** for each variable in the (input) fixed effects. This is performed by first normalising the data and following the steps below
 
 * For the  categorical variables such as Sex, Genotype etc:
-    1. Fit the sub model $response=\beta_0+\beta_1 VariableOfInterest+e$ under the optimal model configuration and estimate the standard deviation of the residuals, $\sigma_e$
-    2. Calculate the max absolute distance (MAD) of the mean of response under each level of the categorical variable e.g.mean response for the control and the threatment group
+    1. Normalise the input data to have zero mean and unit standard deviation, columnwise
+    2. Fit the sub model $response=\beta_0+\beta_1 VariableOfInterest+e$ under the optimal model configuration and estimate the standard deviation of the residuals, $\sigma_e$
+    3. Calculate the max absolute distance (MAD) of the mean of response under each level of the categorical variable e.g.mean response for the control and the threatment group
     3. Estimate the effect size by $MAD/\sigma_e$
 * For the continuous variables such as body weight:
-    1. Fit the sub model $response=\beta_0+\beta_1 VariableOfInterest+e$ under the optimal model configuration
-    2. Report $\beta_1$ as the effect size
+    1. Normalise the input data to have zero mean and unit standard deviation, columnwise
+    2. Fit the sub model $response=\beta_0+\beta_1 VariableOfInterest+e$ under the optimal model configuration
+    3. Report $\beta_1$ as the effect size
     
     
 The percentage change for all variables (categorical and continues) is estimated as below
 
-   1. Fit the sub model $response=\beta_0+\beta_1 VariableOfInterest+e$ under the optimal model configuration
-   2. Find the range of the ransponse variable $r=\max_{\text{response}} - \min_{\text{response}}$
-   3. Calculate the percent change by $\beta_1/r$
+   1. Normalise the input data to have zero mean and unit standard deviation, columnwise
+   2. Fit the sub model $response=\beta_0+\beta_1 VariableOfInterest+e$ under the optimal model configuration
+   3. Obtain $\beta_1$ for the percentage change
 
 Note that one can exclude the calculation of the effect sizes and percentage changes by setting the fifth element of `MM_optimise` to `FALSE.`
 

@@ -494,7 +494,7 @@ percentageChangeCont = function(model                ,
 		)
 	)
 	######
-	ran   = FUN(data[, depVar])
+	ran   = 1 # --ONE-- Just to cancel 100 but keep the percent (*100) FUN(data[, depVar])
 	if (is.null(coefs) || is.null(ran) || is.nan(ran))
 		return(NULL)
 	######
@@ -537,7 +537,7 @@ percentageChangeCont = function(model                ,
 				'Variable'            = mainEffsOnlyWhenIndivi                   ,
 				'Model'               = printformula(formula(model))             ,
 				'Type'                = 'Standardized interaction coefficients ' ,
-				'Percentage change' = Matrix2List(out / ran * 100, sep = sep)
+				'Percentage change'   = Matrix2List(out / ran * 100, sep = sep)  
 			)
 		)
 	}
@@ -706,7 +706,7 @@ eff.size = function(object,
 				'Variable'            = effOfInd                            ,
 				'Model'               = printformula(formula(NModel))       ,
 				'Type'                = 'Mean differences'                   ,
-				'Percentage change' = PerChange
+				'Percentage change'   = PerChange
 			)
 		}
 	} else{
