@@ -313,7 +313,7 @@ MM_result = OpenStatsAnalysis(
 )
 ```
 
-### Fisher exact test
+### Fisher exact test framework
 Fisher Exact Test is a standard framework for analysing categorical data that assesses the null hypothesis of independence of rows and columns in a contingency table with fixed marginals. This is the subject of the Fisher Exact (FE) framework in OpenStats.
 
 #### Implementation

@@ -123,7 +123,7 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 	if (length(method) > 1 || !method %in% c('MM', 'FE', 'RR'))
 		stop('\n ~> `method` must be one of `MM`, `FE` or `RR`')
 	#####
-	if (method %in% 'MM') {
+	if (toupper(method) %in% 'MM') {
 		if(length(MM_optimise)!=6)
 			stop('\n ~> `MM_optimise` must be a vector of 6 TRUE/FALSE elements. Example:\n\t c(TRUE,TRUE,TRUE,TRUE,TRUE,TRUE)')
 		if (FormulaContainsFunction(MM_fixed)) {
@@ -150,7 +150,7 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 		if (!is.null(output$input))
 			output$input$fixed = MM_fixed
 		
-	} else if (method %in% 'FE') {
+	} else if (toupper(method) %in% 'FE') {
 		if (FormulaContainsFunction(FE_formula)) {
 			stop(
 				'\n ~> Function detected in `FE_formula`.\n\t	Please apply the function to the dataset prior to the analysis.'
@@ -178,7 +178,7 @@ OpenStatsAnalysis0 = function(OpenStatsListObject = NULL       ,
 		if (!is.null(output$input))
 			output$input$formula = FE_formula
 		
-	} else if (method %in% 'RR') {
+	} else if (toupper(method) %in% 'RR') {
 		if (FormulaContainsFunction(RR_formula)) {
 			stop(
 				'\n ~> Function detected in `RR_formula`.\n\t	Please apply the function to the dataset prior to the analysis.'
