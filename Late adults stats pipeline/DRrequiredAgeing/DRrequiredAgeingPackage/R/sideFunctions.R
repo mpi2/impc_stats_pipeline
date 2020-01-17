@@ -3821,7 +3821,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
   dfSelected  = df[lapply(df$optionCollection, length) > 0,]
   #dfSelected  = dfSelected[dfSelected$isAnnotation, ]
   dfSelected  = dfSelected[dfSelected$type %in% 'simpleParameter', ]
-  dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
+  #dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
   dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
   dfSelected  = dfSelected[!duplicated(dfSelected),]
 

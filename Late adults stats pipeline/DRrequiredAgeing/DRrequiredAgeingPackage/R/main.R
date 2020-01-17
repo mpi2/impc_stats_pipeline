@@ -5,7 +5,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       normalisedPhenlist = FALSE                     ,
                       subdir = 'Results'                             ,
                       seed = 123456                                  ,
-                      MethodOfReadingCategoricalCategories  = 'file' , # url & update
+                      MethodOfReadingCategoricalCategories  = 'file' , # `file`, `solr` or `update`
                       OverwriteExistingFiles  = FALSE                ,
                       ignoreSkipList          = FALSE                ,
                       onlyFillNotExisitingResults = FALSE            ,
