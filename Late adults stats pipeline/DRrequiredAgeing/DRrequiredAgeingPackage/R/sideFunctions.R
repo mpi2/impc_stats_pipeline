@@ -3823,7 +3823,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
   dfSelected  = dfSelected[dfSelected$type %in% 'simpleParameter', ]
   #dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
   dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
-  dfSelected  = dfSelected[!duplicated(dfSelected),]
+  dfSelected  = dfSelected[!duplicated(dfSelected$parameterKey),]
 
   dfSelected$categories = sapply(dfSelected$parameterId, function(x) {
     #message0('Pid = ', x)
@@ -3837,7 +3837,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
   })
 
   ###################################################
-  message0('Finished in ',round(difftime(Sys.time() , startTime, units = 'sec'), 2),'s')
+  message0('Finished in ',round(difftime(Sys.time() , startTime, units = 'min'), 2),'m')
   ###################################################
   if (updateImpressFileInThePackage) {
     fileName = system.file("extdata", "AllCts.csv", package = "DRrequiredAgeing")
