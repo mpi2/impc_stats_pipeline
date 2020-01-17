@@ -3825,7 +3825,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
   dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
   dfSelected  = dfSelected[!duplicated(dfSelected$parameterKey),]
 
-  message0('\t Total items to look up: ', nrow(dfSelected))
+  message0('\t\t Total items to look up: ', nrow(dfSelected))
   dfSelected$categories = sapply(dfSelected$parameterId, function(x) {
     #message0('Pid = ', x)
     l = unlist(fromJSON(
