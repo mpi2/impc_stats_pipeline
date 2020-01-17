@@ -1248,17 +1248,24 @@ max0 = function(x, ...) {
   return(r)
 }
 
-
 # Get possible categories for the categorical variables
-GetPossibleCategories = function(procedure = NULL, file = TRUE) {
+GetPossibleCategories = function(procedure = NULL, method = 'file') {
   requireNamespace('pingr')
-  if (file) {
+  # Predefine list
+  CatList = data.frame(parameter_stable_id = NA, categories = NA)
+  message0('Loading the list of possible categories for categorical variables ...')
+  if (method %in% c('file', 'update')) {
+    message0('* We recommend you to update the file only *once* otherwise the whole process may take longer ...')
+    if (method %in% 'update') {
+      tmp = updateImpress(updateImpressFileInThePackage = TRUE)
+      rm(tmp)
+    }
     path = file.path(system.file("extdata", package = "DRrequiredAgeing"),
                      'AllCts.csv')
     message0('Reading the Category levels from the file : \n\t\t ====> ',
              path)
-    CatList = read.csv(file = path)[, -1]
-  } else{
+    CatList = read.csv(file = path)#[, -1]
+  } else if (method %in% 'solr') {
     if (pingr::is_online()) {
       url = paste0(
         #'http://ves-ebi-d0:8986/solr/pipeline/select?q=procedure_stable_id:',
@@ -1269,17 +1276,16 @@ GetPossibleCategories = function(procedure = NULL, file = TRUE) {
       message0('Reading the Category levels from : \n\t\t ====> ',
                url)
       CatList = read.csv(file = url)
-      CatList = CatList[!duplicated(CatList),]
-      if (any(dim(CatList) == 0)) {
-        CatList[1, ] = NA
-      } else{
+      if (all(dim(na.omit(CatList)) > 0)) {
+        CatList = CatList[!duplicated(CatList),]
         message0(nrow(CatList),
-                 ' parameter(s) found...')
+                 ' parameter(s) found ...')
       }
     } else{
       message0('Warning. Please check the internet connection ....')
-      CatList = data.frame(parameter_stable_id = NA, categories = NA)
     }
+  } else {
+    message0('please select either `file`, `solr`, `update` (latter needs admin permission) ....')
   }
   return(CatList)
 }
@@ -3760,4 +3766,139 @@ requiredDataColumns = function(x){
     'category'
   )
   return(ColumnsList)
+}
+
+updateImpress = function(updateImpressFileInThePackage = FALSE) {
+  requireNamespace('pingr')
+  library(jsonlite)
+  if (!pingr::is_online()) {
+    stop(
+      'You must be connected to the internet to be able to update the categorical categories from the IMPReSS ...'
+    )
+  }
+  ###############
+  message0('Updating the IMPReSS categories in progress ...')
+  message0('\t Step 1. Getting the list of parameters ...')
+  counter   =  1
+  startTime = Sys.time()
+  df = data.frame('parameterKey' = character(),
+                  optionCollection = character())
+  pipelineList = fromJSON(txt = 'http://api.mousephenotype.org/impress/pipeline/list')
+  for (pipelineId in names(pipelineList)[1]) {
+    message0('Pipeline id: ', pipelineId)
+    ProcedureList = fromJSON(
+      txt = paste0(
+        'http://api.mousephenotype.org/impress/procedure/belongingtopipeline/keys/',
+        pipelineId
+      )
+    )
+    for (procedureId in names(ProcedureList)) {
+      message0('\t Procedure id: ', procedureId)
+      parameterOptions = fromJSON(
+        txt = paste0(
+          'http://api.mousephenotype.org/impress/parameter/belongingtoprocedure/full/',
+          procedureId
+        )
+      )
+      if (is.null(dim(parameterOptions)))
+        next
+
+      if (counter < 2) {
+        df =  parameterOptions
+      } else{
+        df = rbind(df , parameterOptions)
+      }
+      counter = counter + 1
+
+    }
+  }
+  ###################################################
+  # save(df, file = paste0(Sys.Date(), '_Impress.Rdata'))
+  ###################################################
+
+  ###################################################
+  message0('\t Step2. Fetching the category names from the category ids ...')
+  dfSelected  = df[lapply(df$optionCollection, length) > 0,]
+  dfSelected  = dfSelected[dfSelected$isAnnotation, ]
+  dfSelected  = dfSelected[dfSelected$type %in% 'simpleParameter', ]
+  dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
+  dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
+  dfSelected  = dfSelected[!duplicated(dfSelected),]
+
+  dfSelected$categories = sapply(dfSelected$parameterId, function(x) {
+    #message0('Pid = ', x)
+    l = unlist(fromJSON(
+      paste0(
+        'http://api.mousephenotype.org/impress/option/belongingtoparameter/names/',
+        x
+      )
+    ))
+    paste(l, collapse = ',', sep = ',')
+  })
+
+  ###################################################
+  message0('Finished in ',round(difftime(Sys.time() , startTime, units = 'sec'), 2),'s')
+  ###################################################
+  if (updateImpressFileInThePackage) {
+    fileName = system.file("extdata", "AllCts.csv", package = "DRrequiredAgeing")
+  } else{
+    fileName = file.path(getwd(), 'AllCts.csv')
+  }
+  outP = data.frame(parameter_stable_id = dfSelected$parameterKey,
+                    categories          = dfSelected$categories)
+  message0('\tThe output file:\n\t  => ', fileName)
+  write.csv(x         = outP    ,
+            file      = fileName,
+            row.names = FALSE)
+  return(invisible(outP))
+}
+
+CreateVirtualDrive = function(active = FALSE) {
+  wd = getwd()
+  if (.Platform$OS.type != 'windows') {
+    message0('Virtual drive only works for windows OS.')
+    return(wd)
+  }
+  if (active) {
+    message0('Creating a virtual drive ... ')
+    system('subst U: /D', wait = TRUE)
+    if (system(paste0('subst U: "', wd, '"'), wait = TRUE) < 1) {
+      message0('Virtual directory successfully created.')
+      wd = 'U:'
+    } else{
+      message0('Cannot create the virtual drive. It may already exist.')
+    }
+  }
+  return(wd)
+}
+
+
+readInputDatafromFile = function(file = NULL,
+                         checkNamesForMissingColNames = TRUE,
+                         sep          = ',',
+                         na.strings   = 'NA') {
+  message0('Reading the input file ...\n\t ~> ', file)
+  if (!file.exists(file))
+    message0('File is not local or does not exist!')
+  message0('Reading the input data ...')
+  if (!grepl(pattern = '.Rdata',
+             x = file,
+             fixed = TRUE)) {
+    rdata = read.csv(
+      file = file                                    ,
+      check.names      = checkNamesForMissingColNames,
+      sep              = sep                         ,
+      na.strings       = na.strings                  ,
+      stringsAsFactors = TRUE
+    )
+  } else{
+    loadfile = load(file = file)
+    if(length(loadfile)<1)
+      stop('The loaded Rdata is blank ...')
+    rdata = get(loadfile[1])
+  }
+  message0('Input file dimentions: ',
+           paste0(dim(rdata), collapse  = ', '))
+  return(rdata)
+
 }

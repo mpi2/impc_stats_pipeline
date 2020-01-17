@@ -1,15 +1,15 @@
 ## You must check the 'check' parameter
 mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/select?q=*%3A*&fq=procedure_stable_id%3AIMPC_ECG_002&rows=590000&wt=csv&indent=true'            ,
-                      sep = ','                            ,
-                      na.strings = 'NA'                    ,
-                      normalisedPhenlist = FALSE           ,
-                      subdir = 'Results'                   ,
-                      seed = 123456                        ,
-                      readCategoriesFromFile  = TRUE       ,
-                      OverwriteExistingFiles  = FALSE      ,
-                      ignoreSkipList          = FALSE      ,
-                      onlyFillNotExisitingResults = FALSE  ,
-                      WhiteListMethods  = NULL             ,
+                      sep = ','                                      ,
+                      na.strings = 'NA'                              ,
+                      normalisedPhenlist = FALSE                     ,
+                      subdir = 'Results'                             ,
+                      seed = 123456                                  ,
+                      MethodOfReadingCategoricalCategories  = 'file' , # url & update
+                      OverwriteExistingFiles  = FALSE                ,
+                      ignoreSkipList          = FALSE                ,
+                      onlyFillNotExisitingResults = FALSE            ,
+                      WhiteListMethods  = NULL                       ,
                       # Carefully use this option!
                       # It can remove the entire result file (some colonies in a single output file)
                       # Only for multicore
@@ -114,36 +114,18 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   wd  = file.path(cwd,
                   paste(subdir, sep = '_', collapse = '_'))
   dir.create0(wd, recursive = TRUE)
-  if (virtualDrive) {
-    message0('Creating a virtual drive ... ')
-    system('subst U: /D', wait = TRUE)
-    system(paste0('subst U: "', wd, '"'), wait = TRUE)
-    wd = 'U:'
-  }
+  wd = CreateVirtualDrive(active = virtualDrive)
   message0('Setting the working directory to: \n\t\t ===> ', wd)
   setwd(dir = wd)
   ##################
   set.seed(seed)
   # Read file
-  message0('Reading the input file ...\n\t ~> ', file)
-  if (!file.exists(file))
-    message0('File is not local or does not exist!')
-
-  if (!grepl(pattern = '.Rdata', x = file, fixed = TRUE)) {
-    rdata = read.csv(
-      file = file                                    ,
-      check.names      = checkNamesForMissingColNames,
-      sep              = sep                         ,
-      na.strings       = na.strings                  ,
-      stringsAsFactors = TRUE
-    )
-  } else{
-    load(file = file)
-    rdata = rdata0
-    rm(rdata0)
-  }
-  message0('Input file dimentions: ',
-           paste0(dim(rdata), collapse  = ', '))
+  rdata = readInputDatafromFile(
+    file = file,
+    checkNamesForMissingColNames = checkNamesForMissingColNames,
+    sep = sep,
+    na.strings = na.strings
+  )
   rdata                 = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
   new.data              = rdata
   new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)), ]
@@ -169,8 +151,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   registerDoParallel(cl, cores = crs)
   # End of multicore initialization
   # Get possible categories for the categorical variables
-  message0('Loading the list of possible categories for categorical variables ...')
-  CatList = GetPossibleCategories (procedure = NULL, file = readCategoriesFromFile)
+  CatList = GetPossibleCategories (procedure = NULL, method = MethodOfReadingCategoricalCategories)
   message0('Filtering the dataset in progress ....')
   Strtime      = Sys.time()
   procedures   = as.character(unique(na.omit(new.data$procedure_group)))
