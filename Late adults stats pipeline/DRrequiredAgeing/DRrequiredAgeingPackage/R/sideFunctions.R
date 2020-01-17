@@ -3784,7 +3784,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
   df = data.frame('parameterKey' = character(),
                   optionCollection = character())
   pipelineList = fromJSON(txt = 'http://api.mousephenotype.org/impress/pipeline/list')
-  for (pipelineId in names(pipelineList)[1]) {
+  for (pipelineId in names(pipelineList)) {
     message0('Pipeline id: ', pipelineId)
     ProcedureList = fromJSON(
       txt = paste0(
