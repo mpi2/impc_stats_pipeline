@@ -3819,7 +3819,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
   ###################################################
   message0('\t Step2. Fetching the category names from the category ids ...')
   dfSelected  = df[lapply(df$optionCollection, length) > 0,]
-  dfSelected  = dfSelected[dfSelected$isAnnotation, ]
+  #dfSelected  = dfSelected[dfSelected$isAnnotation, ]
   dfSelected  = dfSelected[dfSelected$type %in% 'simpleParameter', ]
   dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
   dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
