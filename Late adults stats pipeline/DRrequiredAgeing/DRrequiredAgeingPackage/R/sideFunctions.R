@@ -200,8 +200,6 @@ IsInBlackListCategories = function(x, len = 1, blackList = NULL) {
   return(list(result = r, note = note))
 }
 
-
-
 #
 MergeLevels = function(x, listOfLevelMaps) {
   note = NULL

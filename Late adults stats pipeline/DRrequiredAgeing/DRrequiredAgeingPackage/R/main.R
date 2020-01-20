@@ -628,6 +628,24 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     n3.5.2  = droplevels0(n3.5.1)
                     MergLev = MergeLevels(x = n3.5.2[, depVar],
                                           listOfLevelMaps = CategoryMap)
+                    ### Store a text file with the parameter_stable_id of merged groups
+                    if (!is.null(MergeLevels$note)) {
+                      write(
+                        paste(
+                          parameter,
+                          MergeLevels$note,
+                          sep = '\t',
+                          collapse = '\t'
+                        ),
+                        file = 'MergedCategoriesParameterStableIds.txt',
+                        append = ifelse(
+                          file.exists('MergedCategoriesParameterStableIds.txt'),
+                          TRUE,
+                          FALSE
+                        )
+                      )
+                    }
+                    ###
                     n3.5.2[, depVar] = MergLev$x
                     n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]),])
                     n3.5.2OnlyKO     = subset(n3.5.2,n3.5.2$biological_sample_group %in% 'experimental')

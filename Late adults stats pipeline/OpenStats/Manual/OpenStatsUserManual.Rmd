@@ -40,10 +40,25 @@ test_Cat = OpenStatsList(
 
 Coping with a large volume of categorical and continuous data in the high-throughput phenotyping pipelines such as [Inetrnational Mouse Phenotyping Consortium (IMPC)](https://www.mousephenotype.org/) requires a robust automated statistical pipeline with minimal manual intervention.
 
-[**OpenStats**](https://github.com/mpi2/impc_stats_pipeline/tree/master/Late%20adults%20stats%20pipeline/OpenStats/OpenStatsPackage)] provides a variety of the statistical workflows for the identification of abnormal phenotypes with an emphasize on high-throughput data generating process. The embedded set of checks and on-fly fixes assures accurate and robust analyses for high-throughput data and a comprehensive output allows communicating the results to the downstream processes.
+[**OpenStats**](https://github.com/mpi2/impc_stats_pipeline/tree/master/Late%20adults%20stats%20pipeline/OpenStats/OpenStatsPackage) provides a variety of the statistical workflows for the identification of abnormal phenotypes with an emphasize on high-throughput data generating process. The embedded set of checks and on-fly fixes assures accurate and robust analyses for high-throughput data and a comprehensive output allows communicating the results to the downstream processes.
+
+## Install the package
+OpenStats is fully written in [R](https://cran.r-project.org/) and can be installed using the standard `install.package()` command or directly from Github,
+
+```{r, echo=TRUE,eval=FALSE}
+library(devtools)
+install_github(
+	repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/OpenStats/OpenStatsPackage/',
+	dependencies = TRUE,
+	upgrade = 'always',
+	force = TRUE,
+	build = TRUE,
+	quiet = FALSE
+)
+```
 
 # Package architecture
-OpenStats is fully written in [R](https://cran.r-project.org/) and can be installed using the standard `install.package()` command. A schematic illustration of the three-layer internal workflow of OpenStats is given below. More details can be found in the appropriate sections of the User’s Guide.
+OpenStats follows a four-layer architecture namely, model and data input, preprocessing and data preparation, statistical analysis and reports. This is shown in the figure below. More details can be found in the appropriate sections of the User’s Guid.
 
 ![](workflow.png)  
 
