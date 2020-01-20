@@ -629,11 +629,11 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     MergLev = MergeLevels(x = n3.5.2[, depVar],
                                           listOfLevelMaps = CategoryMap)
                     ### Store a text file with the parameter_stable_id of merged groups
-                    if (!is.null(MergeLevels$note)) {
+                    if (!is.null(MergLev$note)) {
                       write(
                         paste(
                           parameter,
-                          MergeLevels$note,
+                          MergLev$note,
                           sep = '\t',
                           collapse = '\t'
                         ),

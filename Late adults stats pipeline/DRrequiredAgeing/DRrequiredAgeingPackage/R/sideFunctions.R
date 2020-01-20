@@ -3881,7 +3881,7 @@ readInputDatafromFile = function(file = NULL,
     message0('File is not local or does not exist!')
   message0('Reading the input data ...')
   if (!grepl(pattern = '.Rdata',
-             x = file,
+             x = head(file,1),
              fixed = TRUE)) {
     rdata = read.csv(
       file = file                                    ,
