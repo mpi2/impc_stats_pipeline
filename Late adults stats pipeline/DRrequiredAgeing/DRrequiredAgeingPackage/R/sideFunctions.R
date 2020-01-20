@@ -3852,8 +3852,8 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
   return(invisible(outP))
 }
 
-CreateVirtualDrive = function(active = FALSE) {
-  wd = getwd()
+CreateVirtualDrive = function(active = FALSE, currentwd = NULL) {
+  wd = ifelse(is.null(currentwd), getwd(), currentwd)
   if (.Platform$OS.type != 'windows') {
     message0('Virtual drive only works for windows OS.')
     return(wd)

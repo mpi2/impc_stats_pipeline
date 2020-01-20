@@ -114,7 +114,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   wd  = file.path(cwd,
                   paste(subdir, sep = '_', collapse = '_'))
   dir.create0(wd, recursive = TRUE)
-  wd = CreateVirtualDrive(active = virtualDrive)
+  wd = CreateVirtualDrive(active = virtualDrive,currentwd = wd)
   message0('Setting the working directory to: \n\t\t ===> ', wd)
   setwd(dir = wd)
   ##################
