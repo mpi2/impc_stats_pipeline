@@ -227,8 +227,9 @@ MergeLevels = function(x                         ,
   if (report && !is.null(note)) {
     write(
       paste(
+        Sys.time()         ,
         parameter_stable_id,
-        note,
+        note               ,
         sep = '\t',
         collapse = '\t'
       ),
