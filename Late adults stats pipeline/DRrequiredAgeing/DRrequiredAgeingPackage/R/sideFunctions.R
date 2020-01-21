@@ -206,7 +206,9 @@ MergeLevels = function(x                         ,
                        listOfLevelMaps           ,
                        parameter_stable_id       ,
                        AllowedParametersList     ,
-                       report = FALSE) {
+                       report         = FALSE    ,
+                       reportFileName = 'MergedCategoriesParameterStableIds.txt',
+                       fileColumnSep  = '\t') {
   note = NULL
   if (all(parameter_stable_id %in% AllowedParametersList) &&
       !is.null(x)    &&
@@ -227,18 +229,16 @@ MergeLevels = function(x                         ,
   if (report && !is.null(note)) {
     write(
       paste(
-        Sys.time()         ,
-        parameter_stable_id,
-        note               ,
-        sep = '\t',
-        collapse = '\t'
+        Sys.time()              ,
+        parameter_stable_id     ,
+        note                    ,
+        sep      = fileColumnSep,
+        collapse = fileColumnSep
       ),
-      file = 'MergedCategoriesParameterStableIds.txt',
-      append = ifelse(
-        file.exists('MergedCategoriesParameterStableIds.txt'),
-        TRUE,
-        FALSE
-      )
+      file = reportFileName,
+      append = ifelse(file.exists(reportFileName),
+                      TRUE                       ,
+                      FALSE)
     )
   }
   return(list(x = x, note = if (is.null(note)) {
