@@ -200,10 +200,18 @@ IsInBlackListCategories = function(x, len = 1, blackList = NULL) {
   return(list(result = r, note = note))
 }
 
+
 #
-MergeLevels = function(x, listOfLevelMaps) {
+MergeLevels = function(x                         ,
+                       listOfLevelMaps           ,
+                       parameter_stable_id       ,
+                       AllowedParametersList     ,
+                       report = FALSE) {
   note = NULL
-  if (!is.null(x) && !is.numeric(x) &&  length(x) > 0 &&
+  if (all(parameter_stable_id %in% AllowedParametersList) &&
+      !is.null(x)    &&
+      !is.numeric(x) &&
+      length(x) > 0  &&
       nlevels(as.factor(x)) > 0) {
     x  = as.factor(x)
     nl = nlevels(x)
@@ -215,6 +223,22 @@ MergeLevels = function(x, listOfLevelMaps) {
         note = c(note, paste0(as.character(l[i]), '-->', newCat))
       }
     }
+  }
+  if (report && !is.null(note)) {
+    write(
+      paste(
+        parameter_stable_id,
+        note,
+        sep = '\t',
+        collapse = '\t'
+      ),
+      file = 'MergedCategoriesParameterStableIds.txt',
+      append = ifelse(
+        file.exists('MergedCategoriesParameterStableIds.txt'),
+        TRUE,
+        FALSE
+      )
+    )
   }
   return(list(x = x, note = if (is.null(note)) {
     note
