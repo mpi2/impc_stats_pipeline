@@ -1345,7 +1345,7 @@ ReadFactorLevelsFromSolr = function(parameter,
     x = Levels,
     fixed = fixed
   )
-  return(list(levels = fLevels, note = note))
+  return(list(levels = unique(trimws(fLevels)), note = note))
 }
 
 # Fast replacement of nulls
@@ -3857,7 +3857,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
         x
       )
     ))
-    paste(l, collapse = ',', sep = ',')
+    paste(trimws(l), collapse = ',', sep = ',')
   })
 
   ###################################################
@@ -3897,16 +3897,17 @@ CreateVirtualDrive = function(active = FALSE, currentwd = NULL) {
 }
 
 
+
 readInputDatafromFile = function(file = NULL,
-                         checkNamesForMissingColNames = TRUE,
-                         sep          = ',',
-                         na.strings   = 'NA') {
+                                 checkNamesForMissingColNames = TRUE,
+                                 sep          = ',',
+                                 na.strings   = 'NA') {
   message0('Reading the input file ...\n\t ~> ', file)
   if (!file.exists(file))
     message0('File is not local or does not exist!')
   message0('Reading the input data ...')
   if (!grepl(pattern = '.Rdata',
-             x = head(file,1),
+             x = head(file, 1),
              fixed = TRUE)) {
     rdata = read.csv(
       file = file                                    ,
@@ -3917,12 +3918,31 @@ readInputDatafromFile = function(file = NULL,
     )
   } else{
     loadfile = load(file = file)
-    if(length(loadfile)<1)
+    if (length(loadfile) < 1)
       stop('The loaded Rdata is blank ...')
     rdata = get(loadfile[1])
   }
   message0('Input file dimentions: ',
            paste0(dim(rdata), collapse  = ', '))
+  rdata = removeLeadingSpaceFromDataFrameFactors(rdata)
   return(rdata)
+}
 
+removeLeadingSpaceFromDataFrameFactors = function(x) {
+  if (is.null(x))
+    return(x)
+  message0('Remove leading/trailins space from a data frame ...')
+  message0 ('\t Note that the factors get to the charachter and t/l space will be removed ...')
+  message0 ('\t The order of the factors may not preserved!')
+  #x = as.data.frame(x)
+  catV = unname(unlist(sapply(x, function(xx) {
+    return(is.factor(xx))
+  })))
+  if (!sum(catV))
+    return(x)
+
+  for (i in which(catV == TRUE)) {
+    x[, i] = as.factor(trimws(as.character(x[, i])))
+  }
+  return(x)
 }
