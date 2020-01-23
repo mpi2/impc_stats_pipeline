@@ -227,12 +227,12 @@ OpenStatsList0 =
 				message0(
 					'Total `Weight` data points for ',
 					MakeCaptionFromNamesAndIndecis(name = names(dataset), index = coNames),
-					':\n\t Level(frequency): \n\t  ',
-					pasteComma(
-						paste0(names(wsglvls), '(', wsglvls, ')'),
-						truncate = FALSE,
-						sep = ',\n\t  '
-					)
+					': \n\t Level(frequency): \n\t  ',
+					pasteComma(numberingX(paste0(
+						names(wsglvls), '(', wsglvls, ')'
+					)),
+					truncate = FALSE,
+					sep = ',\n\t  ')
 				)
 				if (min(wsglvls, na.rm = TRUE) <= 2) {
 					message0(
@@ -311,6 +311,8 @@ OpenStatsList0 =
 		)
 		return(invisible(r))
 	}
+
+
 #-------------------------------------------------------------------------------
 ## Check dataset for the minimum required info and additional cleaning steps
 checkDataset = function(dataset,
@@ -323,14 +325,15 @@ checkDataset = function(dataset,
 		InGS    = interaction(dataset[,coNames])
 		tbGSL   = table(InGS)
 		
+	
 		message0(
 			'Total samples in ',
 			MakeCaptionFromNamesAndIndecis(name = names(dataset), index = coNames),
-			': \n\tLevel(frequency): \n\t ',
+			': \n\t Level(frequency): \n\t  ',
 			pasteComma(
-				paste0(names(tbGSL), '(', tbGSL, ')'),
+				numberingX(paste0(names(tbGSL), '(', tbGSL, ')')),
 				truncate = FALSE,
-				sep = '\n\t '
+				sep = '\n\t  '
 			)
 		)
 		if (min(tbGSL) < 1)

@@ -2043,9 +2043,9 @@ RRGetTheLeveLWithMaxFrequency = function(data, lower) {
 	r      = names(tbl[maxTbl])
 	if (length(r) > 1) {
 		message0(
-			'\tMore than one variable with the highest frequency detected. See:\n\tLevel(frequency): ',
+			'\tMore than one variable with the highest frequency detected. See:\n\t Level(frequency): ',
 			pasteComma(paste0(r, '(', tbl[maxTbl], ')'), truncate = FALSE),
-			'\n\t\tThe first one (`',
+			'\n\t\t The first one (`',
 			r[1],
 			'`) would be used.'
 		)
@@ -3580,8 +3580,27 @@ OpenStatsListRelabling = function(dataset, col, l1, rel1, l2, rel2) {
 	return(dataset)
 }
 
+LevelsAsFacNumbered = function(x, numbering = TRUE, sep = '. ') {
+	if (is.null(x) ||
+			length(x) < 1)
+		return(x)
+	r  = levels(as.factor(x))
+	nr = length(r)
+	if (numbering) {
+		r = paste(1:nr, r, sep = sep)
+	}
+	return(r)
+}
 
-checkSummary = function(dataset, var, ...) {
+numberingX = function(x, sep = '. ') {
+	if (length(x) < 1)
+		return(x)
+	lx = length(x)
+	r = paste(1:lx, x, sep = sep)
+	return(r)
+}
+
+checkSummary = function(dataset, var, numbering = TRUE,  ...) {
 	lvls = NULL
 	if (is.null(dataset) ||
 			is.null(var)     ||
@@ -3595,7 +3614,11 @@ checkSummary = function(dataset, var, ...) {
 			', missings = ',
 			round(sum(is.na(dataset[, var])) / length(dataset[, var]) * 100),
 			'%): \n\t  ',
-			pasteComma(levels(as.factor(dataset[, var])), width = 250, sep = '\n\t  ')
+			pasteComma(
+				LevelsAsFacNumbered(dataset[, var], numbering = numbering), 
+				width = 250,
+				sep = '\n\t  '
+			)
 		)
 	else
 		lvls = paste0(
