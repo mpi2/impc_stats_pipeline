@@ -6,10 +6,10 @@ plotFERR = function(x, l1, l2, main, ...) {
 	if (!is.null(x$output$SplitModels[[l1]][[l2]]$table))
 		mosaicplot(x$output$SplitModels[[l1]][[l2]]$table, main = main, ...)
 	else
-		message0('Can not find [',
-						 l1,
-						 ' X ',
-						 l2,
+		message0('Can not find [' ,
+						 l1               ,
+						 ' X '            ,
+						 l2               ,
 						 '] table')
 }
 
@@ -35,31 +35,31 @@ plot.OpenStatsRR = function(x,
 	HighRes = pastedot('High', Labels$response, 'Genotype')
 	
 	plotFERR (
-		x = x,
-		l1 = LowRes,
-		l2 = Labels$Genotype$Genotype,
-		main = main,
+		x = x                                       ,
+		l1 = LowRes                                 ,
+		l2 = Labels$Genotype$Genotype               ,
+		main = main                                 ,
 		...
 	)
 	plotFERR (
-		x = x,
-		l1 = HighRes,
-		l2 = Labels$Genotype$Genotype,
-		main = main,
+		x = x                                       ,
+		l1 = HighRes                                ,
+		l2 = Labels$Genotype$Genotype               ,
+		main = main                                 ,
 		...
 	)
 	plotFERR (
-		x = x,
-		l1 = LowRes,
-		l2 = Labels$Sex$Sex,
-		main = main,
+		x = x                                       ,
+		l1 = LowRes                                 ,
+		l2 = Labels$Sex$Sex                         ,
+		main = main                                 ,
 		...
 	)
 	plotFERR (
-		x = x,
-		l1 = HighRes,
-		l2 = Labels$LifeStage$LifeStage,
-		main = main,
+		x = x                                       ,
+		l1 = HighRes                                ,
+		l2 = Labels$LifeStage$LifeStage             ,
+		main = main                                 ,
 		...
 	)
 	
@@ -85,31 +85,31 @@ plot.OpenStatsFE = function(x,
 	
 	Labels = OpenStatsListLevels(x)
 	plotFERR (
-		x = x,
-		l1 = Labels$response,
-		l2 = Labels$Genotype$Genotype,
-		main = main,
-		...
+		x = x                             ,
+		l1 = Labels$response              ,
+		l2 = Labels$Genotype$Genotype     ,
+		main = main                       ,
+		...    
+	)    
+	plotFERR (      
+		x = x                             ,
+		l1 = Labels$response              ,
+		l2 = Labels$Sex$Sex               ,
+		main = main                       ,
+		...    
+	)    
+	plotFERR (    
+		x = x                             ,
+		l1 = Labels$Genotype$Genotype     ,
+		l2 = Labels$Sex$Sex               ,
+		main = main                       ,
+		...    
 	)
 	plotFERR (
-		x = x,
-		l1 = Labels$response,
-		l2 = Labels$Sex$Sex,
-		main = main,
-		...
-	)
-	plotFERR (
-		x = x,
-		l1 = Labels$Genotype$Genotype,
-		l2 = Labels$Sex$Sex,
-		main = main,
-		...
-	)
-	plotFERR (
-		x = x,
-		l1 = Labels$response,
-		l2 = Labels$LifeStage$LifeStage,
-		main = main,
+		x = x                             ,
+		l1 = Labels$response              ,
+		l2 = Labels$LifeStage$LifeStage   ,
+		main = main                       ,
 		...
 	)
 	par(ask = p$ask, mfrow = p$mfrow)
@@ -118,7 +118,7 @@ plot.OpenStatsFE = function(x,
 ###############################################
 # Plot MM
 ###############################################
-plot.OpenStatsMM = function (x                   ,
+plot.OpenStatsMM = function (x                        ,
 																	main = 'Final Model',
 																	ask = FALSE         ,
 																	mfrow = c(2, 2)     ,
@@ -139,6 +139,7 @@ plot.OpenStatsMM = function (x                   ,
 	
 	predR            = predict(fm)
 	residR           = resid(fm)
+	respShapiroTest  = normality.test0(transData$data[, transData$names[1]])
 	residShapiroTest = normality.test0(residR)
 	n                = length(na.omit(residR))
 	plot(
@@ -155,10 +156,10 @@ plot.OpenStatsMM = function (x                   ,
 	densityPlot(
 		residR,
 		xlab = ifelse(
-			is.null(residShapiroTest$'P-value'),
+			is.null(residShapiroTest$'P-value')               ,
 			'Residuals'                                       ,
 			paste0( 
-				'Residuals - ['                                  ,
+				'Residuals - ['                                 ,
 				residShapiroTest$'Test'                         ,
 				'] p-value = '                                  ,
 				round(residShapiroTest$'P-value', 8) 
@@ -177,12 +178,24 @@ plot.OpenStatsMM = function (x                   ,
 		...
 	)
 	#qqline(residR, ...)
+	ptext  =  paste0(transData$names[1], ' (n = ', n, ')')
 	densityPlot(
 		transData$data[, transData$names[1]]                ,
 		main = 'Density of the response'                    ,
-		xlab = paste0(transData$names[1], ' (n = ', n, ')') ,
+		xlab = ifelse(
+			is.null(respShapiroTest$'P-value')                ,
+			ptext                                             ,
+			paste0(
+				ptext                                           ,
+				' - ['                                          ,
+				respShapiroTest$'Test'                          ,
+				'] p-value = '                                  ,
+				round(respShapiroTest$'P-value', 8)
+			)
+		)   ,
 		rug  = TRUE                                         ,
 		...
 	)
 	par(ask = p$ask, mfrow = p$mfrow)
 }
+
