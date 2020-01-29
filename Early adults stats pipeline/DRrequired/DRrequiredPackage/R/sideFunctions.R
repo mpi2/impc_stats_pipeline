@@ -910,7 +910,7 @@ BatchGenerator = function(file                       ,
 
 # remove special characters from a string
 RemoveSpecialChars = function(x,
-                              what = '[^0-9A-Za-z]',
+                              what = '[^0-9A-Za-z ]',
                               replaceBy = '_',
                               message = FALSE) {
   what = gsub(
@@ -1366,8 +1366,8 @@ SummaryStatisticsOriginal = function(x,
 OtherExtraColumns = function(obj,
                              ColNames,
                              names,
-                             lower = TRUE,
-                             what = '[^0-9A-Za-z]',
+                             lower = FALSE,
+                             what = '[^0-9A-Za-z ]',
                              replaceBy = '_') {
   p4 = NULL
   ColNameInd = ColNames %in% colnames(obj)
@@ -2547,7 +2547,7 @@ LowerandRemoveSpecials <- function(x)
     LowerandRemoveSpecials(x[[y]]))
   if ("data.frame" %in% class(x))
     x1 <- as.data.frame(x1)
-  names(x1) <- gsub("[^[:alnum:]]", "_", tolower(cnames))
+  names(x1) <- gsub("[^[:alnum:]]", "_", (cnames))
   return(x1)
 }
 

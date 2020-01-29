@@ -1,6 +1,6 @@
 VectorOutPutNames = function(clean = TRUE,
                              replace = '_',
-                             lower = TRUE,
+                             lower = FALSE,
                              ...) {
   r = c(
     'Method',
