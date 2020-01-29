@@ -1,5 +1,5 @@
 # all in small case and separated by underscore
-SuccessfulOutput = function(args) {
+SuccessfulOutput = function(args, writeOutputToDB = FALSE) {
   requireNamespace("DBI")
   ### 1 Experiment detail
   experiment_details      = list(
@@ -46,6 +46,7 @@ SuccessfulOutput = function(args) {
   )
 
   # Write to the SQLite DB
+  if (writeOutputToDB)
   WriteToDB(outP,
             dbname = paste0(experiment_details$gene_accession_id[1], "_DR10SQLite.db"))
 

@@ -51,6 +51,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       # Raw data
                       storeRawData           = TRUE        ,
                       compressRawData        = TRUE        ,
+               		  writeOutputToDB        = TRUE        ,
                       # Only for Batch generator
                       BatchProducer          =  FALSE      ,
                       cpu = 4                              ,
@@ -830,7 +831,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                           GenePageURL = GenePageURL                      ,
                           encode = encode                                ,
                           wd     = wd
-                        )
+                        ),
+                        writeOutputToDB = writeOutputToDB
                       )# c(as.list(environment()), ls()))
                       if ((
                         NullOrError(c.ww0$NormalObj)          ||
@@ -913,7 +915,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                           OrgSpecIds        = OrgSpecIds                          ,
                           encode 			      = encode                              ,
                           methodmap         = methodmap
-                        )
+                        ),
+                        writeOutputToDB = writeOutputToDB
                       )
                       #optFail     = NotProcessedOutput(args = c(as.list(environment()), ls()))
                       NotProcFile = paste(outpfile2,

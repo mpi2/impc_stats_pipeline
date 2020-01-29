@@ -1,5 +1,5 @@
 # all in small case and separated by underscore
-NotProcessedOutput = function(args) {
+NotProcessedOutput = function(args, writeOutputToDB = FALSE) {
   requireNamespace("DBI")
   bsg3.5        = droplevels0(args$n3.5$biological_sample_group)
   bsg3.5.2      = droplevels0(args$n3.5.2$biological_sample_group)
@@ -116,8 +116,9 @@ NotProcessedOutput = function(args) {
            active = args$encode)
   )
   # Write to the SQLite DB
-  WriteToDB(optFail,
-            dbname = paste0(experiment_details$gene_accession_id[1], "_DR10SQLite.db"))
+  if (writeOutputToDB)
+    WriteToDB(optFail,
+              dbname = paste0(experiment_details$gene_accession_id[1], "_DR10SQLite.db"))
 
   return(optFail)
 }

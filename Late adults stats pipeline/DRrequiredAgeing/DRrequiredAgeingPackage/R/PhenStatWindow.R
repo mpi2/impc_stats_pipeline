@@ -33,7 +33,7 @@ PhenStatWindow = function (phenlistObject                                ,
                            maxPeaks = 15                                 ,
                            direction = direction                         ,
                            ########
-                           outlierDetection = TRUE                       ,
+                           outlierDetection = FALSE                      ,
                            #######
                            FERROptimise                                  ,
                            MMOptimise                                    ,

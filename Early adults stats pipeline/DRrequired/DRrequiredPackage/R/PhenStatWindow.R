@@ -32,9 +32,8 @@ PhenStatWindow = function (phenlistObject                                ,
                            weightORthreshold = 'weight'                  ,
                            maxPeaks = 15                                 ,
                            direction = direction                         ,
-                           min.obs = 'auto'                              ,
  						   ########
-                           outlierDetection = TRUE                       ,
+                           outlierDetection = FALSE                      ,
                            #######
                            ...)
 {

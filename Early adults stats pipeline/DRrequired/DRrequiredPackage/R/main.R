@@ -48,6 +48,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 # Raw data
                 storeRawData           = TRUE        ,
                 compressRawData        = TRUE        ,
+                writeOutputToDB        = TRUE        ,
                 # Only for Batch generator
                 BatchProducer          =  FALSE      ,
                 cpu = 4                              ,
@@ -56,7 +57,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 ChunkSize              = 24          ,
                 MinColoniesInChunks    = 32          ,
                 controlSize            = 1500        ,
-				### Just for outlier detection
+                ### Just for outlier detection
                 outlierDetection       = FALSE       ,
                 ### Just for Ageing Batch GEnerator  ,
                 combineEAandLA        = FALSE        ,
@@ -783,6 +784,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         residFunction = residFunction,
                         weightORthreshold = weightORthreshold,
                         direction  = direction               ,
+                        outlierDetection = outlierDetection
                       )
                       note = c(
                         note                               ,
@@ -823,7 +825,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                           GenePageURL = GenePageURL                      ,
                           encode = encode                                ,
                           wd     = wd
-                        )
+                        ),
+                        writeOutputToDB = writeOutputToDB
                       )# c(as.list(environment()), ls()))
                       if ((
                         NullOrError(c.ww0$NormalObj$value) ||
@@ -908,7 +911,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                           OrgSpecIds        = OrgSpecIds                          ,
                           encode 			      = encode                              ,
                           methodmap         = methodmap
-                        )
+                        ),
+                        writeOutputToDB = writeOutputToDB
                       )
                       #optFail     = NotProcessedOutput(args = c(as.list(environment()), ls()))
                       NotProcFile = paste(outpfile2,
@@ -937,7 +941,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                   \n\n '
                   )
                   counter  = counter  + 1
-				  gc()
+                  gc()
                 }
               }
             }

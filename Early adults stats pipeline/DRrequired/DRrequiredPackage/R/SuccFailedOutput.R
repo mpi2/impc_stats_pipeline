@@ -1,5 +1,5 @@
 # all in small case and separated by underscore
-SuccessfulOutput = function(args) {
+SuccessfulOutput = function(args, writeOutputToDB = FALSE) {
   requireNamespace("DBI")
   ### 1 Experiment detail
   experiment_details      = list(
@@ -39,14 +39,15 @@ SuccessfulOutput = function(args) {
   ######## 2 CSV
   outP =   c(
     unlist(experiment_details),
-    base64(x =
-             JsonObj,
+             base64(x =
+                      JsonObj,
            active = args$encode)
   )
 
   # Write to the SQLite DB
-  WriteToDB(outP,
-            dbname = paste0(experiment_details$gene_accession_id[1], "_DR10SQLite.db"))
+  if (writeOutputToDB)
+    WriteToDB(outP,
+              dbname = paste0(experiment_details$gene_accession_id[1], "_DR10SQLite.db"))
 
   return(outP)
 }
