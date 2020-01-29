@@ -15,7 +15,7 @@ PhenStatWindow = function (phenlistObject                                ,
                              #               nlme::varFixed(~ 1 /
                              #                                ModelWeight))
                              nlme::varFixed( ~ 1 /
-                                               ModelWeight)
+                                              (ModelWeight))
                            },
                            check = 2                                     ,
                            messages = FALSE                              ,
@@ -33,19 +33,35 @@ PhenStatWindow = function (phenlistObject                                ,
                            maxPeaks = 15                                 ,
                            direction = direction                         ,
                            min.obs = 'auto'                              ,
+ 						   ########
+                           outlierDetection = TRUE                       ,
+                           #######
                            ...)
 {
   requireNamespace('PhenStat')
   requireNamespace('SmoothWin')
   requireNamespace('nlme')
   set.seed(seed)
+  ### Outliwe detection
+  if (outlierDetection && method %in% 'MM') {
+    message0('Outlier detection in progress ...')
+    phenlistObject = PhenListOutlierDetection(phenlistObject     ,
+                                              plot   = !storeplot,
+                                              active = outlierDetection)
+  } else{
+    phenlistObject@datasetPL$outlierWeight = 1
+  }
   # Do not remove line below (necessary for windowing)
-  phenlistObject@datasetPL = phenlistObject@datasetPL[order(Date2Integer(phenlistObject@datasetPL$Batch)), ]
+  if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Batch')) {
+    message0('Sorting the dataset on Batch')
+    phenlistObject@datasetPL = sortDataset(x        = phenlistObject@datasetPL,
+                                           BatchCol = 'Batch')
+  }
   ###########################
   # Run normal (not windowed) models
   ###########################
   ## I checked the source and the messaging mechanism is written using the non-standard functioning in R
-  note = windowingNote = graphFileName = NULL
+  note = windowingNote = graphFileName = object0 = NULL
   if (method == 'MM') {
     message0('Mixed model in progress ....')
     object0 = ModeWithErrorsAndMessages(
@@ -168,13 +184,13 @@ PhenStatWindow = function (phenlistObject                                ,
           maxPeaks,
           ' modes. A random sample of ',
           maxPeaks,
-          ' would be used. total modes: ',
+          ' will be used. total modes: ',
           length(unique(mm))
         )
         sa            = sample(unique(tt[mm]), maxPeaks)
         mm            = mm[which(tt[mm] %in% sa)]
       }
-      ###
+      ####
       message0('Windowing algorithm in progress ...')
       r = SmoothWin(
         object = obj                            ,
@@ -194,22 +210,20 @@ PhenStatWindow = function (phenlistObject                                ,
         predictFun = predFunction               ,
         weightORthreshold = weightORthreshold   ,
         direction = direction                   ,
-        min.obs = if (min.obs %in% 'auto') {
-          function(ignore.me.in.default) {
-            message0('Total number of sex: ', PhenStat:::noSexes(phenlistObject))
+        min.obs = function(ignore.me.in.default) {
+            message0('Total number of sex: ',
+					noSexes0(phenlistObject))
             lutm = length(unique(tt[mm]))
             r = ifelse(lutm > 1,
-                       PhenStat:::noSexes(phenlistObject) * 35,
+                     noSexes0(phenlistObject) * 35,
                        max(pi * sqrt(length(tt)), 35))
             r = max(r * lutm, length(mm), na.rm = TRUE)
             r = min(r       , length(tt), na.rm = TRUE)
             message0('min.obs =  ', r)
             return(r)
-          }
-        } else{
-          message0('Manual min.obse set to ', min.obs)
-          min.obs
-        }
+        },
+					zeroCompensation = threshold * 10 ^ -3,
+					externalWeight   = phenlistObject@datasetPL$outlierWeight
       )
       ##############################
       phenlistObject@datasetPL$AllModelWeights = we = we2 =  r$finalModel$FullWeight
@@ -217,7 +231,7 @@ PhenStatWindow = function (phenlistObject                                ,
           length(unique(we)) < 2 ||
           var(we, na.rm = TRUE) < threshold) {
         we2  = NULL
-        windowingNote$windowing_extra = 'There is no variation in the weights then the standard model is applied.'
+        windowingNote$'Windowing extra' = 'There is no variation in the weights then the standard model is applied.'
       }else{
         ####################
         MeanVarOverTime = function(mm, tt, data = phenlistObject@datasetPL) {
@@ -239,13 +253,20 @@ PhenStatWindow = function (phenlistObject                                ,
           }
         }
         ####################
-        vMutants  = MeanVarOverTime(mm = (1:length(tt))[mm.bck],
+        vMutants  = MeanVarOverTime(
+          mm = (1:length(tt))[mm.bck],
                                     tt = tt,
-                                    data = phenlistObject@datasetPL[, depVariable])
-        VControls = MeanVarOverTime(mm = (1:length(tt))[-mm.bck],
+          data = phenlistObject@datasetPL[, depVariable]
+        )
+        VControls = MeanVarOverTime(
+          mm = (1:length(tt))[-mm.bck],
                                     tt = tt,
-                                    data = phenlistObject@datasetPL[, depVariable])
-        message0('Disabled but: Mutant sd = ', vMutants, ', Control sd = ', VControls)
+          data = phenlistObject@datasetPL[, depVariable]
+        )
+        message0('Disabled but: Mutant sd = ',
+                 vMutants,
+                 ', Control sd = ',
+                 VControls)
         #we2[mm]  = we2[mm] * vMutants
         #we2[-mm] = we2[-mm] * VControls
       }
@@ -284,7 +305,7 @@ PhenStatWindow = function (phenlistObject                                ,
           keep_interaction  = CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Sex')
         )
       )
-      windowingNote$windowing_analysis$full_model_windowed = objectfulw$note
+      windowingNote$'Windowing analysis'$full_model_windowed = objectfulw$note
       # Plotting
       args = list(
         # for output
@@ -307,9 +328,9 @@ PhenStatWindow = function (phenlistObject                                ,
         external_sample_ids = nlme::getData(obj)[,'external_sample_id']
       )
       #args    = c(as.list(environment()), list())
-      windowingNote$window_parameters = WindowingDetails(args)
+      windowingNote$'Window parameters' = WindowingDetails(args)
       graphFileName  = PlotWindowingResult(args = args, overwrite = OverwriteExistingFiles)
-      ObjectsThatMustBeRemovedInEachIteration(c('args', 'objectNorm'))
+      ObjectsThatMustBeRemovedInEachIteration(c('args', 'objectNorm','objectfulw'))
     } else{
       message0('An error in forming the full model (windowing only) ... ')
       objectf = objectNorm = objectfulw = NULL# object0

@@ -8,4 +8,4 @@ Description: The required package for the IMPC stats pipeline (PhenStat version)
 License: LGPL (>= 2)
 Encoding: UTF-8
 LazyData: true
-Imports: PhenStat, RJSONIO, SmoothWin, stringi, base64enc, jsonlite, pingr, doParallel, foreach, nlme, parallel, MASS, base, abind, methods, rlist
+Imports: PhenStat, RJSONIO, methods, SmoothWin, stringi, base64enc, jsonlite, pingr, doParallel, foreach, nlme, parallel, MASS, base, abind, OpenStats, rlist, DBI, RSQLite, gtools, plyr, robustbase

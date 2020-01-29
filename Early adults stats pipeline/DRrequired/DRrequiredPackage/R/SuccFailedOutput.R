@@ -1,9 +1,10 @@
 # all in small case and separated by underscore
 SuccessfulOutput = function(args) {
-
+  requireNamespace("DBI")
   ### 1 Experiment detail
   experiment_details      = list(
     ####
+    StatPacketCreationDate= as.character(Sys.time())                                             , #0
     status                =  ifelse(
       NullOrError(args$c.ww0$NormalObj$value),
       'Failed',
@@ -29,11 +30,11 @@ SuccessfulOutput = function(args) {
 
   ######## 2 JSON
   message0('Forming the list before applying JSON transformation ...')
-  args$note$experiment_details = experiment_details
-  listDetails                  = list(details = sortList(args$note))
-  listVectorOutput             = list(vectoroutput = args$c.ww.vec$list)
-  FinalList                    = list(result = c(listVectorOutput, listDetails))
-  JsonObj                      = FinalJsonBobectCreator(FinalList = cleanNULLkeys(FinalList))
+  args$note$'Experiment detail' = experiment_details[-1]
+  listDetails                   = list('Details' = sortList(args$note))
+  listVectorOutput              = list('Vector output' = args$c.ww.vec$list)
+  FinalList                     = list('Result' = c(listVectorOutput, listDetails))
+  JsonObj                      = FinalJson2ObjectCreator(FinalList = cleanNULLkeys(FinalList))
 
   ######## 2 CSV
   outP =   c(
@@ -42,6 +43,11 @@ SuccessfulOutput = function(args) {
              JsonObj,
            active = args$encode)
   )
-  return(outP)
 
+  # Write to the SQLite DB
+  WriteToDB(outP,
+            dbname = paste0(experiment_details$gene_accession_id[1], "_DR10SQLite.db"))
+
+  return(outP)
 }
+

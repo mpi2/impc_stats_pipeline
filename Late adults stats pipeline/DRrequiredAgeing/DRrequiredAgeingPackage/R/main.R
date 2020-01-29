@@ -664,7 +664,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$'Criteria result'
                     ) {
                       message0('Analysing the dataset in progress ...')
-                      message0('Creating PhenListAgeing object ...')
+                      message0('Creating OpenStats object ...')
                       a = OpenStats::OpenStatsList(
                         n3.5.2,
                         testGenotype             = 'experimental',
@@ -679,14 +679,14 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         depVar = depVar,
                         sex = 'Sex',
                         genotype = 'Genotype',
-                        label = 'Phenlist object summary statistics'
+                        label = 'OpenStatsList object summary statistics'
                       )
                       note = c(note, a_summary_before_concurrent)
                       #
                       PhenListSpecIds = OtherExtraColumns (
                         obj = a@datasetPL,
                         ColNames = 'external_sample_id',
-                        names    = 'Phenlist external_sample_id'
+                        names    = 'OpenStatsList external_sample_id'
                       )
                       note = c(note, PhenListSpecIds)
                       ### Get method of analysis
@@ -725,14 +725,14 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                           depVar = depVar,
                           sex = 'Sex',
                           genotype = 'Genotype',
-                          label = 'Phenlist and cuncurrent data summary statistics'
+                          label = 'OpenStatList and cuncurrent data summary statistics'
                         )
                         note  =  c(note, a_phenlist_concurrent_summary)
                       }
                       # check the Weight column
                       message0('Checking whether Weight column exists in the raw data ...')
                       if (!CheckIfNameExistInDataFrame(a@datasetPL, 'Weight')) {
-                        note$'Existence of the weight column in the PhenList object' =
+                        note$'Existence of the weight column in the OpenStatsList object' =
                           'Weight column does not exist in the raw data'
                       }
                       # Equation type

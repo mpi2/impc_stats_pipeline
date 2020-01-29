@@ -5,8 +5,9 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 normalisedPhenlist = FALSE           ,
                 subdir = 'Results'                   ,
                 seed = 123456                        ,
-                readCategoriesFromFile  = TRUE       ,
+                MethodOfReadingCategoricalCategories  = 'file' , # `file`, `solr` or `update`
                 OverwriteExistingFiles  = FALSE      ,
+                ignoreSkipList          = FALSE                ,
                 onlyFillNotExisitingResults = FALSE  ,
                 WhiteListMethods  = NULL             ,
                 # Carefully use this option!
@@ -36,8 +37,6 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 }                                    ,
                 messages = TRUE                      ,
                 threshold = sqrt(.Machine$double.eps) * 10,
-                min.obs   = 'auto'                   ,
-                ##################
                 outdelim = '\t'                      ,
                 debug = TRUE                         ,
                 encode = FALSE                       ,
@@ -57,6 +56,11 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 ChunkSize              = 24          ,
                 MinColoniesInChunks    = 32          ,
                 controlSize            = 1500        ,
+				### Just for outlier detection
+                outlierDetection       = FALSE       ,
+                ### Just for Ageing Batch GEnerator  ,
+                combineEAandLA        = FALSE        ,
+                solrBaseURL           = 'http://hx-noah-74-10:8090' ,
                 ### Just for debuging
                 superDebug             = FALSE       ,
                 extraBatchParameters   = '-m "rh7-hosts-ebi5-12 rh7-hosts-ebi5-13 rh7-hosts-ebi5-14 rh7-hosts-ebi5-15 rh7-hosts-ebi5-16 rh7-hosts-ebi5-17 rh7-hosts-ebi5-18 rh7-hosts-ebi5-19 rh7-hosts-ebi5-20 rh7-hosts-ebi5-24 rh7-hosts-ebi5-25 rh7-hosts-ebi5-26 rh7-hosts-ebi5-27 rh7-hosts-ebi6-00 rh7-hosts-ebi6-01 rh7-hosts-ebi6-02 rh7-hosts-ebi6-03 rh7-hosts-ebi6-04 rh7-hosts-ebi6-05 rh7-hosts-ebi6-06 rh7-hosts-ebi6-07 rh7-hosts-ebi6-08 rh7-hosts-ebi6-09 rh7-hosts-ebi6-10 rh7-hosts-ebi6-11 rh7-hosts-ebi6-12 rh7-hosts-ebi6-13 rh7-hosts-ebi6-14 rh7-hosts-ebi6-15 rh7-hosts-ebi6-16 rh7-hosts-ebi6-17"',
@@ -88,13 +92,18 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   requireNamespace('SmoothWin')
   requireNamespace('nlme')
   requireNamespace('base64enc')
+  requireNamespace('RJSONIO'    )
+  requireNamespace('jsonlite'   )
+  requireNamespace('DBI'        )
   # Config files
   message0('Loading configuration ...')
   methodmap                      = readConf('MethodMap.conf')
   equationmap                    = readConf('EquationMap.conf')
   CategoryMap                    = readConf('CategoryMap.conf')
+  MergeCategoryParameters        = read.csv(file = file.path(local(), 'MergeParameterList.txt'))
   initial                        = readConf('Initialize.conf')
   exceptionList                  = readFile(file = 'ExceptionMap.list')
+  EA2LAMApping                   = read.csv(file = file.path(local(), 'EA2LA_parameter_mappings_2019-09-24.csv'))
   #CategoricalCategoryBlackList   = readFile(file = 'CategoricalCategoryBlackList.list')
   # Main subdirectory/working directory
   message0('Preparing the working directory ...')
@@ -102,35 +111,23 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   wd  = file.path(cwd,
                   paste(subdir, sep = '_', collapse = '_'))
   dir.create0(wd, recursive = TRUE)
-  if (virtualDrive) {
-    message0('Creating a virtual drive ... ')
-    system('subst U: /D', wait = TRUE)
-    system(paste0('subst U: "', wd, '"'), wait = TRUE)
-    wd = 'U:'
-  }
+  wd = CreateVirtualDrive(active = virtualDrive,currentwd = wd)
   message0('Setting the working directory to: \n\t\t ===> ', wd)
   setwd(dir = wd)
   ##################
   set.seed(seed)
   # Read file
-  message0('Reading the input file ...\n\t ~>', file)
-  if (!file.exists(file))
-    message0('File is not local or does not exist!')
-  rdata = read.csv(
+  rdata = readInputDatafromFile(
     file = file                                    ,
-    check.names      = checkNamesForMissingColNames,
+    checkNamesForMissingColNames = checkNamesForMissingColNames,
     sep              = sep                         ,
-    na.strings       = na.strings                  ,
-    stringsAsFactors = TRUE
+    na.strings = na.strings
   )
-  message0('Input file dimentions: ',
-           paste0(dim(rdata), collapse  = ', '))
   rdata = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
   new.data              = rdata
   new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)), ]
   #########
   new.data$colony_id    = as.character(new.data$colony_id)
-  #new.data$colony_id[new.data$biological_sample_group %in% "control"] = NA
   new.data$external_sample_id = as.factor(new.data$external_sample_id)
   ################
   # Start analysis
@@ -144,7 +141,6 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   if (.Platform$OS.type == 'windows') {
     cl = makeCluster(crs,
                      outfile = outMCoreLog(wd))
-
   } else{
     cl = makeForkCluster(crs,
                          outfile = outMCoreLog(wd))
@@ -152,14 +148,13 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   registerDoParallel(cl, cores = crs)
   # End of multicore initialization
   # Get possible categories for the categorical variables
-  message0('Loading the list of possible categories for categorical variables ...')
-  CatList = GetPossibleCategories (procedure = NULL, file = readCategoriesFromFile)
+  CatList = GetPossibleCategories (procedure = NULL, method = MethodOfReadingCategoricalCategories)
   message0('Filtering the dataset in progress ....')
   Strtime      = Sys.time()
   procedures   = as.character(unique(na.omit(new.data$procedure_group)))
   for (procedure in procedures) {
     ###
-    n2.9 = base::subset(new.data,  new.data$procedure_group %in% procedures)
+    n2.9 = base::subset(new.data,  new.data$procedure_group %in% procedure)
     parameters  = as.character(unique(na.omit(n2.9$parameter_stable_id)))
     for (parameter in parameters) {
       FactorLevels = ReadFactorLevelsFromSolr(parameter = parameter, CatList = CatList)
@@ -167,6 +162,17 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
       counter   = 1
       outP = list()
       n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
+      ############## Read The Ageing parameters from Solr
+      if(BatchProducer && combineEAandLA)
+        n3.0 = getEarlyAdultsFromParameterStableIds(
+          LA_parameter_stable_id = parameter    ,
+          map                    = EA2LAMApping ,
+          LA_data                =  n3.0        ,
+          solrBaseURL            = solrBaseURL
+        )
+      if(is.null(n3.0))
+        next
+      ##############
       centers   = as.character(unique(na.omit(n3.0$phenotyping_center)))
       for (center in centers) {
         n3.1     = base::subset(n3.0, n3.0$phenotyping_center %in% center)
@@ -266,6 +272,17 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     write.csv(BatchData,
                               file = BatchFileName,
                               row.names = FALSE)
+
+                    BatchFileNamezip  = compressFiles(
+                      fileList   = BatchFileName,
+                      dir        = dirname (BatchFileName) ,
+                      filename   = basename(BatchFileName) ,
+                      overwrite  = FALSE                   ,
+                      rmSource   = TRUE
+                    )
+                    if (BatchFileNamezip$status == 0) {
+                      BatchFileName = BatchFileNamezip$file
+                    }
                     out = BatchGenerator(
                       file                 = BatchFileName    ,
                       dir                  = outpDir          ,
@@ -299,7 +316,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     length(colonys),
                     sep = ']~>['
                   ),
-                  ']\n'
+                  ']'
                 )
                 ### Single or multiple cores?
                 `%activemulticore%` = ifelse (activateMulticore &&
@@ -322,12 +339,15 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     'nlme'        ,
                     'RJSONIO'     ,
                     'jsonlite'    ,
-                    'DRrequired'
+                    'OpenStats'  ,
+                    'DRrequiredAgeing',
+                    'DBI'
                   ),
                   .errorhandling = c(MultiCoreErrorHandling),
                   .verbose = verbose                        ,
                   .inorder = inorder
                 ) %activemulticore% {
+                  # for (i in  1:length(colonys)){
                   message0('*~*~*~*~*~* ', i, '|', length(colonys), ' *~*~*~*~*~*')
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
@@ -335,30 +355,35 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     # Initialization before starting the analysis
                     c.ww0  = NULL
                     note   = list()
+                    note = c(note,
+                             list('Random seed' = seed))
                     colony = colonys[i]
                     message0('Current colony: ',colony)
 
                     n3.4 = base::subset(n3.3.m_zyg,	n3.3.m_zyg$colony_id %in% c(colony))
-                    n3.5 = rbind (n3.4, n3.3.c)
+                    n3.5 = sortDataset(x = rbind (n3.4, n3.3.c), BatchCol = 'date_of_experiment')
                     note = c(note,
                              list(
-                               bodyweight_included_in_data = CheckIfNameExistInDataFrame(obj = n3.5,
+                               'Bodyweight included in the input data' = CheckIfNameExistInDataFrame(
+                                 obj   = n3.5,
                                                                                          name = 'weight',
-                                                                                         checkLevels = FALSE)
+                                 checkLevels = FALSE
+                               )
                              ))
                     # Imaginary URLs
-                    note$gene_page_url        = GenePageURL       = GenePageURL(n3.5)
-                    note$bodyweight_page_url = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
+                    note$'Gene page URL'        = GenePageURL       = GenePageURL(n3.5)
+                    note$'Body weight page URL' = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
 
                     ReadMeTxt       = ReadMe (obj = n3.4, URL = GenePageURL)
 
                     # Define response column [do not move me!]
                     depVariable = getResponseColumn(n3.5$observation_type)
                     depVar      = depVariable$column
-                    note$response_type       = paste0(depVar,
-                                                '_of_Type_',
+					message0('Dependent variable: ', depVar)
+                    note$'Response type'         = paste0(depVar,
+                                                          '_of_type_',
                                                 paste(depVariable$lbl, sep = '.'))
-                    note$observation_type    =
+                    note$'Observation type'    =
                       if (!is.null(unique(n3.5$observation_type))) {
                         paste(unique(n3.5$observation_type),
                               sep = '~',
@@ -366,7 +391,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       } else{
                         NULL
                       }
-                    note$data_type           =
+                    note$'Data type'           =
                       if (!is.null(unique(n3.5$data_type))) {
                         paste(unique(n3.5$data_type),
                               sep = '~',
@@ -381,7 +406,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       ifelse(
                         is.numeric(n3.5[, depVar]),
                         as.numeric(initial$min_num_mut_each_sex),
-                        2
+                        0
                       )
                     )
 
@@ -421,13 +446,23 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         plot = superDebug
                       )
                       n3.5 = n3.5_tmp$df
-                      note = list(note , simulation_details = n3.5_tmp$note)
+                      note = list(note , 'Simulation details' = n3.5_tmp$note)
                     }
 
                     # Summary statistics
-                    n3.5_summary = SummaryStatisticsOriginal(x = n3.5, depVar = depVar)
+                    n3.5_summary = SummaryStatisticsOriginal(x      = n3.5,
+                                                             depVar = depVar,
+                                                             label  = 'Raw data summary statistics')
                     note         = c(note, n3.5_summary)
-
+                    if (CheckIfNameExistInDataFrame(n3.5, 'LifeStage')) {
+                      LifeStageTable = table(n3.5$LifeStage)
+                      message0('LifeStage Summary: ',paste(
+                                 names(LifeStageTable),
+                                 LifeStageTable       ,
+                                 sep      = ':'       ,
+                                 collapse = ', '
+                               ))
+                    }
                     # Remove zero frequency categories
                     n3.5.1_F_list = RemoveZeroFrequencyCategories(
                       x = n3.5,
@@ -445,9 +480,11 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       minvar = 0,
                       method = getMethodi(
                         var = parameter,
-                        type = ifelse(is.numeric(n3.5.1[, depVar]),
+                        type = ifelse(
+                          is.numeric(n3.5.1[, depVar]),
                                       'numeric',
-                                      'charachter'),
+                          'charachter'
+                        ),
                         methodMap = methodmap
                       )
                     )
@@ -466,12 +503,12 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       ),
                       names = c(
                         # all lower case
-                        'original_external_sample_id',
-                        'original_sex',
-                        'original_biological_sample_group',
-                        'original_response',
-                        'original_date_of_experiment',
-                        'original_body_weight'
+                        'Original external_sample_id',
+                        'Original sex',
+                        'Original biological_sample_group',
+                        'Original response',
+                        'Original date_of_experiment',
+                        'Original body weight'
                       )
                     )
                     note = c(note, OrgSpecIds)
@@ -507,6 +544,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         message0('File already exists then skipped!')
                         return(NULL)
                       }else{
+						message0('Result does not exist! Adding in progress ...')
                         rmme = lapply(list.files(dirname(outpfile), full.names = TRUE), function(x) {
                           if (!is.null(x)    &&
                               file.exists(x) &&
@@ -521,10 +559,10 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                                   x = x,
                                   fixed = TRUE
                                 )
-                              ))
+                              )
+                          )
                           file.remove(x)
                         })
-                        message0('Result does not exist! Adding in progress ...')
                         write(outpfile, file = 'DoesNotExists.log', append = TRUE)
                       }
                     }
@@ -565,14 +603,14 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         RawoutputFile0 = comRes$file
                       }
                     }
-                    note$input_file           = relativePath(path = file, reference  = wd)
-                    note$output_raw_data_file = relativePath(path = if (storeRawData) {
+                    note$'Input file'             = relativePath(path = file, reference  = wd)
+                    note$'Exported raw data file' = relativePath(path = if (storeRawData) {
                       RawoutputFile0
                     } else{
                       NULL
                     },
                     reference = wd)
-                    note$read_me_file         = relativePath(path = if (storeRawData &&
+                    note$'Readme file'         = relativePath(path = if (storeRawData &&
                                                                         !compressRawData) {
                       ReadMeFile
                     } else{
@@ -584,16 +622,18 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       item = c(parameter, procedure),
                       list = exceptionList,
                       message = 'Value found in the skip list'
-                    )
+                    ) && !ignoreSkipList
                     n3.5.2  = droplevels0(n3.5.1)
-                    MergLev = MergeLevels(x = n3.5.2[, depVar],
-                                          listOfLevelMaps = CategoryMap)
+                    MergLev = MergeLevels(x = n3.5.2[, depVar]                     ,
+                                          listOfLevelMaps = CategoryMap            ,
+                                          parameter_stable_id = parameter          ,
+                                          AllowedParametersList  = MergeCategoryParameters$parameter_stable_id,
+                                          report = TRUE)
+                    ###
                     n3.5.2[, depVar] = MergLev$x
                     n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]),])
                     n3.5.2OnlyKO     = subset(n3.5.2,n3.5.2$biological_sample_group %in% 'experimental')
-                    note$relabeled_levels_categorical_variables_only  = MergLev$note
-
-
+                    note$'Relabeled levels for categorical variables'  = MergLev$note
                     if (!is.null(n3.5.2) &&
                         # data.frame is not zero
                         min0(dim(n3.5.2)) > 0 &&
@@ -618,7 +658,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         NonZeroVariation(n3.5.2[, depVar]) &&
                         !isException &&
                         columnLevelsVariationRadio(dataset = n3.5.2, columnName = depVar) > 0.005 &&
-                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$criteria_result) {
+                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$'Criteria result'
+					) {
                       message0('Analysing the dataset in progress ...')
                       message0('Creating PhenList object ...')
                       a = PhenStat::PhenList(
@@ -635,14 +676,14 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         depVar = depVar,
                         sex = 'Sex',
                         genotype = 'Genotype',
-                        label = 'phenlist_data_summary_statistics'
+                        label = 'PhenList object summary statistics'
                       )
                       note = c(note, a_summary_before_concurrent)
                       #
                       PhenListSpecIds = OtherExtraColumns (
                         obj = a@datasetPL,
                         ColNames = 'external_sample_id',
-                        names = 'phenlist_data_spec_ids'
+                        names    = 'PhenList external_sample_id'
                       )
                       note = c(note, PhenListSpecIds)
                       ### Get method of analysis
@@ -681,14 +722,14 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                           depVar = depVar,
                           sex = 'Sex',
                           genotype = 'Genotype',
-                          label = 'phenlist_and_cuncurrent_data_summary_statistics'
+                          label = 'PhenList and cuncurrent data summary statistics'
                         )
                         note  =  c(note, a_phenlist_concurrent_summary)
                       }
                       # check the Weight column
                       message0('Checking whether Weight column exists in the raw data ...')
                       if (!CheckIfNameExistInDataFrame(a@datasetPL, 'Weight')) {
-                        note$existence_of_weight_column =
+                        note$'Existence of the weight column in the PhenList object' =
                           'Weight column does not exist in the raw data'
                       }
                       # Equation type
@@ -700,13 +741,13 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       )
                       # This is the main engine!
                       note = c(note, list(
-                        bodyweight_initially_included_in_model = ifelse(method %in% 'MM', equationType, FALSE)
+                        'Bodyweight initially included in the model' = ifelse(method %in% 'MM', equationType, FALSE)
                       ))
                       if (normalisedPhenlist){
                         a = normalisePhenList(phenlist = a, colnames = c(depVar, 'Weight'))
                       }
                       message0('Fitting the model ...')
-                      message0('Method: ', method, '\n\t Equation:', equationType)
+                      message0('Method: ', method, ', Equation:', equationType)
                       c.ww0 =	PhenStatWindow(
                         phenlistObject = a,
                         parameter = parameter,
@@ -741,14 +782,13 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         predFunction = predFunction,
                         residFunction = residFunction,
                         weightORthreshold = weightORthreshold,
-                        direction  = direction,
-                        min.obs = min.obs
+                        direction  = direction               ,
                       )
                       note = c(
                         note                               ,
                         c.ww0$note                         ,
-                        applied_method = c.ww0$method      ,
-                        image_url      = relativePath(
+                        'Applied method' = c.ww0$method    ,
+                        'Image URL'      = relativePath(
                           path = c.ww0$graphFileName ,
                           reference = wd
                         )
@@ -804,8 +844,6 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                           )
                         )
                       ##
-                       # agg = c(as.list(environment()), list())
-                       # save(agg,file = 'HAMED.Rdata')
                       StoreRawDataAndWindowingWeights(
                         storeRawData = storeRawData,
                         activeWindowing = activeWindowing,
@@ -817,7 +855,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                         dir        = dirname (RawoutputFile) ,
                         filename   = basename(RawoutputFile) ,
                         ReadMeTxt  = ReadMeTxt,
-                        ReadMeFile = ReadMeFile
+                        ReadMeFile = ReadMeFile,
+                        methodmap  = methodmap
 
                       )
                       StatusSF   = !NullOrError(c.ww0$NormalObj$value)
@@ -836,7 +875,6 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                               file = file.path(wd, paste0('Failed_analyses_', Sys.Date(), '.log')),
                               append = TRUE)
                       }
-
                       write.table(
                         x = paste(outP,
                                   collapse =   outdelim),
@@ -899,13 +937,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                   \n\n '
                   )
                   counter  = counter  + 1
-                  if (!verbose){
-                    return(invisible(c.ww0))
-                  }else{
-                    messsage0('No result will be exported when verbose = TRUE')
-                  }
+				  gc()
                 }
-                multicoreResults = c(multicoreResults, MultiCoreRes)
               }
             }
           }
@@ -920,5 +953,6 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   stopImplicitCluster()
   message0('Finished.')
   setwd(cwd)
-  return(invisible(multicoreResults))
+  message0('Cleaning the meamory ...')
+  gc()
 }

@@ -14,118 +14,15 @@
   )
 }
 
-complete.cases0 = function(x, ...) {
-  if (!is.null(x) && length(x) > 0) {
-    r = complete.cases(x)
-    if (is.null(r))
-      r = NULL
-  } else{
-    message0('Null input in the "complete.case". Null retured!')
-    r = NULL
+noSexes0 = function(obj){
+  if(is.null((obj)))
+    return(1)
+  if('Sex' %in% colnames(obj@datasetPL)){
+    r = nlevels(obj@datasetPL$Sex)
+  }else{
+    r = 1
   }
   return(r)
-}
-
-# Objects that must be removed at each iterations
-ObjectsThatMustBeRemovedInEachIteration = function(x = NULL, ...) {
-  if (is.null(x)) {
-    rm0(
-      c(
-        'note',
-        'minSampRequired',
-        'n3.4',
-        'n3.5',
-        'lvls',
-        'counts',
-        'n3.5.1',
-        'note',
-        'SubSubDirOrdFileName',
-        'outDir',
-        'outpfile',
-        'AllLevels',
-        'GenePageURL',
-        'BodyWeightCurvURL',
-        'depVariable',
-        'depVar',
-        'n3.5_summary',
-        'n3.5.1_F_list',
-        'n3.5.1_v_list',
-        'isException',
-        'ExtraCols',
-        'a',
-        'PhenListSpecIds',
-        'OrgSpecIds',
-        'a_summary_before_concurrent',
-        'a_phenlist_concurrent_summary',
-        'method',
-        'args',
-        'aTmp',
-        'c.ww0',
-        'c.ww.vec',
-        'outP',
-        'optFail'
-      )
-    )
-  } else{
-    rm0(x)
-  }
-}
-
-getNotEmptyValue = function(x, head = Inf) {
-  ux    = unique(x)
-  neux  = which(ux != '' | !is.null(ux))
-  if (length(neux) > 0) {
-    r = head(ux [neux], head)
-  } else{
-    r = 'NotExist'
-  }
-  return(as.character(r))
-}
-
-# Only works for the data from Solr
-# Automatic select the corresponding column for the type of data (only for category and data_point)
-getResponseColumn = function(x, activate = TRUE) {
-  if (activate) {
-    if (length(x) > 0) {
-      lbl      = unique(x)
-      column   = paste(lbl, collapse = '-', sep = '-')
-      accepted = TRUE
-
-      if (length(lbl) > 1)
-        accepted = FALSE
-
-      if (lbl == 'categorical')
-        column = 'category'
-      else if (lbl == 'unidimensional')
-        column = 'data_point'
-      else
-        accepted = FALSE
-    } else{
-      accepted = FALSE
-      column = lbl = 'Unknown'
-    }
-  } else{
-    lbl    = NA
-    column = lbl = NA
-    accepted = FALSE
-  }
-  return(list(
-    column = column,
-    accepted = accepted,
-    lbl = lbl
-  ))
-}
-
-
-IsInBlackListCategories = function(x, len = 1, blackList = NULL) {
-  note = NULL
-  if (!is.null(blackList) && !is.numeric(x) && nlevels(x) == len) {
-    r    = levels(x) %in% blackList
-    note = 'The categorical variable has only one level that is found in the skip list'
-  } else{
-    r    = FALSE
-  }
-  return(list(result = r, note = note))
 }
 
 # Behaviour parameters
@@ -185,10 +82,138 @@ BehviourParamters = function(x, ...) {
   return(r)
 }
 
-#
-MergeLevels = function(x, listOfLevelMaps) {
+
+
+# Objects that must be removed at each iterations
+ObjectsThatMustBeRemovedInEachIteration = function(x = NULL, ...) {
+  if (is.null(x)) {
+    rm0(
+      c(
+        'note',
+        'minSampRequired',
+        'n3.4',
+        'n3.5',
+        'lvls',
+        'counts',
+        'n3.5.1',
+        'note',
+        'SubSubDirOrdFileName',
+        'outDir',
+        'outpfile',
+        'AllLevels',
+        'GenePageURL',
+        'BodyWeightCurvURL',
+        'depVariable',
+        'depVar',
+        'n3.5_summary',
+        'n3.5.1_F_list',
+        'n3.5.1_v_list',
+        'isException',
+        'ExtraCols',
+        'a',
+        'PhenListSpecIds',
+        'OrgSpecIds',
+        'a_summary_before_concurrent',
+        'a_phenlist_concurrent_summary',
+        'method',
+        'args',
+        'aTmp',
+        'c.ww0',
+        'c.ww.vec',
+        'outP',
+        'optFail'
+      )
+    )
+  } else{
+    rm0(x)
+  }
+}
+
+getNotEmptyValue = function(x, head = Inf) {
+  ux    = unique(x)
+  neux  = which(ux != ''     &
+                !is.na(ux)   &
+                !is.null(ux))
+  if (length(neux) > 0) {
+    r = head(ux [neux], head)
+  } else{
+    r = 'NotExist'
+  }
+  return(as.character(r))
+}
+
+sortDataset = function(x = NULL, BatchCol = NULL) {
+  if (is.null(x)        ||
+      is.null(BatchCol) ||
+      length(BatchCol) < 1 ||
+      any(dim(x) < 1))
+    return(x)
+  if (BatchCol %in% names(x)) {
+    message0('Sorting dataset based on ', BatchCol, '...')
+    x = x[order(Date2Integer(x[, BatchCol])),]
+  }
+  return(x)
+}
+# Only works for the data from Solr
+# Automatic select the corresponding column for the type of data (only for category and data_point)
+getResponseColumn = function(x, activate = TRUE) {
+  if (activate) {
+    if (length(x) > 0) {
+      lbl      = unique(x)
+      column   = paste(lbl, collapse = '-', sep = '-')
+      accepted = TRUE
+
+      if (length(lbl) > 1)
+        accepted = FALSE
+
+      if (lbl %in% 'categorical')
+        column = 'category'
+      else if (lbl %in% c('unidimensional','time_series'))
+        column = 'data_point'
+      else
+        accepted = FALSE
+    } else{
+      accepted = FALSE
+      column = lbl = 'Unknown'
+    }
+  } else{
+    lbl    = NA
+    column = lbl = NA
+    accepted = FALSE
+  }
+  return(list(
+    column = column,
+    accepted = accepted,
+    lbl = lbl
+  ))
+}
+
+
+IsInBlackListCategories = function(x, len = 1, blackList = NULL) {
   note = NULL
-  if (!is.null(x) && !is.numeric(x) &&  length(x) > 0 &&
+  if (!is.null(blackList) && !is.numeric(x) && nlevels(x) == len) {
+    r    = levels(x) %in% blackList
+    note = 'The categorical variable has only one level that is found in the skip list'
+  } else{
+    r    = FALSE
+  }
+  return(list(result = r, note = note))
+}
+
+
+#
+MergeLevels = function(x                         ,
+                       listOfLevelMaps           ,
+                       parameter_stable_id       ,
+                       AllowedParametersList     ,
+                       report         = FALSE    ,
+                       reportFileName = 'MergedCategoriesParameterStableIds.txt',
+                       fileColumnSep  = '\t') {
+  note = NULL
+  if (all(parameter_stable_id %in% AllowedParametersList) &&
+      !is.null(x)    &&
+      !is.numeric(x) &&
+      length(x) > 0  &&
       nlevels(as.factor(x)) > 0) {
     x  = as.factor(x)
     nl = nlevels(x)
@@ -200,6 +225,21 @@ MergeLevels = function(x, listOfLevelMaps) {
         note = c(note, paste0(as.character(l[i]), '-->', newCat))
       }
     }
+  }
+  if (report && !is.null(note)) {
+    write(
+      paste(
+        Sys.time()              ,
+        parameter_stable_id     ,
+        note                    ,
+        sep      = fileColumnSep,
+        collapse = fileColumnSep
+      ),
+      file = reportFileName,
+      append = ifelse(file.exists(reportFileName),
+                      TRUE                       ,
+                      FALSE)
+    )
   }
   return(list(x = x, note = if (is.null(note)) {
     note
@@ -318,14 +358,14 @@ concurrentContSelect = function(activate = TRUE,
           if (activate) {
             message0 ('Concurrent control selection in progress ...')
             PhenListObj@datasetPL = m1
-            note$concurrent_control_selection = paste0(LogicalToNote(activate),
+            note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                        ". Single Batch in use")
           } else{
-            note$concurrent_control_selection = paste0(LogicalToNote(activate),
+            note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                        '. Single Batch possible')
           }
         } else{
-          note$concurrent_control_selection = paste0(
+          note$'Concurrent control selection' = paste0(
             LogicalToNote(activate),
             '. There are not enough controls in the dataset at the mutant dates  (min = ',
             minSmp,
@@ -335,13 +375,13 @@ concurrentContSelect = function(activate = TRUE,
           )
         }
       } else{
-        note$concurrent_control_selection = paste0(
+        note$'Concurrent control selection' = paste0(
           LogicalToNote(activate),
           ". The is no control in the dataset at the same day as mutants DOE"
         )
       }
     } else{
-      note$concurrent_control_selection = paste0(
+      note$'Concurrent control selection' = paste0(
         LogicalToNote(activate),
         ". Concurrent control selection not possible. Mutants are scattered on different dates"
       )
@@ -349,20 +389,20 @@ concurrentContSelect = function(activate = TRUE,
   } else {
     tb  = table(PhenListObj@datasetPL[, BatchColName])
     if (length(tb) > 1) {
-      note$concurrent_control_selection = paste0(LogicalToNote(activate),
+      note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                  '. Multi batch found in data (categorical data)')
     } else if (length(tb) == 1) {
-      note$concurrent_control_selection = paste0(LogicalToNote(activate),
+      note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                  '. Original mutants in single batch (categorical data)')
     } else{
-      note$concurrent_control_selection = paste0(LogicalToNote(activate),
+      note$'Concurrent control selection' = paste0(LogicalToNote(activate),
                                                  '. But batch not clear. Please check data')
     }
   }
   # Part 2 extra checks
   if (activate && is.numeric(PhenListObj@datasetPL[, depVar])) {
     ### Check whether there is any variation in data
-    ### No worries it only applies to MM framework
+    # No worries it only applies to MM framework
     checkNoZeroVar = RemoveZerovarCategories(
       x = PhenListObj@datasetPL,
       depVar = depVar,
@@ -399,7 +439,7 @@ concurrentContSelect = function(activate = TRUE,
 
     if (!conditions) {
       PhenListObj = PhenListObjBck
-      note$Concurrent_control_selection_error = paste0(
+      note$'Concurrent control selection error' = paste0(
         LogicalToNote(activate),
         'Cuncurrent control selection would cause failure in model then DISABLED'
       )
@@ -497,11 +537,147 @@ getEquation =  function(var,
   return(equation)
 }
 
+local =  function(x=NULL){
+  r= system.file("extdata", package = "DRrequiredAgeing")
+  return(r)
+}
+
+
+getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
+                                                map         = read.csv(file = file.path(local(),
+                                                                                        'EA2LA_parameter_mappings_2019-09-24.csv')),
+                                                LA_data     = NULL,
+                                                solrBaseURL = 'http://hx-noah-74-10:8090') {
+  message0('EA-LA binding in progress ...')
+  if (!any(c('LA_parameter', 'EA_parameter') %in% names(map))) {
+    stop(
+      'Check the LA/EA mapping column names! It must have at least two columns: EA_parameter and LA_parameter '
+    )
+  }
+  plist = as.character(unique(map$EA_parameter[map$LA_parameter %in% LA_parameter_stable_id]))
+
+  if (length(plist) < 1) {
+    message0('Skip this parameter. No match for the EA corresponded to this parameter, ',
+             LA_parameter_stable_id)
+    return(NULL)
+  }
+  q = URLencode(
+    paste0(
+      solrBaseURL,
+      '/solr/experiment/select?q=*:*',
+      '&fl=',
+      paste(sort(requiredDataColumns(0)), collapse = ','),
+      '&fq=datasource_name:IMPC*&fq=observation_type:(',
+      paste(
+        '"',
+        unique(LA_data$observation_type),
+        '"',
+        collapse = ' OR ',
+        sep = ''
+      ),
+      ')&fq=parameter_stable_id:(',
+      paste('"', plist, '"', collapse = ' OR ', sep = ''),
+      ')&rows=500000000&wt=csv'
+    )
+  )
+  message0(
+    'EA data found for the parameter: ',
+    LA_parameter_stable_id,
+    '\n\t => ',
+    paste(plist, sep = ', ', collapse = ', '),
+    '\n\t => ',
+    q
+  )
+  ######################################
+  EA_data = read.csv(q)
+  #EA_data = subset(EA_data,EA_data$colony_id %in% LA_data$colony_id )
+  if (any(dim(LA_data) < 1) || any(dim(EA_data) < 1)) {
+    message0('Skip this parameter. No EA data to match')
+    return(NULL)
+  } else{
+    message0(nrow(EA_data), ' data point added to the dataset')
+  }
+  ######################################
+  requireNamespace("plyr")
+  message0('Binding the EA and LA data ...')
+  df      = plyr::rbind.fill(EA_data, LA_data)
+  ######################################
+  df      = df[df$colony_id %in%
+                 unique(c(LA_data$colony_id, EA_data$colony_id[EA_data$biological_sample_group %in% 'control'])), ]
+  ######################################
+  message0('Remove any possible duplicate from the combined EA & LA dataset.')
+  df = df[!duplicated(df),]
+  ######################################
+  plist = unique(c(plist,LA_parameter_stable_id))
+  ######################################
+  f = function(str,
+               cut = 1,
+               split = '_',
+               partIndex = NULL) {
+    r = sapply(str, function(x) {
+      s = unlist(strsplit(x, split = split))
+      if (is.null(partIndex)) {
+        r0 = paste(head(s, length(s) - cut),
+                   sep = '_',
+                   collapse = '_')
+      } else{
+        r0 = paste(s[partIndex],
+                   sep = '_',
+                   collapse = '_')
+      }
+      return(r0)
+    })
+    return(unique(r))
+  }
+  ######################################
+  df$LifeStage = ifelse(grepl(pattern = '(IP_)|(LA_)', df$parameter_stable_id),
+                        'Late',
+                        'Early')
+  df$LifeStage = as.factor(df$LifeStage)
+  ######################################
+  df$parameter_stable_id_renamed = df$parameter_stable_id
+  df$parameter_stable_id = gsub(
+    pattern     = paste0('(', paste(f(plist, cut = 0), collapse  = ')|('), ')'),
+    replacement = f(plist[1], cut = 0),
+    x           = df$parameter_stable_id
+  )
+
+  df$procedure_stable_id_renamed = df$procedure_stable_id
+  df$procedure_stable_id         = gsub(
+    pattern     = paste0('(', paste(f(plist, cut = 2), collapse  = ')|('), ')'),
+    replacement =  df$procedure_stable_id[grepl(pattern = f(str = plist[1],
+                                                            cut = 2),
+                                                x = df$procedure_stable_id)][1],
+    x            =  df$procedure_stable_id
+  )
+
+  df$procedure_group_renames = df$procedure_group
+  df$procedure_group         = gsub(
+    pattern = paste0('(', paste(f(plist, cut = 2), collapse  = ')|('), ')'),
+    replacement = f(plist[1], cut = 2),
+    df$procedure_group
+  )
+  if (sum(df$age_in_weeks <= 16 & df$LifeStage %in% 'Late')) {
+    message0('LA must have age_in_weeks > 16')
+    write(
+      x = paste(Sys.Date(), LA_parameter_stable_id, sep = '\t'),
+      file = 'LAWithAgeLessThan16Weeks.txt',
+      append = TRUE
+    )
+  }
+  # Return them into factors ...
+  df$parameter_stable_id  = as.factor(df$parameter_stable_id)
+  df$procedure_stable_id  = as.factor(df$procedure_stable_id)
+  df$procedure_group      = as.factor(df$procedure_group )
+  return(df)
+}
+
 
 # Read config files
 readConf = function(file, path = NULL, ...) {
   if (is.null(path))
-    path = system.file("extdata", package = "DRrequired")
+    path = system.file("extdata", package = "DRrequiredAgeing")
+  message0('Reading the config file:\n\t ~> ',file)
 
   r   = read.dcf(file.path(path, file), all = TRUE,  ...)
   return(r)
@@ -515,6 +691,7 @@ readFile = function(file,
                     ...) {
   if (is.null(path))
     path = system.file("extdata", package = "DRrequired")
+  message0('Reading the config file:\n\t ~> ',file)
 
   r   = FUN(file.path(path, file),  ...)
   return(r)
@@ -881,7 +1058,17 @@ RandomRegardSeed = function(n = 1,
   return(r)
 }
 
-
+complete.cases0 = function(x, ...) {
+  if (!is.null(x) && length(x) > 0) {
+    r = complete.cases(x)
+    if (is.null(r))
+      r = NULL
+  } else{
+    message0('Null input in the "complete.case". Null retured!')
+    r = NULL
+  }
+  return(r)
+}
 #From PhenStat
 columnLevelsVariationRadio = function (dataset,
                                        columnName,
@@ -922,35 +1109,6 @@ columnLevelsVariationRadio = function (dataset,
   }
   return(as.vector(ratio))
 }
-
-normalisePhenList =   function(phenlist, colnames = NULL) {
-  message0('Normalising the PhenList object in progress ...')
-  if (!is.null(colnames)) {
-    colnames = colnames[colnames %in% names(phenlist@datasetPL)]
-
-    if (length(colnames) < 1) {
-      message0('No variable name found in the data. Please check "colnames" ...')
-      return(phenlist)
-    }
-  } else{
-    message0('No variable selected for normalisation. All numerical variables will be normalised.')
-    colnames = names(phenlist@datasetPL)
-  }
-  ######
-  phenlist@datasetPL  [, colnames]      = as.data.frame(lapply(
-    phenlist@datasetPL[, colnames, drop = FALSE],
-    FUN = function(x) {
-      if (is.numeric(x) && length(unique(x)) > 1) {
-        sdx = sd0(x         , na.rm = TRUE)
-        r   =    (x - mean(x, na.rm = TRUE)) / ifelse(!is.na(sdx) && sdx > 0, sdx, 1)
-      } else{
-        r = x
-      }
-      return(r)
-    }
-  ))
-  return(phenlist)
-}
 # remove zero count categories (filter on sex and genotype)
 RemoveZeroFrequencyCategories = function(x,
                                          minSampRequired,
@@ -977,7 +1135,7 @@ RemoveZeroFrequencyCategories = function(x,
     if ((length(names(counts[counts >= minSampRequired])) != totalLevels ||
          !identical(droplevels0(newx), droplevels0(x))) &&
         length(lvls) > 0) {
-      note$sex_genotype_data_included_in_analysis = c(
+      note$'Sex-Genotype data included in the analysis' = c(
         paste(
           'Not all Sex*Genotype interactions exist in data. Threshold: ',
           paste0(minSampRequired),
@@ -1012,6 +1170,37 @@ droplevels0 = function(x, ...) {
   return(r)
 }
 
+normalisePhenList =   function(phenlist, colnames = NULL) {
+  message0('Normalising the PhenList object in progress ...')
+  if (!is.null(colnames)) {
+    colnames = colnames[colnames %in% names(phenlist@datasetPL)]
+
+    if (length(colnames) < 1) {
+      message0('No variable name found in the data. Please check "colnames" ...')
+      return(phenlist)
+    }
+  } else{
+    message0('No variable selected for normalisation. All numerical variables will be normalised.')
+    colnames = names(phenlist@datasetPL)
+  }
+  ######
+  phenlist@datasetPL  [, colnames]      = as.data.frame(lapply(
+    phenlist@datasetPL[, colnames, drop = FALSE],
+    FUN = function(x) {
+      if (is.numeric(x) && length(unique(x)) > 1) {
+        sdx = sd0(x, na.rm = TRUE)
+        r   =    (x - mean(x, na.rm = TRUE)) / ifelse(sdx > 0, sdx, 1)
+      } else{
+        r = x
+      }
+      return(r)
+    }
+  ))
+  return(phenlist)
+}
+
+
+
 # remove zero count categories (filter on sex and genotype)
 RemoveZerovarCategories = function(x,
                                    depVar,
@@ -1027,7 +1216,7 @@ RemoveZerovarCategories = function(x,
     return(list(x = NULL, note = note))
 
   #x      = droplevels0(x)
-  x      = x[complete.cases0(x[, depVar]), , drop = FALSE]
+  x      = x[complete.cases(x[, depVar]), , drop = FALSE]
   newx   = x
   if (is.numeric(x[, depVar]) && (method %in% 'MM')) {
     lvls   = interaction(x[, sex], x[, genotype], sep = sep, drop = drop)
@@ -1044,7 +1233,7 @@ RemoveZerovarCategories = function(x,
       Zvars  = names(vars)[vars <= minvar]
       newx   = x[!lvls %in% Zvars,]
       if (!identical(droplevels0(newx), droplevels0(x))) {
-        note$sex_genotype_zero_variation = paste0(
+        note$'Sex-Genotype interactions zero variation' = paste0(
           'Some categories have zero variation and then removed from the raw data. List of zero variation categories: ',
           paste0(Zvars, collapse = ', '),
           ''
@@ -1073,15 +1262,45 @@ sd0 = function(x, ...) {
   return(r)
 }
 
+cleanNULLkeys = function(list){
+  requireNamespace('rlist')
+  if (!is.null(list)) {
+    message0 ('Removing the NULL keys ...')
+    list = rlist::list.clean(
+      list,
+      fun = function(x) {
+        length(x) == 0L || is.null(x)
+      },
+      recursive = TRUE
+    )
+  }
+  return(list)
+}
+
+NA2LabelInFactor = function(x, label = 'control') {
+  if (is.null(x) || !is.factor(x) || length(x)<1)
+    return(x)
+
+  x = factor(
+    x,
+    levels  = levels(addNA(x)),
+    labels  = c(levels(x), label),
+    exclude = NULL
+  )
+  return(x)
+}
+
+
 SummaryStatisticsOriginal = function(x,
                                      depVar,
                                      sex = 'sex',
                                      genotype = 'biological_sample_group',
-                                     label = 'raw_data_summary_statistics',
+                                     label = 'Raw data summary statistics',
                                      lower = FALSE,
                                      drop = TRUE,
                                      sep = '_',
                                      removeSpecialChars = FALSE,
+                                     what = '[^0-9A-Za-z]',
                                      replace = '_') {
   r   = NULL
   # do not move me
@@ -1089,6 +1308,7 @@ SummaryStatisticsOriginal = function(x,
     return('empty dataset')
 
   x = x[complete.cases0(x[, depVar]), , drop = FALSE]
+
   #x      = droplevels0(x)
   if (is.numeric(x[, depVar])) {
     lvls   = interaction(x[, sex], x[, genotype], sep = sep, drop = drop)
@@ -1097,51 +1317,43 @@ SummaryStatisticsOriginal = function(x,
   }
 
   isNumeric = is.numeric(x[, depVar])
-
   summaryT   = as.list(tapply(x[, depVar], INDEX = lvls, function(xx) {
     if (isNumeric) {
       c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
       m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE) , NA)
       sd = ifelse(length(na.omit(xx)) > 0, sd0 (xx, na.rm = TRUE) , NA)
+      NormTest = OpenStats:::normality.test0(xx)
       r = list(
-        count = c                       ,
-        mean = m                        ,
-        sd = sd                         ,
-        'normality test p-val' = ifelse(
-          length(xx)           > 3    &&
-            length(unique(xx)) > 3    &&
-            length(xx)         < 5000 &&
-            var(xx,na.rm = TRUE)!= 0,
-          shapiro.test(xx)$p.value,
-          'Not possible(Possible cause: n<3 or n>5000 unique data points'
-        )
+        'Count' = c                                 ,
+        'Mean'  = m                                 ,
+        'SD'    = sd                                ,
+        'Normality test p-val' = NormTest
       )
     } else{
       c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
-      r = list(count = c)
+      r = list('Count' = c)
     }
     return(r)
   }, default = -999.991233210123))
   ##
-  fTmp = function(isNum) {
-    if (isNum) {
-      r = list(count = 0,
-               mean = NA,
-               sd = NA)
-    } else{
-      r = list(count = 0)
-    }
-    return(r)
-  }
-  summaryT[summaryT %in% c(-999.991233210123)] = fTmp(isNum = isNumeric)
-
+  # fTmp = function(isNum) {
+  #   if (isNum) {
+  #     r = list('Count' = 0,
+  #              'Mean' = NA,
+  #              'SD' = NA)
+  #   } else{
+  #     r = list('Count' = 0)
+  #   }
+  #   return(r)
+  # }
+  # summaryT[summaryT %in% c(-999.991233210123)] = fTmp(isNum = isNumeric)
   if (lower)
     nnames = tolower(names(summaryT))
   else
     nnames =  names(summaryT)
 
   if (removeSpecialChars) {
-    nnames = RemoveSpecialChars(nnames, replaceBy = replace)
+    nnames = RemoveSpecialChars(nnames, replaceBy = replace, what = what)
   }
 
   r = list(lbl = summaryT)
@@ -1168,7 +1380,7 @@ OtherExtraColumns = function(obj,
     p4 = as.list(p4)
     names(p4) = p0[ColNameInd]
   } else{
-    p4$Error_in_extra_columns = "Column names do not exist or the dataset is empty"
+    p4$'Error in extra columns' = "Column names do not exist or the dataset is empty"
   }
   return(p4)
 }
@@ -1192,17 +1404,24 @@ max0 = function(x, ...) {
   return(r)
 }
 
-
 # Get possible categories for the categorical variables
-GetPossibleCategories = function(procedure = NULL, file = TRUE) {
+GetPossibleCategories = function(procedure = NULL, method = 'file') {
   requireNamespace('pingr')
-  if (file) {
-    path = file.path(system.file("extdata", package = "DRrequired"),
+  # Predefine list
+  CatList = data.frame(parameter_stable_id = NA, categories = NA)
+  message0('Loading the list of possible categories for categorical variables ...')
+  if (method %in% c('file', 'update')) {
+    message0('* We recommend you to update the file only *once* otherwise the whole process may take longer ...')
+    if (method %in% 'update') {
+      tmp = updateImpress(updateImpressFileInThePackage = TRUE)
+      rm(tmp)
+    }
+    path = file.path(system.file("extdata", package = "DRrequiredAgeing"),
                      'AllCts.csv')
     message0('Reading the Category levels from the file : \n\t\t ====> ',
              path)
-    CatList = read.csv(file = path)[, -1]
-  } else{
+    CatList = read.csv(file = path)#[, -1]
+  } else if (method %in% 'solr') {
     if (pingr::is_online()) {
       url = paste0(
         #'http://ves-ebi-d0:8986/solr/pipeline/select?q=procedure_stable_id:',
@@ -1213,17 +1432,16 @@ GetPossibleCategories = function(procedure = NULL, file = TRUE) {
       message0('Reading the Category levels from : \n\t\t ====> ',
                url)
       CatList = read.csv(file = url)
+      if (all(dim(na.omit(CatList)) > 0)) {
       CatList = CatList[!duplicated(CatList), ]
-      if (any(dim(CatList) == 0)) {
-        CatList[1,] = NA
-      } else{
         message0(nrow(CatList),
                  ' parameter(s) found...')
       }
     } else{
       message0('Warning. Please check the internet connection ....')
-      CatList = data.frame(parameter_stable_id = NA, categories = NA)
     }
+  } else {
+    message0('please select either `file`, `solr`, `update` (latter needs admin permission) ....')
   }
   return(CatList)
 }
@@ -1260,7 +1478,7 @@ ReadFactorLevelsFromSolr = function(parameter,
     x = Levels,
     fixed = fixed
   )
-  return(list(levels = fLevels, note = note))
+  return(list(levels = unique(trimws(fLevels)), note = note))
 }
 
 # Fast replacement of nulls
@@ -1276,7 +1494,7 @@ replaceNull = function(x, replace = '-') {
 mapLevelsToFactor = function(levels, newlevels, name = 'response') {
   #############
   res  = NULL
-  n1   = paste0('all_levels_in_',
+  n1   = paste0('All levels in the',
                 name,
                 collapse = '')
   res$n1 = newlevels
@@ -1292,7 +1510,7 @@ mapLevelsToFactor = function(levels, newlevels, name = 'response') {
     return(list(levels = levels, note = res))
   }
   ############
-  n0 = paste0('missing_levels_in_',
+  n0 = paste0('Missing levels in ',
               name,
               collapse = '')
   res$n0 = newlevels[-ind]
@@ -1358,7 +1576,50 @@ base64 = function(x, active) {
   return(r)
 }
 
+RR_thresholdCheck = function(data,
+                             depVar,
+                             parameter,
+                             controllab = 'control',
+                             Experimentallab = 'experimental',
+                             genotypeColumn = 'biological_sample_group',
+                             sexColumn = 'sex',
+                             threshold = 60,
+                             methodmap) {
+  r = list('Criteria result' = TRUE           ,
+           'Value'     = 'not applicable'     ,
+           'Threshold' = 'not applicable')
+  if (!is.null(data) && !is.null(depVar) && !is.null(parameter)) {
+    method = getMethodi(
+      var = parameter,
+      type = ifelse(is.numeric(data[, depVar]),
+                    'numeric',
+                    'charachter'),
+      methodMap = methodmap
+    )
 
+    if (method %in% 'RR') {
+      data = droplevels0(data[complete.cases(data[, depVar]), , drop = FALSE])
+      lv   = levels(droplevels0(subset(data, data[, genotypeColumn] %in% Experimentallab))[, sexColumn])
+      tbl  = table(subset(data, (data[, genotypeColumn] %in% controllab) & (data[,sexColumn] %in% lv))[, sexColumn])
+      if (!is.null(tbl)     &&
+          sum(dim(tbl) > 0) &&
+          all(tbl <= threshold)) {
+        message0(
+          'Not enough data for running RR, threshold = ',
+          threshold,
+          ': ',
+          paste(names(tbl), tbl, sep = '=', collapse = ', ')
+        )
+        r = list(
+          'Criteria result' = FALSE,
+          'Value'           = paste(names(tbl), tbl, sep = '=', collapse = ', '),
+          'Threshold'       = threshold
+        )
+      }
+    }
+  }
+  return(r)
+}
 
 # rename if file exists (Danger! if overwrite==TRUE then it removes the files!)
 file.exists0 = function(file, overwrite = FALSE, ...) {
@@ -1376,6 +1637,7 @@ file.exists0 = function(file, overwrite = FALSE, ...) {
                  stop = nchar(fname))
 
   } else{
+    ext  = ''
     name = fname
   }
   ###
@@ -1403,7 +1665,7 @@ file.exists0 = function(file, overwrite = FALSE, ...) {
 }
 
 # add bits to file name
-addBitToFileName = function(file,
+addBitsToFileName = function(file,
                             bit = '',
                             sep = '_',
                             fullpath = TRUE) {
@@ -1412,6 +1674,39 @@ addBitToFileName = function(file,
   else
     file = paste(bit, basename(file), sep = sep)
   return(file)
+}
+###
+fillNAgaps <- function(x, firstBack=FALSE) {
+  ## NA's in a vector or factor are replaced with last non-NA values
+  ## If firstBack is TRUE, it will fill in leading NA's with the first
+  ## non-NA value. If FALSE, it will not change leading NA's.
+
+  # If it's a factor, store the level labels and convert to integer
+  lvls <- NULL
+  if (is.factor(x)) {
+    lvls <- levels(x)
+    x    <- as.integer(x)
+  }
+
+  goodIdx <- !is.na(x)
+
+  # These are the non-NA values from x only
+  # Add a leading NA or take the first good value, depending on firstBack
+  if (firstBack)   goodVals <- c(x[goodIdx][1], x[goodIdx])
+  else             goodVals <- c(NA,            x[goodIdx])
+
+  # Fill the indices of the output vector with the indices pulled from
+  # these offsets of goodVals. Add 1 to avoid indexing to zero.
+  fillIdx <- cumsum(goodIdx)+1
+
+  x <- goodVals[fillIdx]
+
+  # If it was originally a factor, convert it back
+  if (!is.null(lvls)) {
+    x <- factor(x, levels=seq_along(lvls), labels=lvls)
+  }
+
+  x
 }
 
 
@@ -1446,6 +1741,22 @@ plot_win = function(phenlistObject, r, depVariable, check, ...) {
            rdata2[, depVariable],
            pch = 8,
            col = 'gray')
+  }
+}
+
+
+detach_package <- function(pkg, character.only = FALSE)
+{
+  if (!character.only)
+  {
+    pkg <- deparse(substitute(pkg))
+  }
+  search_item <- paste("package", pkg, sep = ":")
+  while (search_item %in% search())
+  {
+    detach(search_item,
+           unload = TRUE,
+           character.only = TRUE)
   }
 }
 
@@ -1583,7 +1894,8 @@ ModeWithErrorsAndMessages = function(m2ethod,
 
 # plot windowing
 PlotWindowingResult = function(args, overwrite = FALSE, ...) {
-  if (args$plot) {
+  if (args$plot      &&
+      !is.null(args$we)) {
     message0('ploting the results ...')
     file = ifelse(
       is.null(args$PicDir),
@@ -1613,7 +1925,7 @@ PlotWindowingResult = function(args, overwrite = FALSE, ...) {
     if (args$storeplot)
       graphics.off()
     # if (args$storeplot && 1 == 0) {
-    #   png(filename  = addBitToFileName(file = file, bit = 'boxplot'))
+    #   png(filename  = addBitsToFileName(file = file, bit = 'boxplot'))
     #   boxplot_win(
     #     phenlistObject = args$phenlistObject,
     #     we = args$we,
@@ -1628,14 +1940,93 @@ PlotWindowingResult = function(args, overwrite = FALSE, ...) {
   }
 }
 
+## outlier detection
+PhenListOutlierDetection = function(pl                       ,
+                                    alpha   = .9             ,
+                                    wgtFUN  = "sm2.adaptive" ,
+                                    plot    = TRUE           ,
+                                    active  = TRUE) {
+  requireNamespace("robustbase")
+  if (is.null(pl) || !is.numeric(pl@datasetPL$data_point))
+    return(pl)
+  if(!active){
+    message0('\t  Outlier detection is disabled ...')
+    pl@datasetPL$outlierWeight= 1
+    return(pl)
+  }
+  #######
+  message0('\tApplying the outlier detection algorithm ...')
+  df   = pl@datasetPL
+  cols = c('BatchInt', 'data_point','Weight')
+  #######
+  if (CheckIfNameExistInDataFrame(obj = df, 'Batch',checkLevels = TRUE))
+    df$BatchInt = Date2Integer(df$Batch)
 
+  # if (CheckIfNameExistInDataFrame(obj = df, 'LifeStage',checkLevels = TRUE))
+  #   df$LifeStageInt  = as.integer(df$LifeStage)
+  #
+  # if (CheckIfNameExistInDataFrame(obj = df, 'Sex',checkLevels = TRUE))
+  #   df$SexInt  = as.integer(df$Sex)
+
+  plC      =  subset(df, df$Genotype %in% pl@refGenotype)
+  message0(
+    '\tOutlier detection based on the following variables:\n\t  ',
+    paste(cols[cols %in% names(df)], sep = ', ', collapse = ', ')
+  )
+  plOutSet =	plC[, cols[cols %in% names(df)]]
+
+  oat = tryCatch(
+    expr = {
+      ouObj = robustbase::covMcd(data.matrix(plOutSet), alpha = alpha, wgtFUN = wgtFUN)
+      return(ouObj)
+    },
+    warning = function(war) {
+      message0('Ops! outlier detection algorithm failed! no outlier will be marked ...')
+      message0(war)
+      return(NULL)
+    },
+    error   = function(err) {
+      message0('Ops! outlier detection algorithm failed! no outlier will be marked ...')
+      message0(err)
+      return(NULL)
+    }
+  )
+  #################
+  if (!is.null(oat)   &&
+      plot            &&
+      is(oat, 'mcd')  &&
+      active) {
+    plot(
+      plOutSet[, 1],
+      plOutSet[, 2],
+      col = oat$mcd.wt * 1 + 2,
+      pch =  2 + (1 - oat$mcd.wt) * 10
+    )
+    plC$outlierWeight     = as.vector(oat$mcd.wt)
+  } else{
+    plC$outlierWeight     = 1
+  }
+  #################
+  plC$UniqueId          = paste0(plC$external_sample_id, plC$discrete_point)
+  pl@datasetPL$UniqueId = paste0(pl@datasetPL$external_sample_id,
+                                 pl@datasetPL$discrete_point)
+  #################
+  pl@datasetPL = merge(
+    x   = pl@datasetPL                          ,
+    y   = plC[, c('outlierWeight', 'UniqueId')] ,
+    by  = 'UniqueId'                            ,
+    all = TRUE
+  )
+  pl@datasetPL$outlierWeight[is.na(pl@datasetPL$outlierWeight)] = 1
+  pl@datasetPL$UniqueId = NULL
+  return(pl)
+}
 ## date to integer
 Date2Integer = function(x) {
   dates = as.Date(x)
   dates = as.numeric(dates)
   return(dates)
 }
-
 
 # check if variable name exists in the data frame
 CheckIfNameExistInDataFrame = function(obj, name, checkLevels = TRUE) {
@@ -1671,7 +2062,7 @@ cores0 = function(coreRatio = .7,
     detectCores(),
     '; and ',
     crs,
-    ' would be used.'
+    ' will be used.'
   )
   return(crs)
 }
@@ -1738,6 +2129,7 @@ outMCoreLog = function(wd, dir = 'Multicore_logs', fname = '_MulCoreLog.txt') {
   return(path)
 }
 
+
 sortList = function(x,...){
   x[order(names(x),...)]
 }
@@ -1803,14 +2195,14 @@ VectorOutput0 = function(c.ww0,
   }
   ###
   output = paste(
-    '"normal_result":{',
+    '"Normal result":{',
     p1
     ,
-    '}, "windowed_result":{',
+    '}, "Windowed result":{',
     p2,
-    '}, "full_model_result":{',
+    '}, "Full model result":{',
     p3,
-    '}, "full_model_windowed":{',
+    '}, "Full model windowed result":{',
     p4,
     '}',
     collapse = '',
@@ -1890,50 +2282,6 @@ checkQouteNAandNaN = function(pattern, replacement, x, ignoreCase = FALSE) {
   return(x)
 }
 
-
-
-RR_thresholdCheck = function(data,
-                             depVar,
-                             parameter,
-                             controllab = 'control',
-                             Experimentallab = 'experimental',
-                             genotypeColumn = 'biological_sample_group',
-                             sexColumn = 'sex',
-                             threshold = 60,
-                             methodmap) {
-  r = list(criteria_result = TRUE           ,
-           value     = 'not applicable'     ,
-           threshold = 'not applicable')
-  if (!is.null(data) && !is.null(depVar) && !is.null(parameter)) {
-    method = getMethodi(
-      var = parameter,
-      type = ifelse(is.numeric(data[, depVar]),
-                    'numeric',
-                    'charachter'),
-      methodMap = methodmap
-    )
-
-    if (method %in% 'RR'){
-      data = droplevels0(data[complete.cases(data[, depVar]), , drop = FALSE])
-      lv   = levels(droplevels0(subset(data, data[, genotypeColumn] %in% Experimentallab))[, sexColumn])
-      tbl  = table(subset(data, (data[, genotypeColumn] %in% controllab) & (data[,sexColumn] %in% lv))[, sexColumn])
-      if(!is.null(tbl)     &&
-         sum(dim(tbl) > 0) &&
-        all(tbl <= threshold) ) {
-        message0('Not enough data for running RR, threshold = ',threshold,': ',paste(names(tbl), tbl, sep = '=', collapse = ', '))
-          r = list(
-            criteria_result = FALSE,
-            value = paste(names(tbl), tbl, sep = '=', collapse = ', '),
-            threshold = threshold
-          )
-        }
-    }
-  }
-  return(r)
-}
-
-
-
 # Add windowing weights and store the data again
 StoreRawDataAndWindowingWeights = function(storeRawData,
                                            activeWindowing        ,
@@ -1950,7 +2298,9 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            ### 4
                                            colnames = c('external_sample_id', 'AllModelWeights'),
                                            byid     = 'external_sample_id'                      ,
-                                           compressRawData = TRUE) {
+                                           compressRawData = TRUE,
+                                           ### 5
+                                           methodmap  ) {
   message0('Extra columns in the strored data: ',paste(colnames,sep = ', '))
   if (storeRawData            &&
       isS4(c.ww0$InputObject) &&
@@ -2039,7 +2389,7 @@ ReadMe = function(obj, URL = NULL, skip = NULL) {
                ReadMeTxt[-skip]
              },
              collapse =  ']~>['),
-             ']\n')
+             ']')
   } else{
     ReadMeTxt = 'Not found!'
   }
@@ -2063,40 +2413,80 @@ replaceInList <- function (x, FUN, ...)
     FUN(x, ...)
 }
 
-cleanNULLkeys = function(list){
-  requireNamespace('rlist')
-  if (!is.null(list)) {
-    message0 ('Removing the NULL keys ...')
-    list = rlist::list.clean(
-      list,
-      fun = function(x) {
-        length(x) == 0L || is.null(x)
-      },
-      recursive = TRUE
-    )
-  }
-  return(list)
-}
 
-NA2LabelInFactor = function(x, label = 'control') {
-  if (is.null(x) || !is.factor(x) || length(x)<1)
-    return(x)
-
-  x = factor(
-    x,
-    levels  = levels(addNA(x)),
-    labels  = c(levels(x), label),
-    exclude = NULL
+WriteToDB = function(df,
+                     dbname    = 'db' ,
+                     TableName = 'DR10',
+                     maxtry    = 20000,
+                     steptry   = 40,
+                     maxdelay  = .30) {
+  requireNamespace("DBI")
+  dbname  = RemoveSpecialChars(dbname, what = '[^0-9A-Za-z/.]')
+  message0('Writting to the SQLite ...')
+  message0('\tDB name: ', dbname)
+  dbtemp                = df
+  names(dbtemp)[names(dbtemp) %in% '']  =  'Results'
+  dbtemp                = as.data.frame(as.list(dbtemp))
+  dbpath                = file.path0(
+    'db'                    ,
+    dbname                  ,
+    check = FALSE           ,
+    create = TRUE           ,
+    IncludedFileName = TRUE
   )
-  return(x)
+  res     = NULL
+  counter = 1
+  for (i in 1:maxtry) {
+    res = tryCatch(
+      expr = {
+        con =
+          DBI::dbConnect(
+            drv    = RSQLite::SQLite(),
+            dbname = dbpath           ,
+            synchronous       = NULL
+          )
+        DBI::dbWriteTable(con, TableName, dbtemp, append = TRUE)
+        Sys.sleep(.1)
+        DBI::dbDisconnect(conn     = con)
+      },
+      warning = function(war) {
+        DBI::dbDisconnect(conn     = con)
+        return(NULL)
+      },
+      error   = function(err) {
+        DBI::dbDisconnect(conn     = con)
+        return(NULL)
+      }
+    )
+
+    if (is.null(res)) {
+      sleepTime = RandomRegardSeed(1, max = maxdelay)
+      message0('\t',i, '. Retrying ', sleepTime, 's ...')
+      Sys.sleep(sleepTime)
+      if (i %% steptry == 0) {
+        newBase = sub(pattern = '.*(_Dup_)', '' , basename(dbpath), perl = TRUE)
+        dbpath  = file.path(dirname(dbpath), paste0(counter, '_Dup_', newBase))
+        counter = counter + 1
+      }
+
+    } else{
+      message0('\tWritting to the database successful ...')
+      break
+    }
+    if (i >= maxtry) {
+      stop('\tsomething wrong with the data or the database')
+    }
+  }
 }
 
-FinalJsonBobectCreator = function(FinalList,
+FinalJson2ObjectCreator = function(FinalList,
                                   null = 'null',
                                   na = 'null' ,
                                   auto_unbox = TRUE,
                                   SpecialString = '==!!(:HAMED:)!!==',
-                                  rep = 3) {
+                                   rep = 3,
+                                   removeSpecialsFromNames = FALSE) {
+  requireNamespace('jsonlite')
   message0('Forming the JSON object ...')
   FinalList = replaceInList(
     FinalList,
@@ -2108,6 +2498,20 @@ FinalJsonBobectCreator = function(FinalList,
       }
     }
   )
+
+  FinalList = replaceInList(
+    FinalList,
+    FUN  = function(x) {
+      if (!is.null(x) && any(is.infinite(x))) {
+        x[is.infinite(x)] = sign(x[is.infinite(x)])*10^16
+      } else{
+        x
+      }
+    }
+  )
+
+  if (removeSpecialsFromNames)
+    FinalList = LowerandRemoveSpecials(FinalList)
   for (i in 1:rep) {
     JsonObj  = jsonlite::toJSON(
       x = FinalList,
@@ -2132,6 +2536,20 @@ FinalJsonBobectCreator = function(FinalList,
   return(JsonObj)
 }
 
+
+
+LowerandRemoveSpecials <- function(x)
+{
+  cnames <- names(x)
+  if (is.null(cnames))
+    return (x)
+  x1 <- lapply(cnames, function(y)
+    LowerandRemoveSpecials(x[[y]]))
+  if ("data.frame" %in% class(x))
+    x1 <- as.data.frame(x1)
+  names(x1) <- gsub("[^[:alnum:]]", "_", tolower(cnames))
+  return(x1)
+}
 
 
 UnzipAndfilePath = function(file, quiet = TRUE, order = TRUE) {
@@ -2314,7 +2732,11 @@ mimicControls = function(df                             ,
     set.seed(indicator)
   requireNamespace('stringi')
   df.bckOrg    = df
-  note         = list(shift = NULL, new_mutant_indices = NULL, original_mutant_indices = NULL)
+  note         = list(
+    'Shift' = NULL,
+    'New mutant indices' = NULL,
+    'Original mutant indices' = NULL
+  )
   shift        = Indices = NULL
   #####
   # remove zero frequency categories
@@ -2324,15 +2746,15 @@ mimicControls = function(df                             ,
     depVar = depVariable,
     totalLevels = SexGenResLevels
   )
-  df                             = df_rzeros$x
-  note$removed_categories_detail = df_rzeros$note
+  df                               = df_rzeros$x
+  note$'Removed categories detail' = df_rzeros$note
   ###########
   if (is.null(df)                ||
       length(df) < 1             ||
       nrow  (df) < 1             ||
       nlevels(df[, sex]) < 1     ||
       !is.numeric(df[, depVariable])) {
-    note$dataset_status = 'Empty dataset'
+    note$'Dataset status' = 'Empty dataset'
     return(list(
       df = df          ,
       ctv = NULL       ,
@@ -2349,8 +2771,8 @@ mimicControls = function(df                             ,
   conInd    = (df$biological_sample_group == baselines)
   if (!sum(mutInd)  ||
       !sum(conInd)) {
-    note$dataset_status          = 'Missing controls or mutants'
-    note$original_mutant_indices =  mutInd
+    note$'Dataset status'          = 'Missing controls or mutants'
+    note$'Original mutant indices' =  mutInd
     return(list(
       df    = df.bckOrg,
       ctv   = NULL     ,
@@ -2395,10 +2817,10 @@ mimicControls = function(df                             ,
     Indices = c(Indices, ctv$y.index)
   }
   Ind                            =  df$id_d %in% Indices
-  note$new_mutant_indices        =  which(Ind)
-  note$shift                     = shift
-  note$original_mutant_indices   =  mutInd
-  note$dataset_status            = 'No problem detected'
+  note$'New mutant indices'        =  which(Ind)
+  note$'shift'                     = shift
+  note$'Original mutant indices'   =  mutInd
+  note$'Dataset status'            = 'No problem detected'
   # Replace the biological_sample_group and colony_id
   df$colony_id[Ind] = paste0(unique(na.omit(df$colony_id[df$biological_sample_group == mutLabel])), collapse = '')
   df = Factor2CharAndSubstitution(
@@ -2423,8 +2845,9 @@ mimicControls = function(df                             ,
     points(df$cTime     ,
            df[, depVariable],
            #col = as.integer(df$biological_sample_group) - 1,
-           col = as.integer(as.factor(interaction(df$biological_sample_group,df$sex)))
-    )
+           col = as.integer(as.factor(
+             interaction(df$biological_sample_group, df$sex)
+           )))
     points(
       df$cTime[mutInd],
       df[mutInd, depVariable],
@@ -3487,6 +3910,7 @@ ignoromeGenes = function() {
   return(list)
 }
 
+
 requiredDataColumns = function(x){
   ColumnsList = c(
     'allele_accession_id',
@@ -3531,4 +3955,160 @@ requiredDataColumns = function(x){
     'category'
   )
   return(ColumnsList)
+}
+
+updateImpress = function(updateImpressFileInThePackage = FALSE) {
+  requireNamespace('pingr')
+  requireNamespace('jsonlite')
+  if (!pingr::is_online()) {
+    stop(
+      'You must be connected to the internet to be able to update the categorical categories from the IMPReSS ...'
+    )
+  }
+  ###############
+  message0('Updating the IMPReSS categories in progress ...')
+  message0('\t Step 1. Getting the list of parameters ...')
+  counter   =  1
+  startTime = Sys.time()
+  df = data.frame('parameterKey' = character(),
+                  optionCollection = character())
+  pipelineList = jsonlite:::fromJSON(txt = 'http://api.mousephenotype.org/impress/pipeline/list')
+  for (pipelineId in names(pipelineList)) {
+    message0('Pipeline id: ', pipelineId)
+    ProcedureList = jsonlite:::fromJSON(
+      txt = paste0(
+        'http://api.mousephenotype.org/impress/procedure/belongingtopipeline/keys/',
+        pipelineId
+      )
+    )
+    for (procedureId in names(ProcedureList)) {
+      message0('\t Procedure id: ', procedureId)
+      parameterOptions = jsonlite:::fromJSON(
+        txt = paste0(
+          'http://api.mousephenotype.org/impress/parameter/belongingtoprocedure/full/',
+          procedureId
+        )
+      )
+      if (is.null(dim(parameterOptions)))
+        next
+
+      if (counter < 2) {
+        df =  parameterOptions
+      } else{
+        df = rbind(df , parameterOptions)
+      }
+      counter = counter + 1
+
+    }
+  }
+  ###################################################
+  # save(df, file = paste0(Sys.Date(), '_Impress.Rdata'))
+  ###################################################
+
+  ###################################################
+  message0('\t Step2. Fetching the category names from the category ids ...')
+  dfSelected  = df[lapply(df$optionCollection, length) > 0,]
+  #dfSelected  = dfSelected[dfSelected$isAnnotation, ]
+  dfSelected  = dfSelected[dfSelected$type %in% 'simpleParameter', ]
+  #dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
+  dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
+  dfSelected  = dfSelected[!duplicated(dfSelected$parameterKey),]
+
+  message0('\t\t Total items to look up: ', nrow(dfSelected))
+  dfSelected$categories = sapply(dfSelected$parameterId, function(x) {
+    #message0('Pid = ', x)
+    l = unlist(jsonlite:::fromJSON(
+      paste0(
+        'http://api.mousephenotype.org/impress/option/belongingtoparameter/names/',
+        x
+      )
+    ))
+    paste(trimws(l), collapse = ',', sep = ',')
+  })
+
+  ###################################################
+  message0('Finished in ',round(difftime(Sys.time() , startTime, units = 'min'), 2),'m')
+  ###################################################
+  if (updateImpressFileInThePackage) {
+    fileName = system.file("extdata", "AllCts.csv", package = "DRrequiredAgeing")
+  } else{
+    fileName = file.path(getwd(), 'AllCts.csv')
+  }
+  outP = data.frame(parameter_stable_id = dfSelected$parameterKey,
+                    categories          = dfSelected$categories)
+  message0('\tThe output file:\n\t  => ', fileName)
+  write.csv(x         = outP    ,
+            file      = fileName,
+            row.names = FALSE)
+  return(invisible(outP))
+}
+
+CreateVirtualDrive = function(active = FALSE, currentwd = NULL) {
+  wd = ifelse(is.null(currentwd), getwd(), currentwd)
+  if (.Platform$OS.type != 'windows') {
+    message0('Virtual drive only works for windows OS.')
+    return(wd)
+  }
+  if (active) {
+    message0('Creating a virtual drive ... ')
+    system('subst U: /D', wait = TRUE)
+    if (system(paste0('subst U: "', wd, '"'), wait = TRUE) < 1) {
+      message0('Virtual directory successfully created.')
+      wd = 'U:'
+    } else{
+      message0('Cannot create the virtual drive. It may already exist.')
+    }
+  }
+  return(wd)
+}
+
+
+
+readInputDatafromFile = function(file = NULL,
+                                 checkNamesForMissingColNames = TRUE,
+                                 sep          = ',',
+                                 na.strings   = 'NA') {
+  message0('Reading the input file ...\n\t ~> ', file)
+  if (!file.exists(file))
+    message0('File is not local or does not exist!')
+  message0('Reading the input data ...')
+  if (!grepl(pattern = '.Rdata',
+             x = head(file, 1),
+             fixed = TRUE)) {
+    rdata = read.csv(
+      file = file                                    ,
+      check.names      = checkNamesForMissingColNames,
+      sep              = sep                         ,
+      na.strings       = na.strings                  ,
+      stringsAsFactors = TRUE
+    )
+  } else{
+    loadfile = load(file = file)
+    if (length(loadfile) < 1)
+      stop('The loaded Rdata is blank ...')
+    rdata = get(loadfile[1])
+  }
+  message0('Input file dimentions: ',
+           paste0(dim(rdata), collapse  = ', '))
+  rdata = removeLeadingSpaceFromDataFrameFactors(rdata)
+  return(rdata)
+}
+
+removeLeadingSpaceFromDataFrameFactors = function(x) {
+  if (is.null(x))
+    return(x)
+  message0('Remove leading/trailins space from a data frame ...')
+  message0 ('\t Note that the factors get to the charachter and t/l space will be removed ...')
+  message0 ('\t The order of the factors may not preserved!')
+  #x = as.data.frame(x)
+  catV = unname(unlist(sapply(x, function(xx) {
+    return(is.factor(xx))
+  })))
+  if (!sum(catV))
+    return(x)
+
+  for (i in which(catV == TRUE)) {
+    x[, i] = as.factor(trimws(as.character(x[, i])))
+  }
+  return(x)
 }

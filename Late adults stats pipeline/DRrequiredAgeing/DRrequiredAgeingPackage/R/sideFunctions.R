@@ -193,7 +193,7 @@ IsInBlackListCategories = function(x, len = 1, blackList = NULL) {
   note = NULL
   if (!is.null(blackList) && !is.numeric(x) && nlevels(x) == len) {
     r    = levels(x) %in% blackList
-    note = 'The categorical variable has only one level that is found in the skipped list'
+    note = 'The categorical variable has only one level that is found in the skip list'
   } else{
     r    = FALSE
   }
@@ -829,7 +829,9 @@ UniqueAndNNull = function(x,
     x = as.character(unique(x))
     x = paste0(x, collapse = collapse)
     if(removeNewLine)
-      x = gsub(pattern = '\n',x = x,replacement = newlineRepChar)
+      x = gsub(pattern = '\n',
+					 x = x,
+					replacement = newlineRepChar)
     if (removeSpecials)
       x = RemoveSpecialChars(x = x, replaceBy = ' ')
   } else{
@@ -937,6 +939,46 @@ complete.cases0 = function(x, ...) {
   }
   return(r)
 }
+#From PhenStat
+columnLevelsVariationRadio = function (dataset,
+                                       columnName,
+                                       genotypeCol = 'biological_sample_group',
+                                       sexCol = 'sex')
+{
+  message0(paste('depVar = ', columnName))
+  if (is.numeric(dataset[, c(columnName)])) {
+    columnOfInterest <- na.omit(dataset[, c(columnName)])
+    values <- c(length(columnOfInterest))
+    Genotype_levels <- levels(factor(dataset[, genotypeCol]))
+    Sex_levels <- levels(factor(dataset[, sexCol]))
+    values <- c(values, length(levels(factor(
+      columnOfInterest
+    ))))
+    values <-
+      c(values, length(Genotype_levels) * length(Sex_levels))
+    for (i in 1:length(Genotype_levels)) {
+      GenotypeSubset <- subset(dataset, dataset[, genotypeCol] ==
+                                 Genotype_levels[i])
+      for (j in 1:length(Sex_levels)) {
+        GenotypeSexSubset <-
+          subset(GenotypeSubset, GenotypeSubset[, sexCol] ==
+                   Sex_levels[j])
+        columnOfInterestSubset <- na.omit(GenotypeSexSubset[,
+                                                            c(columnName)])
+        values <- c(values, length(columnOfInterestSubset))
+      }
+    }
+    if (length(values) > 1 && values[1] != 0) {
+      ratio = values[2] / values[1]
+      message0('Variability (PhenStat function) = ', ratio)
+    } else{
+      ratio = 1
+    }
+  } else{
+    ratio = 1
+  }
+  return(as.vector(ratio))
+}
 # remove zero count categories (filter on sex and genotype)
 RemoveZeroFrequencyCategories = function(x,
                                          minSampRequired,
@@ -1027,46 +1069,7 @@ normalisePhenList =   function(phenlist, colnames = NULL) {
   return(phenlist)
 }
 
-#From PhenStat
-columnLevelsVariationRadio = function (dataset,
-                                       columnName,
-                                       genotypeCol = 'biological_sample_group',
-                                       sexCol = 'sex')
-{
-  message0(paste('depVar = ', columnName))
-  if (is.numeric(dataset[, c(columnName)])) {
-    columnOfInterest <- na.omit(dataset[, c(columnName)])
-    values <- c(length(columnOfInterest))
-    Genotype_levels <- levels(factor(dataset[, genotypeCol]))
-    Sex_levels <- levels(factor(dataset[, sexCol]))
-    values <- c(values, length(levels(factor(
-      columnOfInterest
-    ))))
-    values <-
-      c(values, length(Genotype_levels) * length(Sex_levels))
-    for (i in 1:length(Genotype_levels)) {
-      GenotypeSubset <- subset(dataset, dataset[, genotypeCol] ==
-                                 Genotype_levels[i])
-      for (j in 1:length(Sex_levels)) {
-        GenotypeSexSubset <-
-          subset(GenotypeSubset, GenotypeSubset[, sexCol] ==
-                   Sex_levels[j])
-        columnOfInterestSubset <- na.omit(GenotypeSexSubset[,
-                                                            c(columnName)])
-        values <- c(values, length(columnOfInterestSubset))
-      }
-    }
-    if (length(values) > 1 && values[1] != 0) {
-      ratio = values[2] / values[1]
-      message0('Variability (PhenStat function) = ', ratio)
-    } else{
-      ratio = 1
-    }
-  } else{
-    ratio = 1
-  }
-  return(as.vector(ratio))
-}
+
 
 # remove zero count categories (filter on sex and genotype)
 RemoveZerovarCategories = function(x,
@@ -1785,6 +1788,7 @@ PhenListOutlierDetection = function(pl                       ,
   oat = tryCatch(
     expr = {
       ouObj = robustbase::covMcd(data.matrix(plOutSet), alpha = alpha, wgtFUN = wgtFUN)
+      return(ouObj)
     },
     warning = function(war) {
       message0('Ops! outlier detection algorithm failed! no outlier will be marked ...')
@@ -2247,7 +2251,6 @@ replaceInList <- function (x, FUN, ...)
 }
 
 
-
 WriteToDB = function(df,
                      dbname    = 'db' ,
                      TableName = 'DR10',
@@ -2320,6 +2323,7 @@ FinalJson2ObjectCreator = function(FinalList,
                                    SpecialString = '==!!(:HAMED:)!!==',
                                    rep = 3,
                                    removeSpecialsFromNames = FALSE) {
+  requireNamespace('jsonlite')
   message0('Forming the JSON object ...')
   FinalList = replaceInList(
     FinalList,
@@ -2436,7 +2440,6 @@ UnzipAndfilePath = function(file, quiet = TRUE, order = TRUE) {
   )
   return(fpath)
 }
-
 
 # Create the relative path from the full path
 relativePath = function(path, reference) {
@@ -2580,7 +2583,7 @@ mimicControls = function(df                             ,
     depVar = depVariable,
     totalLevels = SexGenResLevels
   )
-  df                             = df_rzeros$x
+  df                               = df_rzeros$x
   note$'Removed categories detail' = df_rzeros$note
   ###########
   if (is.null(df)                ||
@@ -3793,7 +3796,7 @@ requiredDataColumns = function(x){
 
 updateImpress = function(updateImpressFileInThePackage = FALSE) {
   requireNamespace('pingr')
-  library(jsonlite)
+  requireNamespace('jsonlite')
   if (!pingr::is_online()) {
     stop(
       'You must be connected to the internet to be able to update the categorical categories from the IMPReSS ...'
@@ -3806,10 +3809,10 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
   startTime = Sys.time()
   df = data.frame('parameterKey' = character(),
                   optionCollection = character())
-  pipelineList = fromJSON(txt = 'http://api.mousephenotype.org/impress/pipeline/list')
+  pipelineList = jsonlite:::fromJSON(txt = 'http://api.mousephenotype.org/impress/pipeline/list')
   for (pipelineId in names(pipelineList)) {
     message0('Pipeline id: ', pipelineId)
-    ProcedureList = fromJSON(
+    ProcedureList = jsonlite:::fromJSON(
       txt = paste0(
         'http://api.mousephenotype.org/impress/procedure/belongingtopipeline/keys/',
         pipelineId
@@ -3817,7 +3820,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
     )
     for (procedureId in names(ProcedureList)) {
       message0('\t Procedure id: ', procedureId)
-      parameterOptions = fromJSON(
+      parameterOptions = jsonlite:::fromJSON(
         txt = paste0(
           'http://api.mousephenotype.org/impress/parameter/belongingtoprocedure/full/',
           procedureId
@@ -3851,7 +3854,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
   message0('\t\t Total items to look up: ', nrow(dfSelected))
   dfSelected$categories = sapply(dfSelected$parameterId, function(x) {
     #message0('Pid = ', x)
-    l = unlist(fromJSON(
+    l = unlist(jsonlite:::fromJSON(
       paste0(
         'http://api.mousephenotype.org/impress/option/belongingtoparameter/names/',
         x
