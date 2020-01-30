@@ -115,7 +115,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   wd = CreateVirtualDrive(active = virtualDrive,currentwd = wd)
   message0('Setting the working directory to: \n\t\t ===> ', wd)
   setwd(dir = wd)
-  ##################
+  ################## The rnd must be above seed!
+  initialRandomValue = round(runif(1,min = 1000,max = 9999))
   set.seed(seed)
   # Read file
   rdata = readInputDatafromFile(
@@ -154,10 +155,12 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   Strtime      = Sys.time()
   procedures   = as.character(unique(na.omit(new.data$procedure_group)))
   for (procedure in procedures) {
+    StrtimePro  = Sys.time()
     ###
     n2.9 = base::subset(new.data,  new.data$procedure_group %in% procedure)
     parameters  = as.character(unique(na.omit(n2.9$parameter_stable_id)))
     for (parameter in parameters) {
+      StrtimePar = Sys.time()
       FactorLevels = ReadFactorLevelsFromSolr(parameter = parameter, CatList = CatList)
       ### counter starts here ....
       counter   = 1
@@ -948,7 +951,19 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
           }
         }
       }
+      RecordSpentTime(
+        timeSt = StrtimePar,
+        dirName = 'PhenStatParameterTime',
+        fileName = c(procedure, parameter),
+        rnd = initialRandomValue
+      )
     }
+    RecordSpentTime(
+      timeSt = StrtimePro,
+      dirName = 'PhenStatProcedureTime',
+      fileName = procedure,
+      rnd = initialRandomValue
+    )
   }
   message0('Closing Connections ...')
   stopCluster(cl)

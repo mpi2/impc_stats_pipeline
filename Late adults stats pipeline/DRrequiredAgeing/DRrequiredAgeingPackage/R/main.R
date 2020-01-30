@@ -51,7 +51,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       # Raw data
                       storeRawData           = TRUE        ,
                       compressRawData        = TRUE        ,
-               		  writeOutputToDB        = TRUE        ,
+                      writeOutputToDB        = TRUE        ,
                       # Only for Batch generator
                       BatchProducer          =  FALSE      ,
                       cpu = 4                              ,
@@ -119,7 +119,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   wd = CreateVirtualDrive(active = virtualDrive,currentwd = wd)
   message0('Setting the working directory to: \n\t\t ===> ', wd)
   setwd(dir = wd)
-  ##################
+  ################## The rnd must be above seed!
+  initialRandomValue = round(runif(1,min = 1000,max = 9999))
   set.seed(seed)
   # Read file
   rdata = readInputDatafromFile(
@@ -158,10 +159,12 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   Strtime      = Sys.time()
   procedures   = as.character(unique(na.omit(new.data$procedure_group)))
   for (procedure in procedures) {
+    StrtimePro  = Sys.time()
     ###
     n2.9 = base::subset(new.data,  new.data$procedure_group %in% procedure)
     parameters  = as.character(unique(na.omit(n2.9$parameter_stable_id)))
     for (parameter in parameters) {
+      StrtimePar = Sys.time()
       FactorLevels = ReadFactorLevelsFromSolr(parameter = parameter, CatList = CatList)
       ### counter starts here ....
       counter   = 1
@@ -952,7 +955,19 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
           }
         }
       }
+      RecordSpentTime(
+        timeSt = StrtimePar,
+        dirName = 'OpenStatsParameterTime',
+        fileName = c(procedure, parameter),
+        rnd = initialRandomValue
+      )
     }
+    RecordSpentTime(
+      timeSt = StrtimePro,
+      dirName = 'OpenStatsProcedureTime',
+      fileName = procedure,
+      rnd = initialRandomValue
+    )
   }
   message0('Closing Connections ...')
   stopCluster(cl)
@@ -964,3 +979,5 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   message0('Cleaning the meamory ...')
   gc()
 }
+
+

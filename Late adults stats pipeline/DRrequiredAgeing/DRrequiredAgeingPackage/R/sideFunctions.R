@@ -3949,3 +3949,22 @@ removeLeadingSpaceFromDataFrameFactors = function(x) {
   }
   return(x)
 }
+
+RecordSpentTime = function(timeSt               ,
+                           dirName  = 'ParaTime',
+                           fileName = 'file.txt',
+                           rnd = NULL) {
+  message0('Recording time ...')
+  if (!dir.exists(dirName))
+    dir.create(dirName)
+  r = round(difftime(Sys.time() , timeSt, units = 'sec'), 2)
+  write(
+    c(fileName, r)                                                ,
+    file = file.path(dirName, paste(
+      rnd, fileName, '.txt', collapse = '_', sep = '_'
+    ))                                                            ,
+    ncolumns = 10 ^ 3                                             ,
+    append = TRUE                                                 ,
+    sep = '\t'
+  )
+}
