@@ -4124,7 +4124,11 @@ RecordSpentTime = function(timeSt               ,
   write(
     c(fileName, r)                                                ,
     file = file.path(dirName, paste(
-      rnd, fileName, '.txt', collapse = '_', sep = '_'
+      rnd,
+      paste(fileName, sep = '_', collapse = '_'),
+      '.txt',
+      collapse = '_',
+      sep = '_'
     ))                                                            ,
     ncolumns = 10 ^ 3                                             ,
     append = TRUE                                                 ,
