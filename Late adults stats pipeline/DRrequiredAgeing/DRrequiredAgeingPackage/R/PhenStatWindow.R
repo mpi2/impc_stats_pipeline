@@ -70,6 +70,21 @@ PhenStatWindow = function (phenlistObject                                ,
     # windowing does not apply to time series
     message0('Time series detected! Windowing does not apply to the time series ...')
     windowing = FALSE
+    ##############################################
+    ##############################################
+    ##############################################
+    ##############################################
+    ##############################################
+    ##############################################
+    ##############################################
+    ### Must be removed after the OpenStats script
+    RandEffTerm = as.formula('~ 1 | Batch')
+    CorrEffect  = NULL
+    ##############################################
+    ##############################################
+    ##############################################
+    ##############################################
+    ##############################################
   } else{
     RandEffTerm = if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'LifeStage'))
       as.formula('~ 1 | Batch')
