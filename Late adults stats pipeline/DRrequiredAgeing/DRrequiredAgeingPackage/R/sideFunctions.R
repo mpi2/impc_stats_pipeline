@@ -857,8 +857,8 @@ removeNAPipe = function(x,
 
 
 # as.numeric with quote!
-as.numeric0 = function(x) {
-  r = suppressWarnings(as.numeric(x))
+as.numeric0 = function(x, ...) {
+  r = suppressWarnings(as.numeric(x, ...))
   return(r)
 }
 
@@ -3971,4 +3971,22 @@ RecordSpentTime = function(timeSt               ,
     append = TRUE                                                 ,
     sep = '\t'
   )
+}
+
+TransformVariableByFunction = function(varType = NULL ,
+                                       types    = c('unidimensional', 'time_series'),
+                                       ###
+                                       data    = NULL ,
+                                       colName = NULL ,
+                                       FUN     = as.numeric0,
+                                       FUNData = is.factor) {
+  if (is.null(data))
+    return(data)
+  if (varType %in% types       &&
+      colName %in% names(data) &&
+      FUNData(data[, colName])) {
+    message0('Applying the function to the data [column = ', colName, ']')
+    data[, colName] = FUN(levels(data[, colName])[data[, colName]])
+  }
+  return(data)
 }

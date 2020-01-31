@@ -382,8 +382,15 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
 
                     # Define response column [do not move me!]
                     depVariable = getResponseColumn(n3.5$observation_type)
+                    n3.5 = TransformVariableByFunction(
+                      varType = depVariable$lbl,
+                      data = n3.5,
+                      types = c('unidimensional', 'time_series'),
+                      colName = depVariable$column,
+                      FUN = as.numeric0
+                    )
                     depVar      = depVariable$column
-					message0('Dependent variable: ', depVar)
+                    message0('Dependent variable: ', depVar)
                     note$'Response type'         = paste0(depVar,
                                                           '_of_type_',
                                                 paste(depVariable$lbl, sep = '.'))
