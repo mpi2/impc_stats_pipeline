@@ -3957,7 +3957,8 @@ requiredDataColumns = function(x){
   return(ColumnsList)
 }
 
-updateImpress = function(updateImpressFileInThePackage = FALSE) {
+updateImpress = function(updateImpressFileInThePackage = FALSE,
+                         saveRdata                     = NULL) {
   requireNamespace('pingr')
   requireNamespace('jsonlite')
   if (!pingr::is_online()) {
@@ -4002,7 +4003,8 @@ updateImpress = function(updateImpressFileInThePackage = FALSE) {
     }
   }
   ###################################################
-  # save(df, file = paste0(Sys.Date(), '_Impress.Rdata'))
+  if (!is.null(saveRdata))
+    save(df, file = paste0(Sys.Date(), '_', saveRdata, '_Impress.Rdata'))
   ###################################################
 
   ###################################################
