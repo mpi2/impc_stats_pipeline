@@ -385,6 +385,11 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
 
                     # Define response column [do not move me!]
                     depVariable = getResponseColumn(n3.5$observation_type)
+                    ################must be removed later
+                    if(depVariable$lbl %in% 'time_series')
+                      return(NULL)
+                    ################
+
                     n3.5 = TransformVariableByFunction(
                       varType = depVariable$lbl,
                       data = n3.5,

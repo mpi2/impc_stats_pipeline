@@ -4146,7 +4146,10 @@ removeLeadingSpaceFromDataFrameFactors = function(x) {
 RecordSpentTime = function(timeSt               ,
                            dirName  = 'ParaTime',
                            fileName = 'file.txt',
-                           rnd = NULL) {
+                           rnd      = NULL      ,
+                           active   = TRUE) {
+  if(!active)
+    return(NULL)
   message0('Recording time ...')
   if (!dir.exists(dirName))
     dir.create(dirName)
