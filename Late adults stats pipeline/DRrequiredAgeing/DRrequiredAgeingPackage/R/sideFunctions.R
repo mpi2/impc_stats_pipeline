@@ -3795,7 +3795,9 @@ requiredDataColumns = function(x){
 }
 
 updateImpress = function(updateImpressFileInThePackage = FALSE,
-                         saveRdata                     = NULL) {
+                         updateTheSkipList             = FALSE,
+                         saveRdata                     = NULL ) {
+  outP = df = NULL
   requireNamespace('pingr')
   requireNamespace('jsonlite')
   if (!pingr::is_online()) {
@@ -3844,42 +3846,67 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
     save(df, file = paste0(Sys.Date(), '_', saveRdata, '_Impress.Rdata'))
   ###################################################
 
+  if (updateTheSkipList)
+    UpdateTheSkipListfromIMPReSSAPI()
   ###################################################
-  message0('\t Step2. Fetching the category names from the category ids ...')
-  dfSelected  = df[lapply(df$optionCollection, length) > 0,]
-  #dfSelected  = dfSelected[dfSelected$isAnnotation, ]
-  dfSelected  = dfSelected[dfSelected$type %in% 'simpleParameter', ]
-  #dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
-  dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
-  dfSelected  = dfSelected[!duplicated(dfSelected$parameterKey),]
+    message0('\t Step2. Fetching the category names from the category ids ...')
+    dfSelected  = df[lapply(df$optionCollection, length) > 0,]
+    #dfSelected  = dfSelected[dfSelected$isAnnotation, ]
+    dfSelected  = dfSelected[dfSelected$type %in% 'simpleParameter', ]
+    #dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
+    dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
+    dfSelected  = dfSelected[!duplicated(dfSelected$parameterKey),]
 
-  message0('\t\t Total items to look up: ', nrow(dfSelected))
-  dfSelected$categories = sapply(dfSelected$parameterId, function(x) {
-    #message0('Pid = ', x)
-    l = unlist(jsonlite:::fromJSON(
-      paste0(
-        'http://api.mousephenotype.org/impress/option/belongingtoparameter/names/',
-        x
-      )
-    ))
-    paste(trimws(l), collapse = ',', sep = ',')
-  })
+    message0('\t\t Total items to look up: ', nrow(dfSelected))
+    dfSelected$categories = sapply(dfSelected$parameterId, function(x) {
+      #message0('Pid = ', x)
+      l = unlist(jsonlite:::fromJSON(
+        paste0(
+          'http://api.mousephenotype.org/impress/option/belongingtoparameter/names/',
+          x
+        )
+      ))
+      paste(trimws(l), collapse = ',', sep = ',')
+    })
 
-  ###################################################
-  message0('Finished in ',round(difftime(Sys.time() , startTime, units = 'min'), 2),'m')
-  ###################################################
-  if (updateImpressFileInThePackage) {
-    fileName = system.file("extdata", "AllCts.csv", package = "DRrequiredAgeing")
-  } else{
-    fileName = file.path(getwd(), 'AllCts.csv')
-  }
-  outP = data.frame(parameter_stable_id = dfSelected$parameterKey,
-                    categories          = dfSelected$categories)
-  message0('\tThe output file:\n\t  => ', fileName)
-  write.csv(x         = outP    ,
-            file      = fileName,
-            row.names = FALSE)
-  return(invisible(outP))
+    ###################################################
+    message0('Finished in ', round(difftime(Sys.time() , startTime, units = 'min'), 2), 'm')
+    ###################################################
+    if (updateImpressFileInThePackage) {
+      fileName = system.file("extdata", "AllCts.csv", package = "DRrequiredAgeing")
+    } else{
+      fileName = file.path(getwd(), 'AllCts.csv')
+    }
+    outP = data.frame(
+      parameter_stable_id = dfSelected$parameterKey,
+      categories          = dfSelected$categories
+    )
+    message0('\tThe output file:\n\t  => ', fileName)
+    write.csv(x         = outP    ,
+              file      = fileName,
+              row.names = FALSE)
+
+  return(invisible(list(
+    categories = outP, dfObject = df
+  )))
+
+}
+
+UpdateTheSkipListfromIMPReSSAPI = function(df) {
+  if (is.null(df))
+    message0('There is an error in the input data. Please check the IMPReSS website is on!')
+  dfSkPar = subset(df, df$isAnnotation == FALSE)
+  dfSkPar = dfSkPar[duplicated(dfSkPar$parameterKey),]
+  ###########
+  fileName = system.file("extdata", "ExceptionMap.list", package = "DRrequiredAgeing")
+  message0('Reading the current skiplist in the package ...\n\t Path = ',
+           fileName)
+  CurrentSkipList = readLines(con =  fileName)
+  ###########
+  NewSkipList  = c(CurrentSkipList, dfSkPar$parameterKey)
+  NewSkipList  = NewSkipList[!duplicated(NewSkipList)]
+  message0('Writting the output back to the path,\n\t', fileName)
+  writeLines(text = NewSkipList, con = fileName)
 }
 
 CreateVirtualDrive = function(active = FALSE, currentwd = NULL) {
