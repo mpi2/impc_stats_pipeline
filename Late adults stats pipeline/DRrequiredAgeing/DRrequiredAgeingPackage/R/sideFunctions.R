@@ -3847,7 +3847,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
   ###################################################
 
   if (updateTheSkipList)
-    UpdateTheSkipListfromIMPReSSAPI()
+    UpdateTheSkipListfromIMPReSSAPI(df)
   ###################################################
     message0('\t Step2. Fetching the category names from the category ids ...')
     dfSelected  = df[lapply(df$optionCollection, length) > 0,]

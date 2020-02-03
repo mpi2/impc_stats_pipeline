@@ -538,7 +538,7 @@ getEquation =  function(var,
 }
 
 local =  function(x=NULL){
-  r= system.file("extdata", package = "DRrequiredAgeing")
+  r= system.file("extdata", package = "DRrequired")
   return(r)
 }
 
@@ -676,7 +676,7 @@ getEarlyAdultsFromParameterStableIds = function(LA_parameter_stable_id,
 # Read config files
 readConf = function(file, path = NULL, ...) {
   if (is.null(path))
-    path = system.file("extdata", package = "DRrequiredAgeing")
+    path = system.file("extdata", package = "DRrequired")
   message0('Reading the config file:\n\t ~> ',file)
 
   r   = read.dcf(file.path(path, file), all = TRUE,  ...)
@@ -1416,7 +1416,7 @@ GetPossibleCategories = function(procedure = NULL, method = 'file') {
       tmp = updateImpress(updateImpressFileInThePackage = TRUE)
       rm(tmp)
     }
-    path = file.path(system.file("extdata", package = "DRrequiredAgeing"),
+    path = file.path(system.file("extdata", package = "DRrequired"),
                      'AllCts.csv')
     message0('Reading the Category levels from the file : \n\t\t ====> ',
              path)
@@ -4010,7 +4010,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
   ###################################################
 
   if (updateTheSkipList)
-    UpdateTheSkipListfromIMPReSSAPI()
+    UpdateTheSkipListfromIMPReSSAPI(df)
   ###################################################
   message0('\t Step2. Fetching the category names from the category ids ...')
   dfSelected  = df[lapply(df$optionCollection, length) > 0,]
@@ -4036,7 +4036,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
   message0('Finished in ', round(difftime(Sys.time() , startTime, units = 'min'), 2), 'm')
   ###################################################
   if (updateImpressFileInThePackage) {
-    fileName = system.file("extdata", "AllCts.csv", package = "DRrequiredAgeing")
+    fileName = system.file("extdata", "AllCts.csv", package = "DRrequired")
   } else{
     fileName = file.path(getwd(), 'AllCts.csv')
   }
@@ -4050,7 +4050,8 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
             row.names = FALSE)
 
   return(invisible(list(
-    categories = outP, dfObject = df
+    categories = outP,
+    dfObject   = df
   )))
 
 }
@@ -4061,7 +4062,7 @@ UpdateTheSkipListfromIMPReSSAPI = function(df) {
   dfSkPar = subset(df, df$isAnnotation == FALSE)
   dfSkPar = dfSkPar[duplicated(dfSkPar$parameterKey),]
   ###########
-  fileName = system.file("extdata", "ExceptionMap.list", package = "DRrequiredAgeing")
+  fileName = system.file("extdata", "ExceptionMap.list", package = "DRrequired")
   message0('Reading the current skiplist in the package ...\n\t Path = ',
            fileName)
   CurrentSkipList = readLines(con =  fileName)
