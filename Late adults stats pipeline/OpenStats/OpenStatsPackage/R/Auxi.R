@@ -3841,7 +3841,12 @@ MakeRRQuantileFromTheValue = function(x) {
 						 '`')
 		return(x)
 	}
-	
+	message0('Input quantile before the transformation: ', pasteComma(x))
 	x = 1 - (1 - head(x, 1)) / 2
+	message0(
+		'Input quantile after the transformation : ' ,
+		pasteComma(x),
+		'\n\t Transformation: 1-(1-x)/2'
+	)
 	return(max(x, 1 - x, na.rm = TRUE))
 }

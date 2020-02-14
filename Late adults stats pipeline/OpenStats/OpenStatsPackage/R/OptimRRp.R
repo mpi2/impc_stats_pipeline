@@ -35,14 +35,14 @@ RRrunner = function(object              ,
 		warnings('Improper value for "RRprop"')
 		return(NULL)
 	}
-	RRprop                  = MakeRRQuantileFromTheValue(RRprop)
+	RRpropTrans             = MakeRRQuantileFromTheValue(RRprop)
 	cleanFormulaForOutput   = checkModelTermsInData(
 		formula = formula,
 		data = object@datasetPL,
 		responseIsTheFirst = TRUE
 	)
 	message0('Discritizing the continuous data into discrete levels. The quantile = ',
-					 RRprop)
+					 RRpropTrans)
 	message0('Stp 1. Low versus Normal/High')
 	RRobject_low = RRDiscretizedEngine(
 		data     = object@datasetPL                   ,
@@ -53,7 +53,7 @@ RRrunner = function(object              ,
 		labels   = c('Low', 'NormalHigh')             ,
 		depVarPrefix = 'Low'                          ,
 		right    = TRUE                               ,
-		prob     = 1 - RRprop
+		prob     = 1 - RRpropTrans
 	)
 	message0('Stp 2. Low/Normal versus High')
 	RRobject_high = RRDiscretizedEngine(
@@ -65,7 +65,7 @@ RRrunner = function(object              ,
 		labels   = c('LowNormal', 'High')             ,
 		depVarPrefix = 'High'                         ,
 		right    = FALSE                              ,
-		prob     = RRprop
+		prob     = RRpropTrans
 	)
 	###########################
 	message0('Fisher exact test with '         ,
@@ -86,7 +86,7 @@ RRrunner = function(object              ,
 				RRextraResults   = list(   
 					depVariable      = x$depVariable           ,
 					disdepVariable   = x$newDepVariable        ,
-					RRprop           = x$RRprop                ,
+					RRpropTransformed= x$RRprop                ,
 					RRLabels         = x$labels                ,
 					RRprefix         = x$depVarPrefix          ,
 					RRreferenceLevel = x$refLevel              ,
@@ -112,7 +112,7 @@ RRrunner = function(object              ,
 				RRextraResults   = list(   
 					depVariable      = x$depVariable           ,
 					disdepVariable   = x$newDepVariable        ,
-					RRprop           = x$RRprop                ,
+					RRpropTransformed= x$RRprop                ,
 					RRLabels         = x$labels                ,
 					RRprefix         = x$depVarPrefix          ,
 					RRreferenceLevel = x$refLevel              ,
@@ -143,7 +143,8 @@ RRrunner = function(object              ,
 			refLevel        = RRrefLevel                      ,
 			full_comparisions = c(fullComparisions, InterLevelComparisions)
 		),
-		extra  = list(Cleanedformula           = cleanFormulaForOutput)
+		extra  = list(Cleanedformula           = cleanFormulaForOutput,
+									TransformedRRprop        = RRpropTrans)
 	)
 	class(OutR) <- 'OpenStatsRR'
 	return(OutR)
