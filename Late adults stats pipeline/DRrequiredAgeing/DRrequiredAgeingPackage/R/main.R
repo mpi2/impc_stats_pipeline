@@ -682,7 +682,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       message0('Analysing the dataset in progress ...')
                       message0('Creating OpenStats object ...')
                       a = OpenStats::OpenStatsList(
-                        n3.5.2,
+                        OpenStats:::RemoveSexWithZeroDataPointInGenSexTableOnlyStatsPipelinenotExposed(n3.5.2,
+                                                                                                       cols = c('biological_sample_group', 'sex')),
                         testGenotype             = 'experimental',
                         refGenotype              = 'control',
                         dataset.colname.genotype = 'biological_sample_group',
