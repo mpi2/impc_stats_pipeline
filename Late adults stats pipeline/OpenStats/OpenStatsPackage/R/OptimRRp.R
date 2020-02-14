@@ -35,6 +35,7 @@ RRrunner = function(object              ,
 		warnings('Improper value for "RRprop"')
 		return(NULL)
 	}
+	RRprop                  = MakeRRQuantileFromTheValue(RRprop)
 	cleanFormulaForOutput   = checkModelTermsInData(
 		formula = formula,
 		data = object@datasetPL,

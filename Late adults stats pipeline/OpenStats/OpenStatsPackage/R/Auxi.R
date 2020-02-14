@@ -3829,3 +3829,19 @@ RemoveSexWithZeroDataPointInGenSexTableOnlyStatsPipelinenotExposed = function(df
 	}
 	return(df)
 }
+
+MakeRRQuantileFromTheValue = function(x) {
+	if (length(x) < 1          ||
+			length(na.omit(x)) < 1 ||
+			!as.numeric(x)         ||
+			any(x > 1)             ||
+			any(x < 0)) {
+		message0('Quantile is not numeric [or not in [0,1] interval], value = `',
+						 pasteComma(x),
+						 '`')
+		return(x)
+	}
+	
+	x = 1 - (1 - head(x, 1)) / 2
+	return(max(x, 1 - x, na.rm = TRUE))
+}
