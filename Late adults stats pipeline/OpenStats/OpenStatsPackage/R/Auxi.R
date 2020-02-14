@@ -3804,24 +3804,28 @@ isVariableCategorical = function(var = NULL, data = NULL) {
 	return(r)
 }
 
-RemoveSexWithZeroDataPointInGenSexTableOnlyStatsPipelinenotExposed = function(object,
+RemoveSexWithZeroDataPointInGenSexTableOnlyStatsPipelinenotExposed = function(df   = NULL,
 																																							cols = c ('Genotype', 'Sex')) {
-	if (is.null(object) ||
-			nrow(object@datasetPL) < 1                          ||
-			!colExists(name = cols[1], data = object@datasetPL) ||
-			!colExists(name = cols[2], data = object@datasetPL))
-		return(object)
+	if (is.null(df) ||
+			nrow(df) < 1                          ||
+			!colExists(name = cols[1], data = df) ||
+			!colExists(name = cols[2], data = df))
+		return(df)
+	if (length(cols) != 2) {
+		message0('col parameter must have absolutely two values ...')
+		return(df)
+	}
 	
-	tbl = table(object@datasetPL[, cols[1]], object@datasetPL[, cols[2]])
+	tbl = table(df[, cols[1]], df[, cols[2]])
 	if (length(dim(tbl)) > 1) {
 		zc = as.data.frame(tbl)
-		zc = zc[zc$Freq < 1, ]
+		zc = zc[zc$Freq < 1,]
 		if (nrow(zc) > 0) {
 			message0('Zero frequency values detected ...')
 			names(zc)[1:length(cols)]   = cols
-			object@datasetPL = object@datasetPL[!object@datasetPL[, cols[-1]] %in% zc[, cols[-1]], ]
-			object@datasetPL = droplevels(object@datasetPL)
+			df = df[!df[, cols[-1]] %in% zc[, cols[-1]],]
+			df = droplevels(df)
 		}
 	}
-	return(object)
+	return(df)
 }
