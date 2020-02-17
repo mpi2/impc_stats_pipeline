@@ -1336,7 +1336,7 @@ AllTables = function(dframe        = NULL,
 	for (i in unique(pmax(1, 1:(lcat - adj)))) {
 		cb = combn(cat, i)
 		for (j in 1:ncol(cb)) {
-			message0('\tspliting on ', pasteComma(cb[, j], replaceNull = FALSE),' ...')
+			message0('\tSpliting on ', pasteComma(cb[, j], replaceNull = FALSE),' ...')
 			out = split(dframe,
 									interaction(dframe[cb[, j]]), drop = TRUE)
 			l2   = c(l2, out)
@@ -2216,7 +2216,7 @@ RRDiscretizedEngine = function(data,
 		for (i in 1:lextra) {
 			cbn = combn(extra, i)
 			for (j in 1:ncol(cbn)) {
-				message0('\tspliting on ', pasteComma(cbn[, j], replaceNull = FALSE),' ...')
+				message0('\tSpliting on ', pasteComma(cbn[, j], replaceNull = FALSE),' ...')
 				out = split(df,
 										interaction(df[cbn[, j]]), drop = TRUE)
 				l2   = c(l2, out)

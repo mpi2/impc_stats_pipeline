@@ -37,6 +37,7 @@ PhenStatWindow = function (phenlistObject                                ,
                            #######
                            FERROptimise                                  ,
                            MMOptimise                                    ,
+                           FERRrep                                       ,
                            ...)
 {
   requireNamespace('PhenStat')
@@ -90,6 +91,7 @@ PhenStatWindow = function (phenlistObject                                ,
     correlation           = CorrEffect,
     MM_optimise           = MMOptimise,
     FERR_FullComparisions = FERROptimise,
+    FERR_rep              = FERRrep,
     MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
     debug                 = TRUE
   )

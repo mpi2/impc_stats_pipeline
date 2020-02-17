@@ -22,6 +22,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       # OpenStats
                       MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
                       FERROptimise            = c(TRUE,TRUE)        ,
+                      FERRrep                 = 1500       ,
                       # Only for simulations
                       simulation              = FALSE      ,
                       Simulation.iteration    = 1          ,
@@ -386,8 +387,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     # Define response column [do not move me!]
                     depVariable = getResponseColumn(n3.5$observation_type)
                     ################must be removed later
-                    if(depVariable$lbl %in% 'time_series')
-                      return(NULL)
+                    # if(depVariable$lbl %in% 'time_series')
+                    #   return(NULL)
                     ################
 
                     n3.5 = TransformVariableByFunction(
@@ -805,7 +806,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         direction  = direction,
                         outlierDetection = outlierDetection,
                         FERROptimise = FERROptimise,
-                        MMOptimise = MMOptimise
+                        MMOptimise = MMOptimise,
+                        FERRrep = FERRrep
                       )
                       note = c(
                         note                               ,

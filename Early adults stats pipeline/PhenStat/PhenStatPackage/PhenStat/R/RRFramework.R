@@ -201,16 +201,45 @@ RRTest <- function(phenList,
   # Matrices for combined datasets or one sex only
 
   #ALL
-
+  percentiles1 <-
+    unname(quantile(GenotypeControlSubset[, c(depVariable)], c(rangeLeft, rangeRight)))
+  ###########
+  countsLow_control_all1 <-
+    sum(sapply(GenotypeControlSubset[, c(depVariable)],
+               function(x)
+                 (x <= percentiles1[1])))
+  countsHigh_control_all1 <-
+    sum(sapply(GenotypeControlSubset[, c(depVariable)],
+               function(x)
+                 (x >= percentiles1[2])))
+  ###########
+  countsLow_mutant_all1 <-
+    sum(sapply(GenotypeMutantSubset[, c(depVariable)],
+               function(x)
+                 (x <= percentiles1[1])))
+  countsHigh_mutant_all1 <-
+    sum(sapply(GenotypeMutantSubset[, c(depVariable)],
+               function(x)
+                 (x >= percentiles1[2])))
+  ###########
+  countsNormal_control_all1 <-
+    sum(sapply(GenotypeControlSubset[, c(depVariable)],
+               function(x)
+                 (x > percentiles1[1] && x < percentiles1[2])))
+  countsNormal_mutant_all1 <-
+    sum(sapply(GenotypeMutantSubset[, c(depVariable)],
+               function(x)
+                 (x > percentiles1[1] && x < percentiles1[2])))
+  ###########
   #1) ##### ALL three rows: Low, Normal, High #####
   count_matrix_all <- matrix(0, 3, 2)
   ES_matrix_all <- matrix(0, 3, 3)
-  count_matrix_all[1, 1] <- countsLow_control_all
-  count_matrix_all[2, 1] <- countsNormal_control_all
-  count_matrix_all[3, 1] <- countsHigh_control_all
-  count_matrix_all[1, 2] <- countsLow_mutant_all
-  count_matrix_all[2, 2] <- countsNormal_mutant_all
-  count_matrix_all[3, 2] <- countsHigh_mutant_all
+  count_matrix_all[1, 1] <- countsLow_control_all1
+  count_matrix_all[2, 1] <- countsNormal_control_all1
+  count_matrix_all[3, 1] <- countsHigh_control_all1
+  count_matrix_all[1, 2] <- countsLow_mutant_all1
+  count_matrix_all[2, 2] <- countsNormal_mutant_all1
+  count_matrix_all[3, 2] <- countsHigh_mutant_all1
   ES_matrix_all[1, 1] <-
     round((count_matrix_all[1, 1] / colSums(count_matrix_all)[1]) * 100, digits =
             digit)
@@ -246,12 +275,12 @@ RRTest <- function(phenList,
   #2) ##### ALL two rows: Low, Normal/High #####
   count_matrix_all_nh <- matrix(0, 2, 2)
   ES_matrix_all_nh <- matrix(0, 2, 3)
-  count_matrix_all_nh[1, 1] <- countsLow_control_all
+  count_matrix_all_nh[1, 1] <- countsLow_control_all1
   count_matrix_all_nh[2, 1] <-
-    countsNormal_control_all + countsHigh_control_all
-  count_matrix_all_nh[1, 2] <- countsLow_mutant_all
+    countsNormal_control_all1 + countsHigh_control_all1
+  count_matrix_all_nh[1, 2] <- countsLow_mutant_all1
   count_matrix_all_nh[2, 2] <-
-    countsNormal_mutant_all + countsHigh_mutant_all
+    countsNormal_mutant_all1 + countsHigh_mutant_all1
   ES_matrix_all_nh[1, 1] <-
     round((count_matrix_all_nh[1, 1] / colSums(count_matrix_all_nh)[1]) * 100, digits =
             digit)
@@ -290,12 +319,12 @@ RRTest <- function(phenList,
   #3) ##### ALL two rows: High, Normal/Low #####
   count_matrix_all_nl <- matrix(0, 2, 2)
   ES_matrix_all_nl <- matrix(0, 2, 3)
-  count_matrix_all_nl[1, 1] <- countsHigh_control_all
+  count_matrix_all_nl[1, 1] <- countsHigh_control_all1
   count_matrix_all_nl[2, 1] <-
-    countsNormal_control_all + countsLow_control_all
-  count_matrix_all_nl[1, 2] <- countsHigh_mutant_all
+    countsNormal_control_all1 + countsLow_control_all1
+  count_matrix_all_nl[1, 2] <- countsHigh_mutant_all1
   count_matrix_all_nl[2, 2] <-
-    countsNormal_mutant_all + countsLow_mutant_all
+    countsNormal_mutant_all1 + countsLow_mutant_all1
   ES_matrix_all_nl[1, 1] <-
     round((count_matrix_all_nl[1, 1] / colSums(count_matrix_all_nl)[1]) * 100, digits =
             digit)
