@@ -229,10 +229,10 @@ MergeLevels = function(x                         ,
   if (report && !is.null(note)) {
     write(
       paste(
-        Sys.time()              ,
-        parameter_stable_id     ,
-        note                    ,
-        sep      = fileColumnSep,
+        Sys.time()                   ,
+        parameter_stable_id          ,
+        paste(note, collapse = ', ') ,
+        sep      = fileColumnSep     ,
         collapse = fileColumnSep
       ),
       file = reportFileName,
