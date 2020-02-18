@@ -41,10 +41,10 @@ OpenStatsReportRR =	function(object)
 	VsplitLowLateMale  = Vsplit[[pastedot(low , 'Male', 'Late')]]
 	VsplitHigLateMale  = Vsplit[[pastedot(high, 'Male', 'Late')]]
 	###
-	GenotypeDiscLabel  = 'Data is discritised by Genotype levels'
-	SexDiscLabel       = 'Data is first split by Sex levels then discritised by Genotype levels'
-	LifeStageDiscLabel = 'Data is first split by LifeStage levels then discritised by Genotype levels'
-	LifeStageSexDiscLabel = 'Data is first split by LifeStage-Sex levels then discritised by Genotype levels'
+	GenotypeDiscLabel  = 'Data is discritised by `Genotype` levels'
+	SexDiscLabel       = 'Data is first split by `Sex` levels then discritised by `Genotype` levels'
+	LifeStageDiscLabel = 'Data is first split by `LifeStage` levels then discritised by `Genotype` levels'
+	LifeStageSexDiscLabel = 'Data is first split by `LifeStage-Sex` levels then discritised by `Genotype` levels'
 	#####################################################################
 	x                = object$input$data
 	columnOfInterest = x[, c(depVariable)]
