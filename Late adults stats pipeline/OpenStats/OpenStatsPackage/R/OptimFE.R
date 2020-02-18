@@ -37,6 +37,9 @@ crunner = function(object              ,
 		data        = data        ,
 		responseIsTheFirst = TRUE
 	)
+	missingInVariable(fixed = newFormula,
+										data  = data      ,
+										threshold = 50)
 	####
 	allTerms    = all_vars0(newFormula)
 	if (length(allTerms) < 2) {

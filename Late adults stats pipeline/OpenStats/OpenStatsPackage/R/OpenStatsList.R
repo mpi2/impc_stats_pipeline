@@ -193,11 +193,13 @@ OpenStatsList0 =
 				dataset = subset(dataset,
 												 dataset$Genotype %in% c(testGenotype, refGenotype))
 				message0(
-					"Dataset has been cleaned to only keep the `Genotype` values: \n\t",
-					pasteComma(testGenotype,
-										 refGenotype,
-										 replaceNull = TRUE,
-										 sep = ',\n\t')
+					"Dataset has been cleaned to only keep the `Genotype` values: \n\t  ",
+					pasteComma(numberingX(c(
+						testGenotype,
+						refGenotype
+					)),
+					replaceNull = TRUE,
+					sep = ',\n\t  ')
 				)
 			}
 			# NULL is ignored as it is checked below (avoid double messages)
