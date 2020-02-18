@@ -755,7 +755,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       }
                       # Equation type
                       equationType = ifelse(
-                        CheckIfNameExistInDataFrame(a@datasetPL, 'Weight'),
+                        CheckIfNameExistInDataFrame(a@datasetPL, 'Weight') &&
+                          MissingPercent(var = 'Weight', data = a@datasetPL) <= .2,
                         getEquation(var = parameter,
                                     equationMap = equationmap),
                         'withoutWeight'

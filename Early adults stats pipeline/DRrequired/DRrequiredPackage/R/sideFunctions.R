@@ -4186,3 +4186,20 @@ TransformVariableByFunction = function(varType = NULL ,
   }
   return(data)
 }
+
+MissingPercent = function(var = NULL, data = NULL) {
+  MissPercent = 1
+  if (length(var) > 0  &&
+      !is.null(data)   &&
+      nrow(data) > 0   &&
+      var %in% names(data)) {
+    MissPercent = sum(is.na(data[, var])) / length(data[, var])
+    message0('The percentage of missings in variable `',
+             var,
+             '`: ',
+             round(MissPercent * 100),
+             '%')
+  }
+  return(MissPercent)
+}
+
