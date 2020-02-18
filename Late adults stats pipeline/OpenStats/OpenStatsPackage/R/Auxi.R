@@ -926,9 +926,10 @@ RandomEffectCheck = function(formula, data) {
 		return(formula)
 	}
 }
-ModelChecks = function(fixed,
-											 data,
-											 checks = c(0, 0, 0),
+
+ModelChecks = function(fixed                 ,
+											 data                  ,
+											 checks = c(0, 0, 0)   ,
 											 responseIsTheFirst = TRUE) {
 	if (length(checks) != 3) {
 		message0('"checks" must be a vector of 3 values. Example c(1,1,1) or c(1,1,0) or c(0,0,0)')
@@ -945,7 +946,54 @@ ModelChecks = function(fixed,
 			fixed = ComplementaryFeasibleTermsInContFormula(formula = fixed, data = data)
 		message0('\tChecked model: ', printformula(fixed))
 	}
+	fixed = missingInVariable(fixed = fixed,
+														data = data,
+														threshold = 50)
 	return(fixed)
+}
+
+missingInVariable = function(fixed = NULL,
+														 data  = NULL,
+														 threshold = 50) {
+	message0('Check missings in progress ...')
+	if (is.null(data) || nrow(data) < 1) {
+		message0('\tNo data at all')
+		return(fixed)
+	}
+	if (is.null(fixed) || length(all_vars0(fixed)) < 1) {
+		message0('\tNo formula imported')
+		return(fixed)
+	}
+	vars = all_vars0(fixed)
+	if (length(vars) < 1 || all(!vars %in% names(data))) {
+		message0('\tVariables in the formula do not exist in the input data')
+		return(fixed)
+	}
+	newVars = vars[vars %in% names(data)]
+	lapply(newVars, function(v) {
+		MissingCounterFunction(v         = v   ,
+													 data      = data,
+													 threshold = threshold)
+	})
+	return(fixed)
+}
+
+MissingCounterFunction =  function(v, data, threshold) {
+	if (length(data[, v]) < 1)
+		return(NULL)
+	missingPercentage = round(sum(is.na(data[, v])) / length(data[, v]) * 100)
+	message0(
+		'\t Missings in variable `',
+		v,
+		'`: ',
+		missingPercentage,
+		ifelse(
+			length(threshold)   > 0 &&
+				missingPercentage > threshold,
+			paste0('% [more than ', threshold, '% of the data]'),
+			'%'
+		)
+	)
 }
 
 termInTheModel = function(model, term, message = FALSE) {
@@ -3607,20 +3655,26 @@ checkSummary = function(dataset, var, numbering = TRUE,  ...) {
 			length (na.omit(dataset[, var])) < 1)
 		return(lvls)
 	
-	if (is.factor(dataset[, var]) || is.character(dataset[, var]))
+	MissingPercent = round(sum(is.na(dataset[, var])) / length(dataset[, var]) * 100)
+	MissingNote    = ifelse(
+		length(MissingPercent) > 0 && MissingPercent > 50      ,
+		paste0(MissingPercent , '% [Alert! Too many missings]'),
+		paste0(MissingPercent , '%')
+	)
+	if (is.factor(dataset[, var]) || is.character(dataset[, var])) {
 		lvls = paste0(
 			'\t Levels (Total levels = ',
 			nlevels(as.factor(dataset[, var])),
 			', missings = ',
-			round(sum(is.na(dataset[, var])) / length(dataset[, var]) * 100),
-			'%): \n\t  ',
+			MissingNote    ,
+			'): \n\t  '    ,
 			pasteComma(
-				LevelsAsFacNumbered(dataset[, var], numbering = numbering), 
+				LevelsAsFacNumbered(dataset[, var], numbering = numbering),
 				width = 250,
 				sep = '\n\t  '
 			)
 		)
-	else
+	} else{
 		lvls = paste0(
 			'\t Summary:\n',
 			'\t  mean      = ',
@@ -3628,9 +3682,9 @@ checkSummary = function(dataset, var, numbering = TRUE,  ...) {
 			'\n\t  sd        = ',
 			sd0(dataset[, var], na.rm = TRUE),
 			'\n\t  Missings  = ',
-			round(sum(is.na(dataset[, var])) / length(dataset[, var]) * 100),
-			'%'
+			MissingNote
 		)
+	}
 	message0(lvls)
 	return(invisible(lvls))
 }
