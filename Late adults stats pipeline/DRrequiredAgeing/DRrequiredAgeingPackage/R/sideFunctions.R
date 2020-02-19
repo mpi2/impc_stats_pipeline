@@ -238,7 +238,8 @@ MergeLevels = function(x                         ,
       file = reportFileName,
       append = ifelse(file.exists(reportFileName),
                       TRUE                       ,
-                      FALSE)
+                      FALSE)                     ,
+      ncolumns = 3500
     )
   }
   return(list(x = x, note = if (is.null(note)) {
