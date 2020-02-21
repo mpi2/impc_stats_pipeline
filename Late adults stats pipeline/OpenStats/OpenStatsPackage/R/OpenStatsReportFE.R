@@ -79,7 +79,8 @@ OpenStatsReportCat =	function(object)
 			'Overall'            =  extractFisherSubTableResults(objRes$Genotype$result)       ,
 			'Sex FvKO p-value'   =	extractFisherSubTableResults(objRes$Genotype_Female$result),
 			'Sex MvKO p-value'   =  extractFisherSubTableResults(objRes$Genotype_Male$result)  ,
-			'Sexual dimorphism detected' = 'Sex specific results are always reported'
+			'Sexual dimorphism detected' = list('Criteria' = TRUE, 
+																					'Note'     = 'Sex specific results are always reported.')
 		),
 		'Genotype estimate'           = lapply0(objRes$Genotype$result, CatEstimateAndCI)     ,
 		'Genotype standard error'     = NULL,

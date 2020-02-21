@@ -236,17 +236,20 @@ M.opt = function(object = NULL            ,
 		if (optimise[3] && Batch_exist && !(mdl %in% 'glm')) {
 			message0('Testing Batch ... ')
 			G.Model =  tryCatch(
-				expr = do.call(
-					'gls',
-					args        = list(
-						model     = formula(F.Model)    ,
-						data      = data                ,
-						na.action = na.omit             ,
-						method    = "REML"                ,
-						weights   = F.Model$call$weights,
-						control   = gCont
-					)
-				),
+				expr = do.call('gls', args =
+											 	listFun(
+											 		list = list(
+											 			model     = formula(F.Model)    ,
+											 			data      = data                ,
+											 			na.action = na.omit             ,
+											 			method    = 'REML'              ,
+											 			weights   = F.Model$call$weights,
+											 			control   = gCont               ,
+											 			...
+											 		),
+											 		FUN = 'gls',
+											 		debug = FALSE
+											 	)),
 				warning = function(war) {
 					message0('* Testing Batch failed with the warning (see below): ')
 					message0('\t', war, breakLine = FALSE)

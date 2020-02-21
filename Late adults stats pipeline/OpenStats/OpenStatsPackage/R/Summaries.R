@@ -80,7 +80,7 @@ summaryCore = function(x,
 		'Tested Gene'                    = vo$`Gp2 genotype`,
 		'Reference Gene'                 = vo$`Gp1 genotype`,
 		'............................'   = '............................',
-		'Sexual dimorphism detected?'    = vo$`Genotype contribution`$`Sexual dimorphism detected`,
+		'Sexual dimorphism detected?'    = pasteComma(vo$`Genotype contribution`$`Sexual dimorphism detected`),
 		'............................'   = ifelse(
 			procedure == 'RR',
 			'* Separate p-values for (Low vs NormalHigh), (LowNormal vs High) and details ',

@@ -7,6 +7,7 @@ OpenStatsReportCont =	function(object,
 	Labels         = OpenStatsListLevels(object = object)
 	Fmodel         = object$output$Final.Model
 	frm            = formula(Fmodel)
+	fim            = object$input$fixed
 	depVariable    = all_vars0(frm)[1]
 	equation       = ifelse(
 		Labels$Weight %in% all_vars0(frm),
@@ -88,6 +89,23 @@ OpenStatsReportCont =	function(object,
 	} else{
 		pcO
 	}
+	SexDymFinalModel = TermInFormulaReturn(
+		active = TRUE,
+		formula = frm,
+		term = CombineLevels(Labels$Genotype$Genotype, Labels$Sex$Sex, debug = debug),
+		return = TRUE,
+		not = FALSE,
+		debug = debug
+	)
+	SexDymInputModel = TermInFormulaReturn(
+		active = TRUE,
+		formula = fim,
+		term = CombineLevels(Labels$Genotype$Genotype, Labels$Sex$Sex, debug = debug),
+		return = TRUE,
+		not = FALSE,
+		debug = debug
+	)
+	
 	#####################################################################
 	OpenStatsReportMM0      = list(
 		'Applied method'                       = 	paste0(framework, ", ", fittingMethod, ', ', format(equation)),
@@ -156,13 +174,15 @@ OpenStatsReportCont =	function(object,
 				),
 				debug = debug
 			),
-			'Sexual dimorphism detected' = TermInFormulaReturn(
-				active = TRUE,
-				formula = frm,
-				term = CombineLevels(Labels$Genotype$Genotype,Labels$Sex$Sex,debug = debug),
-				return = TRUE,
-				not = FALSE,
-				debug = debug
+			'Sexual dimorphism detected' = list(
+				'Criteria' = SexDymFinalModel              ,
+				'Note'     = paste0(
+					'Genotype-Sex interaction '              ,
+					ifelse(SexDymInputModel	,	'is',	'is not'),
+					' part of the input '                    ,
+					ifelse(SexDymFinalModel,	'(it is part of the final)',	'(it is not part of the final)'),
+					' model. '
+				)
 			)
 		),
 		'Genotype estimate' =

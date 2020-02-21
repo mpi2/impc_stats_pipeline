@@ -136,7 +136,8 @@ OpenStatsReportRR =	function(object)
 				extractFisherSubTableResults1(VsplitHigMale$Genotype$result),
 				'Details' = SexDiscLabel
 			),
-			'Sexual dimorphism detected' = 'Sex specific results for Low/High tables are always reported'
+			'Sexual dimorphism detected' = list('Criteria' = TRUE, 
+																					'Note'     = 'Sex specific results for Low/High tables are always reported.')
 		),
 		'Genotype estimate'           = lowHighList(
 			lapply1(VsplitLow$Genotype$result, CatEstimateAndCI),
