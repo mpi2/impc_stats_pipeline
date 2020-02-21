@@ -4204,3 +4204,34 @@ MissingPercent = function(var = NULL, data = NULL) {
   return(MissPercent)
 }
 
+
+EnoughWeightForTheSexGenInteraction = function(df,
+                                               cols = c('Sex'          ,
+                                                        'Genotype')    ,
+                                               weightCol = 'Weight'    ,
+                                               thresh    = 4) {
+  if (is.null(df) || nrow(df) < 1)
+    return(FALSE)
+  if (!weightCol %in% names(df) || all(!cols %in% names(df)))
+    return(FALSE)
+
+  GSinter = tapply(X = df[, weightCol], INDEX = interaction(df[, cols[cols %in% names(df)]]), function(x) {
+    length(na.omit(x))
+  }, default = 0)
+
+  if (min(GSinter) < thresh) {
+    message0(
+      'Less than ',
+      thresh,
+      ' sample in the ',
+      paste(cols, collapse = '-'),
+      ' table for ',
+      weightCol,
+      '\n\t ~~> min = ',
+      min(GSinter)
+    )
+    return(FALSE)
+  } else{
+    return(TRUE)
+  }
+}
