@@ -749,15 +749,16 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       }
                       # Equation type
                       equationType = ifelse(
-                        CheckIfNameExistInDataFrame(a@datasetPL, 'Weight') &&
-                          MissingPercent(var = 'Weight', data = a@datasetPL) <= .2,
+                        CheckIfNameExistInDataFrame(a@datasetPL, 'Weight')        &&
+                          MissingPercent(var = 'Weight', data = a@datasetPL) <= .2 &&
+                          EnoughWeightForTheSexGenInteraction(a@datasetPL),
                         getEquation(var = parameter,
                                     equationMap = equationmap),
                         'withoutWeight'
                       )
                       # This is the main engine!
                       note = c(note, list(
-                        'Bodyweight initially included in the model' = ifelse(method %in% 'MM', equationType, FALSE)
+                        'Bodyweight initially included in the full model' = ifelse(method %in% 'MM', equationType, FALSE)
                       ))
                       if (normalisedPhenlist){
                         a = normalisePhenList(phenlist = a, colnames = c(depVar, 'Weight'))
