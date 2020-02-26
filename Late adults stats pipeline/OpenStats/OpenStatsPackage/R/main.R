@@ -20,7 +20,7 @@ OpenStatsAnalysis = function(OpenStatsListObject   = NULL          ,
 														 else
 														 	varIdent(form =  ~ 1 |	Genotype)            ,
 														 MM_direction = 'both'                         ,
-														 MM_checks    = c(TRUE, TRUE, TRUE)            ,
+														 MM_checks    = c(TRUE, TRUE, TRUE, TRUE)      ,
 														 MM_optimise  = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE),
 														 ### FE or RR
 														 FE_formula = category   ~ Genotype + Sex + LifeStage,

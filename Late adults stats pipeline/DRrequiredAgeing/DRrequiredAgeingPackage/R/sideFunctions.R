@@ -2142,7 +2142,8 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            compressRawData = TRUE,
                                            ### 5
                                            methodmap  ) {
-  message0('Extra columns in the strored data: ', paste(colnames, sep = ', '))
+  message0('Extra columns in the stored data: ',
+           paste(colnames, sep = ', ', collapse = ', '))
   if (storeRawData    &&
       activeWindowing &&
       !NullOrError(c.ww0$WindowedObj) &&

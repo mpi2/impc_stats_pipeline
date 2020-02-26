@@ -39,7 +39,7 @@ OpenStatsAnalysis(
 		varIdent(form = ~ 1 |
 						 	Genotype),
 	MM_direction = "both",
-	MM_checks    = c(TRUE, TRUE, TRUE)                     ,
+	MM_checks    = c(TRUE, TRUE, TRUE, TRUE)               ,
 	MM_optimise  = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)   ,
 	FE_formula   = category ~   Genotype + Sex + LifeStage ,
 	RR_formula   = data_point ~ Genotype + Sex + LifeStage ,
@@ -81,7 +81,7 @@ OpenStatsAnalysis(
 	Only applies to the "MM" framework. Select from  "both" (for stepwise optimisation), "backward" (for backward elimination) or "forward" (for forward selection) for the optimisation algorithm. The default is "both".
 	}
   \item{MM_checks}{
-	Only applies to the "MM" framework. A vector of three 1/0 or TRUE/FALSE values such as c(TRUE, TRUE, TRUE). The first element of the vector activates checks on the model terms (See MM_fixed) to be existed in data. The second term removes any single level factor from the model (in MM_fixed). The third element checks the interaction term to make sure all interactions have some data attached to them. Caution is needed for the third element of the `check` as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(TRUE, TRUE, TRUE).\cr
+	Only applies to the "MM" framework. A vector of four 1/0 or TRUE/FALSE values such as c(TRUE, TRUE, TRUE, TRUE)[default]. Performing pre checks on the input model for some known scenarios. The first element of the vector activates checks on the model terms (See MM_fixed) to be existed in data. The second term removes any single level -factor- from the model (in MM_fixed). The thirs term removes the single value (such as a column of constants/no variation) from the -continuous- terms in the model (in MM_fixed). The Fourth element checks the interaction term to make sure all interactions have some data attached. Caution is needed for the fourth element of the `check` as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(TRUE, TRUE, TRUE, TRUE) that is all checks perform.\cr
 	
 	* Note that the function removed duplicated columns in the dataset prior to applying the lme/gls.\cr
 	* Regardless of the `check`, the function always checks for the existence of the `MM_random` terms in the input data

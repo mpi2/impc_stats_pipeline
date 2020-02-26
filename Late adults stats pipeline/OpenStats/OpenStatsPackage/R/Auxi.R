@@ -929,20 +929,22 @@ RandomEffectCheck = function(formula, data) {
 
 ModelChecks = function(fixed                 ,
 											 data                  ,
-											 checks = c(0, 0, 0)   ,
+											 checks = c(0, 0, 0, 0)   ,
 											 responseIsTheFirst = TRUE) {
-	if (length(checks) != 3) {
-		message0('"checks" must be a vector of 3 values. Example c(1,1,1) or c(1,1,0) or c(0,0,0)')
+	if (length(checks) != 4) {
+		message0('"checks" must be a vector of 4 0/1 TRUE/FALSE values. Example c(1,1,1,1) or c(1,1,1,0) or c(0,0,0,0)')
 		return(fixed)
 	}
 	if (any(checks > 0)) {
 		if (checks[1])
-			fixed  = checkModelTermsInData(formula = fixed,
-																		 data = data,
+			fixed  = checkModelTermsInData(formula  = fixed ,
+																		 data     = data  ,
 																		 responseIsTheFirst = TRUE)
 		if (checks[2])
 			fixed = removeSingleLevelFactors(formula = fixed, data = data)
 		if (checks[3])
+			fixed = removeSingleValueContinuousVariables(formula = fixed, data = data)
+		if (checks[4])
 			fixed = ComplementaryFeasibleTermsInContFormula(formula = fixed, data = data)
 		message0('\tChecked model: ', printformula(fixed))
 	}
@@ -2612,7 +2614,7 @@ removeSingleLevelFactors = function(formula, data) {
 		}) <= 1]
 		if (length(FactsThatMustBeRemoved)) {
 			message0(
-				'The following terms from the model are removed because they only contain one level: ',
+				'The below terms from the model are removed because they only contain one level:\n\t ',
 				pasteComma(
 					FactsThatMustBeRemoved,
 					replaceNull = FALSE,
@@ -2622,6 +2624,33 @@ removeSingleLevelFactors = function(formula, data) {
 			formula = update.formula(formula,
 															 reformulate0(
 															 	termlabels = c('.', FactsThatMustBeRemoved),
+															 	response   = NULL,
+															 	intercept  = TRUE,
+															 	sep        = '-'
+															 ))
+		}
+	}
+	return(formula)
+}
+
+removeSingleValueContinuousVariables = function(formula, data) {
+	cont    = all_vars0(formula)[sapply(data[, all_vars0(formula)], is.numeric)]
+	if (length(cont)) {
+		VarsThatMustBeRemoved = cont[lapply(data[, cont, drop = FALSE], function(x) {
+			length(unique(na.omit(x)))
+		}) <= 1]
+		if (length(VarsThatMustBeRemoved)) {
+			message0(
+				'The below terms from the model are removed because they do not have any variation:\n\t ',
+				pasteComma(
+					VarsThatMustBeRemoved,
+					replaceNull = FALSE,
+					truncate    = FALSE
+				)
+			)
+			formula = update.formula(formula,
+															 reformulate0(
+															 	termlabels = c('.', VarsThatMustBeRemoved),
 															 	response   = NULL,
 															 	intercept  = TRUE,
 															 	sep        = '-'

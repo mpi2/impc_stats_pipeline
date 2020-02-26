@@ -2302,7 +2302,8 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            compressRawData = TRUE,
                                            ### 5
                                            methodmap  ) {
-  message0('Extra columns in the strored data: ',paste(colnames,sep = ', '))
+  message0('Extra columns in the strored data: ',
+           paste(colnames, sep = ', ', collapse = ', '))
   if (storeRawData            &&
       isS4(c.ww0$InputObject) &&
       isS4(c.ww0$WindowedObj$value) &&

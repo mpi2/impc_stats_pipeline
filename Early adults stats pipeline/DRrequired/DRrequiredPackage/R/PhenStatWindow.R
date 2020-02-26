@@ -349,6 +349,9 @@ PhenStatWindow = function (phenlistObject                                ,
     save(agg,
          file = SupDebFile)
   }
+  message0('Running GC() ....')
+  gc()
+  message0('End of the core process ....')
   return(
     list(
       InputObject     = phenlistObject,

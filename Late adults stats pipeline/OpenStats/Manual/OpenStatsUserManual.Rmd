@@ -190,11 +190,13 @@ Setting the fixed and/or random effect as well as weight effect is enough to run
 OpenStats checks the input model and the data for the erroneous scenarios listed below
 
 1. The model terms (`MM_fixed`/`MM_random`) does not exist in the input data. 
-2. OpenStats removes any single level factor from the fixed-effect model (`MM_fixed`). 
-3. OpenStats checks the interaction term to make sure all interactions have some data attached to.
-4. OpenStats removes duplicated columns in the dataset before applying the model.
+2. OpenStats removes any single level factor from the fixed-effect model (`MM_fixed`). Example, Sex with only Female values
+3. OpenStats removes any single value (no variation) term from the fixed-effect model (`MM_fixed`). Example, the same value for the Age covariate
+4. OpenStats checks the interaction term to make sure all interactions have some data attached. Example, no value in Female.Control 
+5. OpenStats removes duplicated columns in the dataset before applying the model. Example, two variables have the same values
+6. OpenStats reports the missings in the model terms and alerts when more than 50% missings detected. Note that OpenStats does not do more except notifying the user. The missings must be handled before the analysis.
 
-One can turn the checks 1-3 on/off by setting TRUE/FALSE in the `MM_checks` argument of the `OpenStatsAnalysis` function.
+One can turn the checks 1-4 on/off by setting TRUE/FALSE in the `MM_checks` argument of the `OpenStatsAnalysis` function.
 
 
 #### Model optimisation and `MM_optimise`

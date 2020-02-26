@@ -67,7 +67,7 @@ PhenStatWindow = function (phenlistObject                                ,
       as.formula('~ 1 | external_sample_id')
     else
       as.formula('~ 1 | external_sample_id/Batch')
-    CorrEffect  = nlme::corAR1() #corSymm()
+    CorrEffect  = nlme::corAR1(form = RandEffTerm) #corSymm()
     # windowing does not apply to time series
     message0('Time series detected! Windowing does not apply to the time series ...')
     windowing = FALSE
@@ -362,6 +362,8 @@ PhenStatWindow = function (phenlistObject                                ,
     save(agg,
          file = SupDebFile)
   }
+  message0('Running GC() ....')
+  gc()
   message0('End of the core process ....')
   return(
     outputList

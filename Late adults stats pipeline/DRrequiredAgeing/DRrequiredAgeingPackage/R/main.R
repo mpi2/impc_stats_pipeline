@@ -49,6 +49,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       storeplot = TRUE                     ,
                       virtualDrive   = FALSE               ,
                       checkNamesForMissingColNames = TRUE  ,
+                      # Just for the OpenStats manuscript
+                      measureExecutionTime   = FALSE       ,
                       # Raw data
                       storeRawData           = TRUE        ,
                       compressRawData        = TRUE        ,
@@ -356,7 +358,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   .verbose = verbose                        ,
                   .inorder = inorder
                 ) %activemulticore% {
-                  # for (i in  1:length(colonys)){
+                #for (i in  1:length(colonys)){
                   message0('*~*~*~*~*~* ', i, '|', length(colonys), ' *~*~*~*~*~*')
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
@@ -387,8 +389,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     # Define response column [do not move me!]
                     depVariable = getResponseColumn(n3.5$observation_type)
                     ################must be removed later
-                    if(depVariable$lbl %in% 'time_series')
-                      return(NULL)
+                    # if(depVariable$lbl %in% 'time_series')
+                    #   return(NULL)
                     ################
 
                     n3.5 = TransformVariableByFunction(
@@ -973,17 +975,20 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
         }
       }
       RecordSpentTime(
-        timeSt = StrtimePar,
-        dirName = 'OpenStatsParameterTime',
-        fileName = c(procedure, parameter),
-        rnd = initialRandomValue
+        timeSt    = StrtimePar                ,
+        dirName   = 'OpenStatsParameterTime'  ,
+        fileName  = c(procedure, parameter)   ,
+        rnd       = initialRandomValue        ,
+        active    = measureExecutionTime
       )
     }
     RecordSpentTime(
-      timeSt = StrtimePro,
-      dirName = 'OpenStatsProcedureTime',
-      fileName = procedure,
-      rnd = initialRandomValue
+      timeSt    = StrtimePro              ,
+      dirName   = 'OpenStatsProcedureTime',
+      fileName  = procedure               ,
+      rnd       = initialRandomValue      ,
+      active    = measureExecutionTime
+
     )
   }
   message0('Closing Connections ...')
