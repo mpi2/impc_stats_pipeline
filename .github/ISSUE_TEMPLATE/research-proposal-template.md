@@ -13,14 +13,14 @@ assignees: ''
 - WG/Individual/paper
 
 # Members involved in this project
-  [ ] @hamed
-  [ ] @others
+  - [ ] @hamed
+  - [ ] @others
 
 # Project estimated time (day/week/month)
 
 # Project completed steps
- [x] data collection
- [ ] etc...
+ - [x] data collection
+ - [ ] etc...
 
 # Project requirement
 - Solr/XML/DB data
