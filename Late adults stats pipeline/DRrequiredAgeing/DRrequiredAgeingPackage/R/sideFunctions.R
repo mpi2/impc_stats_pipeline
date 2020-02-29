@@ -158,8 +158,8 @@ sortDataset = function(x = NULL, BatchCol = NULL) {
 # Automatic select the corresponding column for the type of data (only for category and data_point)
 getResponseColumn = function(x, activate = TRUE) {
   if (activate) {
-    if (length(x) > 0) {
-      lbl      = unique(x)
+    if (length(na.omit(x)) > 0) {
+      lbl      = unique(na.omit(x))
       column   = paste(lbl, collapse = '-', sep = '-')
       accepted = TRUE
 
@@ -168,8 +168,10 @@ getResponseColumn = function(x, activate = TRUE) {
 
       if (lbl %in% 'categorical')
         column = 'category'
-      else if (lbl %in% c('unidimensional','time_series'))
+      else if (lbl %in% c('unidimensional', 'time_series'))
         column = 'data_point'
+      else if (lbl %in% 'text')
+        column =  'text_value'
       else
         accepted = FALSE
     } else{
