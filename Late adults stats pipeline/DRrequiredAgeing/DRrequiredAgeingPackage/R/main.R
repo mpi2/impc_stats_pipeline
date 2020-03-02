@@ -450,7 +450,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       SexGenResLevels = 4
                     }
                     if (!depVariable$accepted) {
-                      write(paste(ReadMeTxt, sep = '\t', collapse = '\t'), file = 'NotProcessedFileImproperDataType.log')
+                      write(paste(ReadMeTxt, sep = '\t', collapse = '\t'),
+                            file = 'NotProcessedFileImproperDataType.log',
+                            append = TRUE)
                       return('Not a proper dataset!')
                     }
 

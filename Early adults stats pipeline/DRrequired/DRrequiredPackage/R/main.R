@@ -445,10 +445,11 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       SexGenResLevels = 4
                     }
                     if (!depVariable$accepted) {
-                      write(paste(ReadMeTxt, sep = '\t', collapse = '\t'), file = 'NotProcessedFileImproperDataType.log')
+                      write(paste(ReadMeTxt, sep = '\t', collapse = '\t'),
+                            file = 'NotProcessedFileImproperDataType.log',
+                            append = TRUE)
                       return('Not a proper dataset!')
                     }
-
                     if (simulation && is.numeric(n3.5[, depVar])) {
                       message0('Simulation in progress ... Round ',
                                sim.index)
