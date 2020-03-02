@@ -358,7 +358,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                   .verbose = verbose                        ,
                   .inorder = inorder
                 ) %activemulticore% {
-                #for (i in  1:length(colonys)){
+                # for (i in  1:length(colonys)){
                   message0('*~*~*~*~*~* ', i, '|', length(colonys), ' *~*~*~*~*~*')
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
@@ -426,14 +426,17 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       is.ABR(x = parameter),
                       as.numeric(initial$min_ABR_mut_each_sex),
                       ifelse(
-                        is.numeric(n3.5[, depVar]),
+                        nrow(n3.5) > 0            &&
+                          depVar %in% names(n3.5) &&
+                          is.numeric(n3.5[, depVar]),
                         as.numeric(initial$min_num_mut_each_sex),
                         0
                       )
                     )
 
                     # add missing levels to categorical variables
-                    if (!is.numeric(n3.5[, depVar])) {
+                    if (depVar %in% names(n3.5) &&
+                        !is.numeric(n3.5[, depVar])) {
                       AllLevels = mapLevelsToFactor(levels = levels(n3.5[, depVar]),
                                                     newlevels = FactorLevels$levels)
                       levels(n3.5[, depVar]) = AllLevels$levels
@@ -446,8 +449,10 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     } else{
                       SexGenResLevels = 4
                     }
-                    if (!depVariable$accepted)
+                    if (!depVariable$accepted) {
+                      write(paste(ReadMeTxt, sep = '\t', collapse = '\t'), file = 'NotProcessedFileImproperDataType.log')
                       return('Not a proper dataset!')
+                    }
 
                     if (simulation && is.numeric(n3.5[, depVar])) {
                       message0('Simulation in progress ... Round ',

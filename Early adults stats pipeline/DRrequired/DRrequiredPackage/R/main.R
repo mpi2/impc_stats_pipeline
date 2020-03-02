@@ -421,6 +421,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                       is.ABR(x = parameter),
                       as.numeric(initial$min_ABR_mut_each_sex),
                       ifelse(
+                        nrow(n3.5) > 0            &&
+                        depVar %in% names(n3.5)   &&
                         is.numeric(n3.5[, depVar]),
                         as.numeric(initial$min_num_mut_each_sex),
                         0
@@ -428,7 +430,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     )
 
                     # add missing levels to categorical variables
-                    if (!is.numeric(n3.5[, depVar])) {
+                    if (depVar %in% names(n3.5) &&
+                        !is.numeric(n3.5[, depVar])) {
                       AllLevels = mapLevelsToFactor(levels = levels(n3.5[, depVar]),
                                                     newlevels = FactorLevels$levels)
                       levels(n3.5[, depVar]) = AllLevels$levels
@@ -441,8 +444,10 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     } else{
                       SexGenResLevels = 4
                     }
-                    if (!depVariable$accepted)
+                    if (!depVariable$accepted) {
+                      write(paste(ReadMeTxt, sep = '\t', collapse = '\t'), file = 'NotProcessedFileImproperDataType.log')
                       return('Not a proper dataset!')
+                    }
 
                     if (simulation && is.numeric(n3.5[, depVar])) {
                       message0('Simulation in progress ... Round ',
