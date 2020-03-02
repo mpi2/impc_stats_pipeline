@@ -1,5 +1,5 @@
 # all in small case and separated by underscore
-SuccessfulOutput = function(args, writeOutputToDB = FALSE) {
+SuccessfulOutput = function(args, writeOutputToDB = FALSE,b64Encode = TRUE,plainOutput = FALSE) {
   requireNamespace("DBI")
   ### 1 Experiment detail
   experiment_details      = list(
@@ -10,22 +10,22 @@ SuccessfulOutput = function(args, writeOutputToDB = FALSE) {
       'Failed',
       'Successful'
     )                                                                                            , #1
-    procedure_group       = args$procedure                                                       , #2
+    procedure_group       = UniqueAndNNull(args$procedure,removeSpecials = FALSE)                , #2
     procedure_stable_id   = UniqueAndNNull(args$n3.5$procedure_stable_id,removeSpecials = FALSE) , #3
     procedure_name        = UniqueAndNNull(args$n3.5$procedure_name,removeSpecials = FALSE)      , #4
-    parameter_stable_id   = args$parameter                                                       , #5
+    parameter_stable_id   = UniqueAndNNull(args$parameter, removeSpecials = FALSE)               , #5
     parameter_name        = UniqueAndNNull(args$n3.5$parameter_name,removeSpecials = FALSE)      , #6
-    phenotyping_center    = args$center                                                          , #7
+    phenotyping_center    = UniqueAndNNull(args$center, removeSpecials = FALSE)                  , #7
     allele_symbol         = UniqueAndNNull(args$n3.5$allele_symbol,removeSpecials = FALSE)       , #8
     allele_accession_id   = UniqueAndNNull(args$n3.5$allele_accession_id,removeSpecials = FALSE) , #9
     gene_symbol           = UniqueAndNNull(args$n3.5$gene_symbol,removeSpecials = FALSE)         , #10
     gene_accession_id     = UniqueAndNNull(args$n3.5$gene_accession_id,removeSpecials = FALSE)   , #11
     pipeline_name         = UniqueAndNNull(args$n3.5$pipeline_name,removeSpecials = FALSE)       , #12
     pipeline_stable_id    = UniqueAndNNull(args$n3.5$pipeline_stable_id,removeSpecials = FALSE)  , #13
-    strain_accession_id   = args$strain               , #14
-    metadata_group        = args$meta                 , #15
-    zygosity              = args$zyg                  , #16
-    colony_id             = args$colony                 #17
+    strain_accession_id   = UniqueAndNNull(args$strain,   removeSpecials = FALSE)                , #14
+    metadata_group        = UniqueAndNNull(args$meta  ,   removeSpecials = FALSE)                , #15
+    zygosity              = UniqueAndNNull(args$zyg   ,   removeSpecials = FALSE)                , #16
+    colony_id             = UniqueAndNNull(args$colony  , removeSpecials = FALSE)                 #17
   )
 
   ######## 2 JSON
@@ -35,14 +35,14 @@ SuccessfulOutput = function(args, writeOutputToDB = FALSE) {
   listVectorOutput              = list('Vector output' = args$c.ww.vec$list)
   FinalList                     = list('Result' = c(listVectorOutput, listDetails))
   JsonObj                      = FinalJson2ObjectCreator(FinalList = cleanNULLkeys(FinalList))
-
+  ####### Just to get names - useful in post processing data (like in pvalue extraction)
+  if (plainOutput)
+    return(experiment_details)
   ######## 2 CSV
-  outP =   c(
-    unlist(experiment_details),
+  outP =   c(unlist(experiment_details),
              base64(x =
                       JsonObj,
-           active = args$encode)
-  )
+                    active = b64Encode && args$encode))
 
   # Write to the SQLite DB
   if (writeOutputToDB)
