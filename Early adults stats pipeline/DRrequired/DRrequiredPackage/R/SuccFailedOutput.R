@@ -35,6 +35,7 @@ SuccessfulOutput = function(args, writeOutputToDB = FALSE,b64Encode = TRUE,plain
   listVectorOutput              = list('Vector output' = args$c.ww.vec$list)
   FinalList                     = list('Result' = c(listVectorOutput, listDetails))
   JsonObj                      = FinalJson2ObjectCreator(FinalList = cleanNULLkeys(FinalList))
+
   ####### Just to get names - useful in post processing data (like in pvalue extraction)
   if (plainOutput)
     return(experiment_details)

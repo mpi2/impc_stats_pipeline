@@ -388,6 +388,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                     # if(depVariable$lbl %in% 'time_series')
                     #   return(NULL)
                     ################
+
                     n3.5 = TransformVariableByFunction(
                       varType = depVariable$lbl,
                       data = n3.5,
@@ -450,6 +451,7 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                             append = TRUE)
                       return('Not a proper dataset!')
                     }
+
                     if (simulation && is.numeric(n3.5[, depVar])) {
                       message0('Simulation in progress ... Round ',
                                sim.index)
@@ -999,3 +1001,5 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   message0('Cleaning the meamory ...')
   gc()
 }
+
+
