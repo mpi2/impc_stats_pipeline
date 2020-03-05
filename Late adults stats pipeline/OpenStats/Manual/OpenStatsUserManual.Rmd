@@ -4,12 +4,18 @@ author: 'Hamed Haseli Mashhadi (hamedhm@ebi.ac.uk), '
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   html_document:
-    number_sections: yes
     css: style.css
-    toc: true
-    highlight: tango  
-    toc_depth: 5
+    highlight: tango
+    number_sections: yes
     pdf_document: default
+    toc: yes
+    toc_depth: 5
+  pdf_document:
+    toc: yes
+    toc_depth: '5'
+  word_document:
+    toc: yes
+    toc_depth: '5'
 ---
 
 ```{r setup, include=FALSE}
