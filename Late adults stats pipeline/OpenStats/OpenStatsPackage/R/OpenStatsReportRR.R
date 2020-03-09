@@ -85,9 +85,10 @@ OpenStatsReportRR =	function(object)
 			'Summary statistics'      = DSsize
 		),
 		Analysis = list(
-			'Model setting'          = extractFERRTerms(object),
-			'Is model optimised'     = NULL                    ,
-			'Multibatch in analysis' = MultiBatch              ,
+			'Model setting'                 = extractFERRTerms(object)          ,
+			'Implementation specification'  = RRextraDetailsExtractor(object)   ,
+			'Is model optimised'            = NULL                              ,
+			'Multibatch in analysis'        = MultiBatch                        ,
 			'Gender included in analysis' = GenderIncludedInAnalysis(x),
 			'Further models' = if (!is.null(Vsplit)) {
 				setNames(lapply0(Vsplit, function(v) {

@@ -2815,7 +2815,7 @@ extractFERRTerms = function(object) {
 	final$formula = printformula(RightFormula2LeftFormula(object$extra$Cleanedformula),
 															 message = FALSE)
 	out = list('Initial formula' = lnitial,
-						 'Final formula'   = final)
+						 'Final formula'   = final  )
 	
 	if (!is.null(object$input$RRprop))
 		out$'RR quantile' = unlist(object$input$RRprop)
@@ -3930,4 +3930,26 @@ MakeRRQuantileFromTheValue = function(x) {
 					 pasteComma(1 - x, x),
 					 ']\n\t Transformation: 1-(1-x)/2, (1-x)/2')
 	return(max(x, 1 - x, na.rm = TRUE))
+}
+
+RRextraDetailsExtractor = function(object,
+																	 sep = ' = ',
+																	 collapse = ', ') {
+	r = NULL
+	if (is.null(object) || 
+			!is.null(object$messages))
+		return(r)
+	
+	r = lapply(object$output$SplitModels, function(x) {
+		lapply(x, function(y) {
+			if (!is.null(y) && 'RRextra' %in% names (y)) {
+				y2 = unlist(y$RRextra)
+				if (is.null(y2))
+					return(NULL)
+				else
+					return(paste(names(y2), y2, sep = sep, collapse = collapse))
+			}
+		})
+	})
+	return(r)
 }

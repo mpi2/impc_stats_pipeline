@@ -42,7 +42,7 @@ OpenStatsReportCat =	function(object)
 			# 	input   = printformula(object$input$formula),
 			# 	final   = printformula(formula)
 			# ),
-			'Model setting' =  extractFERRTerms(object),
+			'Model setting' =  extractFERRTerms(object)                ,
 			'Is model optimised'     = NULL                            , 
 			'Multibatch in analysis' = MultiBatch                      ,
 			'Gender included in analysis' = GenderIncludedInAnalysis(x),
