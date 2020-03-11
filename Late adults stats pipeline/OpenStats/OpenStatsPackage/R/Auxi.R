@@ -983,7 +983,7 @@ missingInVariable = function(fixed = NULL,
 MissingCounterFunction =  function(v, data, threshold) {
 	if (length(data[, v]) < 1)
 		return(NULL)
-	missingPercentage = round(sum(is.na(data[, v])) / length(data[, v]) * 100)
+	missingPercentage = round(sum(is.na(data[, v])) / length(data[, v]) * 100, 2)
 	message0(
 		'\t Missings in variable `',
 		v,
@@ -2119,7 +2119,8 @@ RRCut = function(object                     ,
 								 depVarPrefix = NULL,
 								 right        = TRUE,
 								 refLevel     = NULL,
-								 lower        = 'Genotype'
+								 lower        = 'Genotype',
+								 decimal      = 8
 ) {
 	data     = object
 	if (class(data) %in% c('PhenList', 'OpenStatsList')) {
@@ -2196,8 +2197,11 @@ RRCut = function(object                     ,
 	)
 	###
 	tbc  = prop.table(table(controls$data_point_discretised))
-	tbpc = setNames(as.list(tbc),names(tbc))
-	message0('\tDetected percentile in the data: ',pasteComma(paste(names(tbc),'=',round(tbc,6))))
+	tbpc = setNames(as.list(tbc), names(tbc))
+	message0('\t Detected percentiles in the data (',
+					 decimal        ,
+					 ' decimals): ' ,
+					 pasteComma(paste(names(tbc), '=', round(tbc, 8))))
 	###
 	mutants$data_point_discretised   = cut(
 		x = mutants [, depVariable],
@@ -3081,7 +3085,36 @@ rndProce = function(procedure = NULL) {
 	return(random)
 }
 
+UniqueRatio = function(x, ratio = TRUE) {
+	if (length(x) < 1 ||
+			length(na.omit(x)) < 1)
+		return(0)
+	x = na.omit(x)
+	n = length(x)
+	un = length(unique(x))
+	r = ifelse(n > 0 , un / n, 0)
+	if (ratio)
+		r = round(r * 100)
+	return(r)
+}
 
+mean0 = function(x, na.rm = TRUE) {
+	if (length(x) > 0 &&
+			is.numeric(x)) {
+		return(mean(x, na.rm = na.rm))
+	} else{
+		return(NULL)
+	}
+}
+
+sd01 = function(x, na.rm = TRUE) {
+	if (length(x) > 0 &&
+			is.numeric(x)) {
+		return(sd0(x, na.rm = na.rm))
+	} else{
+		return(NULL)
+	}
+}
 
 normality.test0 = function(x, ...) {
 	if (!is.null(x)                     &&
@@ -3093,13 +3126,14 @@ normality.test0 = function(x, ...) {
 		#################### Shapiro
 		if (length(x) < 5000) {
 			r = list(
-				'P-value'  = shapiro.test(x, ...)$p.value   ,
-				'Unique N' = length(unique(na.omit(x)))     ,
-				'N'        = length(x)                      ,
-				'Mean'     = mean(x,na.rm = TRUE)           ,
-				'SD'       = sd0(x, na.rm = TRUE)           ,
-				'Test'     = 'Shapiro'                      ,
-				'Note'     = 'Cautions require when too many duplicates exist in data'
+				'P-value'          = shapiro.test(x, ...)$p.value   ,
+				'Unique N'         = length(unique(na.omit(x)))     ,
+				'N'                = length(x)                      ,
+				'Unique N/N percent' = UniqueRatio(x)               ,
+				'Mean'             = mean0(x)                       ,
+				'SD'               = sd01(x)                        ,
+				'Test'             = 'Shapiro'                      ,
+				'Note'             = 'Cautions require when too many duplicates exist in data.'
 			)
 		} else {
 			#################### Kolmogorov-Smirnov
@@ -3107,28 +3141,32 @@ normality.test0 = function(x, ...) {
 			r = list(
 				'P-value'  = ks.test(
 					x = jitter(x      = x,
-										 amount = precision)          ,
-					y = 'pnorm'                             ,
-					alternative = 'two.sided'               ,
+										 amount = precision)                    ,
+					y = 'pnorm'                                       ,
+					alternative = 'two.sided'                         ,
 					...
-				)$p.value                                 ,
-				'Unique N' = length(unique(na.omit(x)))   ,
-				'N'        = length(x)                    ,
-				'Mean'     = mean(x, na.rm = TRUE)         ,
-				'SD'       = sd0(x, na.rm = TRUE)         ,
-				'Test'     = 'Kolmogorov-Smirnov'         ,
-				'Note'     = paste0('Small jitter (precision = ',
-														precision,
-														' decimals) added to possible ties (duplicates)')
+				)$p.value                                           ,
+				'Unique N'           = length(unique(na.omit(x)))   ,
+				'N'                  = length(x)                    ,
+				'Unique N/N percent' = UniqueRatio(x)               ,
+				'Mean'               = mean0(x)                     ,
+				'SD'                 = sd01 (x)                     ,
+				'Test'               = 'Kolmogorov-Smirnov'         ,
+				'Note'               = paste0(
+					'Small jitter (precision = ',
+					precision,
+					' decimals) added to possible ties (duplicates).'
+				)
 			)
 		}
 	} else{
 		r = list(
-			'P-value'  = NULL                           ,
-			'Unique N' = length(unique(na.omit(x)))     ,
-			'N'        = length(x)                      ,
-			'Mean'     = ifelse(is.numeric(x), mean(x, na.rm = TRUE), NULL), 
-			'SD'       = ifelse(is.numeric(x), sd0 (x, na.rm = TRUE), NULL), 
+			'P-value'            = NULL                           ,
+			'Unique N'           = length(unique(na.omit(x)))     ,
+			'N'                  = length(x)                      ,
+			'Unique N/N percent' = UniqueRatio(x)                 ,
+			'Mean'     = mean0(x)                                 ,
+			'SD'       = sd01 (x)                                 ,
 			'Test'     = 'No test applied to this data. Please check the data for possible QC issues',
 			'Note'     = NULL
 		)
@@ -3913,7 +3951,7 @@ RemoveSexWithZeroDataPointInGenSexTableOnlyStatsPipelinenotExposed = function(df
 	return(df)
 }
 
-MakeRRQuantileFromTheValue = function(x) {
+MakeRRQuantileFromTheValue = function(x, messages = TRUE) {
 	if (length(x) < 1          ||
 			length(na.omit(x)) < 1 ||
 			!as.numeric(x)         ||
@@ -3924,11 +3962,18 @@ MakeRRQuantileFromTheValue = function(x) {
 						 '`')
 		return(x)
 	}
-	message0('Input quantile before the transformation: ', pasteComma(x))
-	x = 1 - (1 - head(x, 1)) / 2
-	message0('Normal area: [' ,
-					 pasteComma(1 - x, x),
-					 ']\n\t Transformation: 1-(1-x)/2, (1-x)/2')
+	x.bck = x
+	x     = 1 - (1 - head(x, 1)) / 2
+	if (messages) {
+		message0('The probability of the middle area in the distribution: ',
+						 pasteComma(x.bck))
+		message0(
+			'\t Tails probability: '     ,
+			min(x, 1 - x)                ,
+			'\n\t Formula to calculate the tail probabilities: 1-(1-x)/2, (1-x)/2 where x = ',
+			x.bck
+		)
+	}
 	return(max(x, 1 - x, na.rm = TRUE))
 }
 

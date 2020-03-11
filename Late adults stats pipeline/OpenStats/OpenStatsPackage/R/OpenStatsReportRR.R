@@ -10,8 +10,13 @@ OpenStatsReportRR =	function(object)
 	refVariable    = all_vars0(frm)[2]
 	#	equation     = NULL
 	formula        = printformula(frm)
-	framework      = paste0('Reference Range Plus Test framework; quantile = ',
-													object$input$prop)
+	framework      = paste0(
+		'Reference Range Plus Test framework; quantile = ',
+		object$input$prop,
+		' (Tails probability = ',
+		1 - MakeRRQuantileFromTheValue(object$input$prop, messages = FALSE),
+		')'
+	)
 	#	fittingMethod  = NULL
 	#####################################################################
 	Vsplit         = object$output$SplitModels
