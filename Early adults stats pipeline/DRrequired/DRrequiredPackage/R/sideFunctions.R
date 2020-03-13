@@ -1321,21 +1321,27 @@ SummaryStatisticsOriginal = function(x,
 
   isNumeric = is.numeric(x[, depVar])
   summaryT   = as.list(tapply(x[, depVar], INDEX = lvls, function(xx) {
-    if (isNumeric) {
       c  = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
+    uc        = ifelse(length(na.omit(xx)) > 0, length(unique(na.omit(xx))), 0)
+    ##############################
+    if (isNumeric) {
       m  = ifelse(length(na.omit(xx)) > 0, mean(xx, na.rm = TRUE) , NA)
       sd = ifelse(length(na.omit(xx)) > 0, sd0 (xx, na.rm = TRUE) , NA)
       NormTest = OpenStats:::normality.test0(xx)
       r = list(
         'Count' = c                                 ,
+        'Unique N'     = uc                         ,
         'Mean'  = m                                 ,
         'SD'    = sd                                ,
+        'Diversity in response' = uc > 1            ,
         'Normality test p-val' = NormTest
       )
     } else{
-      c = ifelse(length(na.omit(xx)) > 0, length(na.omit(xx)), 0)
-      r = list('Count' = c)
+      r = list('Count'                 = c  ,
+               'Unique N'              = uc ,
+               'Diversity in response' = uc > 1)
     }
+    ##############################
     return(r)
   }, default = -999.991233210123))
   ##
@@ -2304,7 +2310,7 @@ StoreRawDataAndWindowingWeights = function(storeRawData,
                                            compressRawData = TRUE,
                                            ### 5
                                            methodmap  ) {
-  message0('Extra columns in the strored data: ',
+  message0('Extra columns in the stored data: ',
            paste(colnames, sep = ', ', collapse = ', '))
   if (storeRawData            &&
       isS4(c.ww0$InputObject) &&
@@ -4054,8 +4060,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
             row.names = FALSE)
 
   return(invisible(list(
-    categories = outP,
-    dfObject   = df
+    categories = outP, dfObject = df
   )))
 
 }

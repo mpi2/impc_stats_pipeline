@@ -167,6 +167,7 @@ plot.OpenStatsMM = function (x                        ,
 		)                                                   ,
 		main = paste0(main, ': Density of the residuals')   ,
 		rug  = FALSE                                        ,
+		method = 'kernel'                                    ,
 		...
 	)
 	qqPlot(
