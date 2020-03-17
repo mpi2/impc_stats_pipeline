@@ -845,7 +845,7 @@ summary0 = function(x, ...) {
 	return(r)
 }
 
-RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
+RemoveDuplicatedColumnsFromDfandTrimWhiteSpace = function(x, formula = NULL, trimWS = TRUE) {
 	x         = as.data.frame(x)
 	if (!is.null(formula)                      ||
 			sum(all_vars0(formula) %in% names(x)) > 1)
@@ -854,10 +854,16 @@ RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 		vars    = names(x)
 	colVars   = names(x)  %in% vars
 	if (sum(colVars)) {
+		subX    = x[, colVars, drop = FALSE]
+		#####################
+		if (trimWS) {
+			subX = trimColsInDf(df = subX)
+		}
+		#####################
 		message0('Checking duplications in the data model:\n\t ',
 						 pasteComma(names(x)[colVars],
 						 					 truncate = FALSE))
-		subX    = x[, colVars, drop = FALSE]
+		
 		#numCols = sapply(subX, is.numeric)
 		#ConCols = subX[,  numCols, drop = FALSE]
 		#CatCols = subX[, !numCols, drop = FALSE]
@@ -870,8 +876,8 @@ RemoveDuplicatedColumnsFromDf = function(x, formula = NULL) {
 		} else{
 			message0('\tNo duplicate found.')
 		}
-		uniqCols  = subX   [, !dcols  , drop = FALSE]
-		r         = cbind(x[, !colVars, drop = FALSE], uniqCols)
+		uniqCols  = subX   [,!dcols  , drop = FALSE]
+		r         = cbind(x[,!colVars, drop = FALSE], uniqCols)
 		return(r)
 	} else{
 		message0('Formula terms do not exist in the input data')
@@ -2247,8 +2253,9 @@ RRDiscretizedEngine = function(data,
 																		data   = data)) {
 		return(NULL)
 	}
-	vars  =  names(data) %in% all.vars(formula)
-	df    =        data[, vars]
+	vars  = names(data) %in% all.vars(formula)
+	df    = data[, vars, drop = FALSE]
+	df    = trimColsInDf(df = df)
 	cat   = !sapply(df[, all.vars(formula)], is.numeric)
 	extra = all.vars(formula)[cat &
 															!all.vars(formula) %in% c(depVar, lower)]
@@ -3997,4 +4004,31 @@ RRextraDetailsExtractor = function(object,
 		})
 	})
 	return(r)
+}
+
+
+trimColsInDf = function(df, ...) {
+	if (is.null(df) || !is.data.frame(df))
+		return(df)
+	if (nrow(df) < 1)
+		return(df)
+	message0('Removing possible leading/trailing whitespace from the variables in the formula ...')
+	df2 = lapply(names(df) , function(y) {
+		x.bck = x = df[, y]
+		if (is.numeric(x) || all(is.na(x)) || all(is.nan(x))) {
+			x
+		} else if (is.factor(x)) {
+			levels(x) = trimws(levels(x), ...)
+		} else if (is.character(x)) {
+			x = trimws(x, ...)
+		} else{
+			x
+		}
+		if (!identical(x.bck, x))
+			message0('\t Trim applied to variable `', y, '`')
+		return(x)
+	})
+	df2 = droplevels(as.data.frame(df2))
+	names(df2) = names(df)
+	return(df2)
 }

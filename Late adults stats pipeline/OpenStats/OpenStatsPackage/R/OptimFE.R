@@ -9,6 +9,7 @@ crunner = function(object              ,
 									 RRextraResults   = NULL            ,
 									 overallTableName = 'Complete table', 
 									 InterLevelComparisions = TRUE      ,
+									 trimWC                 = TRUE      ,
 									 ...)
 {
 	requireNamespace   ("rlist")
@@ -50,6 +51,8 @@ crunner = function(object              ,
 		return(NULL)
 	}
 	####
+	if (trimWC)
+		data = trimColsInDf(data[, allTerms, drop = FALSE])
 	lComplete   = NULL
 	for (indx in 1:ifelse(fullComparisions, pmax(1, length(allTerms) - 1), 1)) {
 		depVariable = allTerms[indx]

@@ -39,7 +39,7 @@ M.opt = function(object = NULL            ,
 	glCont        = glm.control(epsilon = 10 ^ -36, maxit = 1500)
 	G.Model       = FV.Model  = I.Model = SplitModels = EffectSizes = F.Model = OutR = ResidualNormalityTest = NULL
 	VarHomo       = TRUE
-	data          = RemoveDuplicatedColumnsFromDf(x = object@datasetPL, formula = fixed)
+	data          = RemoveDuplicatedColumnsFromDfandTrimWhiteSpace(x = object@datasetPL, formula = fixed)
 	n             = nrow(data)
 	fixed         = ModelChecks(fixed = fixed,
 															data  = data  ,

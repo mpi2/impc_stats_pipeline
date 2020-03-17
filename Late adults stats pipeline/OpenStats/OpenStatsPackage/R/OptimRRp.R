@@ -37,8 +37,8 @@ RRrunner = function(object              ,
 	}
 	RRpropTrans             = MakeRRQuantileFromTheValue(RRprop)
 	cleanFormulaForOutput   = checkModelTermsInData(
-		formula = formula,
-		data = object@datasetPL,
+		formula            = formula          ,
+		data               = object@datasetPL ,
 		responseIsTheFirst = TRUE
 	)
 	message0('Discritizing the continuous data into discrete levels. The quantile = ',
@@ -91,7 +91,8 @@ RRrunner = function(object              ,
 					RRprefix         = x$depVarPrefix          ,
 					RRreferenceLevel = x$refLevel              ,
 					RRempiricalQuantiles  = x$empiricalQuantiles
-				)                                         ,
+				)                                            ,
+				trimWC = FALSE                               ,
 				...
 			)
 		)
@@ -118,6 +119,7 @@ RRrunner = function(object              ,
 					RRreferenceLevel = x$refLevel              ,
 					RRempiricalQuantiles  = x$empiricalQuantiles
 				)                                            ,
+				trimWC             = FALSE                   ,  
 				...
 			)
 		)
