@@ -3,6 +3,7 @@ classificationTag = function(object               = NULL  ,
 														 SexSpecificThreshold = .05   ,
 														 userMode             = "summaryOutput")
 {
+	decimals = ifelse(phenotypeThreshold < 1, 1, 0) * abs(log(phenotypeThreshold, 10))
 	if (is.null(object)          ||
 			!is.null(object$messages)) {
 		message0('~> The input object is missing or a failure object.')
@@ -112,11 +113,11 @@ classificationTag = function(object               = NULL  ,
 						phenotypeThreshold               ,
 						" - cannot classify effect ["    ,
 						"Interaction pvalue = "          ,
-						SexInteraction                   ,
-						", Genotype Female pvalue = "    ,
-						v$`Sex FvKO p-value`             ,
+						FormatPvalueClassificationTag(SexInteraction,decimals = decimals)       ,
+						", Genotype Female pvalue = "    , 
+						FormatPvalueClassificationTag(v$`Sex FvKO p-value`, decimals = decimals), 
 						", Genotype Male pvalue = "      ,
-						v$`Sex MvKO p-value`,            
+						FormatPvalueClassificationTag(v$`Sex MvKO p-value`, decimals = decimals),            
 						']'
 					)
 				} else if (v$`Sex FvKO p-value` <	 SexSpecificThreshold &&
@@ -177,13 +178,12 @@ classificationTag = function(object               = NULL  ,
 							"If phenotype is significant ",
 							"- cannot classify effect ["  ,
 							"Interaction pvalue = "       ,
-							SexInteraction                ,
-							", Genotype Female pvalue = " ,
-							v$`Sex FvKO p-value`          ,
-							", Genotype Male pvalue = "   ,
-							v$`Sex MvKO p-value`          ,
+							FormatPvalueClassificationTag(SexInteraction, decimals = decimals)       , 
+							", Genotype Female pvalue = "                       ,
+							FormatPvalueClassificationTag(v$`Sex FvKO p-value`, decimals = decimals) , 
+							", Genotype Male pvalue = "                         ,
+							FormatPvalueClassificationTag(v$`Sex MvKO p-value`, decimals = decimals) , 
 							']'
-							
 						)
 				} else if (v$`Sex FvKO p-value` <	SexSpecificThreshold	&&
 									 v$`Sex MvKO p-value` >= SexSpecificThreshold) {
@@ -507,3 +507,4 @@ classificationTag = function(object               = NULL  ,
 	return(outList)
 }
 ##------------------------------------------------------------------------------
+

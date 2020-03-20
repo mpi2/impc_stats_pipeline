@@ -1373,7 +1373,7 @@ replaceNull = function(x, replace = '-') {
 mapLevelsToFactor = function(levels, newlevels, name = 'response') {
   #############
   res  = NULL
-  n1   = paste0('All levels in the',
+  n1   = paste0('All levels in the ',
                 name,
                 collapse = '')
   res$n1 = newlevels

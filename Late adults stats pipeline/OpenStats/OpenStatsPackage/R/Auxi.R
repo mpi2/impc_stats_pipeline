@@ -4032,3 +4032,22 @@ trimColsInDf = function(df, ...) {
 	names(df2) = names(df)
 	return(df2)
 }
+
+FormatPvalueClassificationTag = function(x, decimals = 4) {
+	r = ''
+	if (is.null(x) || length(x) < 1)
+		return(r)
+	r = if (min(x,na.rm = TRUE) >= 10 ^ - decimals) {
+		round(x, digits = decimals)
+	} else{
+		paste0('< ',
+					 format(
+					 	10 ^ -decimals   ,
+					 	digits = decimals,
+					 	trim   = TRUE    ,
+					 	nsmall = decimals,
+					 	scientific = FALSE
+					 ))
+	}
+	return(r)
+}
