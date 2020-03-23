@@ -482,6 +482,27 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                     n3.5_summary = SummaryStatisticsOriginal(x      = n3.5,
                                                              depVar = depVar,
                                                              label  = 'Raw data summary statistics')
+                    # ################### Only for Gross Morphology group
+                    # write(
+                    #   paste(
+                    #     c(
+                    #       procedure,
+                    #       parameter,
+                    #       center,
+                    #       strain,
+                    #       zyg,
+                    #       meta,
+                    #       FlatteningTheSummary(n3.5_summary, 'Raw data summary statistics')
+                    #     ),
+                    #     sep = '\t',
+                    #     collapse = '\t'
+                    #   ),
+                    #   file = 'summaryStats.tsv',
+                    #   append = TRUE,
+                    #   ncolumns = 10 ^ 4
+                    # )
+                    # next
+                    # ##################################
                     note         = c(note, n3.5_summary)
                     if (CheckIfNameExistInDataFrame(n3.5, 'LifeStage')) {
                       LifeStageTable = table(n3.5$LifeStage)

@@ -1164,6 +1164,31 @@ NA2LabelInFactor = function(x, label = 'control') {
 }
 
 
+varsInColsOrReturn = function(x, vars, retValue = NULL) {
+  b.vars = vars
+  r =  if (!all(vars %in% names(x)) || nrow(x) < 1) {
+    retValue
+  } else{
+    vars[vars %in% names(x)]
+  }
+  if (!identical(b.vars, vars)) {
+    message0('Not all variables in the data: ',
+             paste(
+               setdiff(b.vars, vars),
+               sep      = ', ',
+               collapse = ','
+             ))
+  }
+  return(r)
+}
+
+FlatteningTheSummary = function(x, name = 'Raw data summary statistics') {
+  r = sort(paste(names(x[[name]])  , unlist(lapply(x[[name]], function(y) {
+    y[1]
+  })), sep = '='))
+  return(r)
+}
+
 SummaryStatisticsOriginal = function(x,
                                      depVar,
                                      sex = 'sex',
@@ -1182,11 +1207,17 @@ SummaryStatisticsOriginal = function(x,
 
   x = x[complete.cases0(x[, depVar]), , drop = FALSE]
 
+
   #x      = droplevels0(x)
+  v0 = varsInColsOrReturn(x, c(sex, genotype, depVar))
   if (is.numeric(x[, depVar])) {
-    lvls   = interaction(x[, sex], x[, genotype], sep = sep, drop = drop)
-  } else{
-    lvls   = interaction(x[, sex], x[, genotype], x[, depVar], sep = sep, drop = drop)
+    lvls   = interaction(x[, varsInColsOrReturn(x, c(sex, genotype))], sep = sep, drop = drop)
+  } else {
+    if (length(v0) > 1) {
+      lvls   = interaction(x[, varsInColsOrReturn(x, c(sex, genotype, depVar))], sep = sep, drop = drop)
+    } else{
+      lvls   = interaction(x[, c(genotype, depVar)], sep = sep, drop = drop)
+    }
   }
 
   isNumeric = is.numeric(x[, depVar])

@@ -3939,6 +3939,7 @@ RemoveSexWithZeroDataPointInGenSexTableOnlyStatsPipelinenotExposed = function(df
 			!colExists(name = cols[1], data = df) ||
 			!colExists(name = cols[2], data = df))
 		return(df)
+	cols = cols[cols %in% names (df)]
 	if (length(cols) != 2) {
 		message0('col parameter must have absolutely two values ...')
 		return(df)
