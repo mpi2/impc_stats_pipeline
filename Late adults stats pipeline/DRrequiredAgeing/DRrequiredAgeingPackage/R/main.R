@@ -675,6 +675,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                           strain,
                           zyg,
                           meta,
+                          colony,
                           FlatteningTheSummary(n3.5.2_summary, 'GEL data summary statistics')
                         ),
                         sep = '\t',
