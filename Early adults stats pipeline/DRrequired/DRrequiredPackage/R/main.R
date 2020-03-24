@@ -107,6 +107,8 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
   initial                        = readConf('Initialize.conf')
   exceptionList                  = readFile(file = 'ExceptionMap.list')
   EA2LAMApping                   = read.csv(file = file.path(local(), 'EA2LA_parameter_mappings_2019-09-24.csv'))
+  MetaDataList                   = read.csv(file = file.path(local(), 'metadataParameters.csv'))
+  exceptionList                  = unique(c(exceptionList,MetaDataList$parameter_stable_id))
   #CategoricalCategoryBlackList   = readFile(file = 'CategoricalCategoryBlackList.list')
   # Main subdirectory/working directory
   message0('Preparing the working directory ...')
@@ -656,6 +658,30 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                                           report = TRUE)
                     ###
                     n3.5.2[, depVar] = MergLev$x
+                    ################## Only for Gross Morphology group
+                    # n3.5.2_summary = SummaryStatisticsOriginal(x      = n3.5.2,
+                    #                                          depVar = depVar,
+                    #                                          label  = 'GEL data summary statistics')
+                    # write(
+                    #   paste(
+                    #     c(
+                    #       procedure,
+                    #       parameter,
+                    #       center,
+                    #       strain,
+                    #       zyg,
+                    #       meta,
+                    #       FlatteningTheSummary(n3.5.2_summary, 'GEL data summary statistics')
+                    #     ),
+                    #     sep = '\t',
+                    #     collapse = '\t'
+                    #   ),
+                    #   file = 'summaryStats.tsv',
+                    #   append = TRUE,
+                    #   ncolumns = 10 ^ 4
+                    # )
+                    # return(NULL)
+                    ##################################
                     n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]),])
                     n3.5.2OnlyKO     = subset(n3.5.2,n3.5.2$biological_sample_group %in% 'experimental')
                     note$'Relabeled levels for categorical variables'  = MergLev$note

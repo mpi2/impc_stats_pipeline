@@ -1183,9 +1183,14 @@ varsInColsOrReturn = function(x, vars, retValue = NULL) {
 }
 
 FlatteningTheSummary = function(x, name = 'Raw data summary statistics') {
-  r = sort(paste(names(x[[name]])  , unlist(lapply(x[[name]], function(y) {
+  rs =lapply(x[[name]], function(y) {
     y[1]
-  })), sep = '='))
+  })
+  rs1 = unlist(rs)
+  r   = c(min(rs1),max(rs1),mean(rs1),median(rs1),sd(rs1),names(rs)[(which.min(rs1))],names(rs)[(which.max(rs1))])
+  # r = sort(paste(names(x[[name]])  , unlist(lapply(x[[name]], function(y) {
+  #   y[1]
+  # })), sep = '='))
   return(r)
 }
 
@@ -3836,6 +3841,7 @@ requiredDataColumns = function(x){
 }
 
 updateImpress = function(updateImpressFileInThePackage = FALSE,
+                         updateOpeionalParametersList  = FALSE,
                          updateTheSkipList             = FALSE,
                          saveRdata                     = NULL ) {
   outP = df = NULL
@@ -3918,15 +3924,32 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
     } else{
       fileName = file.path(getwd(), 'AllCts.csv')
     }
+    ###################################################
+    if(updateOpeionalParametersList){
+      fileNameMeta = system.file("extdata", "metadataParameters.csv", package = "DRrequiredAgeing")
+    } else{
+      fileNameMeta = file.path(getwd(), 'metadataParameters.csv')
+    }
+    ###################################################
     outP = data.frame(
       parameter_stable_id = dfSelected$parameterKey,
       categories          = dfSelected$categories
     )
+    ###################################################
+    outM = data.frame(
+      parameter_stable_id = unique(df$parameterKey[df$type %in% 'procedureMetadata'])
+    )
+    ###################################################
     message0('\tThe output file:\n\t  => ', fileName)
     write.csv(x         = outP    ,
               file      = fileName,
               row.names = FALSE)
-
+    ###################################################
+    message0('\tThe metadatafile file:\n\t  => ', fileNameMeta)
+    write.csv(x         = outM    ,
+              file      = fileNameMeta,
+              row.names = FALSE)
+    ###################################################
   return(invisible(list(
     categories = outP, dfObject = df
   )))
