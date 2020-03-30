@@ -3821,11 +3821,11 @@ is.df.empty = function(x) {
 }
 
 CleanEmptyRecords = function(x, vars) {
-	if(is.df.empty(x))
+	if (is.df.empty(x))
 		return(NULL)
 	vars1 = vars[vars %in% names(x)]
 	if (length(vars1)) {
-		x = x[all(!is.na(x[, vars1])) && all(x[, vars1] != ""), ]
+		x = x[all(!is.na(x[, vars1])) && all(x[, vars1] != ""), , drop = FALSE]
 	}
 	return(x)
 }

@@ -7,7 +7,7 @@ Method "OpenStatsAnalysis"
 \description{
 The driver function in the OpenStats package for running statisical analysis on phenotypic data. \cr
 
-~> It performs several checks on the data and the input model before performing the analysis. This function supports three main analysis frameworks precisely, Linear Mix model (MM), Fisher Exact test (FE) and Reference Range plus (RR).\cr 
+~> It performs several checks on the data and the input model before performing the analysis. This function supports three main analysis frameworks precisely, Linear Mix model (MM), Fisher's Exact test (FE) and Reference Range plus (RR).\cr 
 
 ~> It further monitors the process for failures and errors and applies some runtime patches/fixes.\cr 
 
@@ -81,10 +81,10 @@ OpenStatsAnalysis(
 	Only applies to the "MM" framework. Select from  "both" (for stepwise optimisation), "backward" (for backward elimination) or "forward" (for forward selection) for the optimisation algorithm. The default is "both".
 	}
   \item{MM_checks}{
-	Only applies to the "MM" framework. A vector of four 1/0 or TRUE/FALSE values such as c(TRUE, TRUE, TRUE, TRUE)[default]. Performing pre checks on the input model for some known scenarios. The first element of the vector activates checks on the model terms (See MM_fixed) to be existed in data. The second term removes any single level -factor- from the model (in MM_fixed). The thirs term removes the single value (such as a column of constants/no variation) from the -continuous- terms in the model (in MM_fixed). The Fourth element checks the interaction term to make sure all interactions have some data attached. Caution is needed for the fourth element of the `check` as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(TRUE, TRUE, TRUE, TRUE) that is all checks perform.\cr
+	Only applies to the "MM" framework. A vector of four 1/0 or TRUE/FALSE values such as c(TRUE, TRUE, TRUE, TRUE)[default]. Performing pre checks on the input model for some known scenarios. The first element of the vector activates checks on the model terms (See MM_fixed) to be existed in data. The second term removes any single level -factor- from the model (in MM_fixed). The third term removes the single value (such as a column of constants/no variation) from the -continuous- terms in the model (in MM_fixed). The Fourth element checks the interaction term to make sure all interactions have some data attached. Caution is needed for this check as it may take longer than usual if the formula in MM_fixed contains many factors. The default is c(TRUE, TRUE, TRUE, TRUE) that is all checks perform.\cr
 	
-	* Note that the function removed duplicated columns in the dataset prior to applying the lme/gls.\cr
-	* Regardless of the `check`, the function always checks for the existence of the `MM_random` terms in the input data
+	* Note that the function always removes duplicated columns in the dataset prior to applying the lme/gls.\cr
+	* Regardless of the `check` settings, the function always checks for the existence of the `MM_random` terms (given it is not set to NULL) in the input data
 }
 	\item{MM_optimise}{
 	Only applies to the "MM" framework. A vector of six binary values such as c(1,1,1,1,1,1) or c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE) (default). The first element of the vector activates the fixed effect optimisation. The algorithm uses AICc to optimise the fixed effects (Check `AICcmodavg` package for more details about AICc). The second and third elements of the vector activate optimisation on 'weight' and 'random effects' respectively. The optimisation of weight and random effects refers to comparing the AICc between a model with and without those effects. The fourth element activates the Split model effects (for example, separate male and female effects) (see `SplitModels` in the output object). The fifth effect activates the effect size estimation (see `Effect sizes` in the output object). The sixth element activates the normality tests on the residuals (see `ResidualNormalityTests` in the output object).
@@ -105,10 +105,10 @@ OpenStatsAnalysis(
 	Only applies to the "RR" framework. A single value between (0.5,1) not including the boundaries. The threshold for the variation ranges in the RR framework. The default value is 0.95. 
 }
   \item{FERR_rep}{
-  Only applies to the "RR" or "FE" frameworks. The number of iteration for the Monte Carlo Fisher's exact test. See "B" parameter in `fisher.test()` function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
+  Only applies to the "RR" or "FE" frameworks. The number of iteration for the Monte Carlo Fisher's Exact test. See "B" parameter in `fisher.test()` function. Set to 0 for non-bayesian results (not recommended). The default is 1500.
 } 
   \item{FERR_FullComparisions}{
-  Only applies to the "RR" or "FE" frameworks. A vector of two logical flags, default c(TRUE,FALSE). Setting the first value to TRUE, then all combinations of the effects (all levels of factors in the input model - for example Male_LifeStage, Male_Genotype, Male_Mutant, Male_control, Female_control, Female_Mutant, Female_LifeStage and so on) will be tested. Otherwise only main effects (no sub levels - for example Sex_LifeStage [not for instance Male_LifeStage]) will be tested. Setting the second element of the vector to TRUE (default FALSE) will force the fisher test to do all comparisions between different levels of the RESPONSE variable. For example, if the respose has three levels such as 1.positive, 2.negative and 3.neutral then the comparisions will be between  1\&2, 1\&3, 2\&3 and 1\&2\&3 (obviously this is the full table).
+  Only applies to the "RR" or "FE" frameworks. A vector of two logical flags, default c(TRUE,FALSE). Setting the first value to TRUE, then all combinations of the effects (all levels of factors in the input model - for example Male_LifeStage, Male_Genotype, Male_Mutant, Male_control, Female_control, Female_Mutant, Female_LifeStage and so on) will be tested. Otherwise only main effects (no sub levels - for example Sex_LifeStage [not for instance Male_LifeStage]) will be tested. Setting the second element of the vector to TRUE (default FALSE) will force Fisher's Exact test to do all comparisions between different levels of the RESPONSE variable. For example, if the respose has three levels such as 1.positive, 2.negative and 3.neutral then the comparisions will be between  1\&2, 1\&3, 2\&3 and 1\&2\&3 (obviously this is the full table).
 } 
 	\item{MMFERR_conf.level}{
   Applies to all frameworks (MM, FE, RR). Single numeric value for the interval confidence level. Default is 0.95
@@ -122,7 +122,7 @@ OpenStatsAnalysis(
   \item{\dots}{
   Other parameters that can be passed to:\cr
   ~> If the model is set to Linear Mixed Model (MM) then the parameters that can be passed to `lme` function. See ?lme() manual page\cr
-  ~> If the model is either Fisher Exact test (FE) or Reference Range + (RR) then the parameters that can be passed to the `fisher.test` function. See ?fisher.test() manual page\cr
+  ~> If the model is either Fisher's Exact test (FE) or Reference Range + (RR) then the parameters that can be passed to the `fisher.test` function. See ?fisher.test() manual page\cr
 }
 }
 
@@ -178,7 +178,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	####################################################################
 	
 	#################
-	# 2.1 Optimised Mixed model (MM) framework
+	# 2.1 Optimised Linear Mixed model (MM) framework
 	#################
 	MM1_result = OpenStatsAnalysis(
 		OpenStatsList = test_Cont,
@@ -191,7 +191,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	
 	
 	#################
-	# 2.2 Mixed model (MM) with NO optimisation
+	# 2.2 Linear Mixed model (MM) with NO optimisation
 	# for the fixed effects but random/weight effects
 	#################
 	MM2_result = OpenStatsAnalysis(
@@ -206,7 +206,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	summary(MM2_result)
 	
 	#################
-	# 2.3 Mixed model (MM) with NO optimisation on the model
+	# 2.3 Linear Mixed model (MM) with NO optimisation on the model
 	#################
 	MM3_result = OpenStatsAnalysis(
 		OpenStatsList = test_Cont,
@@ -233,7 +233,7 @@ Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 	
 	
 	#################
-	# 2.4 Fisher exact framework
+	# 2.4 Fisher's exact test framework
 	#################
 	FE_result = OpenStatsAnalysis(
 		OpenStatsList = test_Cat,

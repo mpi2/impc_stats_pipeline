@@ -236,7 +236,8 @@ OpenStatsList0 =
 					truncate = FALSE,
 					sep = ',\n\t  ')
 				)
-				if (min(wsglvls, na.rm = TRUE) <= 2) {
+				if (min(wsglvls, na.rm = TRUE) <= 2 &&
+						sum(is.na(dataset$Weight)) > 0) {
 					message0(
 						'`Weight` column has (<2) data points for at least one level of ',
 						MakeCaptionFromNamesAndIndecis(name = names(dataset), index = coNames),
