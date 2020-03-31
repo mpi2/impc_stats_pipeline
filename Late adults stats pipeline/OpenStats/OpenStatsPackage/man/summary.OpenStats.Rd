@@ -23,7 +23,9 @@
 		Optional parameters that can be passed to 'summarytools::dfSummary ()'
 	}
 }
-
+\value{
+Tabe of summary statistics
+}
 
 \author{
 	Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>

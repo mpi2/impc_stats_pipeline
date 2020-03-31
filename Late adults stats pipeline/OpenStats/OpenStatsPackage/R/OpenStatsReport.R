@@ -54,7 +54,7 @@ OpenStatsReport = function(object                    ,
 				}
 			}
 			if (RemoveNullKeys && !is.null(out)) {
-				for (i in 1:5) {
+				for (i in seq_len(5)) {
 					out = list.clean(
 						out,
 						fun = function(x) {
@@ -69,7 +69,7 @@ OpenStatsReport = function(object                    ,
 			requireNamespace("jsonlite")
 			n   = 5
 			if (JSON && !is.null(out)) {
-				for (i in 1:n) {
+				for (i in seq_len(n)) {
 					out = toJSON(
 						out,
 						auto_unbox = TRUE,

@@ -56,7 +56,7 @@ crunner = function(object              ,
 	lComplete   = NULL
 	for (indx in 1:ifelse(fullComparisions, pmax(1, length(allTerms) - 1), 1)) {
 		depVariable = allTerms[indx]
-		vars        = allTerms[-c(1:indx)]
+		vars        = allTerms[-c(seq_len(indx))]
 		l           = lcomb = names = alTbls = NULL
 		CmbiVars    = (length(vars) > 1)
 		####
@@ -73,7 +73,7 @@ crunner = function(object              ,
 		}
 		####
 		counter  = 1
-		for (j in 1:length(vars)) {
+		for (j in seq_along(vars)) {
 			message0('\tTesting for the main effect: ',
 							 pasteComma(vars[j], replaceNull = FALSE))
 			lt = ctest(

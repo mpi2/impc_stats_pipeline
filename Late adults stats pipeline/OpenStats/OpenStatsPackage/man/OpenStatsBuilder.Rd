@@ -15,7 +15,6 @@
 		debug = TRUE
 	)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{PhenListobject}{
 		'mandatory argument'. Instance of the `PhenList` class
@@ -41,9 +40,6 @@
 \author{
 Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 }
-
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 	\code{\link{OpenStatsAnalysis}}

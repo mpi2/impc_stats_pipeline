@@ -48,7 +48,6 @@ OpenStatsAnalysis(
 	FERR_rep     = 1500                                    ,
 	FERR_FullComparisions = c(TRUE, FALSE)                 ,
 	MMFERR_conf.level = 0.95                               ,
-	seed         = NULL                                    ,
 	debug        = TRUE                                    ,
 	...
 )
@@ -112,9 +111,6 @@ OpenStatsAnalysis(
 } 
 	\item{MMFERR_conf.level}{
   Applies to all frameworks (MM, FE, RR). Single numeric value for the interval confidence level. Default is 0.95
-}
- \item{seed}{
-	seed to be placed in `set.seed()` function. The default, NULL, imposes no seed.
 }
   \item{debug}{
 	A logical flag. Set to TRUE to see more details about the progress of the function. Default TRUE

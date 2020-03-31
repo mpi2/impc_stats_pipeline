@@ -281,14 +281,14 @@ FeasibleTermsInContFormula = function(formula, data) {
 		message0('\t Response is included in the checks ....')
 	}
 	if (lvars > 0) {
-		for (i in 1:lvars) {
+		for (i in seq_len(lvars)) {
 			message0('\t',
 							 i,
 							 ' of ',
 							 lvars,
 							 '. Checking for the feasibility of terms and interactions ...')
 			cmb = combn(vars, i)
-			for (j in 1:ncol(cmb)) {
+			for (j in seq_len(ncol(cmb))) {
 				message0('\t\t Checking ', pasteComma(cmb[, j]),' ...')
 				xtb = xtabs(
 					formula = paste0('~', paste0(cmb[, j], collapse = '+')),
@@ -519,7 +519,7 @@ percentageChangeCont = function(model                ,
 						'Coefficients: ',
 						r
 					)
-					names(r) = paste(ol[1:lr], '_CareRequired')
+					names(r) = paste(ol[seq_len(lr)], '_CareRequired')
 				} else{
 					names(r) = ol
 				}
@@ -1041,9 +1041,9 @@ SplitEffect = 	function(finalformula     ,
 	names    = c()
 	counter = 1
 	if (largs > 0) {
-		for (i in 1:largs) {
+		for (i in seq_len(largs)) {
 			argComb = combn(args, i, simplify = TRUE)
-			for (j in 1:ncol(argComb)) {
+			for (j in seq_len(ncol(argComb))) {
 				arg = as.vector(argComb[, j])
 				if (arg %in% dname &&
 						!is.numeric(data[, arg]) &&
@@ -1321,7 +1321,7 @@ fisher.test1 = function(x,
 		)
 		for (i in 2:nrx) {
 			cbn = combn(nrx, i)
-			subtbl = lapply(1:ncol(cbn), function(j) {
+			subtbl = lapply(seq_len(ncol(cbn)), function(j) {
 				r = suppressMessages(fisher.test0(
 					x = x[cbn[, j], ],
 					formula = formula,
@@ -1391,7 +1391,7 @@ AllTables = function(dframe        = NULL,
 	message0('\tSplitting in progress ...')
 	for (i in unique(pmax(1, 1:(lcat - adj)))) {
 		cb = combn(cat, i)
-		for (j in 1:ncol(cb)) {
+		for (j in seq_len(ncol(cb))) {
 			message0('\tSpliting on ', pasteComma(cb[, j], replaceNull = FALSE),' ...')
 			out = split(dframe,
 									interaction(dframe[cb[, j]]), drop = TRUE)
@@ -1445,7 +1445,7 @@ AllTables = function(dframe        = NULL,
 				nl = names(x)[!names(x) %in% oblCols]
 				if (length(nl) > 1) {
 					cmbn = combn(nl, length(nl) - 1)
-					for (i in 1:ncol(cmbn)) {
+					for (i in seq_len(ncol(cmbn))) {
 						r[[i]] = lapply(i, function(y) {
 							x[, -which(names(x) %in% cmbn[, y]), drop = FALSE]
 						})
@@ -1663,9 +1663,9 @@ unmatrix0 = function (x, byrow = FALSE, sep = ' ')
 	rnames <- rownames(x)
 	cnames <- colnames(x)
 	if (is.null(rnames))
-		rnames <- paste("r", 1:nrow(x), sep = "")
+		rnames <- paste("r", seq_len(nrow(x)), sep = "")
 	if (is.null(cnames))
-		cnames <- paste("c", 1:ncol(x), sep = "")
+		cnames <- paste("c", seq_len(ncol(x)), sep = "")
 	nmat <- outer(rnames, cnames, paste, sep = sep)
 	if (byrow) {
 		vlist <- c(t(x))
@@ -1884,7 +1884,7 @@ pasteCollon = function(x){
 }
 
 # Modified from permutations in gtools package
-permn = function (n, r, v = 1:n, set = TRUE, repeats.allowed = FALSE) 
+permn = function (n, r, v = seq_len(n), set = TRUE, repeats.allowed = FALSE) 
 {
 	if (mode(n) != "numeric" || length(n) != 1 || n < 1 || 
 			(n%%1) != 0) 
@@ -1922,12 +1922,12 @@ permn = function (n, r, v = 1:n, set = TRUE, repeats.allowed = FALSE)
 			matrix(v, 1, r)
 		else {
 			X <- NULL
-			for (i in 1:n) X <- rbind(X, cbind(v[i], Recall(n - 
+			for (i in seq_len(n)) X <- rbind(X, cbind(v[i], Recall(n - 
 																												1, r - 1, v[-i])))
 			X
 		}
 	}
-	sub(n, r, v[1:n])
+	sub(n, r, v[seq_len(n)])
 }
 CombineLevels = function(...,
 												 debug  = TRUE,
@@ -1936,7 +1936,7 @@ CombineLevels = function(...,
 	if (length(x) < 1)
 		return(x)
 	pm = t(permn(n = length(x), r = len))
-	r = sapply(1:ncol(pm), function(i) {
+	r = sapply(seq_len(ncol(pm)), function(i) {
 		xx  = pm[, i]
 		nxx = length(xx)
 		if (nxx < 1)
@@ -2008,7 +2008,7 @@ jitter0 = function(x,
 									 upper = 1,
 									 lower = .5,
 									 maxtry = 1500) {
-	for (i in 1:maxtry) {
+	for (i in seq_len(maxtry)) {
 		if (i >= maxtry)
 			message0('\tNo solusion found for the specified RR_prop.')
 		xx = jitter(x = x,
@@ -2274,9 +2274,9 @@ RRDiscretizedEngine = function(data,
 	)
 	
 	if (lextra > 0) {
-		for (i in 1:lextra) {
+		for (i in seq_len(lextra)) {
 			cbn = combn(extra, i)
-			for (j in 1:ncol(cbn)) {
+			for (j in seq_len(ncol(cbn))) {
 				message0('\tSpliting on ', pasteComma(cbn[, j], replaceNull = FALSE),' ...')
 				out = split(df,
 										interaction(df[cbn[, j]]), drop = TRUE)
@@ -2349,7 +2349,7 @@ RRextra = function(object,
 	tblLow = cbind(tbl[, 1], rowSums(tbl[, 2:3]))
 	dimnames(tblLow) = list(c('Control', 'Mutant'), c('Low', 'Normal/High'))
 	
-	tblHigh = cbind(tbl[, 1], rowSums(tbl[, 1:2]))
+	tblHigh = cbind(tbl[, 1], rowSums(tbl[, seq_len(2)]))
 	dimnames(tblHigh) = list(c('Control', 'Mutant'), c('Low/Normal', 'High'))
 	
 	return(list(
@@ -2398,7 +2398,7 @@ columnChecks0 = function(dataset,
 		
 		NoCombinations <- dataPointsSummary[3]
 		variabilityThreshold <- NoCombinations
-		for (i in 1:NoCombinations) {
+		for (i in seq_len(NoCombinations)) {
 			if (dataPointsSummary[3 + i] >= dataPointsThreshold)
 				levelsCheck <- levelsCheck + 1
 		}
@@ -2428,10 +2428,10 @@ columnLevels = function(dataset, columnName) {
 	values <-
 		append(values, length(Genotype_levels) * length(Sex_levels))
 	
-	for (i in 1:length(Genotype_levels)) {
+	for (i in seq_along(Genotype_levels)) {
 		GenotypeSubset <-
 			subset(dataset, dataset$Genotype == Genotype_levels[i])
-		for (j in 1:length(Sex_levels)) {
+		for (j in seq_along(Sex_levels)) {
 			GenotypeSexSubset <- subset(GenotypeSubset,
 																	GenotypeSubset$Sex == Sex_levels[j])
 			
@@ -3204,9 +3204,9 @@ QuyalityTests = function(object,
 	counter = 1
 	flst    = NULL
 	if (length(levels) > 0) {
-		for (i in 1:length(levels)) {
+		for (i in seq_along(levels)) {
 			cmb = combn(x = levels, i)
-			for (j in 1:ncol(cmb)) {
+			for (j in seq_len(ncol(cmb))) {
 				result = tapply(r, as.list(d[, cmb[, j], drop = FALSE]), function(x) {
 					normality.test0(x)
 				})
@@ -3278,9 +3278,9 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 			}
 			# 2. All subset interactions effect sizes
 			if (length(cats) > 1) {
-				for (j in 1:length(cats)) {
+				for (j in seq_along(cats)) {
 					cmbn = combn(x = cats, m = j)
-					for (k in 1:ncol(cmbn)) {
+					for (k in seq_len(ncol(cmbn))) {
 						interact = interaction(data[, cmbn[, k] , drop = FALSE], sep = ' ', drop = TRUE)
 						for (lvl in levels(interact)) {
 							message0('\tLevel:', pasteComma(unlist(lvl)))
@@ -3709,7 +3709,7 @@ LevelsAsFacNumbered = function(x, numbering = TRUE, sep = '. ') {
 	r  = levels(as.factor(x))
 	nr = length(r)
 	if (numbering) {
-		r = paste(1:nr, r, sep = sep)
+		r = paste(seq_len(nr), r, sep = sep)
 	}
 	return(r)
 }
@@ -3718,7 +3718,7 @@ numberingX = function(x, sep = '. ') {
 	if (length(x) < 1)
 		return(x)
 	lx = length(x)
-	r = paste(1:lx, x, sep = sep)
+	r = paste(seq_len(lx), x, sep = sep)
 	return(r)
 }
 
@@ -3868,7 +3868,7 @@ fastBarnardextest  = function(x,
 	clprob = log(1 - prob)
 	Fact   = lfactorial(0:max(c1, c2, na.rm = TRUE)[1])
 	###################################################
-	T = sapply(1:ncol(cbn), function(col) {
+	T = sapply(seq_len(ncol(cbn)), function(col) {
 		i   = cbn[1, col]
 		j   = cbn[2, col]
 		s = n1 + n2 +
@@ -3951,7 +3951,7 @@ RemoveSexWithZeroDataPointInGenSexTableOnlyStatsPipelinenotExposed = function(df
 		zc = zc[zc$Freq < 1,]
 		if (nrow(zc) > 0) {
 			message0('Zero frequency values detected ...')
-			names(zc)[1:length(cols)]   = cols
+			names(zc)[seq_along(cols)]   = cols
 			df = df[!df[, cols[-1]] %in% zc[, cols[-1]],]
 			df = droplevels(df)
 		}

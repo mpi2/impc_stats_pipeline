@@ -57,7 +57,7 @@ M.opt = function(object = NULL            ,
 		message0(mdl, ': Fitting the full model ... ')
 		fixed         = initialFixed
 		fixedTerms    = formulaTerms(initialFixed)
-		for (i in 1:length(fixedTerms)) {
+		for (i in seq_along(fixedTerms)) {
 			I.Model    = tryCatch(
 				expr     = do.call(mdl,
 													 listFun(

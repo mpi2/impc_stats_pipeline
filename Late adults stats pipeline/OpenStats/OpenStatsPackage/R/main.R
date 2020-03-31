@@ -31,11 +31,8 @@ OpenStatsAnalysis = function(OpenStatsListObject   = NULL          ,
 														 FERR_FullComparisions = c(TRUE,FALSE),
 														 ##### Others
 														 MMFERR_conf.level = 0.95            ,
-														 seed       = NULL                   ,
 														 debug      = TRUE                   ,
 														 ...) {
-	if(!is.null(seed))
-		set.seed(seed)
 	r = NULL
 	s = tryCatch(
 		expr = {
