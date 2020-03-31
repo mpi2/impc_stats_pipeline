@@ -15,3 +15,5 @@ Depends: R (>= 3.5.3.0)
 Date: 2019-04-31
 VignetteBuilder: knitr
 Suggests: rmarkdown
+BugReports: https://git.io/Jv50e
+URL: https://git.io/JeOVN

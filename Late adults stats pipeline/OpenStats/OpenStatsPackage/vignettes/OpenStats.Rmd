@@ -28,7 +28,9 @@ vignette: >
 The User's Guide with more details about the statistical analysis is available as part of the
 online documentation from (https://rpubs.com/hamedhm/openstats). Project Github repository including *dev* version of the package is available on (https://git.io/JeOVN).
 
+**OpenStats** can be installed using the standard R package installation routin:
 
+**R code here**
 
 ## Building block of the software
 *OpenStats* consists of one input layer and three operational layers:
@@ -439,4 +441,7 @@ There are also graphics for the OpenStatsMM/FE/RR. Below shows an example for th
 	plot(MM_result, col = 2)
 ```
 
-
+### Session information
+```{r R_hide0175, results='tex', echo=TRUE, eval=TRUE}
+ sessionInfo()
+```
