@@ -6,14 +6,15 @@ author:
 date: "`r format(Sys.time(), '%d %B %Y')`"
 package: OpenStats
 output:
+  pdf_document: 
+    number_sections: yes
+    toc: yes
+    toc_depth: 5
   html_document:
     highlight: tango
     number_sections: yes
     toc: yes
     toc_depth: 5
-  pdf_document:
-    toc: yes
-    toc_depth: '5'
   word_document:
     toc: yes
     toc_depth: '5'
