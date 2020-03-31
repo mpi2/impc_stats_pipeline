@@ -4,7 +4,7 @@ Title: A Robust and Scalable Software Package for Reproducible Analysis of High-
 Version: 1.0.0
 Author: Hamed Haseli Mashhadi
 Maintainer: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
-Description: Package contains several methods for statistical analysis of phenotypic data. This package is designed to substitute the old PhenStat package.
+Description: Package contains several methods for statistical analysis of phenotypic data.
 License: GPL (>= 2)
 Imports: nlme, MASS, jsonlite, Hmisc, methods, knitr, AICcmodavg, car, rlist, summarytools
 Encoding: UTF-8
@@ -13,3 +13,5 @@ Repository: CRAN
 RoxygenNote: 6.0.1
 Depends: R (>= 3.5.3.0)
 Date: 2019-04-31
+VignetteBuilder: knitr
+Suggests: rmarkdown

@@ -7,7 +7,6 @@ output:
     css: style.css
     highlight: tango
     number_sections: yes
-    pdf_document: default
     toc: yes
     toc_depth: 5
   pdf_document:

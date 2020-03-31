@@ -3246,7 +3246,7 @@ as.list0 = function(x, ...) {
 
 AllEffSizes = function(object, depVariable, effOfInd, data) {
 	if (length(effOfInd) < 1 ||
-			effOfInd ==   1) {
+			all(effOfInd == 1)) {
 		message0('\tSkipped . No variable found for the effect size ...')
 		return(NULL)
 	}
@@ -3260,7 +3260,7 @@ AllEffSizes = function(object, depVariable, effOfInd, data) {
 		}
 	)]
 	counter1 = counter2  = 1
-	if (length(effOfInd)) {
+	if (!is.null(effOfInd) && length(effOfInd)) {
 		for (eff in effOfInd) {
 			message0('\tLevel:', pasteComma(unlist(eff)))
 			# 1. Main effect

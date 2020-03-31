@@ -25,11 +25,11 @@
 }
 \usepackage{anyfontsize}
 
-<< echo=FALSE, eval=TRUE, results='tex'>>=
+<< echo=FALSE, eval=TRUE, results='asis'>>=
   options(width = 95)
 	knitr::opts_knit$set(width = 95)
 	knitr::opts_chunk$set(out.width = "1\\linewidth")
-	knitr::opts_chunk$set(results = 'tex')
+	knitr::opts_chunk$set(results = 'asis')
 	knitr::opts_chunk$set(size    = 'small')
 	knitr::opts_chunk$set(warning = TRUE)
 	knitr::opts_chunk$set(prompt = TRUE)
@@ -90,7 +90,7 @@ For instance, it can be dataset stored in csv, tsv or txt file. Data is organise
 
 
 
-<<R_hide002, echo=TRUE, eval=TRUE, results='tex'>>=
+<<R_hide002, echo=TRUE, eval=TRUE, results='asis'>>=
 library(OpenStats)
 ###################
 # Data preparation
@@ -124,7 +124,7 @@ All tasks in OpenStats are accompanied by step-by-step reports, error messages, 
 
 The chunk of code below demonstrates an example of using \emph{OpenStatsList} when the user sets out-messages to TRUE/FALSE:
 
-<<R_hide003, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide003, results='asis', echo=TRUE, eval=TRUE>>=
   #######################################
   # Default behaviour with messages
   #######################################
@@ -163,7 +163,7 @@ The chunk of code below demonstrates an example of using \emph{OpenStatsList} wh
 \subsection{OpenStatsList Object}
 The output of the \textit{OpenStatsList} function is the \textit{OpenStatsList} object that contains a cleaned dataset as well as a copy of the original dataset. \textit{OpenStats} allows \textbf{plot} and \textbf{summary} of the OpenStatList object. Below is an example of the OpenStatsList function accompanied by the plot and summary:
 
-<<R_hide005, echo=TRUE, eval=TRUE, results='tex'>>=
+<<R_hide005, echo=TRUE, eval=TRUE, results='asis'>>=
   library(OpenStats)
   df = read.csv(system.file("extdata", "test_continuous.csv", 
                             package = "OpenStats"))
@@ -243,7 +243,7 @@ In this section, we show some examples of the functionalities in \textit{OpenSta
 \subsection{Linear mixed model framework}
 The linear mixed model framework applies to continuous data. In this example, data is extracted from the sample data that accompany the software. Here, ``Genotype'' is the effect of interest. The response is stored in the variable ``data\_point'' and genotype (Genotype) and body weight (Weight) are covariates. The model selection is left to the default, stepwise, and between-group covariance structure are assumes proportional to the genotype levels (different variation for controls than mutants): 
 
-<<R_hide010, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide010, results='asis', echo=TRUE, eval=TRUE>>=
   library(nlme)
   library(OpenStats)
 	#################
@@ -279,7 +279,7 @@ The linear mixed model framework applies to continuous data. In this example, da
 
 An alternative to the analytically estimating the sub-models is to break the input data into splits and run the model on the subset of the data. This can be performed by passing the output of OpenStatsAnalysis function, \emph{OpenStatsMM}, to the function, \emph{OpenStatsComplementarySplit}. This function allows the OpenStatsMM object as input and a set of variable names that split happens on. The example below shows the split on ``Sex'':
 
-<<R_hide010m2, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide010m2, results='asis', echo=TRUE, eval=TRUE>>=
   library(nlme)
   library(OpenStats)
 	#################
@@ -318,7 +318,7 @@ An alternative to the analytically estimating the sub-models is to break the inp
 \subsection{Reference range plus framework}
 Reference range plus framework applies to continuous data. In this example, data is extracted from the sample data that accompany the software. Here, ``Genotype'' is the effect of interest. The response is stored in the variable ``data\_point'' and genotype (Genotype) and sex (Sex) are covariate. 
 
-<<R_hide01020, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide01020, results='asis', echo=TRUE, eval=TRUE>>=
   library(nlme)
   library(OpenStats)
 	#################
@@ -353,7 +353,7 @@ Reference range plus framework applies to continuous data. In this example, data
 \subsection{Fisher's exact test framework}
 Fisher's Exact test framework applies to categorical data. In this example, data is extracted from the sample data that accompany the software. Here, Genotype is the effect of interest. The response is stored in the variable \emph{category} and Genotype and Sex are the covariates. 
 
-<<R_hide0102, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide0102, results='asis', echo=TRUE, eval=TRUE>>=
   library(nlme)
   library(OpenStats)
   #################
@@ -384,7 +384,7 @@ Fisher's Exact test framework applies to categorical data. In this example, data
 \subsection{OpenStatsAnalysis output object}
 OpenStatsAnalysis output consists of three elements namely, \emph{input}, \emph{output} and \emph{extra.} The \emph{input} object encapsulate the input parameters to the function, \emph{output} hold the analysis results and the \emph{extra} keeps some extra processes on the data/model. Below is an example output from the Reference Rage plus framework:
 
-<<R_hide01021, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide01021, results='asis', echo=TRUE, eval=TRUE>>=
   library(nlme)
   library(OpenStats)
 	#################
@@ -424,14 +424,14 @@ OpenStatsAnalysis output consists of three elements namely, \emph{input}, \emph{
 \textit{OpenStats} package stores the results of statistical analyses in the \textit{OpenStatsMM/RR/FE} object.
 The standard \emph{summary} function can be applied to print out a summary table. The function \textit{OpenStatsReport} can be used to create a table of detailed summary in the form of either list or JSON. The following is an example of the summary output of the MM framework. The same function applied to the FE and RR output objects.\\
 
-<<R_hide013, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide013, results='asis', echo=TRUE, eval=TRUE>>=
 summary(MM_result)
 @
 
 
 \textit{OpenStatsReport} function was developed for large scale application where automatic implementation is require. Following is the JSON output of the function from an \emph{OpenStatsMM} object:
 
-<<R_hide015, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide015, results='asis', echo=TRUE, eval=TRUE>>=
 	OpenStatsReport(
 	  object = MM_result,
 	  JSON = TRUE,
@@ -444,7 +444,7 @@ summary(MM_result)
 \section{Graphics}
 Graphics in \textit{OpenStats} are as easy as calling the \textbf{plot()} function on a OpenStatsList or the OpenStatsMM/FE/RR object. Calling the plot function on the OpenStatsList object is shown below:
 
-<<R_hide017, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide017, results='asis', echo=TRUE, eval=TRUE>>=
 library(OpenStats)
   ###################
 	file = system.file("extdata", "test_continuous.csv", 
@@ -475,7 +475,7 @@ library(OpenStats)
 
 There are also graphics for the OpenStatsMM/FE/RR. Below shows an example for the OpenStatsMM output:
 
-<<R_hide018, results='tex', echo=TRUE, eval=TRUE>>=
+<<R_hide018, results='asis', echo=TRUE, eval=TRUE>>=
 	plot(MM_result, col = 2)
 @
 
