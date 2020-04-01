@@ -1,6 +1,6 @@
 ---
 title: '**OpenStats**'
-author: 'Hamed Haseli Mashhadi (hamedhm@ebi.ac.uk), '
+author: 'Hamed Haseli Mashhadi (hamedhm@ebi.ac.uk) '
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output:
   html_document:
