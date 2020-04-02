@@ -3846,7 +3846,7 @@ requiredDataColumns = function(x){
 }
 
 updateImpress = function(updateImpressFileInThePackage = FALSE,
-                         updateOpeionalParametersList  = FALSE,
+                         updateOptionalParametersList  = FALSE,
                          updateTheSkipList             = FALSE,
                          saveRdata                     = NULL ) {
   outP = df = NULL
@@ -3930,7 +3930,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
       fileName = file.path(getwd(), 'AllCts.csv')
     }
     ###################################################
-    if(updateOpeionalParametersList){
+    if(updateOptionalParametersList){
       fileNameMeta = system.file("extdata", "metadataParameters.csv", package = "DRrequiredAgeing")
     } else{
       fileNameMeta = file.path(getwd(), 'metadataParameters.csv')
