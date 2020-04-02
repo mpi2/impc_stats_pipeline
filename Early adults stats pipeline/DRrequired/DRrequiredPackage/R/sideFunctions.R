@@ -4093,7 +4093,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
     fileName = file.path(getwd(), 'AllCts.csv')
   }
     ###################################################
-    if(updateOptionalParametersList){
+    if(updateOptionalParametersList && updateImpressFileInThePackage){
       fileNameMeta = system.file("extdata", "metadataParameters.csv", package = "DRrequiredAgeing")
     } else{
       fileNameMeta = file.path(getwd(), 'metadataParameters.csv')
