@@ -168,7 +168,9 @@ getResponseColumn = function(x, activate = TRUE) {
 
       if (lbl %in% 'categorical')
         column = 'category'
-      else if (lbl %in% c('unidimensional', 'time_series'))
+      else if (lbl %in% 'unidimensional')
+        column = 'data_point'
+      else if (lbl %in% 'time_series')
         column = 'data_point'
       else if (lbl %in% 'text')
         column =  'text_value'
