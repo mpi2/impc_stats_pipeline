@@ -397,9 +397,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
 
                     n3.5 = TransformVariableByFunction(
                       varType = depVariable$lbl,
-                      data = n3.5,
+                      data = n3.5              ,
                       types = c('unidimensional', 'time_series'),
-                      colName = depVariable$column,
+                      colName = depVariable$column              ,
                       FUN = as.numeric0
                     )
                     depVar      = depVariable$column

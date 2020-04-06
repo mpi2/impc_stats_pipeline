@@ -1212,12 +1212,14 @@ SummaryStatisticsOriginal = function(x,
                                      replace = '_') {
   r   = NULL
   # do not move me
-  if (any(dim(x) == 0) || is.null(complete.cases0(x[, depVar])))
-    return('empty dataset')
+  if (any(dim(x) == 0) ||
+      nrow(x) < 1)
+    return(list('Error in input data' = 'empty dataset'))
+
+  if (sum(complete.cases0(x[, depVar])) < 1)
+    return(list('Error in input data' = 'No value for the response - all NA'))
 
   x = x[complete.cases0(x[, depVar]), , drop = FALSE]
-
-
   #x      = droplevels0(x)
   v0 = varsInColsOrReturn(x, c(sex, genotype, depVar))
   if (is.numeric(x[, depVar])) {
@@ -4087,7 +4089,8 @@ TransformVariableByFunction = function(varType = NULL ,
       colName %in% names(data) &&
       FUNData(data[, colName])) {
     message0('Applying the function to the data [column = ', colName, ']')
-    data[, colName] = FUN(levels(data[, colName])[data[, colName]])
+      #data[, colName] = FUN(levels(data[, colName])[data[, colName]])
+      data[, colName] = FUN(data[, colName])
   }
   return(data)
 }
