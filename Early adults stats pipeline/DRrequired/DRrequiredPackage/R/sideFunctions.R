@@ -4308,10 +4308,17 @@ EnoughWeightForTheSexGenInteraction = function(df,
   }
 }
 
-list.dirsDepth = function(path=getwd(), depth = 0, ...) {
+list.dirsDepth = function(path  = getwd(),
+                          depth = 0      ,
+                          cumulative = FALSE,
+                          ...) {
+  dirs = path
   if (depth > 0)
-  for (i in 0:depth) {
-    path = c(path, list.dirs(path = path, recursive = FALSE, ...))
+    for (i in 1:depth) {
+      path   = list.dirs(path = path, recursive = FALSE, ...)
+      dirs   = if(cumulative)  c(path, dirs) else  path
   }
-  return(unique(path))
+  return(unique(dirs))
 }
+
+
