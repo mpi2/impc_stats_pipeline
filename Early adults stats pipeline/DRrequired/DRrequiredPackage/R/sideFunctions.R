@@ -4322,3 +4322,27 @@ list.dirsDepth = function(path  = getwd(),
 }
 
 
+minijobsCreator = function(path  = getwd(),
+                           depth = 2,
+                           fname = 'minijobs.txt') {
+  lf = DRrequiredAgeing:::list.dirsDepth(path = path, depth = depth)
+  a = paste0(
+    'bsub "find ',
+    lf,
+    ' -type f > ',
+    path,
+    '/FileIndex_',
+    basename(lf),
+    '_',
+    round(runif(length(lf)), 6),
+    '.Ind"'
+  )
+  write(
+    x = a,
+    file = fname,
+    ncolumns = 10 ^ 5,
+    append = FALSE,
+    sep = '\n'
+  )
+}
+
