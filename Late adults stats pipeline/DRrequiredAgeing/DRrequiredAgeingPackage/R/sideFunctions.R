@@ -4183,3 +4183,134 @@ minijobsCreator = function(path  = getwd(),
   )
 }
 
+#### Only for the ETL process step 1,2,3,4
+ETLStep1MakePar2RdataJobs = function(path = getwd(),
+                                     mem = 25000,
+                                     pattern = '.parquet') {
+  files = list.files(
+    path = paste0(path, '/'),
+    pattern = pattern,
+    full.names = TRUE,
+    recursive = TRUE,
+    include.dirs = FALSE
+  )
+  write(
+    paste0(
+      'bsub -M ',
+      mem,
+      ' -e "step2_Par2Rdata_error.log" -o "Step2_Par2Rdata_output.log" Rscript Step2Parquet2Rdata.R "',
+      files,
+      '" ""'
+    ),
+    file = 'jobs_step2_Parquet2Rdata.bch'
+  )
+  write('', file = 'Step1 completed.log')
+}
+
+
+ETLStep2Parquet2Rdata = function(files) {
+  library(miniparquet)
+  df = lapply(seq_along(files),
+              function(i) {
+                message(i, '|', length(files), ' ~> ', files[i])
+                r = miniparquet::parquet_read(files[i])
+                return(r)
+              })
+  ###############
+  procedure_list = na.omit(unique(unlist(lapply(df, function(x) {
+    unique(x$procedure_group)
+  }))))
+
+  for (proc in procedure_list) {
+    message(which(procedure_list == proc),
+            '/',
+            length(procedure_list),
+            ' Checking for ',
+            proc)
+    rdata = data.table::rbindlist(lapply(df, function(x) {
+      r = subset(x, x$procedure_group == proc)
+      return(r)
+    }))
+
+    if (!is.null(rdata) &&
+        nrow    (rdata) > 0) {
+      rdata = rdata[!duplicated(rdata),]
+    }
+
+    outDir = file.path('ProcedureScatterRdata', proc)
+    if (!dir.exists(outDir))
+      dir.create(outDir, recursive = TRUE)
+    save(rdata,
+         file = file.path(
+           outDir,
+           paste(
+             round(runif(1) * 10 ^ 6)  ,
+             proc                  ,
+             '.Rdata'              ,
+             sep = '_'             ,
+             collapse = '_'
+           )
+         ),
+         compress = FALSE)
+    rm(rdata)
+    gc()
+  }
+}
+
+ETLStep3MergeRdataFilesJobs = function(path = file.path(getwd(), 'ProcedureScatterRdata'),
+                                       mem = 40000) {
+  dirs = list.dirs(path = path,
+                   full.names = TRUE ,
+                   recursive  = FALSE)
+  ############## jobs creator#
+  write(
+    paste0(
+      'bsub -M ',
+      mem,
+      ' -e "step4_MergeRdatas_error.log" -o "step4_MergeRdatas_output.log" Rscript Step4MergingRdataFiles.R "',
+      unique(na.omit(dirs)),
+      '"'
+    ),
+    file = 'jobs_step4_MergeRdatas.bch'
+  )
+  write('',file = 'Step3 completed.log')
+}
+
+
+ETLStep4MergingRdataFiles = function(RootDir) {
+  for (dir in RootDir) {
+    message('Merging data in ', dir)
+    rdata0 = NULL
+    fs = list.files(
+      path = dir,
+      pattern = 'Rdata',
+      full.names = TRUE,
+      recursive = FALSE,
+      ignore.case = TRUE
+    )
+    if (length(fs) < 1)
+      next
+    for (f in fs) {
+      if (!grepl(pattern = '.Rdata', x = f))
+        next
+      message('\t file: ', f)
+      load(f)
+      rdata0 = rbind(rdata0, rdata)
+      rm(rdata)
+    }
+    outDir = file.path(getwd(), 'Rdata')
+    if (!dir.exists(outDir)) {
+      dir.create(outDir, recursive = TRUE)
+    }
+    save(rdata0, file = file.path(outDir                              ,
+                                  paste0(
+                                    # Sys.Date(),
+                                    #'_',
+                                    unique(rdata0$procedure_group),
+                                    '.Rdata',
+                                    collapse = '_'
+                                  )))
+    rm(rdata0)
+    gc()
+  }
+}
