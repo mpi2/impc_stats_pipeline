@@ -53,7 +53,7 @@ OpenStats is fully written in [R](https://cran.r-project.org/) and can be instal
 ```{r, echo=TRUE,eval=FALSE}
 library(devtools)
 install_github(
-	repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/OpenStats/OpenStatsPackage/',
+	repo = 'mpi2/OpenStats',
 	dependencies = TRUE,
 	upgrade = 'always',
 	force = TRUE,
@@ -461,7 +461,7 @@ There are some predefined effects such as sex effect that are typically used in 
 
 
 # Further questions
-This manual followed by the function manual in the **[OpenStats](https://github.com/mpi2/impc_stats_pipeline/tree/master/Late%20adults%20stats%20pipeline/OpenStats/OpenStatsPackage)** R package address the theories and implementation of the three statistical frameworks in OpenStats. The further questions could be requested by the email of the OpenStats developer, <hamedhm@ebi.ac.uk>.
+This manual followed by the function manual in the **[OpenStats](https://github.com/mpi2/OpenStats/)** R package address the theories and implementation of the three statistical frameworks in OpenStats. The further questions could be requested by the email of the OpenStats developer, <hamedhm@ebi.ac.uk>.
 
 
 
