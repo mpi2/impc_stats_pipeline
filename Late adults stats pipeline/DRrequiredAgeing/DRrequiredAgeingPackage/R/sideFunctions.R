@@ -4038,7 +4038,7 @@ removeLeadingSpaceFromDataFrameFactors = function(x) {
     return(x)
   message0('Remove leading/trailins space from a data frame ...')
   message0 ('\t Note that the factors get to the charachter and t/l space will be removed ...')
-  message0 ('\t The order of the factors may not preserved!')
+  message0 ('\t The order of the factors may not be preserved!')
   #x = as.data.frame(x)
   catV = unname(unlist(sapply(x, function(xx) {
     return(is.factor(xx))
