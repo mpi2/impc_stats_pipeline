@@ -266,26 +266,28 @@ GenePageURL = function(obj) {
     'parameter_stable_id',
     'pipeline_stable_id',
     'phenotyping_center',
-    'metadata_group'
+    'metadata_group'    ,
+    'biological_sample_group'
   ) %in% names(obj)
   ##########
   if (prod(activation) > 0) {
+    obj2 = subset(obj, obj$biological_sample_group %in% 'experimental')
     r = paste(
       'https://www.mousephenotype.org/data/charts?'  ,
       'accession='                                   ,
-      getNotEmptyValue(obj$gene_accession_id, 1)     ,
+      getNotEmptyValue(obj2$gene_accession_id, 1)    ,
       '&allele_accession_id='                        ,
-      getNotEmptyValue(obj$allele_accession_id, 1)   ,
+      getNotEmptyValue(obj2$allele_accession_id, 1)  ,
       '&zygosity='                                   ,
-      getNotEmptyValue(obj$zygosity, 1)        ,
+      getNotEmptyValue(obj2$zygosity, 1)             ,
       '&parameter_stable_id='                        ,
-      getNotEmptyValue(obj$parameter_stable_id, 1)   ,
+      getNotEmptyValue(obj2$parameter_stable_id, 1)  ,
       '&pipeline_stable_id='                         ,
-      getNotEmptyValue(obj$pipeline_stable_id, 1)    ,
+      getNotEmptyValue(obj2$pipeline_stable_id, 1)   ,
       '&phenotyping_center='                         ,
-      getNotEmptyValue(obj$phenotyping_center, 1)    ,
+      getNotEmptyValue(obj2$phenotyping_center, 1)   ,
       '&metadata_group='                             ,
-      getNotEmptyValue(obj$metadata_group, 1)        ,
+      getNotEmptyValue(obj2$metadata_group, 1)       ,
       sep = ''                                       ,
       collapse = ''
     )
@@ -302,12 +304,13 @@ BodyWeightCurvURL = function(obj) {
     return ('Empty dataset has no BWT URL!')
   }
   # allele_accession_id to make sure that we are safe for external application of the R package
-  activation = c('allele_accession_id', 'gene_accession_id') %in% names(obj)
+  activation = c('allele_accession_id', 'gene_accession_id','biological_sample_group') %in% names(obj)
+  obj2 = subset(obj, obj$biological_sample_group %in% 'experimental')
   if (prod(activation) > 0) {
     r = paste(
       'https://www.mousephenotype.org/data/charts?'    ,
       'accession='                                     ,
-      getNotEmptyValue(obj$gene_accession_id, 1)       ,
+      getNotEmptyValue(obj2$gene_accession_id, 1)       ,
       '&parameter_stable_id='                          ,
       'IMPC_BWT_008_001'                               ,
       '&chart_type=TIME_SERIES_LINE'                   ,
@@ -2409,7 +2412,10 @@ message0 = function(...,
 
 ## ReadMe
 ReadMe = function(obj, URL = NULL, skip = NULL) {
-  if (any(dim(obj)) > 0 && !is.null(obj)) {
+  if('biological_sample_group' %in% names(obj)){
+    obj = subset(obj, obj$biological_sample_group %in% 'experimental')
+  }
+  if (!is.null(obj) && nrow(obj) > 0) {
     ReadMeTxt = paste(
       c(
         'Gene_symbol',
@@ -4346,3 +4352,134 @@ minijobsCreator = function(path  = getwd(),
   )
 }
 
+#### Only for the ETL process step 1,2,3,4
+ETLStep1MakePar2RdataJobs = function(path = getwd(),
+                                     mem = 25000,
+                                     pattern = '.parquet') {
+  files = list.files(
+    path = paste0(path, '/'),
+    pattern = pattern,
+    full.names = TRUE,
+    recursive = TRUE,
+    include.dirs = FALSE
+  )
+  write(
+    paste0(
+      'bsub -M ',
+      mem,
+      ' -e "step2_Par2Rdata_error.log" -o "Step2_Par2Rdata_output.log" Rscript Step2Parquet2Rdata.R "',
+      files,
+      '" ""'
+    ),
+    file = 'jobs_step2_Parquet2Rdata.bch'
+  )
+  write('', file = 'Step1 completed.log')
+}
+
+
+ETLStep2Parquet2Rdata = function(files) {
+  library(miniparquet)
+  df = lapply(seq_along(files),
+              function(i) {
+                message(i, '|', length(files), ' ~> ', files[i])
+                r = miniparquet::parquet_read(files[i])
+                return(r)
+              })
+  ###############
+  procedure_list = na.omit(unique(unlist(lapply(df, function(x) {
+    unique(x$procedure_group)
+  }))))
+
+  for (proc in procedure_list) {
+    message(which(procedure_list == proc),
+            '/',
+            length(procedure_list),
+            ' Checking for ',
+            proc)
+    rdata = data.table::rbindlist(lapply(df, function(x) {
+      r = subset(x, x$procedure_group == proc)
+      return(r)
+    }))
+
+    if (!is.null(rdata) &&
+        nrow    (rdata) > 0) {
+      rdata = rdata[!duplicated(rdata),]
+    }
+
+    outDir = file.path('ProcedureScatterRdata', proc)
+    if (!dir.exists(outDir))
+      dir.create(outDir, recursive = TRUE)
+    save(rdata,
+         file = file.path(
+           outDir,
+           paste(
+             round(runif(1) * 10 ^ 6)  ,
+             proc                  ,
+             '.Rdata'              ,
+             sep = '_'             ,
+             collapse = '_'
+           )
+         ),
+         compress = FALSE)
+    rm(rdata)
+    gc()
+  }
+}
+
+ETLStep3MergeRdataFilesJobs = function(path = file.path(getwd(), 'ProcedureScatterRdata'),
+                                       mem = 40000) {
+  dirs = list.dirs(path = path,
+                   full.names = TRUE ,
+                   recursive  = FALSE)
+  ############## jobs creator#
+  write(
+    paste0(
+      'bsub -M ',
+      mem,
+      ' -e "step4_MergeRdatas_error.log" -o "step4_MergeRdatas_output.log" Rscript Step4MergingRdataFiles.R "',
+      unique(na.omit(dirs)),
+      '"'
+    ),
+    file = 'jobs_step4_MergeRdatas.bch'
+  )
+  write('',file = 'Step3 completed.log')
+}
+
+
+ETLStep4MergingRdataFiles = function(RootDir) {
+  for (dir in RootDir) {
+    message('Merging data in ', dir)
+    rdata0 = NULL
+    fs = list.files(
+      path = dir,
+      pattern = 'Rdata',
+      full.names = TRUE,
+      recursive = FALSE,
+      ignore.case = TRUE
+    )
+    if (length(fs) < 1)
+      next
+    for (f in fs) {
+      if (!grepl(pattern = '.Rdata', x = f))
+        next
+      message('\t file: ', f)
+      load(f)
+      rdata0 = rbind(rdata0, rdata)
+      rm(rdata)
+    }
+    outDir = file.path(getwd(), 'Rdata')
+    if (!dir.exists(outDir)) {
+      dir.create(outDir, recursive = TRUE)
+    }
+    save(rdata0, file = file.path(outDir                              ,
+                                  paste0(
+                                    # Sys.Date(),
+                                    #'_',
+                                    unique(rdata0$procedure_group),
+                                    '.Rdata',
+                                    collapse = '_'
+                                  )))
+    rm(rdata0)
+    gc()
+  }
+}

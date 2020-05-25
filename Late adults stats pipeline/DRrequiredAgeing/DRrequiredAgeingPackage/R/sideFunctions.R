@@ -266,26 +266,28 @@ GenePageURL = function(obj) {
     'parameter_stable_id',
     'pipeline_stable_id',
     'phenotyping_center',
-    'metadata_group'
+    'metadata_group'    ,
+    'biological_sample_group'
   ) %in% names(obj)
   ##########
   if (prod(activation) > 0) {
+    obj2 = subset(obj, obj$biological_sample_group %in% 'experimental')
     r = paste(
       'https://www.mousephenotype.org/data/charts?'  ,
       'accession='                                   ,
-      getNotEmptyValue(obj$gene_accession_id, 1)     ,
+      getNotEmptyValue(obj2$gene_accession_id, 1)    ,
       '&allele_accession_id='                        ,
-      getNotEmptyValue(obj$allele_accession_id, 1)   ,
+      getNotEmptyValue(obj2$allele_accession_id, 1)  ,
       '&zygosity='                                   ,
-      getNotEmptyValue(obj$zygosity, 1)        ,
+      getNotEmptyValue(obj2$zygosity, 1)             ,
       '&parameter_stable_id='                        ,
-      getNotEmptyValue(obj$parameter_stable_id, 1)   ,
+      getNotEmptyValue(obj2$parameter_stable_id, 1)  ,
       '&pipeline_stable_id='                         ,
-      getNotEmptyValue(obj$pipeline_stable_id, 1)    ,
+      getNotEmptyValue(obj2$pipeline_stable_id, 1)   ,
       '&phenotyping_center='                         ,
-      getNotEmptyValue(obj$phenotyping_center, 1)    ,
+      getNotEmptyValue(obj2$phenotyping_center, 1)   ,
       '&metadata_group='                             ,
-      getNotEmptyValue(obj$metadata_group, 1)        ,
+      getNotEmptyValue(obj2$metadata_group, 1)       ,
       sep = ''                                       ,
       collapse = ''
     )
@@ -302,12 +304,13 @@ BodyWeightCurvURL = function(obj) {
     return ('Empty dataset has no BWT URL!')
   }
   # allele_accession_id to make sure that we are safe for external application of the R package
-  activation = c('allele_accession_id', 'gene_accession_id') %in% names(obj)
+  activation = c('allele_accession_id', 'gene_accession_id','biological_sample_group') %in% names(obj)
+  obj2 = subset(obj, obj$biological_sample_group %in% 'experimental')
   if (prod(activation) > 0) {
     r = paste(
       'https://www.mousephenotype.org/data/charts?'    ,
       'accession='                                     ,
-      getNotEmptyValue(obj$gene_accession_id, 1)       ,
+      getNotEmptyValue(obj2$gene_accession_id, 1)       ,
       '&parameter_stable_id='                          ,
       'IMPC_BWT_008_001'                               ,
       '&chart_type=TIME_SERIES_LINE'                   ,
@@ -2246,7 +2249,10 @@ message0 = function(...,
 
 ## ReadMe
 ReadMe = function(obj, URL = NULL, skip = NULL) {
-  if (any(dim(obj)) > 0 && !is.null(obj)) {
+  if('biological_sample_group' %in% names(obj)){
+    obj = subset(obj, obj$biological_sample_group %in% 'experimental')
+  }
+  if (!is.null(obj) && nrow(obj) > 0) {
     ReadMeTxt = paste(
       c(
         'Gene_symbol',
