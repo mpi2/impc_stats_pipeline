@@ -132,8 +132,8 @@ ObjectsThatMustBeRemovedInEachIteration = function(x = NULL, ...) {
 getNotEmptyValue = function(x, head = Inf) {
   ux    = unique(x)
   neux  = which(ux != ''     &
-                !is.na(ux)   &
-                !is.null(ux))
+                  !is.na(ux)   &
+                  !is.null(ux))
   if (length(neux) > 0) {
     r = head(ux [neux], head)
   } else{
@@ -838,8 +838,8 @@ UniqueAndNNull = function(x,
     x = paste0(x, collapse = collapse)
     if(removeNewLine)
       x = gsub(pattern = '\n',
-					 x = x,
-					replacement = newlineRepChar)
+               x = x,
+               replacement = newlineRepChar)
     if (removeSpecials)
       x = RemoveSpecialChars(x = x, replaceBy = ' ')
   } else{
@@ -1229,13 +1229,18 @@ SummaryStatisticsOriginal = function(x,
   v0 = varsInColsOrReturn(x, c(sex, genotype, depVar))
   if (is.numeric(x[, depVar])) {
     lvls   = interaction(x[, varsInColsOrReturn(x, c(sex, genotype))], sep = sep, drop = drop)
+    vvls   = interaction(x[, varsInColsOrReturn(x, c(sex, genotype))], sep = sep, drop = drop)
   } else {
     if (length(v0) > 1) {
       lvls   = interaction(x[, varsInColsOrReturn(x, c(sex, genotype, depVar))], sep = sep, drop = drop)
+      vvls   = interaction(x[, varsInColsOrReturn(x, c(sex, genotype))], sep = sep, drop = drop)
+
     } else{
       lvls   = interaction(x[, c(genotype, depVar)], sep = sep, drop = drop)
+      vvls   = interaction(x[, c(genotype)], sep = sep, drop = drop)
     }
   }
+
 
   isNumeric = is.numeric(x[, depVar])
   summaryT    = as.list(tapply(x[, depVar], INDEX = lvls, function(xx) {
@@ -1282,9 +1287,28 @@ SummaryStatisticsOriginal = function(x,
   if (removeSpecialChars) {
     nnames = RemoveSpecialChars(nnames, replaceBy = replace, what = what)
   }
-
-  r = list(lbl = summaryT)
+  vls = sort(unique(vvls))
+  rl = summaryTDetailed = summaryT
+  rl2 = NULL
+  if (length(vls) > 0) {
+    for (n in vls) {
+      if (is.null(rl))
+        next
+      grp = grepl(pattern = n,
+                  x = names(rl),
+                  fixed = TRUE)
+      if (sum(grp) < 1)
+        next
+      rl2[n] = list(rl[grp])
+      rl = rl[!grp]
+    }
+    if (!is.null(rl) && length(rl)>0)
+      rl2['others'] = rl
+    summaryT = rl2
+  }
+  r = list(lbl = list('Collapsed' = summaryT, 'Detailed' = summaryTDetailed))
   names(r) = label
+
   return(r)
 }
 
@@ -2025,6 +2049,7 @@ subModelVectorOutput = function(object ,
       ReportNullSchema  = ReportNullSchema
     )
     if (!is.null(res)) {
+      #res = vectorOutputDictionary2List(res)
       res$`Classification tag` = OpenStats:::classificationTag(x)
     }
     return(res)
@@ -2034,7 +2059,113 @@ subModelVectorOutput = function(object ,
   return(r)
 }
 
-
+WhileListForDic2list=function(){
+  r = c("Genotype contribution",
+        "Genotype effect size",
+        "Genotype estimate",
+        "Genotype p-value",
+        "Genotype percentage change",
+        "Interactions p-value",
+        "Intercept estimate",
+        "Intercept p-value",
+        "LifeStage EvKO effect size",
+        "LifeStage EvKO estimate",
+        "LifeStage EvKO p-value",
+        "LifeStage EvKO standard error",
+        "LifeStage LvKO effect size",
+        "LifeStage LvKO estimate",
+        "LifeStage LvKO p-value",
+        "LifeStage LvKO standard error",
+        "LifeStage effect size",
+        "LifeStage estimate",
+        "LifeStage p-value",
+        "LifeStage standard error",
+        "LifeStageSexGenotype FvEvKO effect size",
+        "LifeStageSexGenotype FvEvKO estimate",
+        "LifeStageSexGenotype FvEvKO p-value",
+        "LifeStageSexGenotype FvEvKO standard error",
+        "LifeStageSexGenotype FvLvKO effect size",
+        "LifeStageSexGenotype FvLvKO estimate",
+        "LifeStageSexGenotype FvLvKO p-value",
+        "LifeStageSexGenotype FvLvKO standard error",
+        "LifeStageSexGenotype MvEvKO effect size",
+        "LifeStageSexGenotype MvEvKO estimate",
+        "LifeStageSexGenotype MvEvKO p-value",
+        "LifeStageSexGenotype MvEvKO standard error",
+        "LifeStageSexGenotype MvLvKO effect size",
+        "LifeStageSexGenotype MvLvKO estimate",
+        "LifeStageSexGenotype MvLvKO p-value",
+        "LifeStageSexGenotype MvLvKO standard error",
+        "Sex FvKO effect size",
+        "Sex FvKO estimate",
+        "Sex FvKO p-value",
+        "Sex FvKO standard error",
+        "Sex MvKO effect size",
+        "Sex MvKO estimate",
+        "Sex MvKO p-value",
+        "Sex MvKO standard error",
+        "Sex effect size",
+        "Sex estimate",
+        "Sex p-value",
+        "Sex standard error",
+        "Weight effect size",
+        "Weight estimate",
+        "Weight p-value",
+        "Weight standard error",
+        "Genotype contribution",
+        "Genotype effect size",
+        "Genotype estimate",
+        "Genotype p-value",
+        "Genotype percentage change",
+        "Interactions p-value",
+        "Intercept estimate",
+        "Intercept p-value",
+        "LifeStage EvKO effect size",
+        "LifeStage EvKO estimate",
+        "LifeStage EvKO p-value",
+        "LifeStage EvKO standard error",
+        "LifeStage LvKO effect size",
+        "LifeStage LvKO estimate",
+        "LifeStage LvKO p-value",
+        "LifeStage LvKO standard error",
+        "LifeStage effect size",
+        "LifeStage estimate",
+        "LifeStage p-value",
+        "LifeStage standard error",
+        "LifeStageSexGenotype FvEvKO effect size",
+        "LifeStageSexGenotype FvEvKO estimate",
+        "LifeStageSexGenotype FvEvKO p-value",
+        "LifeStageSexGenotype FvEvKO standard error",
+        "LifeStageSexGenotype FvLvKO effect size",
+        "LifeStageSexGenotype FvLvKO estimate",
+        "LifeStageSexGenotype FvLvKO p-value",
+        "LifeStageSexGenotype FvLvKO standard error",
+        "LifeStageSexGenotype MvEvKO effect size",
+        "LifeStageSexGenotype MvEvKO estimate",
+        "LifeStageSexGenotype MvEvKO p-value",
+        "LifeStageSexGenotype MvEvKO standard error",
+        "LifeStageSexGenotype MvLvKO effect size",
+        "LifeStageSexGenotype MvLvKO estimate",
+        "LifeStageSexGenotype MvLvKO p-value",
+        "LifeStageSexGenotype MvLvKO standard error",
+        "Sex FvKO effect size",
+        "Sex FvKO estimate",
+        "Sex FvKO p-value",
+        "Sex FvKO standard error",
+        "Sex MvKO effect size",
+        "Sex MvKO estimate",
+        "Sex MvKO p-value",
+        "Sex MvKO standard error",
+        "Sex effect size",
+        "Sex estimate",
+        "Sex p-value",
+        "Sex standard error",
+        "Weight effect size",
+        "Weight estimate",
+        "Weight p-value",
+        "Weight standard error")
+  return(r)
+}
 # A new vector output for this package only
 VectorOutput0 = function(c.ww0,
                          ExtraCols                 ,
@@ -2124,6 +2255,11 @@ VectorOutput0 = function(c.ww0,
     p2 = p3 = p4 = NULL
   }
   ###
+  # p1 = vectorOutputDictionary2List(p1)
+  # p2 = vectorOutputDictionary2List(p2)
+  # p3 = vectorOutputDictionary2List(p3)
+  # p4 = vectorOutputDictionary2List(p4)
+
   output = list(
     'Normal result'       = p1,
     'Windowed result'     = p2,
@@ -2135,6 +2271,23 @@ VectorOutput0 = function(c.ww0,
               list = output))
 }
 
+# vectorOutputDictionary2List = function(x, whitelist = WhileListForDic2list()) {
+#   if (is.null(x))
+#     return(x)
+#   nx = names(x)
+#   if (length(nx) < 1)
+#     return(x)
+#   for (name in nx) {
+#     if (!name %in% whitelist)
+#       next
+#     if (is(x[[name]], 'list')) {
+#       x$WILLBECHANGED = dictionary2listConvert(x[[name]])
+#       names(x)[names(x) %in% 'WILLBECHANGED'] = paste0(name, '_2')
+#     }
+#
+#   }
+#   return(x)
+# }
 
 # Area under the curve
 AUC = function(x, y) {
@@ -3911,60 +4064,60 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
   if (updateTheSkipList)
     UpdateTheSkipListfromIMPReSSAPI(df)
   ###################################################
-    message0('\t Step2. Fetching the category names from the category ids ...')
-    dfSelected  = df[lapply(df$optionCollection, length) > 0,]
-    #dfSelected  = dfSelected[dfSelected$isAnnotation, ]
-    dfSelected  = dfSelected[dfSelected$type %in% 'simpleParameter', ]
-    #dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
-    dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
-    dfSelected  = dfSelected[!duplicated(dfSelected$parameterKey),]
+  message0('\t Step2. Fetching the category names from the category ids ...')
+  dfSelected  = df[lapply(df$optionCollection, length) > 0,]
+  #dfSelected  = dfSelected[dfSelected$isAnnotation, ]
+  dfSelected  = dfSelected[dfSelected$type %in% 'simpleParameter', ]
+  #dfSelected  = dfSelected[dfSelected$valueType %in% 'TEXT', ]
+  dfSelected  = dfSelected[, c('parameterKey', 'optionCollection', 'parameterId')]
+  dfSelected  = dfSelected[!duplicated(dfSelected$parameterKey),]
 
-    message0('\t\t Total items to look up: ', nrow(dfSelected))
-    dfSelected$categories = sapply(dfSelected$parameterId, function(x) {
-      #message0('Pid = ', x)
-      l = unlist(jsonlite:::fromJSON(
-        paste0(
-          'http://api.mousephenotype.org/impress/option/belongingtoparameter/names/',
-          x
-        )
-      ))
-      paste(trimws(l), collapse = ',', sep = ',')
-    })
+  message0('\t\t Total items to look up: ', nrow(dfSelected))
+  dfSelected$categories = sapply(dfSelected$parameterId, function(x) {
+    #message0('Pid = ', x)
+    l = unlist(jsonlite:::fromJSON(
+      paste0(
+        'http://api.mousephenotype.org/impress/option/belongingtoparameter/names/',
+        x
+      )
+    ))
+    paste(trimws(l), collapse = ',', sep = ',')
+  })
 
-    ###################################################
-    message0('Finished in ', round(difftime(Sys.time() , startTime, units = 'min'), 2), 'm')
-    ###################################################
-    if (updateImpressFileInThePackage) {
-      fileName = system.file("extdata", "AllCts.csv", package = "DRrequiredAgeing")
-    } else{
-      fileName = file.path(getwd(), 'AllCts.csv')
-    }
-    ###################################################
-    if(updateOptionalParametersList && updateImpressFileInThePackage){
-      fileNameMeta = system.file("extdata", "metadataParameters.csv", package = "DRrequiredAgeing")
-    } else{
-      fileNameMeta = file.path(getwd(), 'metadataParameters.csv')
-    }
-    ###################################################
-    outP = data.frame(
-      parameter_stable_id = dfSelected$parameterKey,
-      categories          = dfSelected$categories
-    )
-    ###################################################
-    outM = data.frame(
-      parameter_stable_id = unique(df$parameterKey[df$type %in% 'procedureMetadata'])
-    )
-    ###################################################
-    message0('\tThe output file:\n\t  => ', fileName)
-    write.csv(x         = outP    ,
-              file      = fileName,
-              row.names = FALSE)
-    ###################################################
-    message0('\tThe metadatafile file:\n\t  => ', fileNameMeta)
-    write.csv(x         = outM    ,
-              file      = fileNameMeta,
-              row.names = FALSE)
-    ###################################################
+  ###################################################
+  message0('Finished in ', round(difftime(Sys.time() , startTime, units = 'min'), 2), 'm')
+  ###################################################
+  if (updateImpressFileInThePackage) {
+    fileName = system.file("extdata", "AllCts.csv", package = "DRrequiredAgeing")
+  } else{
+    fileName = file.path(getwd(), 'AllCts.csv')
+  }
+  ###################################################
+  if(updateOptionalParametersList && updateImpressFileInThePackage){
+    fileNameMeta = system.file("extdata", "metadataParameters.csv", package = "DRrequiredAgeing")
+  } else{
+    fileNameMeta = file.path(getwd(), 'metadataParameters.csv')
+  }
+  ###################################################
+  outP = data.frame(
+    parameter_stable_id = dfSelected$parameterKey,
+    categories          = dfSelected$categories
+  )
+  ###################################################
+  outM = data.frame(
+    parameter_stable_id = unique(df$parameterKey[df$type %in% 'procedureMetadata'])
+  )
+  ###################################################
+  message0('\tThe output file:\n\t  => ', fileName)
+  write.csv(x         = outP    ,
+            file      = fileName,
+            row.names = FALSE)
+  ###################################################
+  message0('\tThe metadatafile file:\n\t  => ', fileNameMeta)
+  write.csv(x         = outM    ,
+            file      = fileNameMeta,
+            row.names = FALSE)
+  ###################################################
   return(invisible(list(
     categories = outP, dfObject = df
   )))
@@ -4097,8 +4250,8 @@ TransformVariableByFunction = function(varType = NULL ,
       colName %in% names(data) &&
       FUNData(data[, colName])) {
     message0('Applying the function to the data [column = ', colName, ']')
-      #data[, colName] = FUN(levels(data[, colName])[data[, colName]])
-      data[, colName] = FUN(data[, colName])
+    #data[, colName] = FUN(levels(data[, colName])[data[, colName]])
+    data[, colName] = FUN(data[, colName])
   }
   return(data)
 }
@@ -4319,4 +4472,20 @@ ETLStep4MergingRdataFiles = function(RootDir) {
     rm(rdata0)
     gc()
   }
+}
+
+
+
+
+dictionary2listConvert = function(x) {
+  if (is.null(x) || !is(x, 'list'))
+    return(x)
+  x = as.list(x)
+  r2 = lapply(names(x), function(name) {
+    r = list(category = name, data = lapply(x[name], function(y) {
+      return(y)
+    }))
+    return(r)
+  })
+  return(r2)
 }

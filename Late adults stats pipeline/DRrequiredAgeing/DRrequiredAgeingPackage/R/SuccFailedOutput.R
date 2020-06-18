@@ -18,6 +18,7 @@ SuccessfulOutput = function(args, writeOutputToDB = FALSE, b64Encode = TRUE, pla
     parameter_name        = UniqueAndNNull(args$n3.5$parameter_name,removeSpecials = FALSE)      , #6
     phenotyping_center    = UniqueAndNNull(args$center,removeSpecials = FALSE)                   , #7
     allele_symbol         = UniqueAndNNull(args$n3.5$allele_symbol,removeSpecials = FALSE)       , #8
+    allele_name           = UniqueAndNNull(args$n3.5$allelic_composition,removeSpecials = FALSE) , #8_1
     allele_accession_id   = UniqueAndNNull(args$n3.5$allele_accession_id,removeSpecials = FALSE) , #9
     gene_symbol           = UniqueAndNNull(args$n3.5$gene_symbol,removeSpecials = FALSE)         , #10
     gene_accession_id     = UniqueAndNNull(args$n3.5$gene_accession_id,removeSpecials = FALSE)   , #11
@@ -28,6 +29,11 @@ SuccessfulOutput = function(args, writeOutputToDB = FALSE, b64Encode = TRUE, pla
     zygosity              = UniqueAndNNull(args$zyg, removeSpecials = FALSE  )               , #16
     colony_id             = UniqueAndNNull(args$colony, removeSpecials = FALSE )               #17
   )
+
+
+  #args$note$`Raw data summary statistics_2`=dictionary2listConvert(args$note$`Raw data summary statistics`)
+  #args$note$`OpenStatsList object summary statistics_2`=dictionary2listConvert(args$note$`OpenStatsList object summary statistics`)
+
 
   ######## 2 JSON
   message0('Forming the list before applying JSON transformation ...')

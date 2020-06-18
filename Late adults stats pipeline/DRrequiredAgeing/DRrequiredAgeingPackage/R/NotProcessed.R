@@ -87,6 +87,7 @@ NotProcessedOutput = function(args, writeOutputToDB = FALSE) {
     parameter_name        = UniqueAndNNull(args$n3.5$parameter_name,removeSpecials = FALSE)     , #6
     phenotyping_center    = args$center                                                         , #7
     allele_symbol         = UniqueAndNNull(args$n3.5$allele_symbol,removeSpecials = FALSE)      , #8
+    allele_name           = UniqueAndNNull(args$n3.5$allelic_composition,removeSpecials = FALSE) , #8_1
     allele_accession_id   = UniqueAndNNull(args$n3.5$allele_accession_id,removeSpecials = FALSE), #9
     gene_symbol           = UniqueAndNNull(args$n3.5$gene_symbol,removeSpecials = FALSE)        , #10
     gene_accession_id     = UniqueAndNNull(args$n3.5$gene_accession_id,removeSpecials = FALSE)  , #11
