@@ -163,14 +163,14 @@ GenotypeTag = function(obj,
       ),
       FEMALE = listM(
         returnWhatBasedOnThreshold(
-          x = obj$`Sex FvKO estimate`$Value,
+          x = obj$`Sex FvKO p-value`,
           threshold = threshold,
           Return = 'ABNORMAL'
         )
       ),
       FEMALE = listM(
         returnWhatBasedOnThreshold(
-          x = obj$`Sex FvKO estimate`$Value,
+          x = obj$`Sex FvKO p-value`,
           threshold = threshold,
           Return = 'INFERRED'
         )
@@ -184,14 +184,14 @@ GenotypeTag = function(obj,
       ),
       MALE = listM(
         returnWhatBasedOnThreshold(
-          x = obj$`Sex MvKO estimate`$Value,
+          x = obj$`Sex MvKO p-value`,
           threshold = threshold,
           Return = 'INFERRED'
         )
       ),
       MALE = listM(
         returnWhatBasedOnThreshold(
-          x = obj$`Sex MvKO estimate`$Value,
+          x = obj$`Sex MvKO p-value`,
           threshold = threshold,
           Return = 'INFERRED'
         )
