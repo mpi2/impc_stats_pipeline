@@ -80,7 +80,7 @@ NotProcessedOutput = function(args, writeOutputToDB = FALSE) {
     ####
     StatPacketCreationDate= as.character(Sys.time())                                            , #0
     status                = 'NotProcessed'                                                      , #1
-    procedure_group       = args$procedure                                                      , #2
+    procedure_group       = UniqueAndNNull(args$n3.5$procedure_group,removeSpecials = FALSE)    , #2
     procedure_stable_id   = UniqueAndNNull(args$n3.5$procedure_stable_id,removeSpecials = FALSE), #3
     procedure_name        = UniqueAndNNull(args$n3.5$procedure_name,removeSpecials = FALSE)     , #4
     parameter_stable_id   = args$parameter                                                      , #5

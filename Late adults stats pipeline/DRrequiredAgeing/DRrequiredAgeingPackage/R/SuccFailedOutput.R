@@ -11,7 +11,7 @@ SuccessfulOutput = function(args, writeOutputToDB = FALSE, b64Encode = TRUE, pla
       'Successful',
       'Failed'
     )                                                                                            , #1
-    procedure_group       = UniqueAndNNull(args$procedure,removeSpecials = FALSE)                , #2
+    procedure_group       = UniqueAndNNull(args$n3.5$procedure_group,removeSpecials = FALSE)     , #2
     procedure_stable_id   = UniqueAndNNull(args$n3.5$procedure_stable_id,removeSpecials = FALSE) , #3
     procedure_name        = UniqueAndNNull(args$n3.5$procedure_name,removeSpecials = FALSE)      , #4
     parameter_stable_id   = UniqueAndNNull(args$parameter,removeSpecials = FALSE)                , #5

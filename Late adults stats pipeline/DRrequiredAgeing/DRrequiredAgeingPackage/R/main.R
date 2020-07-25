@@ -162,11 +162,11 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   CatList = GetPossibleCategories (procedure = NULL, method = MethodOfReadingCategoricalCategories)
   message0('Filtering the dataset in progress ....')
   Strtime      = Sys.time()
-  procedures   = as.character(unique(na.omit(new.data$procedure_group)))
+  procedures   = as.character(unique(na.omit(new.data$procedure_stable_id)))
   for (procedure in procedures) {
     StrtimePro  = Sys.time()
     ###
-    n2.9 = base::subset(new.data,  new.data$procedure_group %in% procedure)
+    n2.9 = base::subset(new.data,  new.data$procedure_stable_id %in% procedure)
     parameters  = as.character(unique(na.omit(n2.9$parameter_stable_id)))
     for (parameter in parameters) {
       StrtimePar = Sys.time()
