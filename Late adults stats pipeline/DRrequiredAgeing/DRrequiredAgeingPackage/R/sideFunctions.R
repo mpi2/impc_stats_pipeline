@@ -704,7 +704,7 @@ readFile = function(file,
   return(r)
 }
 
-# Replace blank elements of a vector with user define charachter
+# Replace blank elements of a vector with user define character
 RepBlank = function(x, match = '', replace = 'control') {
   x[x %in% match] = replace
   return(x)
@@ -2676,8 +2676,6 @@ relativePath = function(path, reference) {
 }
 
 
-
-
 # Closest points for the mutants
 closest.time.value  = function(x,
                                time1,
@@ -4488,4 +4486,167 @@ dictionary2listConvert = function(x) {
     return(r)
   })
   return(r2)
+}
+
+
+waitTillCommandFinish = function(command = 'bjobs',
+                                 checkcommand = 'bjobs',
+                                 exitIfTheOutputContains = 'No unfinished job found',
+                                 WaitBeforeRetrySec = 30,
+                                 ...) {
+  r = system2(command = checkcommand,
+              wait = TRUE,
+              stdout = TRUE,
+              ...)
+  totalSeconds = 0
+  while (length(r) > 0 && !grepl(
+    pattern = exitIfTheOutputContains,
+    x = r,
+    perl = TRUE,
+    ignore.case = TRUE
+  )) {
+    totalSeconds = totalSeconds + WaitBeforeRetrySec
+    message('waiting for ', totalSeconds, 's')
+    Sys.sleep(WaitBeforeRetrySec)
+    r = system2(command = checkcommand,
+                wait = TRUE,
+                stdout = TRUE,
+                ...)
+
+  }
+  r2 = system(command = command,
+               wait = FALSE,
+               ...)
+  return(invisible(r2))
+}
+waitTillCommandFinish ('bsub "sleep 60"')
+
+filesContain = function(path = getwd(),
+                        extension = NULL,
+                        containWhat = 'Exit',
+                        ...) {
+  res = FALSE
+  files = list.files(
+    path = path,
+    pattern = extension,
+    all.files = TRUE,
+    full.names = TRUE,
+    include.dirs = FALSE,
+    ...
+  )
+  for (file in files) {
+    fcontent = readLines(file)
+    if (grepl(pattern = containWhat, x = fcontent))
+      return(TRUE)
+  }
+
+  return(res)
+}
+
+jobCreator = function(path = getwd(),
+                      pattern = '.Rdata',
+                      JobListFile = 'DataGenerationJobList.bch') {
+  if (!dir.exists(file.path('DataGeneratingLog')))
+    dir.create(
+      path = file.path('DataGeneratingLog'),
+      recursive = TRUE,
+      showWarnings = FALSE
+    )
+  if (file.exists(JobListFile))
+    unlink(JobListFile)
+  files = list.files(
+    path = path,
+    pattern = pattern,
+    full.names = TRUE,
+    recursive = FALSE,
+    include.dirs = FALSE,
+    all.files = TRUE
+  )
+  proc = tools::file_path_sans_ext(basename(files))
+  write(
+    paste0(
+      'bsub',
+      ' -e ',
+      file.path('DataGeneratingLog', paste0(proc, '_errorlog.log')),
+      ' -o ',
+      file.path('DataGeneratingLog', paste0(proc, '_outputlog.log')),
+      ' -n 1 -M 43000 Rscript InputDataGenerator.R "',
+      files,
+      '" "',
+      proc,
+      '"'
+    ),
+    file = JobListFile
+  )
+}
+
+StatsPipeline = function(path = getwd()) {
+  setwd(path)
+  ### Phase I: Preparing parquet files
+  ###############################################
+  message0('Step 1 read the data from the parguets - LSF job creator')
+  source(file.path(local(), '0-ETL/Step1MakePar2RdataJobs.R'))
+  f(path)
+  rm(f)
+
+  ###############################################
+  message0('Step 2 read the data from the parguets')
+  file.copy(
+    from = file.path(local(), '0-ETL/Step2Parquet2Rdata.R'),
+    to = file.path(path, 'Step2Parquet2Rdata.R'),
+    overwrite = TRUE
+  )
+  system('chmod 775 jobs_step2_Parquet2Rdata.bch',wait = TRUE)
+  system('./jobs_step2_Parquet2Rdata.bch',wait = TRUE)
+  waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
+  file.remove( file.path(path, 'Step2Parquet2Rdata.R'))
+  if (filesContain(path = path,extension = '.log',containWhat = 'Exit'))
+    stop('an error happend in step 2. Parquet2Rdata conversion')
+
+
+  ###############################################
+  message0('Step 3 merge Rdata files into single file for each procedure - LSF jobs creator')
+  source(file.path(local(), '0-ETL/Step3MergeRdataFilesJobs.R'))
+  f(file.path(path,'ProcedureScatterRdata'))
+  rm(f)
+
+
+  ###############################################
+  message0('Step 4 merge Rdata files into single file for each procedure')
+  file.copy(
+    from = file.path(local(), '0-ETL/Step4MergingRdataFiles.R'),
+    to = file.path(path, 'Step4MergingRdataFiles.R'),
+    overwrite = TRUE
+  )
+  system('chmod 775 jobs_step4_MergeRdatas.bch',wait = TRUE)
+  system('./jobs_step4_MergeRdatas.bch',wait = TRUE)
+  waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
+  file.remove( file.path(path, 'Step4MergingRdataFiles.R'))
+  if (filesContain(path = path,extension = '.log',containWhat = 'Exit'))
+    stop('an error happend in step 4. Merge Rdata files into one single Rdata file per procedure')
+
+  ###############################################
+  ## Compress logs
+  system(command = 'zip -rm Parquet2RdataJobs.zip *.bch')
+  system(command = 'zip -rm Parquet2RdataLogs.zip *.log')
+  system(command = 'rm -rf ProcedureScatterRdata')
+  ###########  END of Phase I ###################
+
+  ##### Phase II. Preprocessing the data
+  jobCreator(path = file.path(path,'Rdata/'))
+  file.copy(
+    from = file.path(local(), 'jobs/InputDataGenerator.R'),
+    to = file.path(path, 'InputDataGenerator.R'),
+    overwrite = TRUE
+  )
+  system('chmod 775 DataGenerationJobList.bch',wait = TRUE)
+  system('./DataGenerationJobList.bch',wait = TRUE)
+  waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
+  file.remove( file.path(path, 'InputDataGenerator.R'))
+  if (filesContain(path = file.path(path,'DataGeneratingLog'),extension = '',containWhat = 'Exit'))
+    stop('an error happend in Phase II step 1. Preprocessing the data')
+
+
+
+
 }
