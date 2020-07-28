@@ -689,7 +689,7 @@ for (i in 1:length(files)) {
                 paste0("M B.strain = ", stra),
                 paste0("Colony = ", colony),
                 paste0("Zyg = ", zyg),
-                paste0("age = ", ageGroup, "w")
+                paste0("\nage = ", ageGroup, "w")
               ))
               plotGeneSex(td, etc = c(
                 paste0("\nC B.strain = ", cstrain),
