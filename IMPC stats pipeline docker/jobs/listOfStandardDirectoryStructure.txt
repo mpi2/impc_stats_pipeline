@@ -1,0 +1,14 @@
+ <DIR>          ExtractedPValues
+ <DIR>          IndexByCentre 
+ <DIR>          Results_XXX
+ <DIR>          SingleJobs
+ 
+ 				AllJobs.bch
+				function.R
+				InputDataGenerator.R
+				Required UNIX codes.txt
+				Index.txt
+				
+				listOfStandardDirectoryStructure.txt
+
+
