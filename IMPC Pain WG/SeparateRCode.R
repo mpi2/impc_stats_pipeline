@@ -196,25 +196,25 @@ for (i in 1:length(files)) {
     )
   }
   #############################
-  par(mfrow=c(2,2))
-  pie2(table(df$age_in_weeks[df$`Is Baseline?`  != TRUE]	),main=paste(centre,'- KO'),col=1:5,minThreshold = 10)
-  pie2(table(df$age_in_weeks[df$`Is Baseline?`  == TRUE]	),main=paste(centre,'- WT'),col=6:11)
-  table(df$`Gene symbol`)
-  addmargins(table(df$`Colony name`))
-  table(df$`Colony name`,df$Zygosity)
-  table(df$`Colony name`,df$Strain)
-  addmargins(table(df$`Is Baseline?`))
-  nlevels(droplevels(df$`Colony name`[df$`Is Baseline?`== FALSE & df$`Colony name` !='']))
-  nrow(df)
-  ##############################
-  addmargins(table(df$Sex,df$`Is Baseline?`),margin = c(1,2))
-  addmargins(table(df$Sex,df$age_in_weeks),margin = c(1,2))
-  addmargins(table(df$Sex,df$Zygosity),margin = c(1,2))
-  #dfSummary(df,style = 'grid')
-  ###############################
-  if (sum(df$`Bodyweight (g)`, na.rm = TRUE) > 0) {
-    # plot(df$age_in_weeks, df$`Bodyweight (g)`)
-  }
+  # par(mfrow=c(2,2))
+  # pie2(table(df$age_in_weeks[df$`Is Baseline?`  != TRUE]	),main=paste(centre,'- KO'),col=1:5,minThreshold = 10)
+  # pie2(table(df$age_in_weeks[df$`Is Baseline?`  == TRUE]	),main=paste(centre,'- WT'),col=6:11)
+  # table(df$`Gene symbol`)
+  # addmargins(table(df$`Colony name`))
+  # table(df$`Colony name`,df$Zygosity)
+  # table(df$`Colony name`,df$Strain)
+  # addmargins(table(df$`Is Baseline?`))
+  # nlevels(droplevels(df$`Colony name`[df$`Is Baseline?`== FALSE & df$`Colony name` !='']))
+  # nrow(df)
+  # ##############################
+  # addmargins(table(df$Sex,df$`Is Baseline?`),margin = c(1,2))
+  # addmargins(table(df$Sex,df$age_in_weeks),margin = c(1,2))
+  # addmargins(table(df$Sex,df$Zygosity),margin = c(1,2))
+  # #dfSummary(df,style = 'grid')
+  # ###############################
+  # if (sum(df$`Bodyweight (g)`, na.rm = TRUE) > 0) {
+  #   # plot(df$age_in_weeks, df$`Bodyweight (g)`)
+  # }
   ###############################
   # fix a QC issue in the data
   df <- df[!((df$`Colony name` %in% "CR1760") & (df$Zygosity %in% "heterozygous")), ]
@@ -435,7 +435,9 @@ for (i in 1:length(files)) {
   df_melt <- droplevels(df_melt)
   # Discussed with Sonia to remove Test0 as it is inhabituation and not challenged in MRC Harwell
   if (centre %in% "MRC Harwell") {
-    df_melt <- droplevels(subset(df_melt, !df_melt$Group %in% "Test0"))
+    # Jacquie and Janine email
+    # https://mail.google.com/mail/u/0/#search/janine/FMfcgxwJWrVzHFXDrKbzkMvLgxcnhVrQ
+    # df_melt <- droplevels(subset(df_melt, !df_melt$Group %in% "Test0"))
   }
   ###############################
   # Separate controls from mutants
@@ -553,6 +555,8 @@ for (i in 1:length(files)) {
       for (meta in unique(df2_mutant$Metadata_group)) {
         for (colony in unique(df2_mutant$Colony_name)) {
           for (cstrain in unique(df2_control$Strain)) {
+            if(centre %in% 'JAX' && cstrain %in% 'C57BL/6J')
+              next
             ###############################
             # Select the mutants###########
             df_mut_filtered <- droplevels(
@@ -572,7 +576,7 @@ for (i in 1:length(files)) {
               df_mut_filtered,
               subset(df2_control, df2_control$Strain %in% cstrain)
             )
-       
+
             # for (ageGroup in unique(df_both$age)) {
             # adf_both = subset(df_both, df_both$age %in% ageGroup)
             df_both <- droplevels(df_both)
@@ -728,8 +732,10 @@ for (i in 1:length(files)) {
               ))
               # Because MRC Harwell does not have Test0 included in the analysis
               if (nrow(tsdGroupR$Group) < 3) {
-                tsdGroupR$Group <- rbind(NA, NA, tsdGroupR$Group)
-                rownames(tsdGroupR$Group) <- c("Test1-Test0", "Test2-Test0", "Test2-Test1")
+                # For Harwell temporary suppresed
+                # https://mail.google.com/mail/u/0/#search/janine/FMfcgxwJWrVzHFXDrKbzkMvLgxcnhVrQ
+                #tsdGroupR$Group <- rbind(NA, NA, tsdGroupR$Group)
+                #rownames(tsdGroupR$Group) <- c("Test1-Test0", "Test2-Test0", "Test2-Test1")
               }
 
               tsdGroupTableR <- dataFramerows(tsdGroupR$Group)[4, , drop = FALSE]
