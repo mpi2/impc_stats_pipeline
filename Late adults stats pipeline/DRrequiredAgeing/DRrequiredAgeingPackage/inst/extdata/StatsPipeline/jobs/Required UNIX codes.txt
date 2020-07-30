@@ -1,0 +1,39 @@
+http://ves-hx-d8:8090/mi/impc/solr/experiment/select?q=*%3A*&fq=procedure_group%3A*ESLIM_001*&fq=observation_type%3A(categorical+OR+unidimensional)&rows=1&wt=json&indent=true
+
+
+
+### Logs
+find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs cp --backup=numbered -t ~/NoBckDir/DR12/logs/
+find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs cp --backup=numbered -t ~/NoBckDir/DR12/logs/
+
+
+### Logs
+find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs rm
+find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs rm
+
+
+### Merge files
+cat *.tsv >> all.tsv
+
+
+### Find in error logs
+find . -type f | grep -h "exit" | wc -l
+grep "exit code 2" * -lR
+
+### Compress a directory
+bsub -q research-rh74  "tar -zcvf ~/NoBckDir/DR11/jobs/DR11XXXXX_simulation.tar.gz ~/NoBckDir/DR11/jobs/Result_XXXXX/"
+
+
+# RemoveLSF  cluster tmp
+find /ebi/lsf/ebi-spool/02/ -user hamedhm -type f | xargs rm -rf# 
+
+
+# Split a text files based on #lines
+split -50000 Index_DR101_V1.txt split_index_
+
+
+# search and copy files
+find . -type f -name "*.bch" -exec cp -n {} ~/NoBckDir/singlejobsdr12/ \;
+
+
+
