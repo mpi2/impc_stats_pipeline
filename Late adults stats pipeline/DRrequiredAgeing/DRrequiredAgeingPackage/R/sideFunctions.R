@@ -4587,8 +4587,7 @@ jobCreator = function(path = getwd(),
   )
 }
 
-path = getwd()
-SP.results=file.path(getwd(),'SP')
+
 
 StatsPipeline = function(path = getwd(), SP.results=file.path(getwd(),'SP')) {
   path0 = path
@@ -4724,5 +4723,11 @@ StatsPipeline = function(path = getwd(), SP.results=file.path(getwd(),'SP')) {
     ),
     wait = TRUE
   )
+
+  message0('This is the last step. If you see no file in the list below, the SP is successfully completed.')
+  setwd(file.path(SP.results, 'logs'))
+  system(command = 'grep "exit" * -lR',wait = TRUE)
+
+  message0('SP finished.')
 
 }
