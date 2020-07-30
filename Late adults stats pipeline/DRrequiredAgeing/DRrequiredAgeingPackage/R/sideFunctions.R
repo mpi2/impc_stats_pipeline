@@ -4519,7 +4519,6 @@ waitTillCommandFinish = function(command = 'bjobs',
                ...)
   return(invisible(r2))
 }
-waitTillCommandFinish ('bsub "sleep 60"')
 
 filesContain = function(path = getwd(),
                         extension = NULL,
@@ -4584,45 +4583,43 @@ StatsPipeline = function(path = getwd()) {
   setwd(path)
   ### Phase I: Preparing parquet files
   ###############################################
-  message0('Step 1 read the data from the parguets - LSF job creator')
-  source(file.path(local(), '0-ETL/Step1MakePar2RdataJobs.R'))
+ DRrequiredAgeing:::message0('Step 1 read the data from the parguets - LSF job creator')
+  source(file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
   f(path)
   rm(f)
 
   ###############################################
-  message0('Step 2 read the data from the parguets')
+  DRrequiredAgeing:::message0('Step 2 read the data from the parguets')
   file.copy(
-    from = file.path(local(), '0-ETL/Step2Parquet2Rdata.R'),
+    from = file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step2Parquet2Rdata.R'),
     to = file.path(path, 'Step2Parquet2Rdata.R'),
     overwrite = TRUE
   )
   system('chmod 775 jobs_step2_Parquet2Rdata.bch',wait = TRUE)
   system('./jobs_step2_Parquet2Rdata.bch',wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
+  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
   file.remove( file.path(path, 'Step2Parquet2Rdata.R'))
-  if (filesContain(path = path,extension = '.log',containWhat = 'Exit'))
+  if (DRrequiredAgeing:::filesContain(path = path,extension = '.log',containWhat = 'Exit'))
     stop('an error happend in step 2. Parquet2Rdata conversion')
 
-
   ###############################################
-  message0('Step 3 merge Rdata files into single file for each procedure - LSF jobs creator')
-  source(file.path(local(), '0-ETL/Step3MergeRdataFilesJobs.R'))
+  DRrequiredAgeing:::message0('Step 3 merge Rdata files into single file for each procedure - LSF jobs creator')
+  source(file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step3MergeRdataFilesJobs.R'))
   f(file.path(path,'ProcedureScatterRdata'))
   rm(f)
 
-
   ###############################################
-  message0('Step 4 merge Rdata files into single file for each procedure')
+  DRrequiredAgeing:::message0('Step 4 merge Rdata files into single file for each procedure')
   file.copy(
-    from = file.path(local(), '0-ETL/Step4MergingRdataFiles.R'),
+    from = file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step4MergingRdataFiles.R'),
     to = file.path(path, 'Step4MergingRdataFiles.R'),
     overwrite = TRUE
   )
   system('chmod 775 jobs_step4_MergeRdatas.bch',wait = TRUE)
   system('./jobs_step4_MergeRdatas.bch',wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
+  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
   file.remove( file.path(path, 'Step4MergingRdataFiles.R'))
-  if (filesContain(path = path,extension = '.log',containWhat = 'Exit'))
+  if (DRrequiredAgeing:::filesContain(path = path,extension = '.log',containWhat = 'Exit'))
     stop('an error happend in step 4. Merge Rdata files into one single Rdata file per procedure')
 
   ###############################################
@@ -4632,10 +4629,10 @@ StatsPipeline = function(path = getwd()) {
   system(command = 'rm -rf ProcedureScatterRdata')
   ###########  END of Phase I ###################
 
-  ##### Phase II. Preprocessing the data
+  ##### Phase II. Reprocessing the data
   jobCreator(path = file.path(path,'Rdata/'))
   file.copy(
-    from = file.path(local(), 'jobs/InputDataGenerator.R'),
+    from = file.path(DRrequiredAgeing:::local(), 'StatsPipeline/jobs/InputDataGenerator.R'),
     to = file.path(path, 'InputDataGenerator.R'),
     overwrite = TRUE
   )

@@ -1,1 +1,0 @@
-bsub -e DataGeneratingLog/_errorlog.log -o DataGeneratingLog/_outputlog.log -n 1 -M 43000 Rscript InputDataGenerator.R "" ""
