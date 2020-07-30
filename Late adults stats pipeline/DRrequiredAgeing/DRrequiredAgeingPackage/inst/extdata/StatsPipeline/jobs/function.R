@@ -4,7 +4,7 @@ runner = function(file) {
   library(DRrequiredAgeing)
   mainAgeing(
     file = suppressWarnings(tail(UnzipAndfilePath(file), 1)),
-    subdir = 'Results_DR12V1OpenStats',
+    subdir = 'Results_IMPC_SP',
     concurrentControlSelect = FALSE,
     seed = 123456,
     # For windowing only,

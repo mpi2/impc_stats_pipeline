@@ -4055,7 +4055,7 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
     }
   }
   ###################################################
-  if (!is.null(saveRdata))
+  if (!is.null(saveRdata) && saveRdata)
     save(df, file = paste0(Sys.Date(), '_', saveRdata, '_Impress.Rdata'))
   ###################################################
 
@@ -4506,7 +4506,12 @@ waitTillCommandFinish = function(command = 'bjobs',
     ignore.case = TRUE
   )) {
     totalSeconds = totalSeconds + WaitBeforeRetrySec
-    message('waiting for ', totalSeconds, 's')
+    message0('waiting for ',
+            WaitBeforeRetrySec,
+            's',
+            '. Total waiting untill now: ',
+            totalSeconds,
+            's')
     Sys.sleep(WaitBeforeRetrySec)
     r = system2(command = checkcommand,
                 wait = TRUE,
@@ -4534,9 +4539,12 @@ filesContain = function(path = getwd(),
     ...
   )
   for (file in files) {
+    DRrequiredAgeing:::message0('checking for term "',containWhat,'":', file)
     fcontent = readLines(file)
-    if (grepl(pattern = containWhat, x = fcontent))
-      return(TRUE)
+    for (l in fcontent)
+      if (grepl(pattern = containWhat, x = l))
+        return(TRUE)
+    DRrequiredAgeing:::message0('\t Passed ...')
   }
 
   return(res)
@@ -4579,13 +4587,20 @@ jobCreator = function(path = getwd(),
   )
 }
 
-StatsPipeline = function(path = getwd()) {
+path = getwd()
+SP.results=file.path(getwd(),'SP')
+
+StatsPipeline = function(path = getwd(), SP.results=file.path(getwd(),'SP')) {
+  path0 = path
+  path = SP.results
+  if (!dir.exists(path))
+    dir.create(path)
   setwd(path)
   ### Phase I: Preparing parquet files
   ###############################################
  DRrequiredAgeing:::message0('Step 1 read the data from the parguets - LSF job creator')
   source(file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
-  f(path)
+  f(path0)
   rm(f)
 
   ###############################################
@@ -4597,7 +4612,7 @@ StatsPipeline = function(path = getwd()) {
   )
   system('chmod 775 jobs_step2_Parquet2Rdata.bch',wait = TRUE)
   system('./jobs_step2_Parquet2Rdata.bch',wait = TRUE)
-  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
+  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs')
   file.remove( file.path(path, 'Step2Parquet2Rdata.R'))
   if (DRrequiredAgeing:::filesContain(path = path,extension = '.log',containWhat = 'Exit'))
     stop('an error happend in step 2. Parquet2Rdata conversion')
@@ -4624,13 +4639,13 @@ StatsPipeline = function(path = getwd()) {
 
   ###############################################
   ## Compress logs
-  system(command = 'zip -rm Parquet2RdataJobs.zip *.bch')
-  system(command = 'zip -rm Parquet2RdataLogs.zip *.log')
-  system(command = 'rm -rf ProcedureScatterRdata')
+  system(command = 'zip -rm Parquet2RdataJobs.zip *.bch',wait = TRUE)
+  system(command = 'zip -rm Parquet2RdataLogs.zip *.log',wait = TRUE)
+  system(command = 'rm -rf ProcedureScatterRdata',wait = TRUE)
   ###########  END of Phase I ###################
 
   ##### Phase II. Reprocessing the data
-  jobCreator(path = file.path(path,'Rdata/'))
+  DRrequiredAgeing:::jobCreator(path = file.path(path,'Rdata/'))
   file.copy(
     from = file.path(DRrequiredAgeing:::local(), 'StatsPipeline/jobs/InputDataGenerator.R'),
     to = file.path(path, 'InputDataGenerator.R'),
@@ -4638,12 +4653,76 @@ StatsPipeline = function(path = getwd()) {
   )
   system('chmod 775 DataGenerationJobList.bch',wait = TRUE)
   system('./DataGenerationJobList.bch',wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
+  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs')
   file.remove( file.path(path, 'InputDataGenerator.R'))
-  if (filesContain(path = file.path(path,'DataGeneratingLog'),extension = '',containWhat = 'Exit'))
+  if (filesContain(path = file.path(path,'DataGeneratingLog'),extension = '.log',containWhat = 'Exit'))
     stop('an error happend in Phase II step 1. Preprocessing the data')
 
+  ## Compress logs
+  system(command = 'mv *.R  DataGeneratingLog/',wait = TRUE)
+  system(command = 'mv *.bch  DataGeneratingLog/',wait = TRUE)
+  system(command = 'zip -rm DataGeneratingLog.zip DataGeneratingLog/',wait = TRUE)
+  system(command = 'mkdir DataGeneratingLog',wait = TRUE)
+  system(command = 'mv DataGeneratingLog.zip DataGeneratingLog/',wait = TRUE)
 
 
+  ## remove logs
+  system(command = 'find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs rm', ignore.stdout = TRUE,wait = TRUE)
+  system(command = 'find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs rm', ignore.stdout = TRUE,wait = TRUE)
+
+  ## Add all single jobs into one single job
+  if (!dir.exists('jobs'))
+    system(command = 'mkdir jobs',wait = TRUE)
+  if (file.exists('jobs/AllJobs.bch'))
+    system(command = 'rm jobs/AllJobs.bch',wait = TRUE)
+  system(command = 'find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch',wait = TRUE)
+
+  path = file.path(path,'jobs')
+  setwd(path)
+
+
+  ## Update procedure/parameters from the IMPReSS
+  DRrequiredAgeing:::updateImpress(
+    updateImpressFileInThePackage = TRUE,
+    updateOptionalParametersList = TRUE,
+    updateTheSkipList = TRUE,
+    saveRdata = FALSE
+  )
+
+  # copy stats pipeline driver script
+  file.copy(
+    from = file.path(DRrequiredAgeing:::local(), 'StatsPipeline/jobs/function.R'),
+    to = file.path(path,'function.R'),
+    overwrite = TRUE
+  )
+  system('chmod 775 AllJobs.bch',wait = TRUE)
+  system('./AllJobs.bch',wait = TRUE)
+  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs')
+
+
+  setwd(SP.results)
+  if (dir.exists('logs')) {
+    system(command = 'rm -rf logs', wait = TRUE)
+  }
+
+  system(command = 'mkdir logs', wait = TRUE)
+
+
+  system(
+    command = paste0(
+      'find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs cp --backup=numbered -t ',
+      SP.results,
+      '/logs/'
+    ),
+    wait = TRUE
+  )
+  system(
+    command = paste0(
+      'find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs cp --backup=numbered -t ',
+      SP.results,
+      '/logs/'
+    ),
+    wait = TRUE
+  )
 
 }
