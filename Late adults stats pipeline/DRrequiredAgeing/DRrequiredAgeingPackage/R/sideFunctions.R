@@ -4539,11 +4539,14 @@ filesContain = function(path = getwd(),
     ...
   )
   for (file in files) {
-    DRrequiredAgeing:::message0('checking for term "',containWhat,'":', file)
-    fcontent = readLines(file)
-    for (l in fcontent)
+    DRrequiredAgeing:::message0('checking for term "', containWhat, '":', file)
+    fcontent = readLines(file, warn = FALSE)
+    for (l in fcontent) {
+      if (is.null(l))
+        next
       if (grepl(pattern = containWhat, x = l))
         return(TRUE)
+    }
     DRrequiredAgeing:::message0('\t Passed ...')
   }
 
@@ -4600,7 +4603,7 @@ StatsPipeline = function(path = getwd(), SP.results=file.path(getwd(),'SP')) {
  DRrequiredAgeing:::message0('Step 1 read the data from the parguets - LSF job creator')
   source(file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
   f(path0)
-  rm(f)
+  rm0('f')
 
   ###############################################
   DRrequiredAgeing:::message0('Step 2 read the data from the parguets')
@@ -4620,7 +4623,7 @@ StatsPipeline = function(path = getwd(), SP.results=file.path(getwd(),'SP')) {
   DRrequiredAgeing:::message0('Step 3 merge Rdata files into single file for each procedure - LSF jobs creator')
   source(file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step3MergeRdataFilesJobs.R'))
   f(file.path(path,'ProcedureScatterRdata'))
-  rm(f)
+  rm0('f')
 
   ###############################################
   DRrequiredAgeing:::message0('Step 4 merge Rdata files into single file for each procedure')
