@@ -4631,7 +4631,7 @@ StatsPipeline = function(path = getwd(), SP.results=file.path(getwd(),'SP')) {
   )
   system('chmod 775 jobs_step4_MergeRdatas.bch',wait = TRUE)
   system('./jobs_step4_MergeRdatas.bch',wait = TRUE)
-  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs',exitIfTheOutputContains = 'XXXXXXXXXXX')
+  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs')
   file.remove( file.path(path, 'Step4MergingRdataFiles.R'))
   if (DRrequiredAgeing:::filesContain(path = path,extension = '.log',containWhat = 'Exit'))
     stop('an error happend in step 4. Merge Rdata files into one single Rdata file per procedure')
