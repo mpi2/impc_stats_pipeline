@@ -2,6 +2,7 @@ Package: DRrequiredAgeing
 Type: Package
 Title: The required package for IMPC ageing pipeline (OpenStats)
 Version: 1.0.0
+Depends: R (>= 3.5)
 Author: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 Maintainer: Hamed Haseli Mashhadi <hamedhm@ebi.ac.uk>
 Description: The required package for IMPC ageing pipeline.
