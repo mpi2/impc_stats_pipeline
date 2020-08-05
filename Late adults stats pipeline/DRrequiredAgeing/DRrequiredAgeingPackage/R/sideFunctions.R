@@ -4319,7 +4319,7 @@ list.dirsDepth = function(path  = getwd(),
 minijobsCreator = function(path  = getwd(),
                            depth = 2,
                            fname = 'minijobs.txt') {
-  lf = DRrequiredAgeing:::list.dirsDepth(path = path, depth = depth)
+  lf =list.dirsDepth(path = path, depth = depth)
   a = paste0(
     'bsub "find ',
     lf,
@@ -4539,7 +4539,7 @@ filesContain = function(path = getwd(),
     ...
   )
   for (file in files) {
-    DRrequiredAgeing:::message0('checking for term "', containWhat, '":', file)
+    message0('checking for term "', containWhat, '":', file)
     fcontent = readLines(file, warn = FALSE)
     for (l in fcontent) {
       if (is.null(l))
@@ -4547,7 +4547,7 @@ filesContain = function(path = getwd(),
       if (grepl(pattern = containWhat, x = l))
         return(TRUE)
     }
-    DRrequiredAgeing:::message0('\t Passed ...')
+    message0('\t Passed ...')
   }
 
   return(res)
@@ -4592,112 +4592,145 @@ jobCreator = function(path = getwd(),
 
 
 
-StatsPipeline = function(path = getwd(), SP.results=file.path(getwd(),'SP')) {
+
+StatsPipeline = function(path = getwd(),
+                         SP.results = file.path(getwd(), 'SP')) {
   startTime = Sys.time()
   message0('Starting the IMPC statistical pipeline ... ')
-  message0('\t Parquet files path:  ',path)
-  message0('\t Output path: ',SP.results)
+  message0('\t Parquet files path:  ', path)
+  message0('\t Output path: ', SP.results)
   ###############################################
   path0 = path
-    path = SP.results
+  path = SP.results
   if (!dir.exists(path))
     dir.create(path)
   setwd(path)
   ### Phase I: Preparing parquet files
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
- DRrequiredAgeing:::message0('Step 1. Reading the data from the parguets directory and creating LSF jobs')
-  source(file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
+  message0('Step 1. Reading the data from the parguets directory and creating LSF jobs')
+  source(
+    file.path(
+      local(),
+      'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'
+    )
+  )
   f(path0)
   rm0('f')
   ###############################################
-  DRrequiredAgeing:::message0('Step 2. Reading the data from the parguets files and creating psudo Rdata')
+  message0('Step 2. Reading the data from the parguets files and creating psudo Rdata')
   file.copy(
-    from = file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step2Parquet2Rdata.R'),
+    from = file.path(
+      local(),
+      'StatsPipeline/0-ETL/Step2Parquet2Rdata.R'
+    ),
     to = file.path(path, 'Step2Parquet2Rdata.R'),
     overwrite = TRUE
   )
-  system('chmod 775 jobs_step2_Parquet2Rdata.bch',wait = TRUE)
-  system('./jobs_step2_Parquet2Rdata.bch',wait = TRUE)
-  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs')
-  file.remove( file.path(path, 'Step2Parquet2Rdata.R'))
-  if (DRrequiredAgeing:::filesContain(path = path,extension = '.log',containWhat = 'Exit'))
+  system('chmod 775 jobs_step2_Parquet2Rdata.bch', wait = TRUE)
+  system('./jobs_step2_Parquet2Rdata.bch', wait = TRUE)
+  waitTillCommandFinish(command = 'bjobs')
+  file.remove(file.path(path, 'Step2Parquet2Rdata.R'))
+  if (filesContain(path = path,
+                                      extension = '.log',
+                                      containWhat = 'Exit'))
     stop('An error occured in step 2. Parquet2Rdata conversion')
 
   ###############################################
-  DRrequiredAgeing:::message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
-  source(file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step3MergeRdataFilesJobs.R'))
-  f(file.path(path,'ProcedureScatterRdata'))
+  message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
+  source(
+    file.path(
+      local(),
+      'StatsPipeline/0-ETL/Step3MergeRdataFilesJobs.R'
+    )
+  )
+  f(file.path(path, 'ProcedureScatterRdata'))
   rm0('f')
 
   ###############################################
-  DRrequiredAgeing:::message0('Step 4. Merging psudo Rdata files into single files per procedure')
+  message0('Step 4. Merging psudo Rdata files into single files per procedure')
   file.copy(
-    from = file.path(DRrequiredAgeing:::local(), 'StatsPipeline/0-ETL/Step4MergingRdataFiles.R'),
+    from = file.path(
+      local(),
+      'StatsPipeline/0-ETL/Step4MergingRdataFiles.R'
+    ),
     to = file.path(path, 'Step4MergingRdataFiles.R'),
     overwrite = TRUE
   )
-  system('chmod 775 jobs_step4_MergeRdatas.bch',wait = TRUE)
-  system('./jobs_step4_MergeRdatas.bch',wait = TRUE)
-  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs')
-  file.remove( file.path(path, 'Step4MergingRdataFiles.R'))
-  if (DRrequiredAgeing:::filesContain(path = path,extension = '.log',containWhat = 'Exit'))
+  system('chmod 775 jobs_step4_MergeRdatas.bch', wait = TRUE)
+  system('./jobs_step4_MergeRdatas.bch', wait = TRUE)
+  waitTillCommandFinish(command = 'bjobs')
+  file.remove(file.path(path, 'Step4MergingRdataFiles.R'))
+  if (filesContain(path = path,
+                                      extension = '.log',
+                                      containWhat = 'Exit'))
     stop('An error occured in step 4. Merging Rdata files into one single Rdata file per procedure')
 
   ###############################################
   ## Compress logs
   message0('Phase I. Compressing the log files and house cleaning ...')
-  system(command = 'zip -rm Parquet2RdataJobs.zip *.bch',wait = TRUE)
-  system(command = 'zip -rm Parquet2RdataLogs.zip *.log',wait = TRUE)
-  system(command = 'rm -rf ProcedureScatterRdata',wait = TRUE)
+  system(command = 'zip -rm Parquet2RdataJobs.zip *.bch', wait = TRUE)
+  system(command = 'zip -rm Parquet2RdataLogs.zip *.log', wait = TRUE)
+  system(command = 'rm -rf ProcedureScatterRdata', wait = TRUE)
   ###########  END of Phase I ###################
 
   ##### Phase II. Reprocessing the data
   message0('Starting Phase II, packaging the big data into small packages ...')
-  DRrequiredAgeing:::jobCreator(path = file.path(path,'Rdata/'))
+  jobCreator(path = file.path(path, 'Rdata/'))
   file.copy(
-    from = file.path(DRrequiredAgeing:::local(), 'StatsPipeline/jobs/InputDataGenerator.R'),
+    from = file.path(
+      local(),
+      'StatsPipeline/jobs/InputDataGenerator.R'
+    ),
     to = file.path(path, 'InputDataGenerator.R'),
     overwrite = TRUE
   )
-  system('chmod 775 DataGenerationJobList.bch',wait = TRUE)
-  system('./DataGenerationJobList.bch',wait = TRUE)
-  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs')
-  file.remove( file.path(path, 'InputDataGenerator.R'))
-  if (filesContain(path = file.path(path,'DataGeneratingLog'),extension = '.log',containWhat = 'Exit'))
+  system('chmod 775 DataGenerationJobList.bch', wait = TRUE)
+  system('./DataGenerationJobList.bch', wait = TRUE)
+  waitTillCommandFinish(command = 'bjobs')
+  file.remove(file.path(path, 'InputDataGenerator.R'))
+  if (filesContain(
+    path = file.path(path, 'DataGeneratingLog'),
+    extension = '.log',
+    containWhat = 'Exit'
+  ))
     stop('An error occured in Phase II step 1. Packaging the big data into small packages')
 
   ## Compress logs
   message0('End of pckagin d data. ')
   message0('Phase II. Compressing the log files and house cleaning ... ')
-  system(command = 'mv *.R  DataGeneratingLog/',wait = TRUE)
-  system(command = 'mv *.bch  DataGeneratingLog/',wait = TRUE)
-  system(command = 'zip -rm DataGeneratingLog.zip DataGeneratingLog/',wait = TRUE)
-  system(command = 'mkdir DataGeneratingLog',wait = TRUE)
-  system(command = 'mv DataGeneratingLog.zip DataGeneratingLog/',wait = TRUE)
+  system(command = 'mv *.R  DataGeneratingLog/', wait = TRUE)
+  system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
+  system(command = 'zip -rm DataGeneratingLog.zip DataGeneratingLog/', wait = TRUE)
+  system(command = 'mkdir DataGeneratingLog', wait = TRUE)
+  system(command = 'mv DataGeneratingLog.zip DataGeneratingLog/', wait = TRUE)
 
 
   ## remove logs
   message0('Removing the log files prior to the run of the statistical anlyses ...')
-  system(command = 'find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs rm', ignore.stdout = TRUE,wait = TRUE)
-  system(command = 'find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs rm', ignore.stdout = TRUE,wait = TRUE)
+  system(command = 'find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs rm',
+         ignore.stdout = TRUE,
+         wait = TRUE)
+  system(command = 'find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs rm',
+         ignore.stdout = TRUE,
+         wait = TRUE)
 
   ## Add all single jobs into one single job
   message0('Appending all procdure based LSF jobs into one single file ...')
   if (!dir.exists('jobs'))
-    system(command = 'mkdir jobs',wait = TRUE)
+    system(command = 'mkdir jobs', wait = TRUE)
   if (file.exists('jobs/AllJobs.bch'))
-    system(command = 'rm jobs/AllJobs.bch',wait = TRUE)
-  system(command = 'find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch',wait = TRUE)
+    system(command = 'rm jobs/AllJobs.bch', wait = TRUE)
+  system(command = 'find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch', wait = TRUE)
 
   message0('Phase III. Initialising the statistical analyses ...')
-  path = file.path(path,'jobs')
+  path = file.path(path, 'jobs')
   setwd(path)
 
 
   ## Update procedure/parameters from the IMPReSS
   message0('Updating the dynamic contents from the IMPReSS ...')
-  DRrequiredAgeing:::updateImpress(
+  updateImpress(
     updateImpressFileInThePackage = TRUE,
     updateOptionalParametersList = TRUE,
     updateTheSkipList = TRUE,
@@ -4707,13 +4740,16 @@ StatsPipeline = function(path = getwd(), SP.results=file.path(getwd(),'SP')) {
   message0('Running the IMPC statistical pipeline by submitting LSF jobs ...')
   # copy stats pipeline driver script
   file.copy(
-    from = file.path(DRrequiredAgeing:::local(), 'StatsPipeline/jobs/function.R'),
-    to = file.path(path,'function.R'),
+    from = file.path(
+      local(),
+      'StatsPipeline/jobs/function.R'
+    ),
+    to = file.path(path, 'function.R'),
     overwrite = TRUE
   )
-  system('chmod 775 AllJobs.bch',wait = TRUE)
-  system('./AllJobs.bch',wait = TRUE)
-  DRrequiredAgeing:::waitTillCommandFinish(command = 'bjobs')
+  system('chmod 775 AllJobs.bch', wait = TRUE)
+  system('./AllJobs.bch', wait = TRUE)
+  waitTillCommandFinish(command = 'bjobs')
 
 
   message0('Postprocessing the IMPC statistical analyses results ...')
@@ -4742,10 +4778,31 @@ StatsPipeline = function(path = getwd(), SP.results=file.path(getwd(),'SP')) {
     wait = TRUE
   )
 
-  message0('This is the last step. If you see no file in the list below, the SP is successfully completed.')
+  message0(
+    'This is the last step. If you see no file in the list below, the SP is successfully completed.'
+  )
   setwd(file.path(SP.results, 'logs'))
-  system(command = 'grep "exit" * -lR',wait = TRUE)
+  system(command = 'grep "exit" * -lR', wait = TRUE)
 
-  message0('SP finished in ',round(difftime(Sys.time(), startTime, units = "min"), 2))
+  message0('SP finished in ', round(difftime(Sys.time(), startTime, units = "min"), 2))
 
+}
+
+
+install.packages.auto <- function(x) {
+  x <- as.character(substitute(x))
+  if(isTRUE(x %in% .packages(all.available=TRUE))) {
+    eval(parse(text = sprintf("require(\"%s\")", x)))
+  } else {
+    #update.packages(ask= FALSE) #update installed packages.
+    eval(parse(text = sprintf("install.packages(\"%s\", dependencies = TRUE)", x)))
+  }
+  if(isTRUE(x %in% .packages(all.available=TRUE))) {
+    eval(parse(text = sprintf("require(\"%s\")", x)))
+  } else {
+    source("http://bioconductor.org/biocLite.R")
+    #biocLite(character(), ask=FALSE) #update installed packages.
+    eval(parse(text = sprintf("biocLite(\"%s\")", x)))
+    eval(parse(text = sprintf("require(\"%s\")", x)))
+  }
 }
