@@ -4593,8 +4593,10 @@ jobCreator = function(path = getwd(),
 
 
 
+
 StatsPipeline = function(path = getwd(),
-                         SP.results = file.path(getwd(), 'SP')) {
+                         SP.results = file.path(getwd(), 'SP'),
+                         waitUntillSee = 'No unfinished job found') {
   startTime = Sys.time()
   message0('Starting the IMPC statistical pipeline ... ')
   message0('\t Parquet files path:  ', path)
@@ -4609,61 +4611,49 @@ StatsPipeline = function(path = getwd(),
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
   message0('Step 1. Reading the data from the parguets directory and creating LSF jobs')
-  source(
-    file.path(
-      local(),
-      'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'
-    )
-  )
+  source(file.path(local(),
+                   'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
   f(path0)
   rm0('f')
   ###############################################
   message0('Step 2. Reading the data from the parguets files and creating psudo Rdata')
   file.copy(
-    from = file.path(
-      local(),
-      'StatsPipeline/0-ETL/Step2Parquet2Rdata.R'
-    ),
+    from = file.path(local(),
+                     'StatsPipeline/0-ETL/Step2Parquet2Rdata.R'),
     to = file.path(path, 'Step2Parquet2Rdata.R'),
     overwrite = TRUE
   )
   system('chmod 775 jobs_step2_Parquet2Rdata.bch', wait = TRUE)
   system('./jobs_step2_Parquet2Rdata.bch', wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs')
+  waitTillCommandFinish(command = 'bjobs', exitIfTheOutputContains = waitUntillSee)
   file.remove(file.path(path, 'Step2Parquet2Rdata.R'))
   if (filesContain(path = path,
-                                      extension = '.log',
-                                      containWhat = 'Exit'))
+                   extension = '.log',
+                   containWhat = 'Exit'))
     stop('An error occured in step 2. Parquet2Rdata conversion')
 
   ###############################################
   message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
-  source(
-    file.path(
-      local(),
-      'StatsPipeline/0-ETL/Step3MergeRdataFilesJobs.R'
-    )
-  )
+  source(file.path(local(),
+                   'StatsPipeline/0-ETL/Step3MergeRdataFilesJobs.R'))
   f(file.path(path, 'ProcedureScatterRdata'))
   rm0('f')
 
   ###############################################
   message0('Step 4. Merging psudo Rdata files into single files per procedure')
   file.copy(
-    from = file.path(
-      local(),
-      'StatsPipeline/0-ETL/Step4MergingRdataFiles.R'
-    ),
+    from = file.path(local(),
+                     'StatsPipeline/0-ETL/Step4MergingRdataFiles.R'),
     to = file.path(path, 'Step4MergingRdataFiles.R'),
     overwrite = TRUE
   )
   system('chmod 775 jobs_step4_MergeRdatas.bch', wait = TRUE)
   system('./jobs_step4_MergeRdatas.bch', wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs')
+  waitTillCommandFinish(command = 'bjobs', exitIfTheOutputContains = waitUntillSee)
   file.remove(file.path(path, 'Step4MergingRdataFiles.R'))
   if (filesContain(path = path,
-                                      extension = '.log',
-                                      containWhat = 'Exit'))
+                   extension = '.log',
+                   containWhat = 'Exit'))
     stop('An error occured in step 4. Merging Rdata files into one single Rdata file per procedure')
 
   ###############################################
@@ -4678,16 +4668,14 @@ StatsPipeline = function(path = getwd(),
   message0('Starting Phase II, packaging the big data into small packages ...')
   jobCreator(path = file.path(path, 'Rdata/'))
   file.copy(
-    from = file.path(
-      local(),
-      'StatsPipeline/jobs/InputDataGenerator.R'
-    ),
+    from = file.path(local(),
+                     'StatsPipeline/jobs/InputDataGenerator.R'),
     to = file.path(path, 'InputDataGenerator.R'),
     overwrite = TRUE
   )
   system('chmod 775 DataGenerationJobList.bch', wait = TRUE)
   system('./DataGenerationJobList.bch', wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs')
+  waitTillCommandFinish(command = 'bjobs', exitIfTheOutputContains = waitUntillSee)
   file.remove(file.path(path, 'InputDataGenerator.R'))
   if (filesContain(
     path = file.path(path, 'DataGeneratingLog'),
@@ -4740,16 +4728,14 @@ StatsPipeline = function(path = getwd(),
   message0('Running the IMPC statistical pipeline by submitting LSF jobs ...')
   # copy stats pipeline driver script
   file.copy(
-    from = file.path(
-      local(),
-      'StatsPipeline/jobs/function.R'
-    ),
+    from = file.path(local(),
+                     'StatsPipeline/jobs/function.R'),
     to = file.path(path, 'function.R'),
     overwrite = TRUE
   )
   system('chmod 775 AllJobs.bch', wait = TRUE)
   system('./AllJobs.bch', wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs')
+  waitTillCommandFinish(command = 'bjobs', exitIfTheOutputContains = waitUntillSee)
 
 
   message0('Postprocessing the IMPC statistical analyses results ...')
