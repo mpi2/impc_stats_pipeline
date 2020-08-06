@@ -4493,35 +4493,41 @@ waitTillCommandFinish = function(command = 'bjobs',
                                  checkcommand = 'bjobs',
                                  exitIfTheOutputContains = 'No unfinished job found',
                                  WaitBeforeRetrySec = 30,
+                                 ignoreline = 0,
                                  ...) {
   r = system2(command = checkcommand,
               wait = TRUE,
               stdout = TRUE,
               ...)
   totalSeconds = 0
-  while (length(r) > 0 && !grepl(
+  if (ignoreline > 0)
+    r = r[-c(ignoreline)]
+  while (length(r) > 0 && !all(grepl(
     pattern = exitIfTheOutputContains,
     x = r,
     perl = TRUE,
     ignore.case = TRUE
-  )) {
+  ))) {
     totalSeconds = totalSeconds + WaitBeforeRetrySec
     message0('waiting for ',
-            WaitBeforeRetrySec,
-            's',
-            '. Total waiting time: ',
-            totalSeconds,
-            's.')
+             WaitBeforeRetrySec,
+             's',
+             '. Total waiting time: ',
+             totalSeconds,
+             's.')
     Sys.sleep(WaitBeforeRetrySec)
     r = system2(command = checkcommand,
                 wait = TRUE,
                 stdout = TRUE,
                 ...)
+    if (ignoreline > 0)
+      r = r[-c(ignoreline)]
 
   }
+  message0('continuing the pipeline ...')
   r2 = system(command = command,
-               wait = FALSE,
-               ...)
+              wait = FALSE,
+              ...)
   return(invisible(r2))
 }
 
@@ -4596,7 +4602,8 @@ jobCreator = function(path = getwd(),
 
 StatsPipeline = function(path = getwd(),
                          SP.results = file.path(getwd(), 'SP'),
-                         waitUntillSee = 'No unfinished job found') {
+                         waitUntillSee = 'No unfinished job found',
+                         ignoreThisLineInWaitingCheck = 0) {
   startTime = Sys.time()
   message0('Starting the IMPC statistical pipeline ... ')
   message0('\t Parquet files path:  ', path)
@@ -4625,7 +4632,11 @@ StatsPipeline = function(path = getwd(),
   )
   system('chmod 775 jobs_step2_Parquet2Rdata.bch', wait = TRUE)
   system('./jobs_step2_Parquet2Rdata.bch', wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs', exitIfTheOutputContains = waitUntillSee)
+  waitTillCommandFinish(
+    command = 'bjobs',
+    exitIfTheOutputContains = waitUntillSee,
+    ignoreline = ignoreThisLineInWaitingCheck
+  )
   file.remove(file.path(path, 'Step2Parquet2Rdata.R'))
   if (filesContain(path = path,
                    extension = '.log',
@@ -4649,7 +4660,11 @@ StatsPipeline = function(path = getwd(),
   )
   system('chmod 775 jobs_step4_MergeRdatas.bch', wait = TRUE)
   system('./jobs_step4_MergeRdatas.bch', wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs', exitIfTheOutputContains = waitUntillSee)
+  waitTillCommandFinish(
+    command = 'bjobs',
+    exitIfTheOutputContains = waitUntillSee,
+    ignoreline = ignoreThisLineInWaitingCheck
+  )
   file.remove(file.path(path, 'Step4MergingRdataFiles.R'))
   if (filesContain(path = path,
                    extension = '.log',
@@ -4675,7 +4690,11 @@ StatsPipeline = function(path = getwd(),
   )
   system('chmod 775 DataGenerationJobList.bch', wait = TRUE)
   system('./DataGenerationJobList.bch', wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs', exitIfTheOutputContains = waitUntillSee)
+  waitTillCommandFinish(
+    command = 'bjobs',
+    exitIfTheOutputContains = waitUntillSee,
+    ignoreline = ignoreThisLineInWaitingCheck
+  )
   file.remove(file.path(path, 'InputDataGenerator.R'))
   if (filesContain(
     path = file.path(path, 'DataGeneratingLog'),
@@ -4735,7 +4754,11 @@ StatsPipeline = function(path = getwd(),
   )
   system('chmod 775 AllJobs.bch', wait = TRUE)
   system('./AllJobs.bch', wait = TRUE)
-  waitTillCommandFinish(command = 'bjobs', exitIfTheOutputContains = waitUntillSee)
+  waitTillCommandFinish(
+    command = 'bjobs',
+    exitIfTheOutputContains = waitUntillSee,
+    ignoreline = ignoreThisLineInWaitingCheck
+  )
 
 
   message0('Postprocessing the IMPC statistical analyses results ...')
