@@ -116,7 +116,9 @@ packages <- c(
   "logistf",
   "pingr",
   "corrplot",
-  "graph"
+  "graph",
+  "RPostgreSQL",
+  "Tmisc"
 )
 
 for (package in packages) {
