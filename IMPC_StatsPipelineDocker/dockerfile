@@ -21,10 +21,10 @@ RUN make
 RUN make install 
 
 
-RUN apt install libgsl-dev
-RUN apt install libxml2-devel
+RUN apt install -y libgsl-dev
+RUN apt install -y libxml2-devel
 RUN add-apt-repository -y ppa:opencpu/imagemagick
-RUN apt-get update
+RUN apt-get -y update
 RUN apt-get install -y libmagick++-dev
    
    
