@@ -1,11 +1,11 @@
-FROM rocker/r-ver:3.4.4
+FROM rocker/r-ver:4.0.2
 
 # ARG WHEN
 
 
 # Make the home directory
-RUN mkdir /home/IMPCStatsPipeline/jobs
-COPY jobs /home/IMPCStatsPipeline/jobs
+RUN mkdir -p ~/IMPCStatsPipeline/jobs
+COPY jobs -p ~/IMPCStatsPipeline/jobs
 
 # 
 CMD wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/impc_statistical_pipeline/install_dependencies.R
