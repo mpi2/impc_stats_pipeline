@@ -4,7 +4,15 @@ FROM rocker/r-ver:4.0.2
 
 WORKDIR /IMPC_SP
 
+# XML package
+RUN apt-get -y purge -f libxml2-dev
+RUN apt-get -y clean
+RUN apt-get -y update
+RUN apt-get -y install libxml2 libxml2-dev
 
+
+# GSL package
+RUN apt install -y libgsl-dev
 
 # Magick++
 RUN apt update 
@@ -21,12 +29,7 @@ RUN make
 RUN make install 
 
 
-RUN apt install -y libgsl-dev
-RUN apt install -y libxml2-devel
-RUN add-apt-repository -y ppa:opencpu/imagemagick
-RUN apt-get -y update
-RUN apt-get install -y libmagick++-dev
-   
+
    
    
    
