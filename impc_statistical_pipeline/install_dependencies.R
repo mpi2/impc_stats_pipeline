@@ -18,9 +18,13 @@ install.packages.auto <- function(x) {
   if (isTRUE(x %in% .packages(all.available = TRUE))) {
     # eval(parse(text = sprintf("require(\"%s\")", x)))
   } else {
-    source("http://bioconductor.org/biocLite.R")
-    # biocLite(character(), ask=FALSE) #update installed packages.
-    eval(parse(text = sprintf("biocLite(\"%s\",ask=FALSE)", x)))
+    # Is bioconductor installed?
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+    
+    eval(parse(text = sprintf(
+      "BiocManager::install(\"%s\",ask=FALSE)", x
+    )))
     eval(parse(text = sprintf("require(\"%s\")", x)))
   }
 }
@@ -30,8 +34,10 @@ install.packages.auto <- function(x) {
 #########################################
 install.packages('devtools')
 library(devtools)
-source("https://bioconductor.org/biocLite.R")
-biocLite("BiocInstaller", ask = FALSE)
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
 
 ##########################################
 #### Install the proper version of some R packages
