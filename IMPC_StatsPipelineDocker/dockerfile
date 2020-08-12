@@ -9,7 +9,7 @@ ADD https://www.imagemagick.org/download/ImageMagick.tar.gz ImageMagick.tar.gz
 #RUN mkdir -p ImageMagick
 CMD tar xvzf ImageMagick.tar.gz 
 CMD cd ImageMagick*
-CMD ls -alh
+RUN echo $(ls -ah)
 RUN chmod 775 configure
 RUN ./configure
 RUN make
