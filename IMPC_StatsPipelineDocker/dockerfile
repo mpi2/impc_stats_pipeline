@@ -2,6 +2,10 @@ FROM rocker/r-ver:4.0.2
 
 # ARG WHEN
 
+WORKDIR /IMPC_SP
+
+
+
 # Magick++
 RUN apt update 
 RUN apt-get -y install build-essential
