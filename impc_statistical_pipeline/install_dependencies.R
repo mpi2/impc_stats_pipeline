@@ -21,7 +21,7 @@ install.packages.auto <- function(x) {
     # Is bioconductor installed?
     if (!requireNamespace("BiocManager", quietly = TRUE))
       install.packages("BiocManager")
-    
+
     eval(parse(text = sprintf(
       "BiocManager::install(\"%s\",ask=FALSE)", x
     )))
@@ -82,6 +82,7 @@ devtools::install_github("hannesmuehleisen/miniparquet")
 # install packages
 ##########################################
 packages <- c(
+  "data.table",
   "RcppGSL",
   "quantreg",
   "Hmisc",
