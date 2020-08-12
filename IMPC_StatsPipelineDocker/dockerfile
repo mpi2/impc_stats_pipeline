@@ -11,7 +11,7 @@ RUN apt update
 RUN apt-get -y install build-essential
 ADD https://www.imagemagick.org/download/ImageMagick.tar.gz ImageMagick.tar.gz
 #RUN mkdir -p ImageMagick
-#RUN tar xvzf ImageMagick.tar.gz 
+RUN tar xvzf ImageMagick.tar.gz 
 WORKDIR ImageMagick-7.0.10-27
 #RUN cd ImageMagick-7.0.10-27
 RUN echo $(ls -ah)
