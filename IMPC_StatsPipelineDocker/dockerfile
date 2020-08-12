@@ -7,8 +7,8 @@ FROM rocker/r-ver:4.0.2
 RUN mkdir -p ~/IMPCStatsPipeline/jobs
 
 # 
-CMD wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/impc_statistical_pipeline/install_dependencies.R
-RUN Rscript install_dependencies.R
+RUN wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/impc_statistical_pipeline/install_dependencies.R
+RUN Rscript "install_dependencies.R"
 
 
 # RUN mkdir ~/mydocker/results 
