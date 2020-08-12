@@ -8,35 +8,12 @@ RUN mkdir /home/IMPCStatsPipeline/jobs
 COPY jobs /home/IMPCStatsPipeline/jobs
 
 # 
+CMD wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/impc_statistical_pipeline/install_dependencies.R
+RUN Rscript install_dependencies.R
 
-RUN R -e "install.packages('SmoothWin')"
-RUN R -e "install.packages('base64enc')"
-RUN R -e "install.packages('RJSONIO')"
-RUN R -e "install.packages('jsonlite')"
-RUN R -e "install.packages('DBI')"
-RUN R -e "install.packages('foreach')"
-RUN R -e "install.packages('doParallel')"
-
-
-
-
-
-
-# Updatescript
-# copy update package script to the home directory
-CMD cd /home/UpdatePackagesFromGithub/jobs \
-  && Rscript "UpdatePackagesFromGithub.R" 
 
 # update the data from impress
 RUN R -e "DRrequiredAgeing:::updateImpress(updateImpressFileInThePackage = TRUE,updateOptionalParametersList = TRUE,updateTheSkipList = TRUE,saveRdata = FALSE)"
-
-
-# step 1 create the raw data from the parquet files
-RUN  mkdir /home/IMPCStatsPipeline/0-ETL 
-COPY 0-ETL /home/IMPCStatsPipeline/0-ETL
-
-
-
 
 # RUN mkdir ~/mydocker/results 
 # docker run -v ~/mydocker/results:/home/IMPCStatsPipeline  analysis
