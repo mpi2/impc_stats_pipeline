@@ -73,7 +73,7 @@ install.packages(
 ##########################################
 # devtools::install_github("tidyverse/tidyr")
 devtools::install_github("eddelbuettel/rcppgsl")
-devtools::install_github("cran/rjags")
+#devtools::install_github("cran/rjags")
 devtools::install_github("cran/latticeExtra")
 devtools::install_github("hannesmuehleisen/miniparquet")
 
