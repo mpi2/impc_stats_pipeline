@@ -5,15 +5,11 @@ FROM rocker/r-ver:4.0.2
 
 # Make the home directory
 RUN mkdir -p ~/IMPCStatsPipeline/jobs
-COPY jobs -p ~/IMPCStatsPipeline/jobs
 
 # 
 CMD wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/impc_statistical_pipeline/install_dependencies.R
 RUN Rscript install_dependencies.R
 
-
-# update the data from impress
-RUN R -e "DRrequiredAgeing:::updateImpress(updateImpressFileInThePackage = TRUE,updateOptionalParametersList = TRUE,updateTheSkipList = TRUE,saveRdata = FALSE)"
 
 # RUN mkdir ~/mydocker/results 
 # docker run -v ~/mydocker/results:/home/IMPCStatsPipeline  analysis
