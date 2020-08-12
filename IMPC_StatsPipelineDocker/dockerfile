@@ -5,7 +5,7 @@ FROM rocker/r-ver:4.0.2
 # Magick++
 RUN apt update 
 RUN apt-get -y install build-essential
-RUN wget https://www.imagemagick.org/download/ImageMagick.tar.gz && tar xvzf ImageMagick.tar.gz
+CMD wget https://www.imagemagick.org/download/ImageMagick.tar.gz && tar xvzf ImageMagick.tar.gz
 RUN cd ImageMagick*/
 RUN ./configure
 RUN make
