@@ -33,14 +33,13 @@ RUN apt-get -y install zlib1g libncurses5
 
 RUN R -e "install.packages('data.table',repos='https://cloud.r-project.org')"
 
-# Make the home directory
-RUN mkdir -p ~/IMPCStatsPipeline/jobs
-CMD cd ~/IMPCStatsPipeline/jobs
-# 
+ 
 # RUN wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/impc_statistical_pipeline/install_dependencies.R
 # RUN Rscript "install_dependencies.R"
 RUN R -e "source('https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/impc_statistical_pipeline/install_dependencies.R')"
 
-
+# Make the home directory
+# RUN mkdir -p ~/IMPCStatsPipeline/jobs
+# CMD cd ~/IMPCStatsPipeline/jobs
 # RUN mkdir ~/mydocker/results 
 # docker run -v ~/mydocker/results:/home/IMPCStatsPipeline  analysis
