@@ -5,8 +5,7 @@ FROM rocker/r-ver:4.0.2
 WORKDIR /IMPC_SP
 
 # zlib
-RUN apt install -y zlib1g
-RUN apt-get -y install libz-dev
+RUN apt-get -y install zlib1g-dev libncurses5-dev
 
 
 RUN R -e "install.packages('data.table',repos='https://cloud.r-project.org')"
