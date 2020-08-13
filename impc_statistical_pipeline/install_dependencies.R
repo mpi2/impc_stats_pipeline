@@ -73,12 +73,12 @@ install.packages(
 ##########################################
 # Install packages that need to be installed from the github
 ##########################################
+devtools::install_github("Rdatatable/data.table",upgrade = 'never')
 # devtools::install_github("tidyverse/tidyr")
 devtools::install_github("eddelbuettel/rcppgsl")
 # devtools::install_github("cran/rjags")
 devtools::install_github("cran/latticeExtra")
 devtools::install_github("hannesmuehleisen/miniparquet")
-devtools::install_github("Rdatatable/data.table")
 
 
 ##########################################

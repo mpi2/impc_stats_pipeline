@@ -28,7 +28,7 @@ RUN apt-get -y install libxml2 libxml2-dev
 RUN apt install -y libgsl-dev
 
 # zlib
-RUN apt-get -y install zlib1g libncurses5
+RUN apt-get -y install zlib1g-dev
 
 
 RUN R -e "install.packages('data.table',repos='https://cloud.r-project.org')"
