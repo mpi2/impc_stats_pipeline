@@ -19,8 +19,9 @@ install.packages.auto <- function(x) {
     # eval(parse(text = sprintf("require(\"%s\")", x)))
   } else {
     # Is bioconductor installed?
-    if (!requireNamespace("BiocManager", quietly = TRUE))
+    if (!requireNamespace("BiocManager", quietly = TRUE)) {
       install.packages("BiocManager")
+    }
 
     eval(parse(text = sprintf(
       "BiocManager::install(\"%s\",ask=FALSE)", x
@@ -32,11 +33,12 @@ install.packages.auto <- function(x) {
 ##########################################
 # Install the driver devtools package
 #########################################
-install.packages('devtools')
+install.packages("devtools")
 library(devtools)
 
-if (!requireNamespace("BiocManager", quietly = TRUE))
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
   install.packages("BiocManager")
+}
 
 
 ##########################################
@@ -73,7 +75,7 @@ install.packages(
 ##########################################
 # devtools::install_github("tidyverse/tidyr")
 devtools::install_github("eddelbuettel/rcppgsl")
-#devtools::install_github("cran/rjags")
+# devtools::install_github("cran/rjags")
 devtools::install_github("cran/latticeExtra")
 devtools::install_github("hannesmuehleisen/miniparquet")
 
@@ -82,7 +84,7 @@ devtools::install_github("hannesmuehleisen/miniparquet")
 # install packages
 ##########################################
 packages <- c(
-  "data.table",
+  # "data.table",
   "RcppGSL",
   "quantreg",
   "Hmisc",
@@ -139,7 +141,7 @@ for (package in packages) {
 # PhenStat
 install_github(
   repo = "mpi2/impc_stats_pipeline/Early adults stats pipeline/PhenStat/PhenStatPackage/PhenStat",
-  dependencies = TRUE,
+  dependencies = FALSE,
   upgrade = "never",
   force = TRUE,
   build = TRUE,
