@@ -35,6 +35,8 @@ install.packages.auto <- function(x) {
 #########################################
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
+}else{
+  require(devtools)
 }
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
@@ -45,41 +47,60 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 ##########################################
 #### Install the proper version of some R packages
 ##########################################
-install.packages(
-  "https://cran.r-project.org/src/contrib/Archive/Rfast/Rfast_1.9.4.tar.gz",
-  repos = NULL,
-  type = "source"
-)
+if (!requireNamespace("Rfast", quietly = TRUE)) {
+  install.packages(
+    "https://cran.r-project.org/src/contrib/Archive/Rfast/Rfast_1.9.4.tar.gz",
+    repos = NULL,
+    type = "source"
+  )
+}
 
-install.packages(
-  "https://cran.r-project.org/src/contrib/Archive/nloptr/nloptr_1.2.2.1.tar.gz",
-  repos = NULL,
-  type = "source"
-)
+if (!requireNamespace("nloptr", quietly = TRUE)) {
+  install.packages(
+    "https://cran.r-project.org/src/contrib/Archive/nloptr/nloptr_1.2.2.1.tar.gz",
+    repos = NULL,
+    type = "source"
+  )
+}
 
-install.packages(
-  "https://cran.r-project.org/src/contrib/Archive/tidyr/tidyr_1.0.2.tar.gz",
-  repos = NULL,
-  type = "source"
-)
+if (!requireNamespace("tidyr", quietly = TRUE)) {
+  install.packages(
+    "https://cran.r-project.org/src/contrib/Archive/tidyr/tidyr_1.0.2.tar.gz",
+    repos = NULL,
+    type = "source"
+  )
+}
 
-install.packages(
-  "https://cran.r-project.org/src/contrib/Archive/magick/magick_2.0.tar.gz",
-  repos = NULL,
-  type = "source"
-)
+if (!requireNamespace("magick", quietly = TRUE)) {
+  install.packages(
+    "https://cran.r-project.org/src/contrib/Archive/magick/magick_2.0.tar.gz",
+    repos = NULL,
+    type = "source"
+  )
+}
 #####
 
 
 ##########################################
 # Install packages that need to be installed from the github
 ##########################################
-devtools::install_github("Rdatatable/data.table",upgrade = 'never')
-# devtools::install_github("tidyverse/tidyr")
-devtools::install_github("eddelbuettel/rcppgsl")
+if (!requireNamespace("data.table", quietly = TRUE)) {
+  devtools::install_github("Rdatatable/data.table", upgrade = "never")
+}
+
+
+if (!requireNamespace("rcppgsl", quietly = TRUE)) {
+  devtools::install_github("eddelbuettel/rcppgsl")
+}
+
 # devtools::install_github("cran/rjags")
-devtools::install_github("cran/latticeExtra")
-devtools::install_github("hannesmuehleisen/miniparquet")
+if (!requireNamespace("latticeExtra", quietly = TRUE)) {
+  devtools::install_github("cran/latticeExtra")
+}
+
+if (!requireNamespace("miniparquet", quietly = TRUE)) {
+  devtools::install_github("hannesmuehleisen/miniparquet")
+}
 
 
 ##########################################
@@ -141,7 +162,7 @@ for (package in packages) {
 # even if they are in the list above
 ##########################################
 # PhenStat
-install_github(
+devtools::install_github(
   repo = "mpi2/impc_stats_pipeline/Early adults stats pipeline/PhenStat/PhenStatPackage/PhenStat",
   dependencies = FALSE,
   upgrade = "never",
@@ -151,7 +172,7 @@ install_github(
 )
 
 # DRrequired
-install_github(
+devtools::install_github(
   repo = "mpi2/impc_stats_pipeline/Early adults stats pipeline/DRrequired/DRrequiredPackage",
   dependencies = TRUE,
   upgrade = "never",
@@ -161,7 +182,7 @@ install_github(
 )
 
 # DRrequiredAgeing
-install_github(
+devtools::install_github(
   repo = "mpi2/impc_stats_pipeline/Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage",
   dependencies = TRUE,
   upgrade = "never",
@@ -171,7 +192,7 @@ install_github(
 )
 
 # SmoothWin
-install_github(
+devtools::install_github(
   repo = "mpi2/impc_stats_pipeline/SoftWindowing/SmoothWin/SmoothWinPackage/",
   dependencies = TRUE,
   upgrade = "never",
@@ -181,7 +202,7 @@ install_github(
 )
 
 # OpenStats
-install_github(
+devtools::install_github(
   # repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/OpenStats/OpenStatsPackage/',
   repo = "mpi2/OpenStats",
   dependencies = TRUE,
