@@ -4321,7 +4321,7 @@ minijobsCreator = function(path  = getwd(),
                            fname = 'minijobs.txt') {
   lf =list.dirsDepth(path = path, depth = depth)
   a = paste0(
-    'bsub "find ',
+    'bsub -e error.err -o output.out "find ',
     lf,
     ' -type f > ',
     path,

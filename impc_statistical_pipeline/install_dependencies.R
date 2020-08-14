@@ -33,8 +33,9 @@ install.packages.auto <- function(x) {
 ##########################################
 # Install the driver devtools package
 #########################################
-install.packages("devtools")
-library(devtools)
+if (!requireNamespace("devtools", quietly = TRUE)) {
+  install.packages("devtools")
+}
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
   install.packages("BiocManager")
