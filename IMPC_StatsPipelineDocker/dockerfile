@@ -40,7 +40,5 @@ RUN apt-get -y install libxml2 libxml2-dev libgsl-dev zlib1g-dev
 RUN R -e "source('https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/impc_statistical_pipeline/install_dependencies.R')"
 
 # Make the home directory
-# RUN mkdir -p ~/IMPCStatsPipeline/jobs
-# CMD cd ~/IMPCStatsPipeline/jobs
-# RUN mkdir ~/mydocker/results 
+WORKDIR /IMPC_SP/StatsPipelineReady
 # docker run -v ~/mydocker/results:/home/IMPCStatsPipeline  analysis
