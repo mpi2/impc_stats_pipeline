@@ -2,7 +2,7 @@ FROM rocker/r-ver:4.0.2
 
 # ARG WHEN
 
-WORKDIR /Dependencies
+WORKDIR /IMPC_SP
 
 RUN apt-get update
 
@@ -39,7 +39,8 @@ RUN apt-get -y install libxml2 libxml2-dev libgsl-dev zlib1g-dev
 # prepare the environment
 RUN R -e "source('https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/impc_statistical_pipeline/install_dependencies.R')"
 
-# Set the home directory as the entry point
-WORKDIR ~/IMPCStatsPipeline
+# Make the home directory
+# RUN mkdir -p ~/IMPCStatsPipeline/jobs
+# CMD cd ~/IMPCStatsPipeline/jobs
 # RUN mkdir ~/mydocker/results 
 # docker run -v ~/mydocker/results:/home/IMPCStatsPipeline  analysis
