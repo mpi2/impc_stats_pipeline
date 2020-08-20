@@ -272,7 +272,7 @@ GenotypeTag = function(obj,
     }
     ############# step 5
     AllCombinations2 = AllCombinations2[grepl(
-      pattern = 'MALE|FEMALE',
+      pattern = 'MALE|FEMALE|OVERALL',
       x = names(AllCombinations2),
       ignore.case = TRUE
     )]
@@ -931,16 +931,16 @@ Write2Postg = function(df) {
   con <- dbConnect(
     drv,
     dbname = "test",
-    host = "ves-ebi-d9.ebi.ac.uk",
-    port = 5433,
-    user = "tc_mi01",
-    password = ''
+    host = "hh-yoda-07-07",
+    port = 5432,
+    user = "impc",
+    password = 'impc'
   )
   
   dbBegin(conn = con)
   r = dbWriteTable(
     conn = con,
-    name = "dr12withmptermsv4",
+    name = "dr12withmptermsv719082020_16",
     value = df,
     append = TRUE,
     row.names = FALSE
@@ -998,7 +998,7 @@ for (i in 1:lflist) {
     #write(paste(r$statpacket[1,19],sep = '\t',collapse = '\t'),file = 'd:/delme.tsv',ncolumns = 10^4)
     df = r$statpacket
     ###################
-    df = cbind(randomIdGenerator(), df)
+    df = cbind(as.numeric(paste0(randomIdGenerator(),format(Sys.time(), "%H%S"))), df)
     names(df)  =  c(
       "id",
       "analysisTime",
