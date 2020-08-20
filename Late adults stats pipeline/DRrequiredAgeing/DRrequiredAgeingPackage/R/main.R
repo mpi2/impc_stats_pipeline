@@ -423,7 +423,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       } else{
                         NULL
                       }
-
+                    # ABR min decreased to 1. 19/8/2020 meeting with Jeremy and Federico
                     minSampRequired = ifelse(
                       is.ABR(x = parameter),
                       as.numeric(initial$min_ABR_mut_each_sex),

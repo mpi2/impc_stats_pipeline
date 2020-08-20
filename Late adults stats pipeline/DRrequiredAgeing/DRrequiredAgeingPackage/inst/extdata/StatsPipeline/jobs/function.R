@@ -24,7 +24,7 @@ runner = function(file) {
     virtualDrive = FALSE,
     ####
     MMOptimise = c(1,1,1,1,1,1),
-    FERRrep = 1500,
+    FERRrep = 0, # decision on 19-8-2020 12.00 AM to turn this option off
     ####
     activateMulticore = FALSE,
     coreRatio = 1,
