@@ -28,6 +28,7 @@ variables:
    
    # For EBI you need to override the definition of CI_REGISTRY to remove the port number
    CI_REGISTRY: dockerhub.ebi.ac.uk
+   CI_PROJECT_PATH: hamedhm/impc-statspipline-docker
    CI_REGISTRY_IMAGE: $CI_REGISTRY/$CI_PROJECT_PATH
 
    #NOW: $(date '+%Y-%m-%d-%H-%M-%S')
@@ -59,10 +60,9 @@ build_image:
     except:
         - schedules
     script:
-        - echo "${CI_REGISTRY_PASSWORD}" | docker login -u "${CI_REGISTRY_USER}" --password-stdin  ${CI_REGISTRY}
-        - mkdir -p "$MOUNT_POINT"
-        
-        - docker build -t impc-sp .  | tee ${MOUNT_POINT}/build.log
+        - echo "${CI_DEPLOY_PASSWORD}" | docker login -u "${CI_DEPLOY_USER}" --password-stdin  ${CI_REGISTRY}
+        - docker build -t $CI_REGISTRY_IMAGE .
+        - docker push $CI_REGISTRY_IMAGE
     
 
 
