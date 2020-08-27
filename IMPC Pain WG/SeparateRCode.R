@@ -1,4 +1,6 @@
 rm(list = ls(all = TRUE))
+# 27-08-2020: I removed batch from the entire models as there is only one date recorded without time and
+# it would be ambiguous to include batch
 # B6N strains can be compared to C57BL/6NJ` BUT NOT`  C57BL/6J
 # B6N Bottom line, our wildtype control mice are still the best option available to use for the statistical comparison.
 # heard back from Lynette (attached).  The stray het can be excluded for this line (CR1760,1xHet and  16xHoms)
@@ -36,11 +38,11 @@ plotGene <- function(td, etc, centre = "UCD") {
         )
       )
     ),
-    MM_random = ~ 1 | id / Batch,
+    MM_random = ~ 1 | id ,
     MM_BodyWeightIncluded = FALSE,
     MM_weight = NULL,
     MM_optimise = c(0, 0, 0, 0, 0, 0),
-    correlation = if (centre %in% "UCD") NULL else corSymm(form = ~ 1 | id / Batch)
+    correlation = if (centre %in% "UCD") NULL else corSymm(form = ~ 1 | id)
   )
   td2 <- td2$output$Final.Model
   #########
@@ -90,11 +92,11 @@ plotGeneSex <- function(td, etc, centre = "UCD") {
         )
       )
     ),
-    MM_random = ~ 1 | id / Batch,
+    MM_random = ~ 1 | id,
     MM_BodyWeightIncluded = FALSE,
     MM_weight = NULL,
     MM_optimise = c(0, 0, 0, 0, 0, 0),
-    correlation = if (centre %in% "UCD") NULL else corSymm(form = ~ 1 | id / Batch)
+    correlation = if (centre %in% "UCD") NULL else corSymm(form = ~ 1 | id )
   )
   td2 <- td2$output$Final.Model
   x <- getData(td2)
@@ -521,8 +523,8 @@ for (i in 1:length(files)) {
     OpenStatsListObject = plAgeVariation,
     method = "MM",
     MM_fixed = logValue ~ Sex * Group,
-    MM_random = ~ 1 | id / Group / Batch,
-    correlation = corSymm(form = ~ 1 | id / Group / Batch),
+    MM_random = ~ 1 | id / Group ,
+    correlation = corSymm(form = ~ 1 | id / Group),
     MM_weight = NULL,
     MM_lower = ~1,
     MM_optimise = c(1, 1, 1, 0, 0, 0)
@@ -673,7 +675,7 @@ for (i in 1:length(files)) {
             )
             if(!dir.exists('RawData'))
               dir.create('RawData')
-            write.csv(pl@datasetPL, file = paste0('RawData/', outputFilename, '.csv'))
+            write.csv(pl@datasetPL, file = paste0('RawData/', outputFilename, '.csv'),row.names = FALSE)
             table(pl@datasetPL$Biological_sample_group, pl@datasetPL$Sex) / 3 # 3 times an animal
             ###############################
             pl@datasetPL$logValue <- log(pl@datasetPL$value)
@@ -684,8 +686,12 @@ for (i in 1:length(files)) {
               OpenStatsListObject = pl,
               method = "MM",
               MM_fixed = logValue ~ Genotype * Sex * Group ,#+ age,
-              MM_random = ~ 1 | id / Group / Batch,
-              correlation = corSymm(form = ~ 1 | id / Group / Batch),
+              MM_random = ~ 1 | id / Group ,
+              correlation = corSymm(form = ~ 1 | id / Group),
+              # Batch has not entered all measurements are done on the same day!
+              # One way is to artificially creating batch by adding +12/24 but as time is not
+              # recorded, this is ambiguous.
+              correlation = corSymm(form = ~ 1 | id / Group),
               MM_weight = varIdent(~ 1 | Genotype),
               MM_optimise = c(1, 1, 1, 1, 1, 1)
             )
