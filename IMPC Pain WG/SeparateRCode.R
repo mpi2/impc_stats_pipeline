@@ -705,8 +705,8 @@ for (i in 1:length(files)) {
               OpenStatsListObject = pl,
               method = "MM",
               MM_fixed = logValue ~ Genotype * Sex * Group, #+ age,
-              MM_random = ~ 1 | id / Group,
-              correlation = corSymm(form = ~ 1 | id / Group / Batch),
+              MM_random = ~ 1 | id / Group / Batch,
+              correlation = corSymm(),
               MM_weight = varIdent(~ 1 | Genotype),
               MM_optimise = c(1, 1, 1, 1, 1, 1)
             )
