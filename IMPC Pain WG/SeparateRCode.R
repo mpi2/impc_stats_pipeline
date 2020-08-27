@@ -1,6 +1,4 @@
 rm(list = ls(all = TRUE))
-# 27-08-2020: I removed batch from the entire models as there is only one date recorded without time and
-# it would be ambiguous to include batch
 # B6N strains can be compared to C57BL/6NJ` BUT NOT`  C57BL/6J
 # B6N Bottom line, our wildtype control mice are still the best option available to use for the statistical comparison.
 # heard back from Lynette (attached).  The stray het can be excluded for this line (CR1760,1xHet and  16xHoms)
@@ -38,11 +36,11 @@ plotGene <- function(td, etc, centre = "UCD") {
         )
       )
     ),
-    MM_random = ~ 1 | id ,
+    MM_random = ~ 1 | id / Batch,
     MM_BodyWeightIncluded = FALSE,
     MM_weight = NULL,
     MM_optimise = c(0, 0, 0, 0, 0, 0),
-    correlation = if (centre %in% "UCD") NULL else corSymm(form = ~ 1 | id)
+    correlation = if (centre %in% "UCD") NULL else corSymm(form = ~ 1 | id / Batch)
   )
   td2 <- td2$output$Final.Model
   #########
@@ -92,11 +90,11 @@ plotGeneSex <- function(td, etc, centre = "UCD") {
         )
       )
     ),
-    MM_random = ~ 1 | id,
+    MM_random = ~ 1 | id / Batch,
     MM_BodyWeightIncluded = FALSE,
     MM_weight = NULL,
     MM_optimise = c(0, 0, 0, 0, 0, 0),
-    correlation = if (centre %in% "UCD") NULL else corSymm(form = ~ 1 | id )
+    correlation = if (centre %in% "UCD") NULL else corSymm(form = ~ 1 | id / Batch)
   )
   td2 <- td2$output$Final.Model
   x <- getData(td2)
@@ -163,13 +161,14 @@ for (i in 1:length(files)) {
   # UCD  '%d/%m/%Y''
   #### Never change below names!
   centre <- c("JAX", "MRC Harwell", "TCP", "UCD")[i]
-  TryTheseFormatsForDates <- c("%m/%d/%Y", "%d/%m/%Y", "%Y-%m-%d", "%d/%m/%Y")[i]
-  df$age_in_weeks <- floor((
-    as.Date(df$`Date of experiment`, tryFormats = TryTheseFormatsForDates) -
-      as.Date(df$`Date of birth`, tryFormats = TryTheseFormatsForDates)) / 7)
+  TryTheseFormatsForDates <-
+    c("%m/%d/%Y", "%d/%m/%Y", "%Y-%m-%d", "%d/%m/%Y")[i]
+  df$`Date of experiment` = as.Date(df$`Date of experiment`, tryFormats = TryTheseFormatsForDates)
+  df$`Date of birth` = as.Date(df$`Date of birth`, tryFormats = TryTheseFormatsForDates)
+  df$age_in_weeks <- floor((df$`Date of experiment` - df$`Date of birth`) / 7)
   ###############################
   # any negative age!
-  if (all(dim(df[df$age_in_weeks < 0, ]) > 0)) {
+  if (all(dim(df[df$age_in_weeks < 0,]) > 0)) {
     df[df$age_in_weeks < 0, c("Date of experiment", "Date of birth", "Is Baseline?")]
   }
   df.org <- df
@@ -435,6 +434,23 @@ for (i in 1:length(files)) {
     variable.name = "Group"
   )
   levels(df_melt$Group) <- c("Test0", "Test1", "Test2")
+
+  #add the following values (days) to the dates
+  #c("JAX", "MRC Harwell", "TCP", "UCD")
+  shiftTest1 = c(1, 1, 1, 1)
+  shiftTest2 = c(2, 2, 6, 6)
+  for (mid in unique(df_melt$id)) {
+    if (sum(df_melt$id == mid & df_melt$Group %in% 'Test1'))
+      df_melt[df_melt$id == mid &
+                df_melt$Group %in% 'Test1', 'Batch'] = df_melt[df_melt$id == mid &
+                                                                 df_melt$Group %in% 'Test0', 'Batch'] + shiftTest1[i]
+      if (sum(df_melt$id == mid & df_melt$Group %in% 'Test2'))
+        df_melt[df_melt$id == mid &
+                  df_melt$Group %in% 'Test2', 'Batch'] = df_melt[df_melt$id == mid &
+                                                                   df_melt$Group %in% 'Test0', 'Batch'] + shiftTest2[i]
+
+  }
+  df_melt$Batch = as.factor(as.character(df_melt$Batch))
   df_melt <- droplevels(df_melt)
   # Discussed with Sonia to remove Test0 as it is inhabituation and not challenged in MRC Harwell
   if (centre %in% "MRC Harwell") {
@@ -523,8 +539,8 @@ for (i in 1:length(files)) {
     OpenStatsListObject = plAgeVariation,
     method = "MM",
     MM_fixed = logValue ~ Sex * Group,
-    MM_random = ~ 1 | id / Group ,
-    correlation = corSymm(form = ~ 1 | id / Group),
+    MM_random = ~ 1 | id / Group / Batch,
+    correlation = corSymm(form = ~ 1 | id / Group / Batch),
     MM_weight = NULL,
     MM_lower = ~1,
     MM_optimise = c(1, 1, 1, 0, 0, 0)
@@ -687,11 +703,7 @@ for (i in 1:length(files)) {
               method = "MM",
               MM_fixed = logValue ~ Genotype * Sex * Group ,#+ age,
               MM_random = ~ 1 | id / Group ,
-              correlation = corSymm(form = ~ 1 | id / Group),
-              # Batch has not entered all measurements are done on the same day!
-              # One way is to artificially creating batch by adding +12/24 but as time is not
-              # recorded, this is ambiguous.
-              # correlation = corSymm(form = ~ 1 | id / Group),
+              correlation = corSymm(form = ~ 1 | id / Group/ Batch),
               MM_weight = varIdent(~ 1 | Genotype),
               MM_optimise = c(1, 1, 1, 1, 1, 1)
             )
