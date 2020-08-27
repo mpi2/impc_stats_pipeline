@@ -163,12 +163,12 @@ for (i in 1:length(files)) {
   centre <- c("JAX", "MRC Harwell", "TCP", "UCD")[i]
   TryTheseFormatsForDates <-
     c("%m/%d/%Y", "%d/%m/%Y", "%Y-%m-%d", "%d/%m/%Y")[i]
-  df$`Date of experiment` = as.Date(df$`Date of experiment`, tryFormats = TryTheseFormatsForDates)
-  df$`Date of birth` = as.Date(df$`Date of birth`, tryFormats = TryTheseFormatsForDates)
+  df$`Date of experiment` <- as.Date(df$`Date of experiment`, tryFormats = TryTheseFormatsForDates)
+  df$`Date of birth` <- as.Date(df$`Date of birth`, tryFormats = TryTheseFormatsForDates)
   df$age_in_weeks <- floor((df$`Date of experiment` - df$`Date of birth`) / 7)
   ###############################
   # any negative age!
-  if (all(dim(df[df$age_in_weeks < 0,]) > 0)) {
+  if (all(dim(df[df$age_in_weeks < 0, ]) > 0)) {
     df[df$age_in_weeks < 0, c("Date of experiment", "Date of birth", "Is Baseline?")]
   }
   df.org <- df
@@ -435,22 +435,23 @@ for (i in 1:length(files)) {
   )
   levels(df_melt$Group) <- c("Test0", "Test1", "Test2")
 
-  #add the following values (days) to the dates
-  #c("JAX", "MRC Harwell", "TCP", "UCD")
-  shiftTest1 = c(1, 1, 1, 1)
-  shiftTest2 = c(2, 2, 6, 6)
+  # add the following values (days) to the dates
+  # c("JAX", "MRC Harwell", "TCP", "UCD")
+  shiftTest1 <- c(1, 1, 1, 1)
+  shiftTest2 <- c(2, 2, 6, 6)
   for (mid in unique(df_melt$id)) {
-    if (sum(df_melt$id == mid & df_melt$Group %in% 'Test1'))
+    if (sum(df_melt$id == mid & df_melt$Group %in% "Test1")) {
       df_melt[df_melt$id == mid &
-                df_melt$Group %in% 'Test1', 'Batch'] = df_melt[df_melt$id == mid &
-                                                                 df_melt$Group %in% 'Test0', 'Batch'] + shiftTest1[i]
-      if (sum(df_melt$id == mid & df_melt$Group %in% 'Test2'))
-        df_melt[df_melt$id == mid &
-                  df_melt$Group %in% 'Test2', 'Batch'] = df_melt[df_melt$id == mid &
-                                                                   df_melt$Group %in% 'Test0', 'Batch'] + shiftTest2[i]
-
+        df_melt$Group %in% "Test1", "Batch"] <- df_melt[df_melt$id == mid &
+        df_melt$Group %in% "Test0", "Batch"] + shiftTest1[i]
+    }
+    if (sum(df_melt$id == mid & df_melt$Group %in% "Test2")) {
+      df_melt[df_melt$id == mid &
+        df_melt$Group %in% "Test2", "Batch"] <- df_melt[df_melt$id == mid &
+        df_melt$Group %in% "Test0", "Batch"] + shiftTest2[i]
+    }
   }
-  df_melt$Batch = as.factor(as.character(df_melt$Batch))
+  df_melt$Batch <- as.factor(as.character(df_melt$Batch))
   df_melt <- droplevels(df_melt)
   # Discussed with Sonia to remove Test0 as it is inhabituation and not challenged in MRC Harwell
   if (centre %in% "MRC Harwell") {
@@ -574,8 +575,9 @@ for (i in 1:length(files)) {
       for (meta in unique(df2_mutant$Metadata_group)) {
         for (colony in unique(df2_mutant$Colony_name)) {
           for (cstrain in unique(df2_control$Strain)) {
-            if(centre %in% 'JAX' && cstrain %in% 'C57BL/6J')
+            if (centre %in% "JAX" && cstrain %in% "C57BL/6J") {
               next
+            }
             ###############################
             # Select the mutants###########
             df_mut_filtered <- droplevels(
@@ -675,7 +677,7 @@ for (i in 1:length(files)) {
             # We process the data using the new IMPC stats pipeline.
             ###############################
             # Creating a PhenList object. Do not know what is PhenList? Check PhenStat package (?PhenList)
-            outputFilename =
+            outputFilename <-
               DRrequiredAgeing:::RemoveSpecialChars(
                 paste(round(runif(1, 1, max = 10^5)), centre, colony, zyg, stra, meta, ageGroup, ".tsv", sep = "-"),
                 what = "[^0-9A-Za-z.]"
@@ -689,9 +691,10 @@ for (i in 1:length(files)) {
               refGenotype = unique(df2_control$Colony_name),
               testGenotype = colony
             )
-            if(!dir.exists('RawData'))
-              dir.create('RawData')
-            write.csv(pl@datasetPL, file = paste0('RawData/', outputFilename, '.csv'),row.names = FALSE)
+            if (!dir.exists("RawData")) {
+              dir.create("RawData")
+            }
+            write.csv(pl@datasetPL, file = paste0("RawData/", outputFilename, ".csv"), row.names = FALSE)
             table(pl@datasetPL$Biological_sample_group, pl@datasetPL$Sex) / 3 # 3 times an animal
             ###############################
             pl@datasetPL$logValue <- log(pl@datasetPL$value)
@@ -701,9 +704,9 @@ for (i in 1:length(files)) {
             td <- OpenStatsAnalysis(
               OpenStatsListObject = pl,
               method = "MM",
-              MM_fixed = logValue ~ Genotype * Sex * Group ,#+ age,
-              MM_random = ~ 1 | id / Group ,
-              correlation = corSymm(form = ~ 1 | id / Group/ Batch),
+              MM_fixed = logValue ~ Genotype * Sex * Group, #+ age,
+              MM_random = ~ 1 | id / Group,
+              correlation = corSymm(form = ~ 1 | id / Group / Batch),
               MM_weight = varIdent(~ 1 | Genotype),
               MM_optimise = c(1, 1, 1, 1, 1, 1)
             )
@@ -761,8 +764,8 @@ for (i in 1:length(files)) {
               if (nrow(tsdGroupR$Group) < 3) {
                 # For Harwell temporary suppresed
                 # https://mail.google.com/mail/u/0/#search/janine/FMfcgxwJWrVzHFXDrKbzkMvLgxcnhVrQ
-                #tsdGroupR$Group <- rbind(NA, NA, tsdGroupR$Group)
-                #rownames(tsdGroupR$Group) <- c("Test1-Test0", "Test2-Test0", "Test2-Test1")
+                # tsdGroupR$Group <- rbind(NA, NA, tsdGroupR$Group)
+                # rownames(tsdGroupR$Group) <- c("Test1-Test0", "Test2-Test0", "Test2-Test1")
               }
 
               tsdGroupTableR <- dataFramerows(tsdGroupR$Group)[4, , drop = FALSE]
@@ -789,7 +792,7 @@ for (i in 1:length(files)) {
               )
               write(
                 paste(report, collapse = "\t"),
-                file =outputFilename,
+                file = outputFilename,
                 ncolumns = 10^5,
                 append = TRUE
               )
@@ -830,11 +833,11 @@ for (i in 1:length(files)) {
     }
   }
   save(Rlist, file = paste0(centre, "-AllResults.Rdata"))
-  rna = paste0(sample(x = letters,size = 3),collapse = '')
+  rna <- paste0(sample(x = letters, size = 3), collapse = "")
   write.csv(
     comparisons,
     file =
-      DRrequiredAgeing:::RemoveSpecialChars(paste(rna,"_MutualComparisonPvalue", centre, ".csv", sep = "-"),
+      DRrequiredAgeing:::RemoveSpecialChars(paste(rna, "_MutualComparisonPvalue", centre, ".csv", sep = "-"),
         what = "[^0-9A-Za-z.]"
       ),
     row.names = FALSE
@@ -842,7 +845,7 @@ for (i in 1:length(files)) {
   write.csv(
     comDifferences,
     file =
-      DRrequiredAgeing:::RemoveSpecialChars(paste(rna,"_MutualComparisonDifferences", centre, ".csv", sep = "-"),
+      DRrequiredAgeing:::RemoveSpecialChars(paste(rna, "_MutualComparisonDifferences", centre, ".csv", sep = "-"),
         what = "[^0-9A-Za-z.]"
       ),
     row.names = FALSE
