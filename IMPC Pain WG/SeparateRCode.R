@@ -691,7 +691,7 @@ for (i in 1:length(files)) {
               # Batch has not entered all measurements are done on the same day!
               # One way is to artificially creating batch by adding +12/24 but as time is not
               # recorded, this is ambiguous.
-              correlation = corSymm(form = ~ 1 | id / Group),
+              # correlation = corSymm(form = ~ 1 | id / Group),
               MM_weight = varIdent(~ 1 | Genotype),
               MM_optimise = c(1, 1, 1, 1, 1, 1)
             )
