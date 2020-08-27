@@ -657,6 +657,11 @@ for (i in 1:length(files)) {
             # We process the data using the new IMPC stats pipeline.
             ###############################
             # Creating a PhenList object. Do not know what is PhenList? Check PhenStat package (?PhenList)
+            outputFilename =
+              DRrequiredAgeing:::RemoveSpecialChars(
+                paste(round(runif(1, 1, max = 10^5)), centre, colony, zyg, stra, meta, ageGroup, ".tsv", sep = "-"),
+                what = "[^0-9A-Za-z.]"
+              )
             pl <- OpenStatsList(
               dataset = df_both,
               dataset.colname.batch = "Batch",
@@ -666,6 +671,9 @@ for (i in 1:length(files)) {
               refGenotype = unique(df2_control$Colony_name),
               testGenotype = colony
             )
+            if(!dir.exists('RawData'))
+              dir.create('RawData')
+            write.csv(pl@datasetPL, file = paste0('RawData/', outputFilename, '.csv'))
             table(pl@datasetPL$Biological_sample_group, pl@datasetPL$Sex) / 3 # 3 times an animal
             ###############################
             pl@datasetPL$logValue <- log(pl@datasetPL$value)
@@ -763,11 +771,7 @@ for (i in 1:length(files)) {
               )
               write(
                 paste(report, collapse = "\t"),
-                file =
-                  DRrequiredAgeing:::RemoveSpecialChars(
-                    paste(round(runif(1, 1, max = 10^5)), centre, colony, zyg, stra, meta, ageGroup, ".tsv", sep = "-"),
-                    what = "[^0-9A-Za-z.]"
-                  ),
+                file =outputFilename,
                 ncolumns = 10^5,
                 append = TRUE
               )
