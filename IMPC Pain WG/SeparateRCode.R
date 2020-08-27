@@ -128,11 +128,12 @@ plotGeneSex <- function(td, etc, centre = "UCD") {
 # library(summarytools)
 ############################
 files <- c(
-  "https://www.ebi.ac.uk/~hamedhm/PainWG/Round%2011-29-06-2020/Data/csv/JAX_VFR_data_collection_QCedJune.zip",
-  "https://www.ebi.ac.uk/~hamedhm/PainWG/Round%2011-29-06-2020/Data/csv/HAR_VFR_data_SUDO_converted.zip",
-  "https://www.ebi.ac.uk/~hamedhm/PainWG/Round%2011-29-06-2020/Data/csv/TCP_VFR_data_collection_sheet_2020-06-15.zip",
-  "https://www.ebi.ac.uk/~hamedhm/PainWG/Round%2011-29-06-2020/Data/csv/UCD_VFR_data_collection_sheet%20022820%20lrb.zip"
+  "https://www.ebi.ac.uk/~hamedhm/PainWG/Round%2012%20-28-07-2020/Data/csv/JAX_VFR_data_collection_QCedJune.zip",
+  "https://www.ebi.ac.uk/~hamedhm/PainWG/Round%2012%20-28-07-2020/Data/csv/HAR_VFR_data_SUDO_converted.zip",
+  "https://www.ebi.ac.uk/~hamedhm/PainWG/Round%2012%20-28-07-2020/Data/csv/TCP_VFR_data_collection_sheet_2020-06-15.zip",
+  "https://www.ebi.ac.uk/~hamedhm/PainWG/Round%2012%20-28-07-2020/Data/csv/UCD_VFR_data_collection_sheet%20022820%20lrb.zip"
 )
+
 for (i in 1:length(files)) {
   df <- read.csv(
     file = DRrequiredAgeing::UnzipAndfilePath(files[i]),

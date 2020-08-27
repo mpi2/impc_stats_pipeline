@@ -4340,6 +4340,22 @@ minijobsCreator = function(path  = getwd(),
   )
 }
 
+DeleteDirectoryAndSubDirectories = function(path  = getwd(),
+                                            depth = 2,
+                                            fname = 'deleteFullDirectory.txt') {
+  lf = DRrequiredAgeing:::list.dirsDepth(path = path, depth = depth)
+  a = paste0('bsub "rm -rf ',
+             lf,
+             '"')
+  write(
+    x = a,
+    file = fname,
+    ncolumns = 10 ^ 5,
+    append = FALSE,
+    sep = '\n'
+  )
+}
+DeleteDirectoryAndSubDirectories(depth = 6)
 #### Only for the ETL process step 1,2,3,4
 ETLStep1MakePar2RdataJobs = function(path = getwd(),
                                      mem = 25000,
