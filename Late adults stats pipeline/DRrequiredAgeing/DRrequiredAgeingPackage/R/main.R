@@ -140,6 +140,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
   #########
   new.data$colony_id    = as.character(new.data$colony_id)
   new.data$external_sample_id = as.factor(new.data$external_sample_id)
+  new.data$metadata = as.character(new.data$metadata)
   ################
   # Start analysis
   ################
@@ -530,7 +531,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         'biological_sample_group',
                         depVar,
                         'date_of_experiment',
-                        'weight'
+                        'weight',
+                        'metadata'
                       ),
                       names = c(
                         # all lower case
@@ -539,7 +541,8 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         'Original biological_sample_group',
                         'Original response',
                         'Original date_of_experiment',
-                        'Original body weight'
+                        'Original body weight',
+                        'Original metadata'
                       )
                     )
                     note = c(note, OrgSpecIds)
