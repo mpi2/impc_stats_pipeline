@@ -1102,7 +1102,7 @@ RemoveZerovarCategories = function(x,
       if (is.numeric(xx) && length(na.omit(xx)) > 1) {
         r = var(xx, na.rm = TRUE)
       } else{
-        r = NULL
+        r = 0
       }
       return(r)
     })
