@@ -154,6 +154,23 @@ sortDataset = function(x = NULL, BatchCol = NULL) {
   }
   return(x)
 }
+
+SimplesortDataset = function(x = NULL, cols = NULL) {
+  if (is.null(x)        ||
+      is.null(cols) ||
+      length(cols) < 1 ||
+      any(dim(x) < 1))
+    return(x)
+  for (col in cols) {
+    if (col %in% names(x) && sum(!is.na(x[, col])) > 0) {
+      message0('Sorting dataset based on `', col, '`...')
+      x = x[order(x[, col]), ]
+    } else{
+      message0('Column `', col, ' does not exist or all NA')
+    }
+  }
+  return(x)
+}
 # Only works for the data from Solr
 # Automatic select the corresponding column for the type of data (only for category and data_point)
 getResponseColumn = function(x, activate = TRUE) {
@@ -1330,6 +1347,7 @@ OtherExtraColumns = function(obj,
     p4 = obj[, newNames, drop = FALSE]
     p4 = as.list(p4)
     names(p4) = p0[ColNameInd]
+    p4 = p4[, colSums(is.na(p4)) != nrow(p4), drop = FALSE]
   } else{
     p4$'Error in extra columns' = "Column names do not exist or the dataset is empty"
   }
@@ -4355,7 +4373,6 @@ DeleteDirectoryAndSubDirectories = function(path  = getwd(),
     sep = '\n'
   )
 }
-DeleteDirectoryAndSubDirectories(depth = 6)
 #### Only for the ETL process step 1,2,3,4
 ETLStep1MakePar2RdataJobs = function(path = getwd(),
                                      mem = 25000,

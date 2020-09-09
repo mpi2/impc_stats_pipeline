@@ -54,7 +54,10 @@ PhenStatWindow = function (phenlistObject                                ,
   } else{
     phenlistObject@datasetPL$outlierWeight = 1
   }
-  # Do not remove line below (necessary for windowing)
+  ###########################
+  # Do not remove lines below (necessary for windowing)
+  phenlistObject@datasetPL = SimplesortDataset(x    = phenlistObject@datasetPL,
+                                               cols = c('external_sample_id', 'discrete_point'))
   if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'Batch')) {
     message0('Sorting the dataset on Batch')
     phenlistObject@datasetPL = sortDataset(x        = phenlistObject@datasetPL,

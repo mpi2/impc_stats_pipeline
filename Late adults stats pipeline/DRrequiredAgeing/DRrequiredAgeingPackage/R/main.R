@@ -532,7 +532,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         depVar,
                         'date_of_experiment',
                         'weight',
-                        'metadata'
+                        'metadata',
+                        'discrete_point',
+                        'time_point'
                       ),
                       names = c(
                         # all lower case
@@ -542,7 +544,9 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                         'Original response',
                         'Original date_of_experiment',
                         'Original body weight',
-                        'Original metadata'
+                        'Original metadata',
+                        'Original discrete_point',
+                        'Original time_point'
                       )
                     )
                     note = c(note, OrgSpecIds)
