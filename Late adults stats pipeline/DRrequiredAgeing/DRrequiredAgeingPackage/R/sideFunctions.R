@@ -1347,13 +1347,32 @@ OtherExtraColumns = function(obj,
     p4 = obj[, newNames, drop = FALSE]
     p4 = as.list(p4)
     names(p4) = p0[ColNameInd]
-    p4 = p4[, colSums(is.na(p4)) != nrow(p4), drop = FALSE]
+    p4 = RemoveNAFromList(p4)
   } else{
     p4$'Error in extra columns' = "Column names do not exist or the dataset is empty"
   }
   return(p4)
 }
 
+RemoveNAFromList = function(x = NULL) {
+  if (is.null(x))
+    return(x)
+
+  if (length(x) < 1)
+    return(x)
+
+  if (length(names(x)) < 1)
+    return(x)
+
+  if (length(names(x)) == 1)
+    return(x)
+
+  ind = sapply(x, function(x) {
+    return (sum(is.na(x))==length(x))
+  })
+
+  return(x[!ind])
+}
 
 # min including null/empty
 min0 = function(x, ...) {
