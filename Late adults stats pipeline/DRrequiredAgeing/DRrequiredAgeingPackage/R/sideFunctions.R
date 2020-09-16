@@ -4655,7 +4655,8 @@ jobCreator = function(path = getwd(),
 StatsPipeline = function(path = getwd(),
                          SP.results = file.path(getwd(), 'SP'),
                          waitUntillSee = 'No unfinished job found',
-                         ignoreThisLineInWaitingCheck = 0) {
+                         ignoreThisLineInWaitingCheck = 0,
+                         windowingPipeline =FALSE) {
   startTime = Sys.time()
   message0('Starting the IMPC statistical pipeline ... ')
   message0('\t Parquet files path:  ', path)
@@ -4798,12 +4799,21 @@ StatsPipeline = function(path = getwd(),
 
   message0('Running the IMPC statistical pipeline by submitting LSF jobs ...')
   # copy stats pipeline driver script
-  file.copy(
-    from = file.path(local(),
-                     'StatsPipeline/jobs/function.R'),
-    to = file.path(path, 'function.R'),
-    overwrite = TRUE
-  )
+  if (windowingPipeline) {
+    file.copy(
+      from = file.path(local(),
+                       'StatsPipeline/jobs/function_windowed.R'),
+      to = file.path(path, 'function.R'),
+      overwrite = TRUE
+    )
+  } else{
+    file.copy(
+      from = file.path(local(),
+                       'StatsPipeline/jobs/function.R'),
+      to = file.path(path, 'function.R'),
+      overwrite = TRUE
+    )
+  }
   system('chmod 775 AllJobs.bch', wait = TRUE)
   system('./AllJobs.bch', wait = TRUE)
   waitTillCommandFinish(
