@@ -202,7 +202,7 @@ GenotypeTag = function(obj,
     fmodels = obj$`Additional information`$Analysis$`Further models`$category
     if (is.null(fmodels))
       return(NULL)
-    
+
     if (length(names(fmodels)) == 1 &&
         names(fmodels) == 'Complete table') {
       fmodels$Genotype$`Complete table` = fmodels$`Complete table`
@@ -293,7 +293,7 @@ GenotypeTag = function(obj,
                 x = nam,
                 fixed = TRUE)
     nam[!gp7] = paste0(nam[!gp7], '.MPTERM')
-    
+
     ############# step 8
     if (!is.null(parameter_stable_id)) {
       controlCat = read.delim('CategoryRemapping.tsv', sep = '\t')
@@ -319,19 +319,19 @@ GenotypeTag = function(obj,
     ############# Finally!
     names(AllCombinations2) = nam
     tag = AllCombinations2
-    
+
   } else if (method %in% 'RR') {
     ###########################################################################
     fmodels = obj$`Additional information`$Analysis$`Further models`
     if (is.null(fmodels))
       return(NULL)
-    
+
     AllCombinations = lapply(fmodels, function(x) {
       lapply(x, function(y) {
         DirectionTagFE(x = y$Result$p.value, threshold = threshold)
       })
     })
-    
+
     if (is.null(AllCombinations))
       return(NULL)
     #### Make the list as sequence of names attached with dot (.)
@@ -347,7 +347,7 @@ GenotypeTag = function(obj,
       x = names(AllCombinations1),
       fixed = TRUE
     ) & AllCombinations1 %in% 'DECREASED')]
-    
+
     #### Keep only genotype analysis
     AllCombinations2 = AllCombinations1[grepl(pattern = 'Genotype.Genotype|Genotype.Genotype_Male|Genotype.Genotype_Female', x =
                                                 names(AllCombinations1))]
@@ -389,7 +389,7 @@ GenotypeTag = function(obj,
                             1)
       }
     }
-    
+
     ############# Finally!
     names(AllCombinations2) = nam #gsub(pattern = 'LOW.|HIGH.',replacement = '',x = nam)
     tag = AllCombinations2
@@ -468,7 +468,7 @@ DecIncDetector = function(x) {
     r = c(r, 'ABNORMAL')
   if (any(grepl(pattern = 'INFERRED', x = names(x))))
     r = c(r, 'INFERRED')
-  
+
   if (length(r) < 1)
     r = NA
   if (length(r) > 1) {
@@ -600,12 +600,12 @@ DecIncDetectorRR = function(x) {
   }
   ######################################
   abpattern = inferpattern = FALSE
-  
+
   if (length(x) > 0) {
     abpattern = grepl(pattern = 'ABNORMAL', x = names(x))
     inferpattern = grepl(pattern = 'INFERRED', x = names(x))
   }
-  
+
   if (length(r) < 1 && !(any(abpattern) || any(inferpattern)))
     r = NA
   ######################################
@@ -712,7 +712,7 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA') {
   mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
   agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)', names(x)) &
     !fgrep & !mgrep
-  
+
   if (method %in% 'RR') {
     fevent = DecIncDetectorRR(x[fgrep])
     mevent = DecIncDetectorRR(x[mgrep])
@@ -731,7 +731,7 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA') {
   if (!is.na(fmevents[1]) && is.na(fmevents[2]))
     oevent = fmevents[1]
   #############################
-  
+
   #############################
   if (method %in% 'RR') {
     MPTERM = list(
@@ -817,7 +817,6 @@ f = function(statpacket = NULL,
   )
   ##################################################################
   message('\t Reading the index file ...')
-  #a <- jsonlite:::fromJSON(txt = '~/../Downloads/mp_chooser_20200520.json')
   load('mp_chooser_20200520.json.Rdata')
   message(
     '\t~>',
@@ -831,7 +830,7 @@ f = function(statpacket = NULL,
     '\n\t~>',
     json$Result$Details$`Gene page URL`
   )
-  
+
   ################################
   b = a[[unScrewProcedure(pipeline)[1]]]
   c = b[[unScrewProcedure(procedure)[1]]]
@@ -863,7 +862,7 @@ f = function(statpacket = NULL,
       x = names(ulistTag2),
       replacement = 'UNSPECIFIED'
     )
-    
+
     ulistTag3 = merge.two(ulistTag2, ulistTag)
     for (name in names(ulistTag3)) {
       # print(name)
@@ -936,7 +935,7 @@ Write2Postg = function(df) {
     user = "impc",
     password = 'impc'
   )
-  
+
   dbBegin(conn = con)
   r = dbWriteTable(
     conn = con,
