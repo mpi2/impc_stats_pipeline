@@ -710,7 +710,7 @@ bselect = function(x) {
 MaleFemaleAbnormalCategories = function(x, method = 'AA') {
   fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
   mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
-  agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)', names(x)) &
+  agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
     !fgrep & !mgrep
 
   if (method %in% 'RR') {
