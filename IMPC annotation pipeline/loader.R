@@ -697,14 +697,45 @@ fF = function(x, pasteterms = TRUE) {
 }
 
 bselect = function(x) {
+  # order important, see MoreThan2Length
   if(length(x)<1)
     return(x)
   nx = names(x)
-  if (length(nx) > 1 && any(grepl(pattern = 'ABNORMAL', x = nx)))
-    x = x[grepl(pattern = 'ABNORMAL', x = nx)][1]
-  if (length(nx) > 1 && any(grepl(pattern = 'INFERRED', x = nx)))
-    x = x[grepl(pattern = 'INFERRED', x = nx)][1]
-  return(x)
+  xx = x
+  if (length(nx) > 1 && any(grepl(pattern = 'INFERRED', x = nx))) {
+    xx = x[grepl(pattern = 'INFERRED', x = nx)][1]
+    return(xx)
+  }
+  if (length(nx) > 1 && any(grepl(pattern = 'ABNORMAL', x = nx))) {
+    xx = x[grepl(pattern = 'ABNORMAL', x = nx)][1]
+    return(xx)
+  }
+  
+  if (length(nx) > 1 && any(grepl(pattern = 'OVERAL', x = nx))) {
+    xx = x[grepl(pattern = 'OVERAL', x = nx)][1]
+    return(xx)
+  }
+  
+  if (length(xx) > 0)
+    xx = na.omit(xx)
+  return(xx)
+}
+
+
+MoreThan2Length = function(xx, index) {
+  # order important, see bselect
+  if (length(xx) > 1 && sum(index) > 1) {
+    if (any(grepl(pattern = 'INFERRED', xx))) {
+      return(grepl(pattern = 'INFERRED', xx))
+      
+    } else if (any(grepl(pattern = 'ABNORMAL', xx))) {
+      return(grepl(pattern = 'ABNORMAL', xx))
+      
+    } else if (any(grepl(pattern = 'OVERAL', xx))) {
+      return(grepl(pattern = 'OVERAL', xx))
+    }
+  }
+  return(index)
 }
 
 MaleFemaleAbnormalCategories = function(x, method = 'AA') {
@@ -713,6 +744,11 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA') {
   agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
     !fgrep & !mgrep
 
+
+  fgrep = MoreThan2Length(names(x),fgrep)
+  mgrep = MoreThan2Length(names(x),mgrep)
+  agrep = MoreThan2Length(names(x),agrep)
+  
   if (method %in% 'RR') {
     fevent = DecIncDetectorRR(x[fgrep])
     mevent = DecIncDetectorRR(x[mgrep])
