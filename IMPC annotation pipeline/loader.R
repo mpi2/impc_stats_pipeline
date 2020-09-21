@@ -853,7 +853,7 @@ f = function(statpacket = NULL,
   )
   ##################################################################
   message('\t Reading the index file ...')
-  load('mp_chooser_20200520.json.Rdata')
+  load('mp_chooser_19092020.json.Rdata')
   message(
     '\t~>',
     paste(
@@ -966,7 +966,7 @@ Write2Postg = function(df) {
   con <- dbConnect(
     drv,
     dbname = "test",
-    host = "hh-yoda-07-07",
+    host = "hh-yoda-05-01",
     port = 5432,
     user = "impc",
     password = 'impc'
