@@ -831,7 +831,9 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA') {
 }
 ##############################
 f = function(statpacket = NULL,
-             level = 10 ^ -4) {
+             level = 10 ^ -4,
+             TermKey = 'MPTERM',
+             resultKey = 'Normal result') {
   ulistTag3 = MPTERMS = NA
   message('Running the annotation pipeline')
   if (!statpacket$V2 %in% 'Successful') {
@@ -844,10 +846,10 @@ f = function(statpacket = NULL,
   procedure = statpacket$V3
   parameter = statpacket$V6
   json      =  jsonlite::fromJSON(statpacket$V20)
-  method   = GetMethodStPa(json$Result$`Vector output`$`Normal result`$`Applied method`)
+  method   = GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
   ##################################################################
   Gtag = GenotypeTag(
-    obj = json$Result$`Vector output`$`Normal result`,
+    obj = json$Result$`Vector output`[[resultKey]],
     parameter_stable_id = statpacket$V6,
     threshold = level
   )
@@ -950,8 +952,10 @@ f = function(statpacket = NULL,
   if (!is.null(MPTERMS)     &&
       length(ulistTag3) > 0 &&
       length(na.omit(ulistTag3)) > 0) {
-    json$Result$Details$MPTERM = MPTERMS
+    json$Result$Details[[TermKey]] = MPTERMS
     statpacket$V20 = DRrequiredAgeing:::FinalJson2ObjectCreator(FinalList = json)
+  }else{
+    message('No MP term found ...')
   }
   return(invisible(list(
     MPTERM = MPTERMS, statpacket = statpacket
@@ -959,23 +963,34 @@ f = function(statpacket = NULL,
 }
 
 #################################################################################
-Write2Postg = function(df) {
+Write2Postg = function(df,
+                       dbname = 'test',
+                       host = "hh-yoda-05-01",
+                       port = '5432',
+                       user = 'impc',
+                       password = 'impc',
+                       outputdb = paste0('db_',
+                                         DRrequiredAgeing:::RemoveSpecialChars(
+                                           format(Sys.time(), '%a%b%d %Y HM%H %M'),
+                                           replaceBy = '_',
+                                           what = ' '
+                                         ))) {
   library(RPostgreSQL)
   library(data.table)
   drv <- dbDriver("PostgreSQL")
   con <- dbConnect(
     drv,
-    dbname = "test",
-    host = "hh-yoda-05-01",
-    port = 5432,
-    user = "impc",
-    password = 'impc'
+    dbname = dbname,
+    host = host,
+    port = port,
+    user = user,
+    password = password
   )
-
+  
   dbBegin(conn = con)
   r = dbWriteTable(
     conn = con,
-    name = "dr12withmptermsv719082020_16",
+    name = outputdb,
     value = df,
     append = TRUE,
     row.names = FALSE
@@ -991,6 +1006,32 @@ randomIdGenerator = function(l = 10) {
     size = l,
     replace = TRUE
   ), collapse = '')
+  return(r)
+}
+
+StratifiedMPTerms = function(object) {
+  # overall, male, female
+  r = c(NA, NA, NA)
+  if (is.null(object))
+    return(r)
+  if (is.null(object$MPTERM) || length(object$MPTERM) < 1)
+    return (r)
+  for (i in seq_along(object$MPTERM)) {
+    
+    if (object$MPTERM[[i]]$sex == 'not_considered')
+      r[1] = paste(object$MPTERM[[i]]$term_id,
+                   collapse = '~',
+                   sep = '~')
+    if (object$MPTERM[[i]]$sex == 'male')
+      r[2] = paste(object$MPTERM[[i]]$term_id,
+                   collapse = '~',
+                   sep = '~')
+    if (object$MPTERM[[i]]$sex == 'female')
+      r[3] = paste(object$MPTERM[[i]]$term_id,
+                   collapse = '~',
+                   sep = '~')
+    
+  }
   return(r)
 }
 
@@ -1029,8 +1070,18 @@ for (i in 1:lflist) {
     if (ncol(df) != 20)
       next
     ###################
-    r = f(statpacket = df, level = .0001)
-    #write(paste(r$statpacket[1,19],sep = '\t',collapse = '\t'),file = 'd:/delme.tsv',ncolumns = 10^4)
+    r = rN = f(statpacket = df, level = .0001)
+    rW = f(
+      statpacket = df,
+      level = .0001,
+      resultKey = 'Windowed result',
+      TermKey = 'WMPTERM'
+    )
+    
+    StratifiedMPTerms(rN)
+    StratifiedMPTerms(rW)
+    
+    
     df = r$statpacket
     ###################
     df = cbind(as.numeric(paste0(randomIdGenerator(),format(Sys.time(), "%H%S"))), df)
@@ -1057,7 +1108,7 @@ for (i in 1:lflist) {
       "colony_id",
       "statpacket"
     )
-    status  = Write2Postg(df = df[1, ])
+    status  = Write2Postg(df = df[1,], host =  "hh-yoda-05-01")
     id = id + 1
     #print(file)
   }
