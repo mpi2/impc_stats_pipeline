@@ -3,12 +3,12 @@ library(data.table)
 library(jsonlite)
 ####################
 unlist0 = function(x, active = TRUE) {
-	x2 = unlist(x)
-	if ((is.null(x) || is.null(x2)) && active) {
-		return(NA)
-	} else{
-		return(x2)
-	}
+  x2 = unlist(x)
+  if ((is.null(x) || is.null(x2)) && active) {
+    return(NA)
+  } else{
+    return(paste(x2, sep = '~', collapse = '~'))
+  }
 }
 
 is.nullorNA = function(x) {
@@ -58,6 +58,13 @@ MakeURL = function(object, objectJSON) {
 	return(r)
 }
 
+length0 = function(x) {
+  r = length(x)
+  if (r < 1)
+    return(NA)
+  return(r)
+}
+
 SelectWindowingParameters = function(object) {
   r = c(
     ###### Windowing parameters
@@ -66,7 +73,7 @@ SelectWindowingParameters = function(object) {
     unlist0(object$`Window parameters`$`Min obs required in the window`),
     unlist0(object$`Window parameters`$`The number of DOE in the window`) ,
     unlist0(object$`Window parameters`$Threshold)                   ,
-    unlist0(length(object$`Window parameters`$`Window weights`))             ,
+    unlist0(length0(object$`Window parameters`$`Window weights`))             ,
     unlist0(object$`Window parameters`$`Total obs or weight in the window`)
   )
   return(r)
@@ -216,8 +223,8 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
 				################# VectorOutput Results
 				SelectAnalysis(r1$Result$`Vector output`$`Normal result`)             ,
 				SelectAnalysis(r1$Result$`Vector output`$`Windowed result`)           ,
-				SelectAnalysis(r1$Result$`Vector output`$`Full model result`)         ,
-				SelectAnalysis(r1$Result$`Vector output`$`Full model windowed result`),
+				#SelectAnalysis(r1$Result$`Vector output`$`Full model result`)         ,
+				#SelectAnalysis(r1$Result$`Vector output`$`Full model windowed result`),
 				################# Other results
 				SelectOthers(r1$Result$Details)                                      ,
 				################ Ignorome/Reference/Behaviour
@@ -228,8 +235,8 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
 				##### Pvals
 				unlist0(r1$Result$`Vector output`$`Normal result`$`Genotype p-value`)      ,
 				unlist0(r1$Result$`Vector output`$`Windowed result`$`Genotype p-value`)    ,
-				unlist0(r1$Result$`Vector output`$`Full model result`$`Genotype p-value`)  ,
-				unlist0(r1$Result$`Vector output`$`Full model windowed result`$`Genotype p-value`),
+				#unlist0(r1$Result$`Vector output`$`Full model result`$`Genotype p-value`)  ,
+				#unlist0(r1$Result$`Vector output`$`Full model windowed result`$`Genotype p-value`),
 				##### MP TERM
 				DRrequiredAgeing:::StratifiedMPTerms(rN),
 				DRrequiredAgeing:::StratifiedMPTerms(rW),
