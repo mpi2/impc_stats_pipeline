@@ -126,6 +126,8 @@ tableCount = function(Gen,
 
 ########## Main function
 f = function(start, end, file = 'Index_DR101_V1.txt') {
+  if (is.na(end))
+    end = start
 	ofname = paste0('R', '_', start, '-', end, '_pval.tsv')
 	if (file.exists(paste0('./resultF/', ofname)))
 		unlink(paste0('./resultF/', ofname))
