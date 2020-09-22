@@ -5970,6 +5970,8 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
   if (!dir.exists('output'))
     dir.create('output', recursive = TRUE)
 
+  if (!dir.exists('resultF'))
+    dir.create('resultF', recursive = TRUE)
 
   for (i in 2:(length(ind) + 1)) {
     write(
