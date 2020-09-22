@@ -255,7 +255,7 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
 	}
 }
 
-ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]))
+ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
 
 
 
