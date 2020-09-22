@@ -5896,8 +5896,9 @@ StratifiedMPTerms = function(object) {
   r = c(NA, NA, NA)
   if (is.null(object))
     return(r)
-  if (is.null(object$MPTERM) || length(object$MPTERM) < 1)
+  if (is.null(object$MPTERM) || length(object$MPTERM) < 1 || all(is.na(object$MPTERM)))
     return (r)
+
   for (i in seq_along(object$MPTERM)) {
 
     if (object$MPTERM[[i]]$sex == 'not_considered')
