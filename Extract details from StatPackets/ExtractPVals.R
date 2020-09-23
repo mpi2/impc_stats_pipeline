@@ -130,6 +130,94 @@ tableCount = function(Gen,
 }
 
 
+outputNames = function(){
+  c1 = c(
+    "Analysis date",
+    "status",
+    "procedure_group",
+    "procedure_stable_id",
+    "procedure_name",
+    "parameter_stable_id",
+    "parameter_name",
+    "phenotyping_center",
+    "allele_symbol",
+    "allele_name",
+    "allele_accession_id",
+    "gene_symbol",
+    "gene_accession_id",
+    "pipeline_name",
+    "pipeline_stable_id",
+    "strain_accession_id",
+    "metadata_group",
+    "zygosity",
+    "colony_id",
+    "StatPacket"
+  )
+
+  c2 = c(
+    "Applied method",
+    "Classification tag",
+    "Residual variances homogeneity",
+    "Batch included",
+    "Sexual dimorphism detected",
+    "Sexual dimorphism detected note",
+    "Genotype estimate",
+    "Sex FvKO estimate",
+    "Sex MvKO estimate",
+    "Genotype p-value",
+    "Genotype standard error",
+    "Sex FvKO p-value",
+    "Sex MvKO p-value",
+    "Sex FvKO standard error",
+    "Sex MvKO standard error",
+    "Sex p-value",
+    "Sex estimate",
+    "Sex standard error",
+    "Weight p-value",
+    "Weight estimate",
+    "Weight standard error"
+  )
+
+  c3 = c(
+    "Concurrent control selection",
+    "is referenc gene",
+    "is ignorome gene",
+    "is behaviour gene",
+    "variation_in_respone_after_preprocess",
+    "variation_in_respone_before_preprocess",
+    "NGenotype p-value",
+    "WGenotype p-value"
+
+  )
+
+  c4 = c('MP_both',
+         'MP_male',
+         'MP_female')
+  c5 = c(
+    c1,
+    "response Type",
+    "applied Method",
+    "windowing l",
+    "windowing k",
+    "Min obs required in the window",
+    "the number of DateOfExperiment in the window",
+    "windowing Threshold",
+    "Total number of window weights",
+    "sum of weights",
+    paste0('N_', c2),
+    paste0('W_', c2),
+    c3,
+    paste0('N_', c4),
+    paste0('W_', c4),
+    'URL',
+    'Data URL',
+    'Total KO male',
+    'Total KO female',
+    'Total WT male',
+    'Total WT male'
+  )
+  return(c5)
+}
 
 ########## Main function
 f = function(start, end, file = 'Index_DR101_V1.txt') {
