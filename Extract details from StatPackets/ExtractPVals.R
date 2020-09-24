@@ -1,6 +1,7 @@
 args = commandArgs(trailingOnly = TRUE)
 library(data.table)
 library(jsonlite)
+library(digest)
 ####################
 unlist0 = function(x, active = TRUE) {
   x2 = unlist(x)
@@ -150,8 +151,7 @@ outputNames = function(){
     "strain_accession_id",
     "metadata_group",
     "zygosity",
-    "colony_id",
-    "StatPacket"
+    "colony_id"
   )
 
   c2 = c(
@@ -214,10 +214,104 @@ outputNames = function(){
     'Total KO male',
     'Total KO female',
     'Total WT male',
-    'Total WT male'
+    'Total WT female'
   )
   return(c5)
 }
+
+makeIndexColumn = function(x) {
+  library(digest)
+  r = apply(x,1,function(y){
+    digest(paste(y,sep = '~',collapse = '~'))
+  })
+  return(r)
+}
+
+
+replaceNA = function(x, replaceby = 'No MP term assigned') {
+  x[is.na(x)] = replaceby
+  return(x)
+}
+
+DRSummary = function(x) {
+  df = data.table::fread(file = 'AllUnidimensionals.tsv',
+                         header = FALSE,
+                         sep = '\t')
+  names(df) = outputNames()
+  print(table(df$status))
+  print(nrow(df))
+  print(length(na.omit(df$N_MP_both)))
+  print(length(na.omit(df$N_MP_male)))
+  print(length(na.omit(df$N_MP_female)))
+
+  print(length(na.omit(df$W_MP_both)))
+  print(length(na.omit(df$W_MP_male)))
+  print(length(na.omit(df$W_MP_female)))
+
+
+  df1 = df[!is.na(df$N_MP_both) | !is.na(df$W_MP_both),]
+  table(df1$N_MP_both == df1$W_MP_both,useNA = 'always')
+
+  df2 = df[!is.na(df$N_MP_male) | !is.na(df$W_MP_male),]
+  table(df2$N_MP_male == df2$W_MP_male,useNA = 'always')
+
+  df3 = df[!is.na(df$N_MP_female) | !is.na(df$W_MP_female),]
+  table(df3$N_MP_female == df3$W_MP_female,useNA = 'always')
+
+
+}
+
+calculateDiscrepancy = function(x,y){
+  r = (is.na(x) & !is.na(y)) | (!is.na(x) & is.na(y))
+  return(sum(r))
+}
+
+DRSummaryAcross = function(x) {
+  df12 = data.table::fread(file = '/homes/hamedhm/impc_statistical_pipeline/IMPC_DRs/flatten_observations_dr12.0_15092020/SP/jobs/ExtractPvalues/resultF/data_point_of_type_unidimensional/AllUnidimensionals.tsv',
+                         header = FALSE,
+                         sep = '\t')
+
+  df11 = data.table::fread(file = '/homes/hamedhm/impc_statistical_pipeline/IMPC_DRs/flatten_observations_dr11.0_16092020/SP/jobs/ExtractPvalues/resultF/data_point_of_type_unidimensional/AllDR11Unidimensionals.tsv',
+                           header = FALSE,
+                           sep = '\t')
+
+
+  names(df11)=outputNames()
+  names(df12)=outputNames()
+
+
+
+  df11$id = makeIndexColumn(df11[,2:19])
+  df12$id = makeIndexColumn(df12[,2:19])
+
+  mall = merge(df11,df12,by = 'id',all = TRUE,suffixes = c('_dr11','_dr12'))
+  m = merge(df11,df12,by = 'id',all = FALSE,suffixes = c('_dr11','_dr12'))
+
+  table(m$N_MP_both_dr11==m$N_MP_both_dr12,useNA = 'always')
+  calculateDiscrepancy(m$N_MP_both_dr11,m$N_MP_both_dr12)
+
+
+  table(m$N_MP_male_dr11==m$N_MP_male_dr12,useNA = 'always')
+  calculateDiscrepancy(m$N_MP_male_dr11,m$N_MP_male_dr12)
+
+  table(m$N_MP_female_dr11==m$N_MP_female_dr12,useNA = 'always')
+  calculateDiscrepancy(m$N_MP_female_dr11,m$N_MP_female_dr12)
+
+  # window
+
+  table(m$W_MP_both_dr11==m$W_MP_both_dr12,useNA = 'always')
+  calculateDiscrepancy(m$W_MP_both_dr11,m$W_MP_both_dr12)
+
+
+  table(m$W_MP_male_dr11==m$W_MP_male_dr12,useNA = 'always')
+  calculateDiscrepancy(m$W_MP_male_dr11,m$W_MP_male_dr12)
+
+  table(m$W_MP_female_dr11==m$W_MP_female_dr12,useNA = 'always')
+  calculateDiscrepancy(m$W_MP_female_dr11,m$W_MP_female_dr12)
+
+
+}
+
 
 ########## Main function
 f = function(start, end, file = 'Index_DR101_V1.txt') {

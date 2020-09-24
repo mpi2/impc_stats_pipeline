@@ -150,7 +150,8 @@ packages <- c(
   "corrplot",
   "graph",
   "RPostgreSQL",
-  "Tmisc"
+  "Tmisc",
+  "digest"
 )
 
 for (package in packages) {
