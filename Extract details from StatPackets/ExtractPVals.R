@@ -444,7 +444,90 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
 	}
 }
 
-ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
+factor2number = function(x){
+  return(as.numeric(as.character(x)))
+}
+
+qvalueEstimator = function(x){
+  x$`NGenotype q-value` = p.adjust(factor2number(x$`NGenotype p-value`))
+  x$`N_Sex FvKO q-value` = p.adjust(factor2number(x$`N_Sex FvKO p-value`))
+  x$`N_Sex MvKO q-value` = p.adjust(factor2number(x$`N_Sex MvKO p-value`))
+  
+  x$`WGenotype q-value`  = p.adjust(factor2number(x$`WGenotype p-value`))
+  x$`W_Sex FvKO q-value` = p.adjust(factor2number(x$`W_Sex FvKO p-value`))
+  x$`W_Sex MvKO q-value` = p.adjust(factor2number(x$`W_Sex MvKO p-value`))
+  
+  return(x)
+}
+
+
+qvaluesGenerator = function(df) {
+  df = as.data.frame(df)
+  names(df) = outputNames()
+  df = df[df$status == 'Successful' &
+            df$`applied Method` %in% c('MM', 'FE'),]
+  if (nrow(df) < 1)
+    return(NA)
+  counter = 1
+  for (centre in unique(df$phenotyping_center)) {
+    df1 = subset(df, df$phenotyping_center == centre)
+    for (procedure in unique(df1$procedure_stable_id)) {
+      df2 = subset(df1, df1$procedure_stable_id == procedure)
+      for (parameter in unique(df2$parameter_stable_id)) {
+        df3 = subset(df2, df2$parameter_stable_id == parameter)
+        for (zygosity in unique(df3$zygosity)) {
+          df4 = subset(df3, df3$zygosity == zygosity)
+          for (strain in unique(df4$strain_accession_id)) {
+            df5 = subset(df4, df4$strain_accession_id == strain)
+            for (metadata in unique(df5$metadata_group)) {
+              df6 = subset(df5, df5$metadata_group == metadata)
+              df6 = droplevels(df6)
+              if (counter == 1) {
+                d =  qvalueEstimator(df6)
+              } else{
+                d = rbind(d, qvalueEstimator(df6))
+              }
+              counter = counter + 1
+            }
+            
+          }
+        }
+        cat('\r-->', counter)
+      }
+    }
+  }
+  
+  d = d[, colSums(is.na(d)) < nrow(d), drop = FALSE]
+  return(d)
+  
+}
+
+
+qvalue2AllZips = function(path = getwd()) {
+  files = list.files(
+    path = path,
+    pattern = '.zip',
+    all.files = TRUE,
+    full.names = TRUE,
+    include.dirs = FALSE
+  )
+  for (file in files) {
+    df = NULL
+    df = data.table::fread(
+      file = DRrequiredAgeing::UnzipAndfilePath(file = file)[1],
+      header = FALSE,
+      sep = '\t',
+      stringsAsFactors = TRUE
+    )
+    df = qvaluesGenerator(df)
+    write.csv(df,
+              file = paste0(basename(file), '.csv'),
+              row.names = FALSE)
+  }
+}
+
+
+# ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
 
 
 
