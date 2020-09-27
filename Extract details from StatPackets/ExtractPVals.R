@@ -445,7 +445,7 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
 }
 
 factor2number = function(x){
-  return(as.numeric(as.character(x)))
+  return(suppressWarnings(as.numeric(as.character(x))))
 }
 
 qvalueEstimator = function(x){
@@ -526,7 +526,7 @@ qvalue2AllZips = function(path = getwd()) {
   }
 }
 
-
+qvalue2AllZips()
 # ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
 
 
