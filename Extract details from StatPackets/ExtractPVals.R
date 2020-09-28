@@ -29,8 +29,8 @@ SelectOthers = function(object) {
 SelectMISC = function(object) {
   ReferenceGene = c('Nxn', 'Rnf10', 'Ap4e1', 'Prkab1', 'Dnase1l2', 'Dbn1')
   rReference = object$V12   %in% ReferenceGene
-  rIgnorome  = object$V11  %in% DRrequired:::ignoromeGenes()
-  rBehaviour = object$V6   %in% DRrequired:::BehviourParamters()
+  rIgnorome  = object$V11  %in% DRrequiredAgeing:::ignoromeGenes()
+  rBehaviour = object$V6   %in% DRrequiredAgeing:::BehviourParamters()
   return(c(rReference, rIgnorome, rBehaviour))
 }
 
@@ -113,6 +113,41 @@ SelectAnalysis = function(object) {
 		unlist0(object$`Weight standard error`)
 	)
 	return(r)
+}
+
+SelectAnalysisFE = function(object) {
+  r = c(
+    ######
+    unlist0(object$`Applied method`)                ,
+    unlist0(object$`Classification tag`$`Classification tag`) ,
+    #unlist0(object$formula)                                  ,
+    unlist0(object$`Residual variances homogeneity`)  ,
+    unlist0(object$`Batch included`)                  ,
+    # Sexual dymorphism
+    unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Criteria)   ,
+    unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Note)   ,
+    # effect size
+    unlist0(as.list(object$`Genotype estimate`$`Complete table`)$Value)               ,
+    unlist0(as.list(object$`Sex FvKO estimate`$`Complete table`)$Value)               ,
+    unlist0(as.list(object$`Sex MvKO estimate`$`Complete table`)$Value)               ,
+    # Genotype
+    unlist0(object$`Genotype p-value`$`Complete table`)                      ,
+    unlist0(object$`Genotype standard error`)           ,
+    # sexDim
+    unlist0(object$`Sex FvKO p-value`$`Complete table`)                  ,
+    unlist0(object$`Sex MvKO p-value`$`Complete table`)                  ,
+    unlist0(object$`Sex FvKO standard error`)           ,
+    unlist0(object$`Sex MvKO standard error`)           ,
+    # sex
+    unlist0(object$`Sex p-value`$`Complete table`)                       ,
+    unlist0(as.list(object$`Sex estimate`$`Complete table`)$Value)                ,
+    unlist0(object$`Sex standard error`)                ,
+    # Bodyweight
+    unlist0(object$`Weight p-value`)                    ,
+    unlist0(object$`Weight estimate`$Value)             ,
+    unlist0(object$`Weight standard error`)
+  )
+  return(r)
 }
 
 tableCount = function(Gen,
@@ -313,142 +348,215 @@ DRSummaryAcross = function(x) {
 }
 
 
+
 ########## Main function
 f = function(start, end, file = 'Index_DR101_V1.txt') {
   if (is.na(end))
     end = start
-	ofname = paste0('R', '_', start, '-', end, '_pval.tsv')
-	if (file.exists(paste0('./resultF/', ofname)))
-		unlink(paste0('./resultF/', ofname))
-	library(RJSONIO)
-	library(DRrequiredAgeing)
-	library(data.table)
-	####
-	df = readLines(file)
-	for (i in start:end) {
-		cat(i, '|')
-		file = df[i]
-		if (!(
-		  grepl(pattern = 'Successful',
-		        x = file,
-		        fixed = TRUE) ||
-		  grepl(pattern = 'NotProcessed',
-		        x = file,
-		        fixed = TRUE) ||
-		  grepl(pattern = 'Failed',
-		        x = file,
-		        fixed = TRUE)
-		))
-		  next
-		if (!file.exists(file)) {
-		  if (file.exists(dirname(file),    'output_Successful.tsv'))
-		    file = file.path(dirname(file), 'output_Successful.tsv')
-		  else if (file.exists(dirname(file), 'output_NotProcessed.tsv'))
-		    file = file.path(dirname(file),   'output_NotProcessed.tsv')
-		  else
-		    write(file,file =  paste0('DoesNotExistFiles_',Sys.Date(),'.txt'),append = TRUE)
-		    next
-		}
-
-		r0 = fread(
-			file = file,
-			header = FALSE,
-			sep = '\t',
-			quote = "",
-			stringsAsFactors = FALSE
-		)
-		rN = DRrequiredAgeing:::annotationChooser(
-		  statpacket = r0,
-		  level = .0001
-		)
-		rW = DRrequiredAgeing:::annotationChooser(
-		  statpacket = r0,
-		  level = .0001,
-		  resultKey = 'Windowed result',
-		  TermKey = 'WMPTERM'
-		)
-
-
-
-		if (ncol(r0) != 20){
-			write(file,file = paste0('Error_Overal_',Sys.Date(),'.txt'),append = TRUE)
-			next
-		}
-		r1 =
-		  tryCatch(
-		    expr =
-		      fromJSON(r0$V20, flatten = TRUE),
-		    warning = function(w) {
-		      write(file,file =paste0('Error_inJSON_',Sys.Date(),'.txt'),append = TRUE)
-		      return(NULL)
-		    },
-		    error = function(e) {
-		      write(file,file =paste0('Error_inJSON_',Sys.Date(),'.txt'),append = TRUE)
-		      return(NULL)
-		    })
-		#method = r1$result$detail$applied_method
-		if(is.null(r1))
-		  next
-		#method = r1$result$detail$applied_method
-
-
-		###### only MM's
-		#if (!is.null(method) && method  %in% 'MM') {
-			message(paste(i, '|',  end , ':', file))
-			x = c(
-				unlist(r0[1, 1:19]),
-				unlist0(r1$Result$Details$`Response type`) ,
-				unlist0(r1$Result$Details$`Applied method`),
-				################# Window parameters
-				# Have you changed that for new structure of l and k output???
-				SelectWindowingParameters(object = r1$Result$Details)                 ,
-				################# VectorOutput Results
-				SelectAnalysis(r1$Result$`Vector output`$`Normal result`)             ,
-				SelectAnalysis(r1$Result$`Vector output`$`Windowed result`)           ,
-				#SelectAnalysis(r1$Result$`Vector output`$`Full model result`)         ,
-				#SelectAnalysis(r1$Result$`Vector output`$`Full model windowed result`),
-				################# Other results
-				SelectOthers(r1$Result$Details)                                      ,
-				################ Ignorome/Reference/Behaviour
-				SelectMISC(r0)                                                       ,
-				##### Variation in response
-				unlist0(r1$Result$Details$variation_in_respone_after_preprocess[1])   ,
-				unlist0(r1$result$details$variation_in_respone_before_preprocess[1])  ,
-				##### Pvals
-				unlist0(r1$Result$`Vector output`$`Normal result`$`Genotype p-value`)      ,
-				unlist0(r1$Result$`Vector output`$`Windowed result`$`Genotype p-value`)    ,
-				#unlist0(r1$Result$`Vector output`$`Full model result`$`Genotype p-value`)  ,
-				#unlist0(r1$Result$`Vector output`$`Full model windowed result`$`Genotype p-value`),
-				##### MP TERM
-				DRrequiredAgeing:::StratifiedMPTerms(rN),
-				DRrequiredAgeing:::StratifiedMPTerms(rW),
-				##### URL
-				MakeURL(r0, r1),
-				tableCount(
-				  Gen = r1$Result$Details$Original_biological_sample_group,
-				  Sex = r1$Result$Details$Original_sex
-				)
-			)
-			write(
-			  x = paste(x, collapse = '\t'),
-			  file = DRrequiredAgeing:::file.path0(
-			    paste0('./resultF/', r1$Result$Details$`Response type`, '/', ofname),
-			    create = TRUE,
-			    check  = FALSE,
-			    IncludedFileName = TRUE
-			  ),
-			  append = TRUE,
-			  ncolumns = 10 ^ 4
-			)
-		#}
-	}
+  ofname = paste0('R', '_', start, '-', end, '_pval.tsv')
+  if (file.exists(paste0('./resultF/', ofname)))
+    unlink(paste0('./resultF/', ofname))
+  library(RJSONIO)
+  library(DRrequiredAgeing)
+  library(data.table)
+  ####
+  df = readLines(file)
+  for (i in start:end) {
+    cat(i, '|')
+    file = df[i]
+    if (!(
+      grepl(
+        pattern = 'Successful',
+        x = file,
+        fixed = TRUE
+      ) ||
+      grepl(
+        pattern = 'NotProcessed',
+        x = file,
+        fixed = TRUE
+      ) ||
+      grepl(
+        pattern = 'Failed',
+        x = file,
+        fixed = TRUE
+      )
+    ))
+    next
+    if (!file.exists(file)) {
+      if (file.exists(dirname(file),    'output_Successful.tsv'))
+        file = file.path(dirname(file), 'output_Successful.tsv')
+      else if (file.exists(dirname(file), 'output_NotProcessed.tsv'))
+        file = file.path(dirname(file),   'output_NotProcessed.tsv')
+      else
+        write(
+          file,
+          file =  paste0('DoesNotExistFiles_', Sys.Date(), '.txt'),
+          append = TRUE
+        )
+      next
+    }
+    
+    r0 = fread(
+      file = file,
+      header = FALSE,
+      sep = '\t',
+      quote = "",
+      stringsAsFactors = FALSE
+    )
+    rN = DRrequiredAgeing:::annotationChooser(statpacket = r0,
+                                              level = .0001)
+    rW = DRrequiredAgeing:::annotationChooser(
+      statpacket = r0,
+      level = .0001,
+      resultKey = 'Windowed result',
+      TermKey = 'WMPTERM'
+    )
+    
+    
+    
+    if (ncol(r0) != 20) {
+      write(file,
+            file = paste0('Error_Overal_', Sys.Date(), '.txt'),
+            append = TRUE)
+      next
+    }
+    r1 =
+      tryCatch(
+        expr =
+          fromJSON(r0$V20, flatten = TRUE),
+        warning = function(w) {
+          write(file,
+                file = paste0('Error_inJSON_', Sys.Date(), '.txt'),
+                append = TRUE)
+          return(NULL)
+        },
+        error = function(e) {
+          write(file,
+                file = paste0('Error_inJSON_', Sys.Date(), '.txt'),
+                append = TRUE)
+          return(NULL)
+        }
+      )
+    #method = r1$result$detail$applied_method
+    if (is.null(r1))
+      next
+    
+    
+    method = r1$Result$Details$`Applied method`
+        message(paste(i, '|',  end , ':', file))
+    if (is.null(method) || method  %in% c('MM', 'RR')) {
+      x = c(
+        unlist(r0[1, 1:19]),
+        unlist0(r1$Result$Details$`Response type`) ,
+        unlist0(r1$Result$Details$`Applied method`),
+        ################# Window parameters
+        # Have you changed that for new structure of l and k output???
+        SelectWindowingParameters(object = r1$Result$Details)                 ,
+        ################# VectorOutput Results
+        SelectAnalysis(r1$Result$`Vector output`$`Normal result`)             ,
+        SelectAnalysis(r1$Result$`Vector output`$`Windowed result`)           ,
+        #SelectAnalysis(r1$Result$`Vector output`$`Full model result`)         ,
+        #SelectAnalysis(r1$Result$`Vector output`$`Full model windowed result`),
+        ################# Other results
+        SelectOthers(r1$Result$Details)                                      ,
+        ################ Ignorome/Reference/Behaviour
+        SelectMISC(r0)                                                       ,
+        ##### Variation in response
+        unlist0(
+          r1$Result$Details$'Variation in respone after preprocessing'[1]
+        )   ,
+        unlist0(
+          r1$Result$Details$'Variation in respone before preprocessing'[1]
+        )   ,
+        ##### Pvals
+        unlist0(
+          r1$Result$`Vector output`$`Normal result`$`Genotype p-value`
+        )      ,
+        unlist0(
+          r1$Result$`Vector output`$`Windowed result`$`Genotype p-value`
+        )    ,
+        #unlist0(r1$Result$`Vector output`$`Full model result`$`Genotype p-value`)  ,
+        #unlist0(r1$Result$`Vector output`$`Full model windowed result`$`Genotype p-value`),
+        ##### MP TERM
+        DRrequiredAgeing:::StratifiedMPTerms(rN),
+        DRrequiredAgeing:::StratifiedMPTerms(rW),
+        ##### URL
+        MakeURL(r0, r1),
+        tableCount(
+          Gen = r1$Result$Details$Original_biological_sample_group,
+          Sex = r1$Result$Details$Original_sex
+        )
+      )
+    } else{
+      # FE only
+      x = c(
+        unlist(r0[1, 1:19]),
+        unlist0(r1$Result$Details$`Response type`) ,
+        unlist0(r1$Result$Details$`Applied method`),
+        ################# Window parameters
+        # Have you changed that for new structure of l and k output???
+        SelectWindowingParameters(object = r1$Result$Details)                 ,
+        ################# VectorOutput Results
+        SelectAnalysisFE(r1$Result$`Vector output`$`Normal result`)             ,
+        SelectAnalysisFE(r1$Result$`Vector output`$`Windowed result`)           ,
+        #SelectAnalysis(r1$Result$`Vector output`$`Full model result`)         ,
+        #SelectAnalysis(r1$Result$`Vector output`$`Full model windowed result`),
+        ################# Other results
+        SelectOthers(r1$Result$Details)                                      ,
+        ################ Ignorome/Reference/Behaviour
+        SelectMISC(r0)                                                       ,
+        ##### Variation in response
+        unlist0(
+          r1$Result$Details$'Variation in respone after preprocessing'[1]
+        )   ,
+        unlist0(
+          r1$Result$Details$'Variation in respone before preprocessing'[1]
+        )  ,
+        ##### Pvals
+        unlist0(
+          r1$Result$`Vector output`$`Normal result`$`Genotype p-value`$`Complete table`
+        )      ,
+        unlist0(
+          r1$Result$`Vector output`$`Windowed result`$`Genotype p-value`$`Complete table`
+        )    ,
+        #unlist0(r1$Result$`Vector output`$`Full model result`$`Genotype p-value`)  ,
+        #unlist0(r1$Result$`Vector output`$`Full model windowed result`$`Genotype p-value`),
+        ##### MP TERM
+        DRrequiredAgeing:::StratifiedMPTerms(rN),
+        DRrequiredAgeing:::StratifiedMPTerms(rW),
+        ##### URL
+        MakeURL(r0, r1),
+        tableCount(
+          Gen = r1$Result$Details$Original_biological_sample_group,
+          Sex = r1$Result$Details$Original_sex
+        )
+      )
+    }
+    write(
+      x = paste(x, collapse = '\t'),
+      file = DRrequiredAgeing:::file.path0(
+        paste0(
+          './resultF/',
+          r1$Result$Details$`Response type`,
+          '/',
+          ofname
+        ),
+        create = TRUE,
+        check  = FALSE,
+        IncludedFileName = TRUE
+      ),
+      append = TRUE,
+      ncolumns = 10 ^ 4
+    )
+    #}
+  }
 }
 
-factor2number = function(x){
+factor2number = function(x) {
   return(suppressWarnings(as.numeric(as.character(x))))
 }
 
-qvalueEstimator = function(x){
+qvalueEstimator = function(x) {
   x$`NGenotype q-value` = p.adjust(factor2number(x$`NGenotype p-value`))
   x$`N_Sex FvKO q-value` = p.adjust(factor2number(x$`N_Sex FvKO p-value`))
   x$`N_Sex MvKO q-value` = p.adjust(factor2number(x$`N_Sex MvKO p-value`))
@@ -465,7 +573,7 @@ qvaluesGenerator = function(df) {
   df = as.data.frame(df)
   names(df) = outputNames()
   df = df[df$status == 'Successful' &
-            df$`applied Method` %in% c('MM', 'FE'),]
+            df$`applied Method` %in% c('MM', 'FE'), ]
   if (nrow(df) < 1)
     return(NA)
   counter = 1
@@ -526,8 +634,8 @@ qvalue2AllZips = function(path = getwd()) {
   }
 }
 
-qvalue2AllZips()
-# ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
+#qvalue2AllZips()
+ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
 
 
 
