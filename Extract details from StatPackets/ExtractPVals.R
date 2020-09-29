@@ -606,6 +606,7 @@ qvaluesGenerator = function(df) {
   }
   
   d = d[, colSums(is.na(d)) < nrow(d), drop = FALSE]
+  d = d[!duplicated(d),]
   return(d)
   
 }
@@ -634,8 +635,8 @@ qvalue2AllZips = function(path = getwd()) {
   }
 }
 
-#qvalue2AllZips()
-ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
+qvalue2AllZips()
+#ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
 
 
 
