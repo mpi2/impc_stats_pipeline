@@ -653,7 +653,7 @@ parameter2qvalue = function(parameter, file) {
   dir = DRrequiredAgeing:::RemoveSpecialChars(basename(file))
   
   if(!dir.exists(dir))
-    dir.create(dir)
+    dir.create(dir,recursive = TRUE)
   
   d = qvaluesGenerator(df = df, filterdfparameter = parameter)
   write.csv(
