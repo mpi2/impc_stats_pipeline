@@ -650,10 +650,17 @@ parameter2qvalue = function(parameter, file) {
     stringsAsFactors = TRUE
   )
   
+  dir = DRrequiredAgeing:::RemoveSpecialChars(basename(file))
+  
+  if(!dir.exists(dir))
+    dir.create(dir)
+  
   d = qvaluesGenerator(df = df, filterdfparameter = parameter)
   write.csv(
     df,
     file = paste0(
+      dir,
+      '/',
       basename(file),
       '_',
       DRrequiredAgeing:::randomIdGenerator(l = 16),
