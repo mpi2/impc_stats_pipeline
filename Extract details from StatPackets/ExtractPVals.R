@@ -569,13 +569,19 @@ qvalueEstimator = function(x) {
 }
 
 
-qvaluesGenerator = function(df) {
+
+qvaluesGenerator = function(df,filterdfparameter=NULL) {
   df = as.data.frame(df)
   names(df) = outputNames()
   df = df[df$status == 'Successful' &
             df$`applied Method` %in% c('MM', 'FE'), ]
   if (nrow(df) < 1)
     return(NA)
+  
+  if(!is.null(filterdfparameter))
+    df = subset(df,df$parameter_stable_id == filterdfparameter)
+    
+  
   counter = 1
   for (centre in unique(df$phenotyping_center)) {
     df1 = subset(df, df$phenotyping_center == centre)
@@ -612,6 +618,7 @@ qvaluesGenerator = function(df) {
 }
 
 
+
 qvalue2AllZips = function(path = getwd()) {
   files = list.files(
     path = path,
@@ -635,9 +642,81 @@ qvalue2AllZips = function(path = getwd()) {
   }
 }
 
-qvalue2AllZips()
-#ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
+parameter2qvalue = function(parameter, file) {
+  df  = data.table::fread(
+    file = DRrequiredAgeing::UnzipAndfilePath(file = file)[1],
+    header = FALSE,
+    sep = '\t',
+    stringsAsFactors = TRUE
+  )
+  
+  d = qvaluesGenerator(df = df, filterdfparameter = parameter)
+  write.csv(
+    df,
+    file = paste0(
+      basename(file),
+      '_',
+      DRrequiredAgeing:::randomIdGenerator(l = 16),
+      '.csv'
+    ),
+    row.names = FALSE
+  )
+  
+}
 
+makejobs = function(path = getwd()) {
+  files = list.files(
+    path = path,
+    pattern = '.zip',
+    all.files = TRUE,
+    full.names = TRUE,
+    include.dirs = FALSE
+  )
+  for (file in files) {
+    df  = data.table::fread(
+      file = DRrequiredAgeing::UnzipAndfilePath(file = file)[1],
+      header = FALSE,
+      sep = '\t',
+      stringsAsFactors = TRUE
+    )
+    names(df) = outputNames()
+    
+    parameters = unique(df$parameter_stable_id)
+    
+    if (!dir.exists('err'))
+      dir.create('err')
+    
+    if (!dir.exists('out'))
+      dir.create('out')
+    
+    bf = basename(file)
+    n = length(parameters)
+    jobs = paste0 (
+      'bsub -M 8000 -e err/err',
+      bf,
+      1:n,
+      ' -o out/out',
+      bf,
+      1:n,
+      ' "Rscript ExtractPVals.R ',
+      parameters,
+      ' ',
+      file,
+      '"'
+    )
+    write(
+      x = paste(jobs,sep = '\n',collapse = '\n'),
+      file = paste0(DRrequiredAgeing:::RemoveSpecialChars(bf), 'Jobs.bch'),
+      ncolumns = 10000
+    )
+  }
+  
+}
+
+#makejobs()
+#qvalue2AllZips()
+parameter2qvalue(args[1], args[2])
+#ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
 
 
 
