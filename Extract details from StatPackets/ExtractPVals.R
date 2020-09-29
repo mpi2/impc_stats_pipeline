@@ -599,6 +599,15 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
             for (metadata in unique(df5$metadata_group)) {
               df6 = subset(df5, df5$metadata_group == metadata)
               df6 = droplevels(df6)
+              
+              df6$`NGenotype p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
+              df6$`N_Sex FvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
+              df6$`N_Sex MvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
+              df6$`WGenotype p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
+              df6$`W_Sex FvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
+              df6$`W_Sex MvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
+              
+              
               if (counter == 1) {
                 d =  qvalueEstimator(df6)
               } else{
@@ -613,7 +622,7 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
       }
     }
   }
-  if(!is.null(d)){
+  if(!is.null(d) && nrow(d)>0){
     d = d[, colSums(is.na(d)) < nrow(d), drop = FALSE]
     d = d[!duplicated(d),]
   }
