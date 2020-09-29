@@ -573,14 +573,16 @@ qvalueEstimator = function(x) {
 qvaluesGenerator = function(df,filterdfparameter=NULL) {
   df = as.data.frame(df)
   names(df) = outputNames()
-  df = df[df$status == 'Successful' &
-            df$`applied Method` %in% c('MM', 'FE'), ]
+  # df = df[df$status == 'Successful' &
+  #           df$`applied Method` %in% c('MM', 'FE'), ]
   if (nrow(df) < 1)
     return(NULL)
   
-  if(!is.null(filterdfparameter))
-    df = droplevels(subset(df,df$parameter_stable_id == filterdfparameter))
+  if (!is.null(filterdfparameter))
+    df = droplevels(subset(df, df$parameter_stable_id == filterdfparameter))
   
+  if (nrow(df) < 1)
+    return(NULL)
   
   counter = 1
   d = NULL
@@ -657,8 +659,8 @@ parameter2qvalue = function(parameter, file) {
   if(!dir.exists(dir))
     dir.create(dir,recursive = TRUE)
   
-  d = qvaluesGenerator(df = df, filterdfparameter = parameter)
-  if(!is.null(d) || nrow(d)<1){
+  d = qvaluesGenerator(df = as.data.frame(df), filterdfparameter = parameter)
+  if(!is.null(d) || nrow(d)>0){
     write.csv(
       d,
       file = paste0(
