@@ -13,17 +13,17 @@ unlist0 = function(x, active = TRUE) {
 }
 
 is.nullorNA = function(x) {
-	if (is.null(x) || all(x == '')) {
-		return(NA)
-	} else{
-		return(x)
-	}
+  if (is.null(x) || all(x == '')) {
+    return(NA)
+  } else{
+    return(x)
+  }
 }
 
 SelectOthers = function(object) {
-	paste0(is.nullorNA(c(
-		unlist(object$`Concurrent control selection`  )
-	)))
+  paste0(is.nullorNA(c(
+    unlist(object$`Concurrent control selection`  )
+  )))
 }
 
 SelectMISC = function(object) {
@@ -35,28 +35,28 @@ SelectMISC = function(object) {
 }
 
 MakeURL = function(object, objectJSON) {
-	r = URLencode(
-		paste0(
-			"https://wwwdev.ebi.ac.uk/mi/impc/dev/phenotype-archive/media/images/windowing/?alleleSymbol=",
-			object$V9,
-			"&colonyID=",
-			object$V19,
-			"&procedure= | ",
-			object$V3,
-			"&parameter= | ",
-			object$V6,
-			"&center=",
-			object$V8,
-			"&zygosity=",
-			object$V18,
-			"&metadata=",
-			object$V17
-		)
-	)
-	r = c(r, URLdecode(unlist(
-		objectJSON$Result$Details$`Exported raw data file`
-	)))
-	return(r)
+  r = URLencode(
+    paste0(
+      "https://wwwdev.ebi.ac.uk/mi/impc/dev/phenotype-archive/media/images/windowing/?alleleSymbol=",
+      object$V9,
+      "&colonyID=",
+      object$V19,
+      "&procedure= | ",
+      object$V3,
+      "&parameter= | ",
+      object$V6,
+      "&center=",
+      object$V8,
+      "&zygosity=",
+      object$V18,
+      "&metadata=",
+      object$V17
+    )
+  )
+  r = c(r, URLdecode(unlist(
+    objectJSON$Result$Details$`Exported raw data file`
+  )))
+  return(r)
 }
 
 length0 = function(x) {
@@ -81,38 +81,38 @@ SelectWindowingParameters = function(object) {
 }
 
 SelectAnalysis = function(object) {
-	r = c(
-		######
-		unlist0(object$`Applied method`)                ,
-		unlist0(object$`Classification tag`$`Classification tag`) ,
-		#unlist0(object$formula)                                  ,
-		unlist0(object$`Residual variances homogeneity`)  ,
-		unlist0(object$`Batch included`)                  ,
-		# Sexual dymorphism
-		unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Criteria)   ,
-		unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Note)   ,
-		# effect size
-		unlist0(object$`Genotype estimate`$Value)               ,
-		unlist0(object$`Sex FvKO estimate`$Value)               ,
-		unlist0(object$`Sex MvKO estimate`$Value)               ,
-		# Genotype
-		unlist0(object$`Genotype p-value`)                  ,
-		unlist0(object$`Genotype standard error`)           ,
-		# sexDim
-		unlist0(object$`Sex FvKO p-value`)                  ,
-		unlist0(object$`Sex MvKO p-value`)                  ,
-		unlist0(object$`Sex FvKO standard error`)           ,
-		unlist0(object$`Sex MvKO standard error`)           ,
-		# sex
-		unlist0(object$`Sex p-value`)                       ,
-		unlist0(object$`Sex estimate`$Value)                ,
-		unlist0(object$`Sex standard error`)                ,
-		# Bodyweight
-		unlist0(object$`Weight p-value`)                    ,
-		unlist0(object$`Weight estimate`$Value)             ,
-		unlist0(object$`Weight standard error`)
-	)
-	return(r)
+  r = c(
+    ######
+    unlist0(object$`Applied method`)                ,
+    unlist0(object$`Classification tag`$`Classification tag`) ,
+    #unlist0(object$formula)                                  ,
+    unlist0(object$`Residual variances homogeneity`)  ,
+    unlist0(object$`Batch included`)                  ,
+    # Sexual dymorphism
+    unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Criteria)   ,
+    unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Note)   ,
+    # effect size
+    unlist0(object$`Genotype estimate`$Value)               ,
+    unlist0(object$`Sex FvKO estimate`$Value)               ,
+    unlist0(object$`Sex MvKO estimate`$Value)               ,
+    # Genotype
+    unlist0(object$`Genotype p-value`)                  ,
+    unlist0(object$`Genotype standard error`)           ,
+    # sexDim
+    unlist0(object$`Sex FvKO p-value`)                  ,
+    unlist0(object$`Sex MvKO p-value`)                  ,
+    unlist0(object$`Sex FvKO standard error`)           ,
+    unlist0(object$`Sex MvKO standard error`)           ,
+    # sex
+    unlist0(object$`Sex p-value`)                       ,
+    unlist0(object$`Sex estimate`$Value)                ,
+    unlist0(object$`Sex standard error`)                ,
+    # Bodyweight
+    unlist0(object$`Weight p-value`)                    ,
+    unlist0(object$`Weight estimate`$Value)             ,
+    unlist0(object$`Weight standard error`)
+  )
+  return(r)
 }
 
 SelectAnalysisFE = function(object) {
@@ -188,7 +188,7 @@ outputNames = function(){
     "zygosity",
     "colony_id"
   )
-
+  
   c2 = c(
     "Applied method",
     "Classification tag",
@@ -212,7 +212,7 @@ outputNames = function(){
     "Weight estimate",
     "Weight standard error"
   )
-
+  
   c3 = c(
     "Concurrent control selection",
     "is referenc gene",
@@ -222,9 +222,9 @@ outputNames = function(){
     "variation_in_respone_before_preprocess",
     "NGenotype p-value",
     "WGenotype p-value"
-
+    
   )
-
+  
   c4 = c('MP_both',
          'MP_male',
          'MP_female')
@@ -278,22 +278,22 @@ DRSummary = function(x) {
   print(length(na.omit(df$N_MP_both)))
   print(length(na.omit(df$N_MP_male)))
   print(length(na.omit(df$N_MP_female)))
-
+  
   print(length(na.omit(df$W_MP_both)))
   print(length(na.omit(df$W_MP_male)))
   print(length(na.omit(df$W_MP_female)))
-
-
+  
+  
   df1 = df[!is.na(df$N_MP_both) | !is.na(df$W_MP_both),]
   table(df1$N_MP_both == df1$W_MP_both,useNA = 'always')
-
+  
   df2 = df[!is.na(df$N_MP_male) | !is.na(df$W_MP_male),]
   table(df2$N_MP_male == df2$W_MP_male,useNA = 'always')
-
+  
   df3 = df[!is.na(df$N_MP_female) | !is.na(df$W_MP_female),]
   table(df3$N_MP_female == df3$W_MP_female,useNA = 'always')
-
-
+  
+  
 }
 
 calculateDiscrepancy = function(x,y){
@@ -303,48 +303,48 @@ calculateDiscrepancy = function(x,y){
 
 DRSummaryAcross = function(x) {
   df12 = data.table::fread(file = '/homes/hamedhm/impc_statistical_pipeline/IMPC_DRs/flatten_observations_dr12.0_15092020/SP/jobs/ExtractPvalues/resultF/data_point_of_type_unidimensional/AllUnidimensionals.tsv',
-                         header = FALSE,
-                         sep = '\t')
-
+                           header = FALSE,
+                           sep = '\t')
+  
   df11 = data.table::fread(file = '/homes/hamedhm/impc_statistical_pipeline/IMPC_DRs/flatten_observations_dr11.0_16092020/SP/jobs/ExtractPvalues/resultF/data_point_of_type_unidimensional/AllDR11Unidimensionals.tsv',
                            header = FALSE,
                            sep = '\t')
-
-
+  
+  
   names(df11)=outputNames()
   names(df12)=outputNames()
-
-
-
+  
+  
+  
   df11$id = makeIndexColumn(df11[,2:19])
   df12$id = makeIndexColumn(df12[,2:19])
-
+  
   mall = merge(df11,df12,by = 'id',all = TRUE,suffixes = c('_dr11','_dr12'))
   m = merge(df11,df12,by = 'id',all = FALSE,suffixes = c('_dr11','_dr12'))
-
+  
   table(m$N_MP_both_dr11==m$N_MP_both_dr12,useNA = 'always')
   calculateDiscrepancy(m$N_MP_both_dr11,m$N_MP_both_dr12)
-
-
+  
+  
   table(m$N_MP_male_dr11==m$N_MP_male_dr12,useNA = 'always')
   calculateDiscrepancy(m$N_MP_male_dr11,m$N_MP_male_dr12)
-
+  
   table(m$N_MP_female_dr11==m$N_MP_female_dr12,useNA = 'always')
   calculateDiscrepancy(m$N_MP_female_dr11,m$N_MP_female_dr12)
-
+  
   # window
-
+  
   table(m$W_MP_both_dr11==m$W_MP_both_dr12,useNA = 'always')
   calculateDiscrepancy(m$W_MP_both_dr11,m$W_MP_both_dr12)
-
-
+  
+  
   table(m$W_MP_male_dr11==m$W_MP_male_dr12,useNA = 'always')
   calculateDiscrepancy(m$W_MP_male_dr11,m$W_MP_male_dr12)
-
+  
   table(m$W_MP_female_dr11==m$W_MP_female_dr12,useNA = 'always')
   calculateDiscrepancy(m$W_MP_female_dr11,m$W_MP_female_dr12)
-
-
+  
+  
 }
 
 
@@ -443,7 +443,7 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
     
     
     method = r1$Result$Details$`Applied method`
-        message(paste(i, '|',  end , ':', file))
+    message(paste(i, '|',  end , ':', file))
     if (is.null(method) || method  %in% c('MM', 'RR')) {
       x = c(
         unlist(r0[1, 1:19]),
@@ -576,13 +576,14 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
   df = df[df$status == 'Successful' &
             df$`applied Method` %in% c('MM', 'FE'), ]
   if (nrow(df) < 1)
-    return(NA)
+    return(NULL)
   
   if(!is.null(filterdfparameter))
-    df = subset(df,df$parameter_stable_id == filterdfparameter)
-    
+    df = droplevels(subset(df,df$parameter_stable_id == filterdfparameter))
+  
   
   counter = 1
+  d = NULL
   for (centre in unique(df$phenotyping_center)) {
     df1 = subset(df, df$phenotyping_center == centre)
     for (procedure in unique(df1$procedure_stable_id)) {
@@ -610,9 +611,10 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
       }
     }
   }
-  
-  d = d[, colSums(is.na(d)) < nrow(d), drop = FALSE]
-  d = d[!duplicated(d),]
+  if(!is.null(d)){
+    d = d[, colSums(is.na(d)) < nrow(d), drop = FALSE]
+    d = d[!duplicated(d),]
+  }
   return(d)
   
 }
@@ -656,18 +658,22 @@ parameter2qvalue = function(parameter, file) {
     dir.create(dir,recursive = TRUE)
   
   d = qvaluesGenerator(df = df, filterdfparameter = parameter)
-  write.csv(
-    df,
-    file = paste0(
-      dir,
-      '/',
-      basename(file),
-      '_',
-      DRrequiredAgeing:::randomIdGenerator(l = 16),
-      '.csv'
-    ),
-    row.names = FALSE
-  )
+  if(!is.null(d) || nrow(d)<1){
+    write.csv(
+      d,
+      file = paste0(
+        dir,
+        '/',
+        basename(file),
+        '_',
+        DRrequiredAgeing:::randomIdGenerator(l = 16),
+        '.csv'
+      ),
+      row.names = FALSE
+    )
+  }else{
+    return(NULL)
+  }
   
 }
 
