@@ -691,7 +691,7 @@ parameter2qvalue = function(parameter, file) {
 makejobs = function(path = getwd()) {
   files = list.files(
     path = path,
-    pattern = '.zip',
+    pattern = '.tsv',
     all.files = TRUE,
     full.names = TRUE,
     include.dirs = FALSE
