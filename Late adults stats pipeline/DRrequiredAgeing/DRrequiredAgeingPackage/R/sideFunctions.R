@@ -5595,32 +5595,57 @@ bselect = function(x) {
 }
 
 
-MoreThan2Length = function(xx, index) {
+
+MoreThan2Length = function(xx,
+                           index,
+                           MPTERMS = NULL,
+                           general = TRUE) {
   # order important, see bselect
-  if (length(xx) > 1 && sum(index) > 1) {
-    if (any(grepl(pattern = 'INFERRED', xx))) {
+  if (length(xx) > 1 &&
+      sum(index) > 1 &&
+      !is.null(MPTERMS) &&
+      length(MPTERMS) > 0) {
+    if (general && any(grepl(pattern = 'INCREASED', xx)) &&
+        any(grepl(pattern = 'INCREASED', names(MPTERMS)))) {
+      return(grepl(pattern = 'INCREASED', xx))
+
+    } else if (general && any(grepl(pattern = 'DECREASED', xx)) &&
+               any(grepl(pattern = 'DECREASED', names(MPTERMS)))) {
+      return(grepl(pattern = 'DECREASED', xx))
+
+    } else if (any(grepl(pattern = 'INFERRED', xx)) &&
+               any(grepl(pattern = 'INFERRED', names(MPTERMS)))) {
       return(grepl(pattern = 'INFERRED', xx))
 
-    } else if (any(grepl(pattern = 'ABNORMAL', xx))) {
+    } else if (any(grepl(pattern = 'ABNORMAL', xx)) &&
+               any(grepl(pattern = 'ABNORMAL', names(MPTERMS)))) {
       return(grepl(pattern = 'ABNORMAL', xx))
 
-    } else if (any(grepl(pattern = 'OVERAL', xx))) {
+    } else if (any(grepl(pattern = 'OVERAL', xx)) &&
+               any(grepl(pattern = 'OVERAL', names(MPTERMS)))) {
       return(grepl(pattern = 'OVERAL', xx))
     }
+
   }
   return(index)
 }
 
-MaleFemaleAbnormalCategories = function(x, method = 'AA') {
+MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL) {
   fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
   mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
   agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
     !fgrep & !mgrep
 
-
-  fgrep = MoreThan2Length(names(x),fgrep)
-  mgrep = MoreThan2Length(names(x),mgrep)
-  agrep = MoreThan2Length(names(x),agrep)
+  if (method %in% 'MM') {
+    fgrep = MoreThan2Length(names(x), fgrep, MPTERMS)
+    mgrep = MoreThan2Length(names(x), mgrep, MPTERMS)
+    agrep = MoreThan2Length(names(x), agrep, MPTERMS)
+  } else{
+    # bug reported 30/10/2020 - (improvement)
+    fgrep = MoreThan2Length(names(x), fgrep, MPTERMS, general = FALSE)
+    mgrep = MoreThan2Length(names(x), mgrep, MPTERMS, general = FALSE)
+    agrep = MoreThan2Length(names(x), agrep, MPTERMS, general = FALSE)
+  }
 
   if (method %in% 'RR') {
     fevent = DecIncDetectorRR(x[fgrep])
@@ -5809,7 +5834,9 @@ annotationChooser = function(statpacket = NULL,
     ##########################
     ulistTag3 = ulistTag3[!is.na(ulistTag3)]
     ################################
-    MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3, method = method)
+    MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
+                                           method = method,
+                                           MPTERMS = ulistD)
     MPTERMS = rlist::list.clean(MPTERMS)
     ################################
     if (length(ulistTag3) > 0 &&
