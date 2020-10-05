@@ -76,7 +76,7 @@ for (i in 1:lflist) {
       "colony_id",
       "statpacket"
     )
-    status  = DRrequiredAgeing:::Write2Postg(df = df[1, ], host =  "hh-yoda-05-01")
+    status  = DRrequiredAgeing:::Write2Postg(df = df[1, ], host =  "hh-yoda-05-01",outputdb = 'db_xxxxxx')
     id = id + 1
     #print(file)
   }

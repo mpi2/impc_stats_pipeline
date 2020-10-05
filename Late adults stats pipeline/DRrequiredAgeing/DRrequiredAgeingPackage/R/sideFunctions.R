@@ -5665,7 +5665,9 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL) {
   if (!is.na(fmevents[1]) && is.na(fmevents[2]))
     oevent = fmevents[1]
   #############################
-
+  # if male and/or female specific term found then ignore the combined sex mp terms
+  if (length(x[fgrep]) > 0 || length(x[mgrep]) > 0)
+    agrep = FALSE
   #############################
   if (method %in% 'RR') {
     MPTERM = list(
@@ -5834,11 +5836,6 @@ annotationChooser = function(statpacket = NULL,
     ##########################
     ulistTag3 = ulistTag3[!is.na(ulistTag3)]
     ################################
-    MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
-                                           method = method,
-                                           MPTERMS = ulistD)
-    MPTERMS = rlist::list.clean(MPTERMS)
-    ################################
     if (length(ulistTag3) > 0 &&
         method %in% 'RR') {
       lIncDec = multiGrepl(pattern = c('INCREASED|DECREASED'),
@@ -5856,6 +5853,11 @@ annotationChooser = function(statpacket = NULL,
     if (length(ulistTag3) > 0) {
       ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
     }
+    ################################
+    MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
+                                           method = method,
+                                           MPTERMS = ulistD)
+    MPTERMS = rlist::list.clean(MPTERMS)
   }
   if (!is.null(MPTERMS)     &&
       length(ulistTag3) > 0 &&
@@ -5879,7 +5881,7 @@ Write2Postg = function(df,
                        password = 'impc',
                        outputdb = paste0('db_',
                                          DRrequiredAgeing:::RemoveSpecialChars(
-                                           format(Sys.time(), '%a%b%d %Y HM%H %M'),
+                                           format(Sys.time(), '%a%b%d %Y'),
                                            replaceBy = '_',
                                            what = ' '
                                          ))) {
