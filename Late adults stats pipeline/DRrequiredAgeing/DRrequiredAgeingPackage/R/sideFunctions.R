@@ -5733,8 +5733,8 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL) {
 annotationChooser = function(statpacket = NULL,
                              level = 10 ^ -4,
                              TermKey = 'MPTERM',
-                             resultKey = 'Normal result') {
-
+                             resultKey = 'Normal result',
+                             mp_chooser_file = 'mp_chooser_19092020.json.Rdata') {
   require('RPostgreSQL')
   require('data.table')
   require(data.table)
@@ -5763,7 +5763,7 @@ annotationChooser = function(statpacket = NULL,
   )
   ##################################################################
   message('\t Reading the index file ...')
-  load(file.path(local(),'annotation','mp_chooser_19092020.json.Rdata'))
+  load(file.path(local(),'annotation',mp_chooser_file))
   message(
     '\t~>',
     paste(
