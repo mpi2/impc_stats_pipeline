@@ -5734,7 +5734,7 @@ annotationChooser = function(statpacket = NULL,
                              level = 10 ^ -4,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
-                             mp_chooser_file = 'mp_chooser_19092020.json.Rdata') {
+                             mp_chooser_file = 'mp_chooser_20200520.json.Rdata') {
   require('RPostgreSQL')
   require('data.table')
   require(data.table)
