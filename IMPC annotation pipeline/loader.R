@@ -20,11 +20,11 @@ flist = readLines(con = file[1])
 lflist = length(flist)
 id = 1
 rnd <-
-  DRrequired:::RandomRegardSeed(
+  DRrequiredAgeing:::RandomRegardSeed(
     n = 1,
     decimal = 0,
     stringOutput = 1,
-    max = 2500,
+    max = 99999,
     round = 1
   )
 for (i in 1:lflist) {
@@ -50,7 +50,7 @@ for (i in 1:lflist) {
     df = r$statpacket
     ###################
     df = cbind(as.numeric(paste0(
-      DRrequiredAgeing:::randomIdGenerator(),
+      DRrequiredAgeing:::randomIdGenerator(13),
       format(Sys.time(), "%H%S")
     )), df)
     names(df)  =  c(
