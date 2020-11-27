@@ -9,6 +9,14 @@ library(rlist)
 library(Tmisc)
 ##############################
 
+shuffle = function (x = as.numeric(Sys.time()) * 100000,
+                    replace = TRUE,
+                    length = 5) {
+  r = as.numeric(unlist(strsplit(as.character(x), "")))
+  r = sample(r, length, replace = replace)
+  return(paste0(r, collapse = ''))
+}
+
 
 # file = 'https://www.ebi.ac.uk/~hamedhm/windowing/DR11/jobs/Results_DR11V2OpenStats/RBRC/IMPC_CSD/IMPC_CSD_050_002/RIKEN_Fbn2_A06_/homozygote/978482d700f332623fc65f3e729dea93/output_Successful.tsv'
 # file ='https://www.ebi.ac.uk/~hamedhm/windowing/DR11/jobs/Results_DR11V2OpenStats/ICS/ESLIM_008/ESLIM_008_001_014/EPD0060_2_H09/heterozygote/d41d8cd98f00b204e9800998ecf8427e/output_Successful.tsv'
@@ -50,9 +58,11 @@ for (i in 1:lflist) {
     df = r$statpacket
     ###################
     df = cbind(as.numeric(paste0(
-      DRrequiredAgeing:::randomIdGenerator(13),
+      shuffle(),
       format(Sys.time(), "%H%S")
     )), df)
+    
+    
     names(df)  =  c(
       "id",
       "analysisTime",
