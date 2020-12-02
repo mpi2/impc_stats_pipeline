@@ -4382,7 +4382,7 @@ minijobsCopyCreator = function(path  = getwd(),
                                server = 'ebi-cli',
                                destination = '~/NoBckDir/',
                                fname = 'miniCopyjobs.txt') {
-  lf = DRrequiredAgeing:::list.dirsDepth(path = path,
+  lf = list.dirsDepth(path = path,
                                          depth = depth,
                                          full.names = TRUE)
 
@@ -4419,7 +4419,7 @@ minijobsCopyCreator = function(path  = getwd(),
 DeleteDirectoryAndSubDirectories = function(path  = getwd(),
                                             depth = 2,
                                             fname = 'deleteFullDirectory.txt') {
-  lf = DRrequiredAgeing:::list.dirsDepth(path = path, depth = depth)
+  lf = list.dirsDepth(path = path, depth = depth)
   a = paste0('bsub "rm -rf ',
              lf,
              '"')
@@ -4457,7 +4457,7 @@ ETLStep1MakePar2RdataJobs = function(path = getwd(),
 
 
 ETLStep2Parquet2Rdata = function(files) {
-  library(miniparquet)
+  requireNamespace(miniparquet)
   df = lapply(seq_along(files),
               function(i) {
                 message(i, '|', length(files), ' ~> ', files[i])
@@ -5774,12 +5774,12 @@ annotationChooser = function(statpacket = NULL,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
                              mp_chooser_file = 'mp_chooser_20200520.json.Rdata') {
-  require('RPostgreSQL')
-  require('data.table')
-  require(data.table)
-  require(jsonlite)
-  require(rlist)
-  require(Tmisc)
+  requireNamespace('RPostgreSQL')
+  requireNamespace('data.table')
+  requireNamespace("data.table")
+  requireNamespace("jsonlite")
+  requireNamespace("rlist")
+  requireNamespace("Tmisc")
 
   ulistTag3 = MPTERMS = NA
   message('Running the annotation pipeline')
@@ -5902,7 +5902,7 @@ annotationChooser = function(statpacket = NULL,
       length(ulistTag3) > 0 &&
       length(na.omit(ulistTag3)) > 0) {
     json$Result$Details[[TermKey]] = MPTERMS
-    statpacket$V20 = DRrequiredAgeing:::FinalJson2ObjectCreator(FinalList = json)
+    statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
   }else{
     message('No MP term found ...')
   }
@@ -5919,14 +5919,14 @@ Write2Postg = function(df,
                        user = 'impc',
                        password = 'impc',
                        outputdb = paste0('db_',
-                                         DRrequiredAgeing:::RemoveSpecialChars(
+                                         RemoveSpecialChars(
                                            format(Sys.time(), '%a%b%d %Y'),
                                            replaceBy = '_',
                                            what = ' '
                                          ))) {
-  require('RPostgreSQL')
-  require('data.table')
-  require('DBI')
+  requireNamespace('RPostgreSQL')
+  requireNamespace('data.table')
+  requireNamespace('DBI')
   drv <- dbDriver("PostgreSQL")
   con <- dbConnect(
     drv,

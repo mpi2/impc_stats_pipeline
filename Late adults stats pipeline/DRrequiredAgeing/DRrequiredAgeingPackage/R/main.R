@@ -1,5 +1,5 @@
 ## You must check the 'check' parameter
-mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/select?q=*%3A*&fq=procedure_stable_id%3AIMPC_ECG_002&rows=590000&wt=csv&indent=true'            ,
+mainAgeing = function(file = NULL                                    ,
                       sep = ','                                      ,
                       na.strings = 'NA'                              ,
                       normalisedPhenlist = FALSE                     ,
@@ -54,7 +54,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       # Raw data
                       storeRawData           = TRUE        ,
                       compressRawData        = TRUE        ,
-                      writeOutputToDB        = TRUE        ,
+                      writeOutputToDB        = FALSE       ,
                       # Only for Batch generator
                       BatchProducer          =  FALSE      ,
                       cpu = 4                              ,
@@ -71,7 +71,7 @@ mainAgeing = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment
                       ### Just for debuging
                       superDebug             = FALSE                      ,
                       subBreakColumns        = NULL,
-                      extraBatchParameters   = '-m "rh7-hosts-ebi5-12 rh7-hosts-ebi5-13 rh7-hosts-ebi5-14 rh7-hosts-ebi5-15 rh7-hosts-ebi5-16 rh7-hosts-ebi5-17 rh7-hosts-ebi5-18 rh7-hosts-ebi5-19 rh7-hosts-ebi5-20 rh7-hosts-ebi5-24 rh7-hosts-ebi5-25 rh7-hosts-ebi5-26 rh7-hosts-ebi5-27 rh7-hosts-ebi6-00 rh7-hosts-ebi6-01 rh7-hosts-ebi6-02 rh7-hosts-ebi6-03 rh7-hosts-ebi6-04 rh7-hosts-ebi6-05 rh7-hosts-ebi6-06 rh7-hosts-ebi6-07 rh7-hosts-ebi6-08 rh7-hosts-ebi6-09 rh7-hosts-ebi6-10 rh7-hosts-ebi6-11 rh7-hosts-ebi6-12 rh7-hosts-ebi6-13 rh7-hosts-ebi6-14 rh7-hosts-ebi6-15 rh7-hosts-ebi6-16 rh7-hosts-ebi6-17"',
+                      extraBatchParameters   = NULL,
                       ...) {
   message0('DRrequiredAgeing loaded')
   message0(

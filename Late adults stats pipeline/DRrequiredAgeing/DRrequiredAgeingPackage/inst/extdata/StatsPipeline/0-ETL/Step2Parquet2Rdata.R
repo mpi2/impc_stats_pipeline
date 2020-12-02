@@ -3,7 +3,7 @@ args = commandArgs(trailingOnly = TRUE)
 ##################### STEP 1 #######################
 ####################################################
 f = function(files) {
-  library(miniparquet)
+  requireNamespace("miniparquet")
   df = lapply(seq_along(files),
               function(i) {
                 message(i, '|', length(files), ' ~> ', files[i])
