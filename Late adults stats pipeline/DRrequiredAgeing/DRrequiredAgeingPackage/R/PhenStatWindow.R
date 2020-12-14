@@ -261,6 +261,9 @@ PhenStatWindow = function (phenlistObject                                ,
         #we2[-mm] = we2[-mm] * VControls
       }
 
+      MM_optimise2 = MMOptimise
+      MM_optimise2[2] = 0
+
       if (!is.null(we2)) {
         message0('Reclaculating an optimised model using the windowing weights ...')
         objectf = OpenStatsAnalysis(
@@ -271,7 +274,7 @@ PhenStatWindow = function (phenlistObject                                ,
           MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
           MM_weight   = nlme::varComb(nlme::varFixed(~ 1 / AllModelWeights)),
           debug       = TRUE,
-          MM_optimise = c(1, 0, 1, 1, 1, 1)
+          MM_optimise = MM_optimise2
         )
       } else{
         message0('Ops no, the soft windowing failed! Just a normal full model will be estimated ...')
