@@ -44,6 +44,7 @@ mainAgeing(
   MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
   FERROptimise            = c(TRUE, TRUE)        ,
   FERRrep                 = 1500       ,
+  equation                = 'auto'     ,
   # Only for simulations
   simulation              = FALSE      ,
   Simulation.iteration    = 1          ,
@@ -158,6 +159,9 @@ mainAgeing(
 }
   \item{FERRrep}{
   See "FERR_rep" in the "OpenStatsAnalysis" function manual from "OpenStats" R package.
+}
+  \item{equation}{
+  Choose between "auto", "withWeight" and "withoutWeight". Setting to "auto" (default) will choose the best model for the IMPC data.
 }
   \item{simulation}{
   Turn the pipeline into the simulation pipeline. That means that the mutants are replaced with the nearest controls and a random shift to left/right. This is used to create synthetic mutants and testing FDR. Default FALSE

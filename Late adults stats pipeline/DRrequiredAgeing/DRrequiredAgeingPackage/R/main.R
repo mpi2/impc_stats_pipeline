@@ -23,6 +23,7 @@ mainAgeing = function(file = NULL                                    ,
                       MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
                       FERROptimise            = c(TRUE,TRUE)        ,
                       FERRrep                 = 1500       ,
+                      equation                = 'auto'     ,
                       # Only for simulations
                       simulation              = FALSE      ,
                       Simulation.iteration    = 1          ,
@@ -797,14 +798,19 @@ mainAgeing = function(file = NULL                                    ,
                           'Weight column does not exist in the raw data'
                       }
                       # Equation type
-                      equationType = ifelse(
-                        CheckIfNameExistInDataFrame(a@datasetPL, 'Weight')         &&
-                          MissingPercent(var = 'Weight', data = a@datasetPL) <= .2 &&
-                          EnoughWeightForTheSexGenInteraction(a@datasetPL)         ,
-                        getEquation(var = parameter,
-                                    equationMap = equationmap),
-                        'withoutWeight'
-                      )
+                      message0('equation is set to ',equation)
+                      if (equation == 'auto') {
+                        equationType = ifelse(
+                          CheckIfNameExistInDataFrame(a@datasetPL, 'Weight')         &&
+                            MissingPercent(var = 'Weight', data = a@datasetPL) <= .2 &&
+                            EnoughWeightForTheSexGenInteraction(a@datasetPL)         ,
+                          getEquation(var = parameter,
+                                      equationMap = equationmap),
+                          'withoutWeight'
+                        )
+                      } else{
+                        equationType = equation
+                      }
                       # This is the main engine!
                       note = c(note, list(
                         'Bodyweight initially included in the full model' = ifelse(method %in% 'MM', equationType, FALSE)
