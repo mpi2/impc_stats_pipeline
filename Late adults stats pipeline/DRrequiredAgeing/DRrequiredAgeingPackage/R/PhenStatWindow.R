@@ -205,8 +205,8 @@ PhenStatWindow = function (phenlistObject                                ,
                    noSexes0(phenlistObject))
           lutm = length(unique(tt[mm]))
           r = ifelse(lutm > 1,
-                     noSexes0(phenlistObject) * 35,
-                     max(pi * sqrt(length(tt)), 35))
+                     noSexes0(phenlistObject) * 50,
+                     max(pi * sqrt(length(tt)), 50))
           r = max(r * lutm, length(mm), na.rm = TRUE)
           r = min(r       , length(tt), na.rm = TRUE)
           message0('min.obs =  ', r)
