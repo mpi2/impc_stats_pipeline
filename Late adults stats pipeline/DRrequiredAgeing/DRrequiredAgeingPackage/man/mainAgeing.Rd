@@ -169,6 +169,9 @@ mainAgeing(
   \item{Simulation.iteration}{
   The number of iterations in the simulation. Default 1 (must be kept 1 even if the simulation=FALSE)
 }
+  \item{skiptimeseries}{
+  Setting to TRUE (default) skips any dataset with observation_type=time_series
+}
   \item{activeWindowing}{
   Activates the SoftWindowing pipeline. This means that the output StatPackets will be contained the non-windowed and windowed results. Default FALSE
 }
