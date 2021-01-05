@@ -27,6 +27,7 @@ mainAgeing = function(file = NULL                                    ,
                       # Only for simulations
                       simulation              = FALSE      ,
                       Simulation.iteration    = 1          ,
+                      skiptimeseries          = TRUE       ,
                       # Only for windowing
                       activeWindowing = TRUE               ,
                       sensitivity = c(1, 1, 1, 0)          ,
@@ -393,8 +394,8 @@ mainAgeing = function(file = NULL                                    ,
                     # Define response column [do not move me!]
                     depVariable = getResponseColumn(n3.5$observation_type)
                     ################must be removed later
-                    # if(depVariable$lbl %in% 'time_series')
-                    #   return(NULL)
+                    if (skiptimeseries && depVariable$lbl %in% 'time_series')
+                      return(NULL)
                     ################
 
                     n3.5 = TransformVariableByFunction(
