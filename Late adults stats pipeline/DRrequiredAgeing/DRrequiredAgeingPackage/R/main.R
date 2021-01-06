@@ -29,12 +29,12 @@ mainAgeing = function(file = NULL                                    ,
                       Simulation.iteration    = 1          ,
                       skiptimeseries          = TRUE       ,
                       # Only for windowing
-                      activeWindowing = TRUE               ,
+                      activeWindowing = FALSE              ,
                       sensitivity = c(1, 1, 1, 0)          ,
                       pvalThreshold = c(0, 0, 0, 0)        ,
-                      check = 2                            ,
+                      check = 1                            ,
                       direction = c(1, 1)                  ,
-                      weightORthreshold = 'weight'         ,
+                      weightORthreshold = 'threshold'      ,
                       predFunction = function(m) {
                         predict(m)
                       }                                    ,

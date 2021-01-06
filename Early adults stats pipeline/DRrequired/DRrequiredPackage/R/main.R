@@ -26,9 +26,9 @@ main = function(file = 'http://ves-ebi-d0:8090/mi/impc/dev/solr/experiment/selec
                 activeWindowing = TRUE               ,
                 sensitivity = c(1, 1, 1, 0)          ,
                 pvalThreshold = c(0, 0, 0, 0)        ,
-                check = 2                            ,
+                check = 1                            ,
                 direction = c(1, 1)                  ,
-                weightORthreshold = 'weight'         ,
+                weightORthreshold = 'hreshold'       ,
                 predFunction = function(m) {
                   predict(m)
                 }                                    ,

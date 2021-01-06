@@ -209,6 +209,40 @@ getResponseColumn = function(x, activate = TRUE) {
   ))
 }
 
+removeOffweightsFromPLobject = function (plObject = NULL,
+                                         threshold = sqrt(.Machine$double.eps) * 10) {
+  if (is.null(plObject) || is.null(threshold))
+    return(plObject)
+
+  if (!'AllModelWeights' %in% names(plObject@datasetPL))
+    return(plObject)
+
+  message0('Removing off threshold weights from PL object for windowing only. Threshold: ', threshold)
+  plObject@datasetPL = plObject@datasetPL[plObject@datasetPL$AllModelWeights >
+                                            threshold,]
+
+  return(plObject)
+
+}
+
+MeanVarOverTime = function(mm, tt, data = phenlistObject@datasetPL) {
+  if (length(tt) < 1 || length(mm) < 1)
+    return(1)
+  v = sapply(unique(tt[mm]), function(i) {
+    ind      = 1:length(tt)
+    CriTeria = (tt %in% i) & (ind %in% mm)
+    if (sum(CriTeria) > 1) {
+      sd0(data[CriTeria], na.rm = TRUE)
+    } else{
+      NA
+    }
+  })
+  if (length(v[!is.na(v)]) > 0) {
+    return(mean(v, na.rm = TRUE))
+  } else{
+    return(1)
+  }
+}
 
 IsInBlackListCategories = function(x, len = 1, blackList = NULL) {
   note = NULL

@@ -84,7 +84,6 @@ PhenStatWindow = function (phenlistObject                                ,
   ###########################
   # Run normal (not windowed) models
   ###########################
-  ## I checked the source and the messaging mechanism is written using the non-standard functioning in R
   note = windowingNote = graphFileName = object0 = NULL
   message0(method, ' in progress ....')
   object0 =   OpenStats::OpenStatsAnalysis(
@@ -224,25 +223,6 @@ PhenStatWindow = function (phenlistObject                                ,
         windowingNote$'Windowing extra' = 'There is no variation in the weights then the standard model is applied.'
       } else{
         ####################
-        MeanVarOverTime = function(mm, tt, data = phenlistObject@datasetPL) {
-          if (length(tt) < 1 || length(mm) < 1)
-            return(1)
-          v = sapply(unique(tt[mm]), function(i) {
-            ind      = 1:length(tt)
-            CriTeria = (tt %in% i) & (ind %in% mm)
-            if (sum(CriTeria) > 1) {
-              sd0(data[CriTeria], na.rm = TRUE)
-            } else{
-              NA
-            }
-          })
-          if (length(v[!is.na(v)]) > 0) {
-            return(mean(v, na.rm = TRUE))
-          } else{
-            return(1)
-          }
-        }
-        ####################
         vMutants  = MeanVarOverTime(
           mm = (1:length(tt))[mm.bck],
           tt = tt,
@@ -266,8 +246,12 @@ PhenStatWindow = function (phenlistObject                                ,
 
       if (!is.null(we2)) {
         message0('Reclaculating an optimised model using the windowing weights ...')
+
+        # in this step we remove off threshold weights (to solve the computation error of small values)
+       phenlistObject2 = removeOffweightsFromPLobject(phenlistObject,threshold)
+
         objectf = OpenStatsAnalysis(
-          OpenStatsListObject = phenlistObject,
+          OpenStatsListObject = phenlistObject2,
           method              = method,
           MM_random   = RandEffTerm   ,
           correlation = CorrEffect    ,
