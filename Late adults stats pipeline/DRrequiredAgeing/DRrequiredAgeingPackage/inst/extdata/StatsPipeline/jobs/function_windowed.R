@@ -14,9 +14,9 @@ runner = function(file) {
     BatchProducer = FALSE,
     # Windowing
     activeWindowing = TRUE,
-    check = 2,
-    storeplot = FALSE,
-    plotWindowing = FALSE,
+    check = 1,
+    storeplot = TRUE,
+    plotWindowing = TRUE,
     ####
     debug = FALSE,
     noSpaceAllowed = TRUE,
