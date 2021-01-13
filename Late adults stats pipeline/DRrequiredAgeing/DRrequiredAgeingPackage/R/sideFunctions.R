@@ -4625,7 +4625,7 @@ waitTillCommandFinish = function(command = 'bjobs',
               stdout = TRUE,
               ...)
   totalSeconds = 0
-  if (ignoreline > 0)
+  if (any(ignoreline > 0))
     r = r[-c(ignoreline)]
   while (length(r) > 0 && !all(grepl(
     pattern = exitIfTheOutputContains,
