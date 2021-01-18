@@ -45,7 +45,8 @@ f = function(files) {
              collapse = '_'
            )
          ),
-         compress = FALSE)
+         compression_level = 1,
+         compress = TRUE)
     rm(rdata)
     gc()
   }
