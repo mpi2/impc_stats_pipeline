@@ -4257,6 +4257,7 @@ readInputDatafromFile = function(file = NULL,
       stringsAsFactors = TRUE
     )
   } else{
+    message0('\tReading the input Rdata ...')
     loadfile = load(file = file)
     if (length(loadfile) < 1)
       stop('The loaded Rdata is blank ...')

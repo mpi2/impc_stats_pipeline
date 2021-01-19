@@ -393,9 +393,6 @@ mainAgeing = function(file = NULL                                    ,
 
                     # Define response column [do not move me!]
                     depVariable = getResponseColumn(n3.5$observation_type)
-                    ################must be removed later
-                    if (skiptimeseries && depVariable$lbl %in% 'time_series')
-                      return(NULL)
                     ################
 
                     n3.5 = TransformVariableByFunction(
@@ -723,7 +720,8 @@ mainAgeing = function(file = NULL                                    ,
                         NonZeroVariation(n3.5.2[, depVar]) &&
                         !isException &&
                         columnLevelsVariationRadio(dataset = n3.5.2, columnName = depVar) > 0.005 &&
-                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$'Criteria result'
+                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$'Criteria result' &&
+                        ifelse (skiptimeseries && depVariable$lbl %in% 'time_series', FALSE, TRUE)
                     ) {
                       message0('Analysing the dataset in progress ...')
                       message0('Creating OpenStats object ...')
