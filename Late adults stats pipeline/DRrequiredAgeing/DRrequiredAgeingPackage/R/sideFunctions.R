@@ -4236,6 +4236,13 @@ readInputDatafromFile = function(file = NULL,
                                  sep          = ',',
                                  na.strings   = 'NA') {
   message0('Reading the input file ...\n\t ~> ', file)
+  if (!is.null(file))
+    file = gsub(
+      pattern = '//',
+      replacement = '/',
+      x = file,
+      fixed = TRUE
+    )
   if (!file.exists(file))
     message0('File is not local or does not exist!')
   message0('Reading the input data ...')
