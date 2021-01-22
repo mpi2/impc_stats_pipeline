@@ -53,16 +53,23 @@ for (i in 1:lflist) {
     if (ncol(df) != 20)
       next
     ###################
-    r = DRrequiredAgeing:::annotationChooser(statpacket = df, level = .0001)
+    rN = DRrequiredAgeing:::annotationChooser(statpacket = df,
+                                              level = .0001)
+    rW = DRrequiredAgeing:::annotationChooser(
+      statpacket = rN$statpacket,
+      level = .0001,
+      resultKey = 'Windowed result',
+      TermKey = 'WMPTERM'
+    )
 
-    df = r$statpacket
+    df = rW$statpacket
     ###################
     df = cbind(as.numeric(paste0(
       shuffle(),
       format(Sys.time(), "%H%S")
     )), df)
-    
-    
+
+
     names(df)  =  c(
       "id",
       "analysisTime",
