@@ -5426,6 +5426,10 @@ DecIncDetector = function(x) {
   if (length(r) < 1)
     r = NA
   if (length(r) > 1) {
+    if (any(grepl(pattern = 'DECREASED', x = r)) && !any(grepl(pattern = 'INCREASED', x = r)))
+      r = 'DECREASED'
+    if (any(grepl(pattern = 'INCREASED', x = r)) && !any(grepl(pattern = 'DECREASED', x = r)))
+      r = 'INCREASED'
     if (any(grepl(pattern = 'ABNORMAL', x = r)))
       r = 'ABNORMAL'
     if (any(grepl(pattern = 'INFERRED', x = r)))
@@ -6001,29 +6005,30 @@ randomIdGenerator = function(l = 10) {
   return(r)
 }
 
-StratifiedMPTerms = function(object) {
+StratifiedMPTerms = function(object, name = 'MPTERM') {
   # overall, male, female
   r = c(NA, NA, NA)
   if (is.null(object))
     return(r)
-  if (is.null(object$MPTERM) || length(object$MPTERM) < 1 || all(is.na(object$MPTERM)))
+  if (is.null(object) ||
+      is.null(object[[name]]) ||
+      length(object[[name]]) < 1 ||
+      all(is.na(object[[name]])))
     return (r)
 
-  for (i in seq_along(object$MPTERM)) {
-
-    if (object$MPTERM[[i]]$sex == 'not_considered')
-      r[1] = paste(object$MPTERM[[i]]$term_id,
+  for (i in seq_along(object[[name]])) {
+    if (!is.null(object[[name]][[i]]$sex) && object[[name]][[i]]$sex == 'not_considered')
+      r[1] = paste(object[[name]][[i]]$term_id,
                    collapse = '~',
                    sep = '~')
-    if (object$MPTERM[[i]]$sex == 'male')
-      r[2] = paste(object$MPTERM[[i]]$term_id,
+    if (!is.null(object[[name]][[i]]$sex) && object[[name]][[i]]$sex == 'male')
+      r[2] = paste(object[[name]][[i]]$term_id,
                    collapse = '~',
                    sep = '~')
-    if (object$MPTERM[[i]]$sex == 'female')
-      r[3] = paste(object$MPTERM[[i]]$term_id,
+    if (!is.null(object[[name]][[i]]$sex) && object[[name]][[i]]$sex == 'female')
+      r[3] = paste(object[[name]][[i]]$term_id,
                    collapse = '~',
                    sep = '~')
-
   }
   return(r)
 }
