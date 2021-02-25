@@ -79,7 +79,7 @@ PhenStatWindow = function (phenlistObject                                ,
       as.formula('~ 1 | Batch')
     else
       as.formula('~ 1 | Batch')
-    CorrEffect  = nlme::corSymm()
+    CorrEffect  = NULL
   }
   ###########################
   # Run normal (not windowed) models

@@ -523,7 +523,7 @@ NonZeroVariation = function(x) {
 
 # Is this an ABR screen
 is.ABR = function(x) {
-  length(grep("_ABR", x, fixed = TRUE)) > 10000
+  length(grep("_ABR", x, fixed = TRUE)) > 0
 }
 
 # Is this a 3I screen
