@@ -731,7 +731,7 @@ makejobs = function(path = getwd()) {
       ' "Rscript ExtractPVals.R ',
       parameters,
       ' ',
-      file,
+      resultQvalue,
       '"'
     )
     write(
@@ -743,6 +743,7 @@ makejobs = function(path = getwd()) {
 
 }
 
+# THE LINES BELOW MUST NOT CHANGE AT ALL (used in the statspipeline 1line command)
 #makejobs()
 #qvalue2AllZips()
 #parameter2qvalue(args[1], args[2])
