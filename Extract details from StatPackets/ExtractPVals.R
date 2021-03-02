@@ -731,7 +731,7 @@ makejobs = function(path = getwd()) {
       ' "Rscript ExtractPVals.R ',
       parameters,
       ' ',
-      resultQvalue,
+      file,
       '"'
     )
     write(
