@@ -669,7 +669,7 @@ parameter2qvalue = function(parameter, file) {
     stringsAsFactors = TRUE
   )
 
-  dir = DRrequiredAgeing:::RemoveSpecialChars(basename(file))
+  dir = 'QvalueResults' # DRrequiredAgeing:::RemoveSpecialChars(basename(file))
 
   if(!dir.exists(dir))
     dir.create(dir,recursive = TRUE)
