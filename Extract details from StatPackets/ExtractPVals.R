@@ -736,7 +736,7 @@ makejobs = function(path = getwd()) {
     )
     write(
       x = paste(jobs,sep = '\n',collapse = '\n'),
-      file = paste0(DRrequiredAgeing:::RemoveSpecialChars(bf), 'Jobs.bch'),
+      file = 'Jobs.bch',
       ncolumns = 10000
     )
   }
