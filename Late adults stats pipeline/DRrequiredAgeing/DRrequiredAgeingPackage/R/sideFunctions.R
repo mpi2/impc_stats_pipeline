@@ -4937,6 +4937,7 @@ StatsPipeline = function(path = getwd(),
   system(command = 'grep "exit" * -lR', wait = TRUE)
 
   message0('SP finished in ', round(difftime(Sys.time(), startTime, units = "min"), 2))
+  DRrequiredAgeing:::message0('Step 1: Postprocessing the IMPC stats pipeline ...')
 
 }
 
