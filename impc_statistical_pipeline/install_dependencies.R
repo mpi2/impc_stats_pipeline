@@ -1,6 +1,7 @@
 ##########################################
 # In this script the orders are important
 ##########################################
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
 # Installer script
 install.packages.auto <- function(x) {
   x <- as.character(x)
@@ -162,10 +163,31 @@ for (package in packages) {
 # Key packages that must be updated
 # even if they are in the list above
 ##########################################
+# SmoothWin
+devtools::install_github(
+  repo = "mpi2/impc_stats_pipeline/SoftWindowing/SmoothWin/SmoothWinPackage/",
+  dependencies = TRUE,
+  upgrade = "never",
+  force = TRUE,
+  build = TRUE,
+  quiet = FALSE
+)
+
 # PhenStat
 devtools::install_github(
   repo = "mpi2/impc_stats_pipeline/Early adults stats pipeline/PhenStat/PhenStatPackage/PhenStat",
   dependencies = FALSE,
+  upgrade = "never",
+  force = TRUE,
+  build = TRUE,
+  quiet = FALSE
+)
+
+# OpenStats
+devtools::install_github(
+  # repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/OpenStats/OpenStatsPackage/',
+  repo = "mpi2/OpenStats",
+  dependencies = TRUE,
   upgrade = "never",
   force = TRUE,
   build = TRUE,
@@ -192,23 +214,4 @@ devtools::install_github(
   quiet = FALSE
 )
 
-# SmoothWin
-devtools::install_github(
-  repo = "mpi2/impc_stats_pipeline/SoftWindowing/SmoothWin/SmoothWinPackage/",
-  dependencies = TRUE,
-  upgrade = "never",
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE
-)
 
-# OpenStats
-devtools::install_github(
-  # repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/OpenStats/OpenStatsPackage/',
-  repo = "mpi2/OpenStats",
-  dependencies = TRUE,
-  upgrade = "never",
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE
-)
