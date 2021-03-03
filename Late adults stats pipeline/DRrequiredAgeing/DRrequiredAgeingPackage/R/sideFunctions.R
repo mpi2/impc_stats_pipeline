@@ -4942,7 +4942,6 @@ StatsPipeline = function(path = getwd(),
 IMPC_statspipelinePostProcess = function(SP.results = getwd(),
                                          waitUntillSee = 'No unfinished job found',
                                          ignoreThisLineInWaitingCheck = 0) {
-  DRrequiredAgeing:::message0('Step 1: Postprocessing the IMPC stats pipeline ...')
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
   DRrequiredAgeing:::message0('Zipping the logs ...')
