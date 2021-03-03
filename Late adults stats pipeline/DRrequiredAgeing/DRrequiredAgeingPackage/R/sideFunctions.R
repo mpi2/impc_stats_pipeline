@@ -4935,10 +4935,164 @@ StatsPipeline = function(path = getwd(),
   )
   setwd(file.path(SP.results, 'logs'))
   system(command = 'grep "exit" * -lR', wait = TRUE)
-
   message0('SP finished in ', round(difftime(Sys.time(), startTime, units = "min"), 2))
+}
+
+
+IMPC_statspipelinePostProcess = function(SP.results = getwd(),
+                                         waitUntillSee = 'No unfinished job found',
+                                         ignoreThisLineInWaitingCheck = 0) {
   DRrequiredAgeing:::message0('Step 1: Postprocessing the IMPC stats pipeline ...')
 
+  DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
+  DRrequiredAgeing:::message0('Zipping the logs ...')
+  setwd(file.path(SP.results, '..','..',  'logs'))
+  system(command = 'zip -rm logs.zip *.ClusterErr *.ClusterOut', wait = TRUE)
+
+  DRrequiredAgeing:::message0('Indexing the results ...')
+  setwd(file.path(SP.results))
+
+  DRrequiredAgeing:::minijobsCreator()
+  system('chmod 775 minijobs.txt', wait = TRUE)
+  system('./minijobs.txt', wait = TRUE)
+  DRrequiredAgeing:::waitTillCommandFinish(
+    command = 'bjobs',
+    exitIfTheOutputContains = waitUntillSee,
+    ignoreline = ignoreThisLineInWaitingCheck
+  )
+  DRrequiredAgeing:::message0('Moving single indeces into a separate directory called SingleIndeces ...')
+  system('rm -rf SingleIndeces/', wait = TRUE)
+  system('mkdir SingleIndeces', wait = TRUE)
+  system('chmod 775 SingleIndeces/', wait = TRUE)
+  system('mv *.Ind SingleIndeces/', wait = TRUE)
+
+  setwd(file.path(SP.results, 'SingleIndeces'))
+  DRrequiredAgeing:::message0('Concating single index files to create a global index for the results ...')
+  system('cat *.Ind >> AllResultsIndeces.txt', wait = TRUE)
+
+  DRrequiredAgeing:::message0('zipping the single indeces ...')
+  system('zip -rm allsingleindeces.zip *.Ind', wait = TRUE)
+
+  DRrequiredAgeing:::message0('Step 2: Extracting bits from the statspackets and creating the spreadsheets')
+  system('rm -rf ../ExtractPvalues/', wait = TRUE)
+  system('mkdir ../ExtractPvalues', wait = TRUE)
+  system('chmod 775 ../ExtractPvalues', wait = TRUE)
+
+  setwd(file.path(SP.results, 'ExtractPvalues'))
+  system('cp ../SingleIndeces/AllResultsIndeces.txt .', wait = TRUE)
+
+  DRrequiredAgeing:::splitIndexFileIntoPiecesForPvalueExtraction(indexFilePath = 'AllResultsIndeces.txt')
+  system('chmod 775 ExtractPValJobs.bch', wait = TRUE)
+  system('rm -f ExtractPVals.R',wait = TRUE)
+  system(
+    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Extract%20details%20from%20StatPackets/ExtractPVals.R',
+    wait = TRUE
+  )
+
+  system('./ExtractPValJobs.bch', wait = TRUE)
+  DRrequiredAgeing:::waitTillCommandFinish(
+    command = 'bjobs',
+    exitIfTheOutputContains = waitUntillSee,
+    ignoreline = ignoreThisLineInWaitingCheck
+  )
+
+  DRrequiredAgeing:::message0('Check for errors in the process ...')
+  setwd(file.path(SP.results, 'ExtractPvalues','output'))
+  if(system(command = 'grep "exit" * -lR', wait = TRUE)==0)
+    stop ('Oh no! we found some errors in the process!')
+
+  DRrequiredAgeing:::message0('Zipping logs ...')
+  setwd(file.path(SP.results, 'ExtractPvalues'))
+  system('zip -rm logs.zip error/ output/ ErrorneousCases.tsv.err', wait = TRUE)
+
+  dirs = list.dirs(
+    file.path(SP.results, 'ExtractPvalues', 'resultF'),
+    full.names = FALSE,
+    recursive = FALSE
+  )
+  for (dir in c('category_of_type_categorical',
+                'data_point_of_type_unidimensional')) {
+    if (!dir %in% dirs)
+      next
+
+    setwd(file.path(SP.results, 'ExtractPvalues', 'resultF', dir))
+    system(paste0('cat *.tsv >> AllPvals',dir,'.tsvv'), wait = TRUE)
+    system('zip -rm alltsvs.zip *.tsv', wait = TRUE)
+    system('mkdir bckup && mv alltsvs.zip bckup/', wait = TRUE)
+
+    system('rm -f ExtractPVals.R', wait = TRUE)
+    system(
+      'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Extract%20details%20from%20StatPackets/ExtractPVals.R',
+      wait = TRUE
+    )
+    editfile('ExtractPVals.R', 'makejobs()', '#makejobs()')
+    editfile('ExtractPVals.R', 'qvalue2AllZips()', '#qvalue2AllZips()')
+    editfile(
+      'ExtractPVals.R',
+      'parameter2qvalue(args[1], args[2])',
+      '#parameter2qvalue(args[1], args[2])'
+    )
+    editfile('ExtractPVals.R', 'ignore.my.name', '#ignore.my.name')
+    source(file = 'ExtractPVals.R')
+    makejobs()
+    for (i in 1:10) {
+      editfile(
+        'ExtractPVals.R',
+        '#parameter2qvalue(args[1], args[2])',
+        'parameter2qvalue(args[1], args[2])'
+      )
+    }
+
+    system('chmod 775 Jobs.bch', wait = TRUE)
+    system('./Jobs.bch', wait = TRUE)
+    DRrequiredAgeing:::waitTillCommandFinish(
+      command = 'bjobs',
+      exitIfTheOutputContains = waitUntillSee,
+      ignoreline = ignoreThisLineInWaitingCheck
+    )
+
+    setwd(file.path(SP.results, 'ExtractPvalues', 'resultF', dir,'out'))
+    if(system(command = 'grep "exit" * -lR', wait = TRUE)==0)
+      stop ('Oh no! we found some errors in the qvalue process!')
+
+    setwd(file.path(SP.results, 'ExtractPvalues', 'resultF', dir))
+    system('zip -rm logs.zip out/ err/ && mv logs.zip bckup/', wait = TRUE)
+
+    setwd(file.path(SP.results, 'ExtractPvalues', 'resultF', dir,'QvalueResults'))
+    system('cat *.csv >> AllResultsIncludingQvalueAndMPterms.csvv', wait = TRUE)
+    system('zip -rm allcsvs.zip *.csv', wait = TRUE)
+    system(paste0(
+      'cp "',
+      file.path(
+        SP.results,
+        'ExtractPvalues',
+        'resultF',
+        dir,
+        'QvalueResults',
+        'AllResultsIncludingQvalueAndMPterms.csvv'
+      ),
+      '" "',
+      file.path(SP.results,
+                paste0('WithQvaluesAndMPterms', dir, '.csv')),
+      '"'
+    ))
+    DRrequiredAgeing:::message0(dir,' Completed!')
+  }
+
+}
+
+editfile = function(file,
+                    searchwhat = '',
+                    replaceby = '') {
+  tx  <- readLines(file)
+  tx2  <-
+    gsub(
+      pattern = searchwhat,
+      replace = replaceby,
+      x = tx,
+      fixed = TRUE
+    )
+  writeLines(tx2, con = file)
 }
 
 
