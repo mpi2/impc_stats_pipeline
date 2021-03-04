@@ -90,7 +90,7 @@ packages <- c(
  "jsonlite"   ,  "1.7.2"   ,  
  "foreach"    ,  "1.5.1"   ,  
  "MASS"       ,  "7.3.53"  ,  
- "OpenStats"  ,  "1.1.4"   ,  
+ # "OpenStats"  ,  "1.1.4"   ,  
  "RSQLite"    ,  "2.2.2"   ,  
  "robustbase" ,  "0.93.7"  ,  
  "msgps"      ,  "1.3.1"   ,  
