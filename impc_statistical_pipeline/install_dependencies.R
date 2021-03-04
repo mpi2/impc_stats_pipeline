@@ -130,6 +130,7 @@ packages <- c(
   "base64enc",
   "jsonlite",
   "pingr",
+  "curl",
   "doParallel",
   "foreach",
   "nlme",
