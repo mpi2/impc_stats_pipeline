@@ -120,6 +120,7 @@ packages <- c(
   "lme4",
   # "Rfast",
   "car",
+  "tidyselect",
   "tidyr",
   "PhenStat",
   "RJSONIO",
