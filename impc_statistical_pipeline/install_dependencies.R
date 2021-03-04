@@ -1,42 +1,13 @@
 ##########################################
 # In this script the orders are important
 ##########################################
-options(repos = c(CRAN = "https://cloud.r-project.org/"))
-# Installer script
-install.packages.auto <- function(x) {
-  x <- as.character(x)
-  if (isTRUE(x %in% .packages(all.available = TRUE))) {
-    # eval(parse(text = sprintf("require(\"%s\")", x)))
-  } else {
-    # update.packages(ask= FALSE) #update installed packages.
-    eval(parse(
-      text = sprintf(
-        "install.packages(\"%s\", dependencies = TRUE,repos='https://cloud.r-project.org')",
-        x
-      )
-    ))
-  }
-  if (isTRUE(x %in% .packages(all.available = TRUE))) {
-    # eval(parse(text = sprintf("require(\"%s\")", x)))
-  } else {
-    # Is bioconductor installed?
-    if (!requireNamespace("BiocManager", quietly = TRUE)) {
-      install.packages("BiocManager")
-    }
-
-    eval(parse(text = sprintf(
-      "BiocManager::install(\"%s\",ask=FALSE)", x
-    )))
-    eval(parse(text = sprintf("require(\"%s\")", x)))
-  }
-}
 
 ##########################################
 # Install the driver devtools package
 #########################################
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
-}else{
+} else{
   require(devtools)
 }
 
@@ -45,45 +16,34 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 }
 
 
-##########################################
-#### Install the proper version of some R packages
-##########################################
-if (!requireNamespace("Rfast", quietly = TRUE)) {
-  install.packages(
-    "https://cran.r-project.org/src/contrib/Archive/Rfast/Rfast_1.9.4.tar.gz",
-    repos = NULL,
-    type = "source"
-  )
+# Installer script
+install.packages.auto <- function(x, v) {
+  ps = installed.packages()
+  exist = FALSE
+  for (p in ps[, 1]) {
+    if (p == x) {
+      if (packageVersion(p) == v)
+        exist = TRUE
+    }
+  }
+  
+  if (!exist) {
+    remotes::install_version(x,
+                             version = v,
+                             repos = "https://cloud.r-project.org",
+                             upgrade = 'never')
+    
+    eval(parse(text = sprintf(
+      "BiocManager::install(\"%s\",ask=FALSE)", x
+    )))
+  }
+  
+  require(x)
 }
-
-if (!requireNamespace("nloptr", quietly = TRUE)) {
-  install.packages(
-    "https://cran.r-project.org/src/contrib/Archive/nloptr/nloptr_1.2.2.1.tar.gz",
-    repos = NULL,
-    type = "source"
-  )
-}
-
-if (!requireNamespace("tidyr", quietly = TRUE)) {
-  install.packages(
-    "https://cran.r-project.org/src/contrib/Archive/tidyr/tidyr_1.0.2.tar.gz",
-    repos = NULL,
-    type = "source"
-  )
-}
-
-if (!requireNamespace("magick", quietly = TRUE)) {
-  install.packages(
-    "https://cran.r-project.org/src/contrib/Archive/magick/magick_2.0.tar.gz",
-    repos = NULL,
-    type = "source"
-  )
-}
-#####
 
 
 ##########################################
-# Install packages that need to be installed from the github
+# Install packages that need to be installed from github
 ##########################################
 if (!requireNamespace("data.table", quietly = TRUE)) {
   devtools::install_github("Rdatatable/data.table", upgrade = "never")
@@ -108,57 +68,56 @@ if (!requireNamespace("miniparquet", quietly = TRUE)) {
 # install packages
 ##########################################
 packages <- c(
-  # "data.table",
-  "RcppGSL",
-  "quantreg",
-  "Hmisc",
-  "AICcmodavg",
-  "car",
-  "summarytools",
-  "nloptr",
-  "RcppZiggurat",
-  "lme4",
-  # "Rfast",
-  "car",
-  "tidyselect",
-  "tidyr",
-  "PhenStat",
-  "RJSONIO",
-  "methods",
-  # "SmoothWin",
-  "stringi",
-  "base64enc",
-  "jsonlite",
-  "pingr",
-  "curl",
-  "doParallel",
-  "foreach",
-  "nlme",
-  "parallel",
-  "MASS",
-  "base",
-  "abind",
-  "OpenStats",
-  "rlist",
-  "DBI",
-  "RSQLite",
-  "gtools",
-  "plyr",
-  "robustbase",
-  "rlang",
-  "nortest",
-  "msgps",
-  "logistf",
-  "pingr",
-  "corrplot",
-  "graph",
-  "RPostgreSQL",
-  "Tmisc",
-  "digest"
+"RcppGSL"      ,"0.3.8"   ,       
+"AICcmodavg"   ,"2.3.1"   ,       
+ "nloptr"      , "1.2.2.2",        
+ "car"         , "3.0.10" ,        
+ "RJSONIO"     , "1.3.1.4",        
+ "base64enc"   , "0.1.3"  ,        
+ "doParallel"  , "1.0.16" ,        
+ "parallel"    , "4.0.2"  ,        
+ "abind"       , "1.4.5"  ,        
+ "DBI"         , "1.1.1"  ,        
+ "plyr"        , "1.8.6"  ,        
+ "nortest"     , "1.0.4"  ,        
+ "pingr"       , "2.0.1"  ,        
+ "RPostgreSQL" , "0.6.2"  ,   
+ "quantreg"    , "5.82"    ,   
+ "car"        ,  "3.0.10"  ,   
+ "RcppZiggurat", "0.1.6"   ,  
+ "tidyr"      ,  "1.1.2"   ,  
+ "methods"    ,  "4.0.2"   ,  
+ "jsonlite"   ,  "1.7.2"   ,  
+ "foreach"    ,  "1.5.1"   ,  
+ "MASS"       ,  "7.3.53"  ,  
+ "OpenStats"  ,  "1.1.4"   ,  
+ "RSQLite"    ,  "2.2.2"   ,  
+ "robustbase" ,  "0.93.7"  ,  
+ "msgps"      ,  "1.3.1"   ,  
+ "corrplot"   ,  "0.84"    ,  
+ "Tmisc"      ,  "1.0.0"   ,  
+"Hmisc"       , "4.4.2"    ,
+"summarytools", "0.9.8"    ,
+"lme4"        , "1.1.26"   ,
+"PhenStat"    , "2.18.0"   ,
+"stringi"     , "1.5.3"    ,
+"pingr"       , "2.0.1"    ,
+"nlme"        , "3.1.151"  ,
+"base"        , "4.0.2"    ,
+"rlist"       , "0.4.6.1"  ,
+"gtools"      , "3.8.2"    ,
+"rlang"       , "0.4.10"   ,
+"logistf"     , "1.24"     ,
+"graph"       , "1.66.0"   ,
+"digest"      , "0.6.27"   ,
+"magick"      , "2.0"      ,
+"Rfast"       , "1.9.4"    ,
+"nloptr"      , "1.2.2.1"  ,
+"tidyr"       , "1.0.2"    
 )
 
-for (package in packages) {
-  install.packages.auto(package)
+for (i in seq(1,length(packages),by=2)) {
+  install.packages.auto(packages[i],packages[i+1])
 }
 
 ##########################################
@@ -215,5 +174,3 @@ devtools::install_github(
   build = TRUE,
   quiet = FALSE
 )
-
-
