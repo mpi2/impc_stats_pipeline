@@ -96,7 +96,7 @@ packages <- c(
  "msgps"      ,  "1.3.1"   ,  
  "corrplot"   ,  "0.84"    ,  
  "Tmisc"      ,  "1.0.0"   ,  
-"Hmisc"       , "4.4.2"    ,
+"Hmisc"       , "4.4.1"    ,
 "summarytools", "0.9.8"    ,
 "lme4"        , "1.1.26"   ,
 "PhenStat"    , "2.18.0"   ,
