@@ -20,6 +20,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 
 
 # Installer script
+avpackages = rownames(available.packages())
 install.packages.auto <- function(x, v) {
   ps = installed.packages()
   exist = FALSE
@@ -31,27 +32,28 @@ install.packages.auto <- function(x, v) {
   }
   
   if (!exist) {
-    tryCatch({
-      remotes::install_version(
-        x,
-        version = v,
-        repos = "https://cloud.r-project.org",
-        quiet = TRUE,
-        upgrade = 'never'
-      )
-    },
-    error = function(cond) {
-      message('****** --->', cond)
-      return(NA)
-    },
-    warning = function(cond) {
-      message('****** --->', cond)
-    })
-    
-    
-    eval(parse(text = sprintf(
-      "BiocManager::install(\"%s\",ask=FALSE)", x
-    )))
+    if (x %in% avpackages) {
+      tryCatch({
+        remotes::install_version(
+          x,
+          version = v,
+          repos = "https://cloud.r-project.org",
+          quiet = TRUE,
+          upgrade = 'never'
+        )
+      },
+      error = function(cond) {
+        message('****** --->', cond)
+        return(NA)
+      },
+      warning = function(cond) {
+        message('****** --->', cond)
+      })
+    } else{
+      eval(parse(text = sprintf(
+        "BiocManager::install(\"%s\",ask=FALSE)", x
+      )))
+    }
   }
   
   require(x)
