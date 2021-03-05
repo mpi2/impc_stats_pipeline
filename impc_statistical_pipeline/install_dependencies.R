@@ -24,7 +24,7 @@ install.packages.auto <- function(x, v) {
   exist = FALSE
   for (p in ps[, 1]) {
     if (p == x) {
-      if (packageVersion(p) == v)
+      if (packageVersion(p) == v || 1==1)
         exist = TRUE
     }
   }
@@ -33,6 +33,7 @@ install.packages.auto <- function(x, v) {
     remotes::install_version(x,
                              version = v,
                              repos = "https://cloud.r-project.org",
+                             quiet = TRUE,
                              upgrade = 'never')
     
     eval(parse(text = sprintf(
@@ -51,12 +52,10 @@ if (!requireNamespace("data.table", quietly = TRUE)) {
   devtools::install_github("Rdatatable/data.table", upgrade = "never")
 }
 
-
 if (!requireNamespace("rcppgsl", quietly = TRUE)) {
   devtools::install_github("eddelbuettel/rcppgsl")
 }
 
-# devtools::install_github("cran/rjags")
 if (!requireNamespace("latticeExtra", quietly = TRUE)) {
   devtools::install_github("cran/latticeExtra")
 }
@@ -65,6 +64,7 @@ if (!requireNamespace("miniparquet", quietly = TRUE)) {
   devtools::install_github("hannesmuehleisen/miniparquet")
 }
 
+install.packages('Hmisc')
 
 ##########################################
 # install packages
@@ -98,24 +98,24 @@ packages <- c(
  "msgps"      ,  "1.3.1"   ,  
  "corrplot"   ,  "0.84"    ,  
  "Tmisc"      ,  "1.0.0"   ,  
-"Hmisc"       , "4.4.1"    ,
-"summarytools", "0.9.8"    ,
-"lme4"        , "1.1.26"   ,
-"PhenStat"    , "2.18.0"   ,
-"stringi"     , "1.5.3"    ,
-"pingr"       , "2.0.1"    ,
-"nlme"        , "3.1.151"  ,
-"base"        , "4.0.2"    ,
-"rlist"       , "0.4.6.1"  ,
-"gtools"      , "3.8.2"    ,
-"rlang"       , "0.4.10"   ,
-"logistf"     , "1.24"     ,
-"graph"       , "1.66.0"   ,
-"digest"      , "0.6.27"   ,
-"magick"      , "2.0"      ,
-"Rfast"       , "1.9.4"    ,
-"nloptr"      , "1.2.2.1"  ,
-"tidyr"       , "1.0.2"    
+ "Hmisc"       , "4.4.1"    ,
+ "summarytools", "0.9.8"    ,
+ "lme4"        , "1.1.26"   ,
+ "PhenStat"    , "2.18.0"   ,
+ "stringi"     , "1.5.3"    ,
+ "pingr"       , "2.0.1"    ,
+ "nlme"        , "3.1.151"  ,
+ "base"        , "4.0.2"    ,
+ "rlist"       , "0.4.6.1"  ,
+ "gtools"      , "3.8.2"    ,
+ "rlang"       , "0.4.10"   ,
+ "logistf"     , "1.24"     ,
+ "graph"       , "1.66.0"   ,
+ "digest"      , "0.6.27"   ,
+ "magick"      , "2.0"      ,
+ "Rfast"       , "1.9.4"    ,
+ "nloptr"      , "1.2.2.1"  ,
+ "tidyr"       , "1.0.2"    
 )
 
 for (i in seq(1,length(packages),by=2)) {
