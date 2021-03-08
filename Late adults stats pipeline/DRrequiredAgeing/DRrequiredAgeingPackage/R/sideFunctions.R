@@ -4951,6 +4951,8 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Indexing the results ...')
   setwd(file.path(SP.results))
 
+  system('rm -f minijobs.txt', wait = TRUE)
+  system('rm -f *.Ind', wait = TRUE)
   DRrequiredAgeing:::minijobsCreator()
   system('chmod 775 minijobs.txt', wait = TRUE)
   system('./minijobs.txt', wait = TRUE)
@@ -5983,7 +5985,9 @@ annotationChooser = function(statpacket = NULL,
 
   ulistTag3 = MPTERMS = NA
   message('Running the annotation pipeline')
-  if (!statpacket$V2 %in% 'Successful') {
+  if (is.null(statpacket) ||
+      length(statpacket) < 0 ||
+      !statpacket$V2 %in% 'Successful') {
     message('Not a successfull StatPackage!')
     return(invisible(list(
       MPTERM = ulistTag3, statpacket = statpacket
