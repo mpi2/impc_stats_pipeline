@@ -5986,7 +5986,9 @@ annotationChooser = function(statpacket = NULL,
   ulistTag3 = MPTERMS = NA
   message('Running the annotation pipeline')
   if (is.null(statpacket) ||
-      length(statpacket) < 0 ||
+      length(statpacket) < 1 ||
+      is.null(statpacket$V2) ||
+      length(statpacket$V2)<1 ||
       !statpacket$V2 %in% 'Successful') {
     message('Not a successfull StatPackage!')
     return(invisible(list(
