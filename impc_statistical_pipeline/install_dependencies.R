@@ -5,6 +5,14 @@
 ##########################################
 # Install the driver devtools package
 #########################################
+## Default repo
+local({
+  r <- getOption("repos")
+  r["CRAN"] <- "https://cloud.r-project.org"
+  options(repos = r)
+})
+
+
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 } else{
@@ -68,15 +76,15 @@ if (!requireNamespace("data.table", quietly = TRUE)) {
 }
 
 if (!requireNamespace("rcppgsl", quietly = TRUE)) {
-  devtools::install_github("eddelbuettel/rcppgsl")
+  devtools::install_github("eddelbuettel/rcppgsl",upgrade = "never")
 }
 
 if (!requireNamespace("latticeExtra", quietly = TRUE)) {
-  devtools::install_github("cran/latticeExtra")
+  devtools::install_github("cran/latticeExtra",upgrade = "never")
 }
 
 if (!requireNamespace("miniparquet", quietly = TRUE)) {
-  devtools::install_github("hannesmuehleisen/miniparquet")
+  devtools::install_github("hannesmuehleisen/miniparquet",upgrade = "never")
 }
 
 install.packages('Hmisc')
