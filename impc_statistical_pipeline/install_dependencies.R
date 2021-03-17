@@ -28,8 +28,10 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 
 
 # Installer script
-avpackages = rownames(available.packages())
+
 install.packages.auto <- function(x, v) {
+  message('\t-> Installing package: ', x, ' version = ', v)
+  avpackages = rownames(available.packages())
   ps = installed.packages()
   exist = FALSE
   for (p in ps[, 1]) {
@@ -43,7 +45,7 @@ install.packages.auto <- function(x, v) {
     if (x %in% avpackages) {
       tryCatch({
         remotes::install_version(
-          x,
+          package = x,
           version = v,
           repos = "https://cloud.r-project.org",
           quiet = TRUE,
