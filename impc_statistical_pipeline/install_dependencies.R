@@ -14,7 +14,7 @@ local({
 
 
 if (!requireNamespace("devtools", quietly = TRUE)) {
-  install.packages("devtools")
+  install.packages("devtools",repos = "https://cloud.r-project.org")
 } else{
   require(devtools)
 }
@@ -23,7 +23,7 @@ R_REMOTES_NO_ERRORS_FROM_WARNINGS="false"
 options(warn=1)
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager")
+  install.packages("BiocManager",repos = "https://cloud.r-project.org")
 }
 
 
