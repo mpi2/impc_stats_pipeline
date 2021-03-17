@@ -7,7 +7,7 @@
 # Install the driver devtools package
 #########################################
 if (!requireNamespace("devtools", quietly = TRUE)) {
-  install.packages("devtools",repos = "https://cloud.r-project.org/")
+  install.packages("devtools",repos = "https://cloud.r-project.org")
 } else{
   require(devtools)
 }
@@ -16,7 +16,7 @@ R_REMOTES_NO_ERRORS_FROM_WARNINGS="false"
 options(warn=1)
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager",repos = "https://cloud.r-project.org/")
+  install.packages("BiocManager",repos = "https://cloud.r-project.org")
 }
 
 
@@ -31,6 +31,7 @@ install.packages.auto <- function(x, v) {
     if (p == x) {
       if (packageVersion(p) == v || 1 == 1) {
         exist = TRUE
+        message('\t --> package is already installed.')
         break
       }
     }
@@ -94,7 +95,7 @@ if (!requireNamespace("miniparquet", quietly = TRUE)) {
 }
 
 if (!requireNamespace("Hmisc", quietly = TRUE)) {
-  install.packages('Hmisc', repos = "https://cloud.r-project.org/")
+  install.packages('Hmisc', repos = "https://cloud.r-project.org")
 }
 
 ##########################################
@@ -207,3 +208,22 @@ devtools::install_github(
   build = TRUE,
   quiet = FALSE
 )
+
+# testing for errors
+pts = c(
+  packages[seq(1, length(packages), by = 2)],
+  'SmoothWin',
+  'OpenStats',
+  'PhenStat',
+  'DRrequired',
+  'DRrequiredAgeing',
+  'rcppgsl',
+  'latticeExtra',
+  'Hmisc',
+  'miniparquet',
+  'data.table'
+)
+for(pt in pts) {
+  if (!requireNamespace(pt, quietly = TRUE))
+    message('oh no, the package ', pt, ' does not exists!')
+}
