@@ -6,14 +6,14 @@
 ##########################################
 # Install the driver devtools package
 #########################################
+R_REMOTES_NO_ERRORS_FROM_WARNINGS="false"
+options(warn=1)
+
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools",repos = "https://cloud.r-project.org/")
 } else{
   require(devtools)
 }
-
-R_REMOTES_NO_ERRORS_FROM_WARNINGS="false"
-options(warn=1)
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
   install.packages("BiocManager",repos = "https://cloud.r-project.org/")
@@ -45,7 +45,7 @@ install.packages.auto <- function(x, v) {
           version = v,
           repos = "https://cloud.r-project.org/",
           quiet = FALSE,
-          force = TRUE,
+          force = FALSE,
           upgrade = 'never',
           type = "source"
         )
@@ -79,15 +79,15 @@ install.packages.auto <- function(x, v) {
 # Install packages that need to be installed from github
 ##########################################
 if (!requireNamespace("data.table", quietly = TRUE)) {
-  devtools::install_github("Rdatatable/data.table", upgrade = "never",force = TRUE)
+  devtools::install_github("Rdatatable/data.table", upgrade = "never",force = FALSE)
 }
 
 if (!requireNamespace("latticeExtra", quietly = TRUE)) {
-  devtools::install_github("cran/latticeExtra",upgrade = "never",force = TRUE)
+  devtools::install_github("cran/latticeExtra",upgrade = "never",force = FALSE)
 }
 
 if (!requireNamespace("miniparquet", quietly = TRUE)) {
-  devtools::install_github("hannesmuehleisen/miniparquet",upgrade = "never",force = TRUE)
+  devtools::install_github("hannesmuehleisen/miniparquet",upgrade = "never",force = FALSE)
 }
 
 if (!requireNamespace("Hmisc", quietly = TRUE)) {
@@ -213,7 +213,6 @@ pts = c(
   'PhenStat',
   'DRrequired',
   'DRrequiredAgeing',
-  'rcppgsl',
   'latticeExtra',
   'Hmisc',
   'miniparquet',
