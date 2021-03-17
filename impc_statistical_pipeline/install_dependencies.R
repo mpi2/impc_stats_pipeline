@@ -70,7 +70,7 @@ install.packages.auto <- function(x, v) {
     }
   }
   
-  require(x)
+  #require(x)
 }
 
 
