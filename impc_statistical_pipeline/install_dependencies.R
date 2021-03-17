@@ -29,8 +29,10 @@ install.packages.auto <- function(x, v) {
   exist = FALSE
   for (p in ps[, 1]) {
     if (p == x) {
-      if (packageVersion(p) == v || 1 == 1)
+      if (packageVersion(p) == v || 1 == 1) {
         exist = TRUE
+        break
+      }
     }
   }
   
@@ -40,10 +42,19 @@ install.packages.auto <- function(x, v) {
         remotes::install_version(
           package = x,
           version = v,
-          repos = "https://cloud.r-project.org/",
-          quiet = TRUE,
-          upgrade = 'never'
+          repos = "https://cloud.r-project.org",
+          quiet = FALSE,
+          force = TRUE,
+          upgrade = 'never',
+          type = "source"
         )
+        # devtools::install_version(
+        #   "lmerTest",
+        #   version = "3.1-2",
+        #   repo = "lib.ugent.be/CRAN",
+        #   dependencies = TRUE,
+        #   type = "source"
+        # )
       },
       error = function(cond) {
         message('****** --->', cond)
