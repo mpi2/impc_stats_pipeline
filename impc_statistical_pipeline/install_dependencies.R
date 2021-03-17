@@ -40,6 +40,7 @@ install.packages.auto <- function(x, v) {
         remotes::install_version(
           package = x,
           version = v,
+          repos = "https://cloud.r-project.org",
           quiet = TRUE,
           upgrade = 'never'
         )
