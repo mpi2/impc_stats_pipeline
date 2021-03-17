@@ -5,13 +5,6 @@
 ##########################################
 # Install the driver devtools package
 #########################################
-## Default repo
-local({
-  r <- getOption("repos")
-  r["CRAN"] <- "https://cloud.r-project.org"
-  options(repos = r)
-})
-
 
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools",repos = "https://cloud.r-project.org")
@@ -89,7 +82,9 @@ if (!requireNamespace("miniparquet", quietly = TRUE)) {
   devtools::install_github("hannesmuehleisen/miniparquet",upgrade = "never")
 }
 
-install.packages('Hmisc')
+if (!requireNamespace("Hmisc", quietly = TRUE)) {
+  install.packages('Hmisc')
+}
 
 ##########################################
 # install packages
