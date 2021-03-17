@@ -2,7 +2,8 @@
 # In this script the orders are important
 ##########################################
 
-
+#options(repos=structure(c(CRAN="YOUR FAVORITE MIRROR")))
+options(repos = c(CRAN = "https://cloud.r-project.org"))
 ##########################################
 # Install the driver devtools package
 #########################################
