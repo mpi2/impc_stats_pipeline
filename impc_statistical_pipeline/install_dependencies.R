@@ -82,10 +82,6 @@ if (!requireNamespace("data.table", quietly = TRUE)) {
   devtools::install_github("Rdatatable/data.table", upgrade = "never",force = TRUE)
 }
 
-if (!requireNamespace("rcppgsl", quietly = TRUE)) {
-  devtools::install_github("eddelbuettel/rcppgsl",upgrade = "never",force = TRUE)
-}
-
 if (!requireNamespace("latticeExtra", quietly = TRUE)) {
   devtools::install_github("cran/latticeExtra",upgrade = "never",force = TRUE)
 }
