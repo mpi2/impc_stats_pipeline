@@ -2,10 +2,16 @@
 # In this script the orders are important
 ##########################################
 
+
+#############################
+r <- getOption("repos")
+r["CRAN"] <- "https://cloud.r-project.org"
+options(repos = r)
+#############################
+
 ##########################################
 # Install the driver devtools package
 #########################################
-
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools",repos = "https://cloud.r-project.org")
 } else{
@@ -23,7 +29,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 # Installer script
 
 install.packages.auto <- function(x, v) {
-  message('\t-> Installing package: ', x, ' version = ', v)
+  message('\n\n\t-> Installing package: ', x, ' version = ', v)
   avpackages = rownames(available.packages())
   ps = installed.packages()
   exist = FALSE
