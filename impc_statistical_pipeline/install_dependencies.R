@@ -83,7 +83,7 @@ if (!requireNamespace("miniparquet", quietly = TRUE)) {
 }
 
 if (!requireNamespace("Hmisc", quietly = TRUE)) {
-  install.packages('Hmisc')
+  install.packages('Hmisc', repos = "https://cloud.r-project.org")
 }
 
 ##########################################
