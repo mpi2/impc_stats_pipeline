@@ -3,7 +3,7 @@
 ##########################################
 
 #options(repos=structure(c(CRAN="YOUR FAVORITE MIRROR")))
-options(repos = c(CRAN = "https://cloud.r-project.org"))
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
 ##########################################
 # Install the driver devtools package
 #########################################
@@ -11,7 +11,7 @@ R_REMOTES_NO_ERRORS_FROM_WARNINGS="false"
 options(warn=1)
 
 if (!requireNamespace("devtools", quietly = TRUE)) {
-  install.packages("devtools",repos = "https://cloud.r-project.org/")
+  install.packages("devtools",repos = "https://cloud.r-project.org/",dependencies = TRUE)
 } else{
   require(devtools)
 }
