@@ -48,6 +48,7 @@ install.packages.auto <- function(x, v) {
           quiet = FALSE,
           force = FALSE,
           upgrade = 'never',
+          dependencies = TRUE,
           type = "source"
         )
         # devtools::install_version(
@@ -80,15 +81,15 @@ install.packages.auto <- function(x, v) {
 # Install packages that need to be installed from github
 ##########################################
 if (!requireNamespace("data.table", quietly = TRUE)) {
-  devtools::install_github("Rdatatable/data.table", upgrade = "never",force = FALSE)
+  devtools::install_github("Rdatatable/data.table", upgrade = "never",force = FALSE,dependencies =TRUE)
 }
 
 if (!requireNamespace("latticeExtra", quietly = TRUE)) {
-  devtools::install_github("cran/latticeExtra",upgrade = "never",force = FALSE)
+  devtools::install_github("cran/latticeExtra",upgrade = "never",force = FALSE,dependencies = TRUE)
 }
 
 if (!requireNamespace("miniparquet", quietly = TRUE)) {
-  devtools::install_github("hannesmuehleisen/miniparquet",upgrade = "never",force = FALSE)
+  devtools::install_github("hannesmuehleisen/miniparquet",upgrade = "never",force = FALSE,dependencies = TRUE)
 }
 
 if (!requireNamespace("Hmisc", quietly = TRUE)) {
