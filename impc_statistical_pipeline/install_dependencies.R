@@ -11,13 +11,13 @@ R_REMOTES_NO_ERRORS_FROM_WARNINGS="false"
 options(warn=1)
 
 if (!requireNamespace("devtools", quietly = TRUE)) {
-  install.packages("devtools",repos = "https://cloud.r-project.org/",dependencies = TRUE)
+  install.packages("devtools",repos = "https://cloud.r-project.org/",dependencies = TRUE,quiet = TRUE)
 } else{
   require(devtools)
 }
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager",repos = "https://cloud.r-project.org/")
+  install.packages("BiocManager",repos = "https://cloud.r-project.org/",quiet = TRUE)
 }
 
 
