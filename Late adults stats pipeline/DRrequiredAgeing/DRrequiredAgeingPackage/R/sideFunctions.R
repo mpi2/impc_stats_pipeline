@@ -5089,7 +5089,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
                                       waitUntillSee = 'No unfinished job found',
                                       ignoreThisLineInWaitingCheck = 0,
                                       ###
-                                      mp_chooser_file = NULL,
+                                      mp_chooser_file = 'mp_chooser_20200520.json.Rdata',
                                       host =  "hh-yoda-05-01",
                                       outputdb = paste0('db_',
                                                         DrrequiredAgeing:::RemoveSpecialChars(
