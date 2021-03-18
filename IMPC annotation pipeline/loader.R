@@ -8,7 +8,6 @@ library(jsonlite)
 library(rlist)
 library(Tmisc)
 ##############################
-
 shuffle = function (x = as.numeric(Sys.time()) * 100000,
                     replace = TRUE,
                     length = 5) {
@@ -18,12 +17,19 @@ shuffle = function (x = as.numeric(Sys.time()) * 100000,
 }
 
 
-# file = 'https://www.ebi.ac.uk/~hamedhm/windowing/DR11/jobs/Results_DR11V2OpenStats/RBRC/IMPC_CSD/IMPC_CSD_050_002/RIKEN_Fbn2_A06_/homozygote/978482d700f332623fc65f3e729dea93/output_Successful.tsv'
-# file ='https://www.ebi.ac.uk/~hamedhm/windowing/DR11/jobs/Results_DR11V2OpenStats/ICS/ESLIM_008/ESLIM_008_001_014/EPD0060_2_H09/heterozygote/d41d8cd98f00b204e9800998ecf8427e/output_Successful.tsv'
-# file = 'https://www.ebi.ac.uk/~hamedhm/windowing/DR12/jobs/Results_DR12V1OpenStats/ICS/ESLIM_008/ESLIM_008_001_014/EPD0060_2_H09/heterozygote/d41d8cd98f00b204e9800998ecf8427e/output_Successful.tsv'
-# download.file(url = file, destfile = 'delme.tsv')
-# file = 'delme.tsv'
 ###########################################
+load('config.Rdata')
+mp_chooser_file = configlist$mp_chooser_file
+host =  configlist$host
+outputdb = configlist$outputdb
+dbname = configlist$dbname
+port = configlist$port
+user = configlist$user
+password = configlist$password
+level = configlist$level
+###########################################
+
+
 flist = readLines(con = file[1])
 lflist = length(flist)
 id = 1
@@ -54,12 +60,14 @@ for (i in 1:lflist) {
       next
     ###################
     rN = DRrequiredAgeing:::annotationChooser(statpacket = df,
-                                              level = .0001)
+                                              level = level,
+                                              mp_chooser_file = mp_chooser_file)
     rW = DRrequiredAgeing:::annotationChooser(
       statpacket = rN$statpacket,
-      level = .0001,
+      level = level,
       resultKey = 'Windowed result',
-      TermKey = 'WMPTERM'
+      TermKey = 'WMPTERM',
+      mp_chooser_file = mp_chooser_file
     )
 
     df = rW$statpacket
@@ -93,7 +101,15 @@ for (i in 1:lflist) {
       "colony_id",
       "statpacket"
     )
-    status  = DRrequiredAgeing:::Write2Postg(df = df[1, ], host =  "hh-yoda-05-01",outputdb = 'db_xxxxxx')
+    status  = DRrequiredAgeing:::Write2Postg(
+      df = df[1, ],
+      host =  host,
+      outputdb = outputdb,
+      dbname = dbname,
+      port = port,
+      user = user,
+      password = password
+    )
     id = id + 1
     #print(file)
   }
