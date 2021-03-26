@@ -5205,7 +5205,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
 
   DRrequiredAgeing:::message0('Zipping logs ...')
   setwd(file.path(SP.results, 'AnnotationExtractor'))
-  system('zip -rm logs.zip log/ err/ out/', wait = TRUE)
+  system('zip -rm logs.zip log/* err/* out/*', wait = TRUE)
 
   DRrequiredAgeing:::message0('Job done.')
 
