@@ -27,8 +27,8 @@ port = configlist$port
 user = configlist$user
 password = configlist$password
 level = configlist$level
+pplevel = configlist$pplevel
 ###########################################
-
 
 flist = readLines(con = file[1])
 lflist = length(flist)
@@ -61,10 +61,12 @@ for (i in 1:lflist) {
     ###################
     rN = DRrequiredAgeing:::annotationChooser(statpacket = df,
                                               level = level,
+                                              pplevel = pplevel,
                                               mp_chooser_file = mp_chooser_file)
     rW = DRrequiredAgeing:::annotationChooser(
       statpacket = rN$statpacket,
       level = level,
+      pplevel = pplevel,
       resultKey = 'Windowed result',
       TermKey = 'WMPTERM',
       mp_chooser_file = mp_chooser_file
