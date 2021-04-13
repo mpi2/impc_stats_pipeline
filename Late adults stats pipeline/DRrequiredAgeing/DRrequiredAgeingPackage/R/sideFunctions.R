@@ -5125,6 +5125,8 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   setwd(file.path(SP.results))
 
   system('rm -f minijobs.txt', wait = TRUE)
+  system('rm -f error.err', wait = TRUE)
+  system('rm -f output.out', wait = TRUE)
   system('rm -f *.Ind', wait = TRUE)
   system('rm -rf AnnotationExtractor/', wait = TRUE)
 
