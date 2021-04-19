@@ -5519,7 +5519,7 @@ GenotypeTag = function(obj,
     }
     ############# step 5
     AllCombinations2 = AllCombinations2[grepl(
-      pattern = 'MALE|FEMALE|OVERALL',
+      pattern = '(MALE)|(FEMALE)|(OVERALL)',
       x = names(AllCombinations2),
       ignore.case = TRUE
     )]
@@ -5596,7 +5596,7 @@ GenotypeTag = function(obj,
     ) & AllCombinations1 %in% 'DECREASED')]
 
     #### Keep only genotype analysis
-    AllCombinations2 = AllCombinations1[grepl(pattern = 'Genotype.Genotype|Genotype.Male.Genotype|Genotype.Female.Genotype', x =
+    AllCombinations2 = AllCombinations1[grepl(pattern = '(Genotype.Genotype)|(Genotype.Male.Genotype)|(Genotype.Female.Genotype)', x =
                                                 names(AllCombinations1))]
     #### The abnormal case is made from the data
     for (i in seq_along(AllCombinations2)) {
@@ -5624,6 +5624,7 @@ GenotypeTag = function(obj,
       ############# step 4
       names(AllCombinations2)[i] = toupper(names(AllCombinations2)[i])
     }
+    AllCombinations2 = AllCombinations2[!grepl('(_FEMALE)|(_MALE)',names(AllCombinations2),fixed = FALSE)]
     ############# step 6
     if (length(AllCombinations2) < 1)
       return(NULL)
@@ -6186,14 +6187,6 @@ annotationChooser = function(statpacket = NULL,
       )))
     }
     ################################
-    if(method == 'RR'){
-      names(ulistTag) = gsub(
-        pattern = '_MALE|_FEMALE',
-        x = names(ulistTag),
-        replacement = '.UNSPECIFIED'
-      )
-    }
-
     ulistTag2 = ulistTag
     names(ulistTag2) = gsub(
       pattern = 'MALE|FEMALE',
