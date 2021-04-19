@@ -5596,17 +5596,17 @@ GenotypeTag = function(obj,
     ) & AllCombinations1 %in% 'DECREASED')]
 
     #### Keep only genotype analysis
-    AllCombinations2 = AllCombinations1[grepl(pattern = 'Genotype.Genotype|Genotype.Genotype_Male|Genotype.Genotype_Female', x =
+    AllCombinations2 = AllCombinations1[grepl(pattern = 'Genotype.Genotype|Genotype.Male.Genotype|Genotype.Female.Genotype', x =
                                                 names(AllCombinations1))]
     #### The abnormal case is made from the data
     for (i in seq_along(AllCombinations2)) {
       names(AllCombinations2)[i]  = gsub(
-        pattern = 'data_point.Genotype.Genotype_Male',
+        pattern = 'data_point.Genotype.Male.Genotype',
         paste0('MALE.', AllCombinations2[i], '.OVERALL.MPTERM'),
         x = names(AllCombinations2)[i]
       )
       names(AllCombinations2)[i]  = gsub(
-        pattern = 'data_point.Genotype.Genotype_Female',
+        pattern = 'data_point.Genotype.Female.Genotype',
         paste0('FEMALE.', AllCombinations2[i], '.OVERALL.MPTERM'),
         x = names(AllCombinations2)[i]
       )
@@ -6186,6 +6186,14 @@ annotationChooser = function(statpacket = NULL,
       )))
     }
     ################################
+    if(method == 'RR'){
+      names(ulistTag) = gsub(
+        pattern = '_MALE|_FEMALE',
+        x = names(ulistTag),
+        replacement = '.UNSPECIFIED'
+      )
+    }
+
     ulistTag2 = ulistTag
     names(ulistTag2) = gsub(
       pattern = 'MALE|FEMALE',
@@ -6197,7 +6205,7 @@ annotationChooser = function(statpacket = NULL,
     for (name in names(ulistTag3)) {
       # print(name)
       splN = unlist(strsplit(name, split = '.', fixed = TRUE))
-      splN = splN[!splN %in% c('LOW', 'HIGH')]
+      splN = splN[!splN %in% c('LOW', 'HIGH','DATA_POINT','GENOTYPE')]
       splnI = multiGrepl(pattern = splN,
                          x = names(ulistD),
                          fixed = TRUE)
