@@ -5153,6 +5153,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   system('zip -rm allsingleindeces.zip *.Ind', wait = TRUE)
 
   system('rm -f split_index_*', wait = TRUE)
+  system('rm -f splits.zip', wait = TRUE)
   system('split -15000 AllResultsIndeces.txt split_index_', wait = TRUE)
 
 
@@ -5210,6 +5211,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Zipping logs ...')
   setwd(file.path(SP.results, 'AnnotationExtractor'))
   system('zip -rm logs.zip log/* err/* out/*', wait = TRUE)
+  system('zip -rm splits.zip split_index_*', wait = TRUE)
 
   DRrequiredAgeing:::message0('Job done.')
 
