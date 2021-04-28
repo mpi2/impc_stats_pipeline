@@ -1,4 +1,4 @@
-FROM rocker/r-ver:3.6.5
+FROM rocker/r-ver:3.6.3
 
 # ARG WHEN
 
