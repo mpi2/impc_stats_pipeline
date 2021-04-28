@@ -16,7 +16,7 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
     "devtools",
     repos = "https://cran.rstudio.com/",
     dependencies = TRUE,
-    quiet = TRUE
+    quiet = FALSE
   )
 }
 require("devtools")
@@ -24,7 +24,7 @@ require("remotes")
 
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager", repos = "https://cran.rstudio.com/", quiet = TRUE)
+  install.packages("BiocManager", repos = "https://cran.rstudio.com/", quiet = FALSE)
 }
 
 
