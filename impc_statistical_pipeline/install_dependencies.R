@@ -3,7 +3,7 @@
 ##########################################
 
 #options(repos=structure(c(CRAN="YOUR FAVORITE MIRROR")))
-options(repos = c(CRAN = "https://cloud.r-project.org/"))
+options(repos = c(CRAN = "https://cloud.r-project.org"))
 update.packages(ask = FALSE);
 ##########################################
 # Install the driver devtools package
@@ -14,7 +14,7 @@ options(warn=1)
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages(
     "devtools",
-    repos = "https://cloud.r-project.org/",
+    repos = "https://cloud.r-project.org",
     dependencies = TRUE,
     quiet = TRUE
   )
@@ -23,7 +23,7 @@ if (!requireNamespace("devtools", quietly = TRUE)) {
 }
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager", repos = "https://cloud.r-project.org/", quiet = TRUE)
+  install.packages("BiocManager", repos = "https://cloud.r-project.org", quiet = TRUE)
 }
 
 
@@ -50,7 +50,7 @@ install.packages.auto <- function(x, v) {
         remotes::install_version(
           package = x,
           version = v,
-          repos = "https://cloud.r-project.org/",
+          repos = "https://cloud.r-project.org",
           quiet = FALSE,
           force = FALSE,
           upgrade = 'never',
@@ -99,7 +99,7 @@ if (!requireNamespace("miniparquet", quietly = TRUE)) {
 }
 
 if (!requireNamespace("Hmisc", quietly = TRUE)) {
-  install.packages('Hmisc', repos = "https://cloud.r-project.org/")
+  install.packages('Hmisc', repos = "https://cloud.r-project.org")
 }
 
 ##########################################
