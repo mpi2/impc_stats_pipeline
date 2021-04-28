@@ -14,9 +14,7 @@ options(warn=1)
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages(
     "devtools",
-    repos = "https://cran.rstudio.com/",
-    dependencies = TRUE,
-    quiet = FALSE
+    repos = "https://cran.rstudio.com/"
   )
 }
 require("devtools")
