@@ -142,6 +142,7 @@ mainAgeing = function(file = NULL                                    ,
   #########
   new.data$colony_id    = as.character(new.data$colony_id)
   new.data$external_sample_id = as.factor(new.data$external_sample_id)
+  new.data$observation_id     = as.factor(new.data$observation_id)
   new.data$metadata = as.character(new.data$metadata)
   ################
   # Start analysis
@@ -526,6 +527,7 @@ mainAgeing = function(file = NULL                                    ,
                       obj = n3.5,
                       ColNames = c(
                         'external_sample_id',
+                        'observation_id',
                         'sex',
                         'biological_sample_group',
                         depVar,
@@ -538,6 +540,7 @@ mainAgeing = function(file = NULL                                    ,
                       names = c(
                         # all lower case
                         'Original external_sample_id',
+                        'Original observation_id',
                         'Original sex',
                         'Original biological_sample_group',
                         'Original response',
@@ -746,8 +749,8 @@ mainAgeing = function(file = NULL                                    ,
                       #
                       PhenListSpecIds = OtherExtraColumns (
                         obj = a@datasetPL,
-                        ColNames = 'external_sample_id',
-                        names    = 'OpenStatsList external_sample_id'
+                        ColNames = c('external_sample_id','observation_id'),
+                        names    = c('OpenStatsList external_sample_id','OpenStatsList observation_id')
                       )
                       note = c(note, PhenListSpecIds)
                       ### Get method of analysis
@@ -868,7 +871,7 @@ mainAgeing = function(file = NULL                                    ,
                           reference = wd
                         )
                       )
-                      ExtraCols = c('external_sample_id')
+                      ExtraCols = c('external_sample_id','observation_id')
                       ####
                       message0('Preparing the output from VectorOutput function ...')
                       c.ww.vec       = VectorOutput0(

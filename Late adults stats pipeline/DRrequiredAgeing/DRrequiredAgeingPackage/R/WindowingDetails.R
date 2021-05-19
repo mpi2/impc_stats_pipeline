@@ -27,7 +27,8 @@ WindowingDetails = function(args) {
     } else{
       rep(1,length(args$external_sample_ids))
     },
-    'external_sample_id' = as.vector(unlist(args$external_sample_ids))
+    'external_sample_id' = as.vector(unlist(args$external_sample_ids)),
+    'observation_id' = as.vector(unlist(args$observation_id))
   )
   return(wn)
 }

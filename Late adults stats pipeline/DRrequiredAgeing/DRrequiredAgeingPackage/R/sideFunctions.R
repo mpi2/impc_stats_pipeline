@@ -4043,6 +4043,7 @@ requiredDataColumns = function(x){
     'phenotyping_center',
     'time_point',
     'external_sample_id',
+    'observation_id',
     'developmental_stage_name',
     'datasource_name',
     'procedure_group',

@@ -311,7 +311,8 @@ PhenStatWindow = function (phenlistObject                                ,
         main              = main              ,
         depVariable       = depVariable       ,
         threshold         = threshold         ,
-        external_sample_ids = nlme::getData(obj)[,'external_sample_id']
+        external_sample_ids = nlme::getData(obj)[,'external_sample_id'],
+        observation_id      = nlme::getData(obj)[,'observation_id']
       )
       #args    = c(as.list(environment()), list())
       windowingNote$'Window parameters' = WindowingDetails(args)
