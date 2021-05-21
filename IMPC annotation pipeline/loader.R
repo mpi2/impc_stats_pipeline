@@ -21,7 +21,7 @@ shuffle = function (x = as.numeric(Sys.time()) * 100000,
 load('config.Rdata')
 mp_chooser_file = configlist$mp_chooser_file
 host =  configlist$host
-outputdb = configlist$outputdb
+tablename = configlist$tablename
 dbname = configlist$dbname
 port = configlist$port
 user = configlist$user
@@ -106,7 +106,7 @@ for (i in 1:lflist) {
     status  = DRrequiredAgeing:::Write2Postg(
       df = df[1, ],
       host =  host,
-      outputdb = outputdb,
+      tablename = tablename,
       dbname = dbname,
       port = port,
       user = user,

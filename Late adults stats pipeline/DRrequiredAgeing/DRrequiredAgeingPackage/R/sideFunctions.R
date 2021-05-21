@@ -5092,7 +5092,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
                                       ###
                                       mp_chooser_file = 'mp_chooser_20210324.json.Rdata',
                                       host =  "hh-yoda-05-01",
-                                      outputdb = paste0('db_',
+                                      tablename = paste0('db_',
                                                         DrrequiredAgeing:::RemoveSpecialChars(
                                                           format(Sys.time(), '%a%b%d %Y'),
                                                           replaceBy = '_',
@@ -5108,7 +5108,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   configlist = list(
     mp_chooser_file = mp_chooser_file,
     host = host,
-    outputdb = outputdb,
+    tablename = tablename,
     dbname = dbname,
     port = port,
     user = user,
@@ -6267,7 +6267,7 @@ Write2Postg = function(df,
                        port = '5432',
                        user = 'impc',
                        password = 'impc',
-                       outputdb = paste0('db_',
+                       tablename = paste0('db_',
                                          RemoveSpecialChars(
                                            format(Sys.time(), '%a%b%d %Y'),
                                            replaceBy = '_',
@@ -6289,7 +6289,7 @@ Write2Postg = function(df,
   dbBegin(conn = con)
   r = dbWriteTable(
     conn = con,
-    name = outputdb,
+    name = tablename,
     value = df,
     append = TRUE,
     row.names = FALSE
