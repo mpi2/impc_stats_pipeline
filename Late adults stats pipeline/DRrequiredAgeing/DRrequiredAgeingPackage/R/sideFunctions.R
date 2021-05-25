@@ -5103,7 +5103,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
                                       user = 'impc',
                                       password = 'impc',
                                       level = .0001,
-                                      pplevel = .005) {
+                                      rrlevel = .0001) {
 
   configlist = list(
     mp_chooser_file = mp_chooser_file,
@@ -5114,7 +5114,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
     user = user,
     password = password,
     level = level,
-    pplevel = pplevel
+    rrlevel = rrlevel
   )
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
@@ -5372,7 +5372,7 @@ GenotypeTag = function(obj,
                        parameter_stable_id = NULL,
                        threshold = 10 ^ -4,
                        expDetailsForErrorOnly = NULL,
-                       pplevel = 10 ^ -4) {
+                       rrlevel = 10 ^ -4) {
   if (is.null(obj))
     return('NotAnalysed')
   method = GetMethodStPa(x = obj$`Applied method`)
@@ -5380,7 +5380,7 @@ GenotypeTag = function(obj,
   message('\t The decision threshold = ',
           threshold,
           ' and for the RR method it is ',
-          pplevel)
+          rrlevel)
   if (method %in% 'MM') {
     tag = list(
       UNSPECIFIED = listM(
@@ -5578,7 +5578,7 @@ GenotypeTag = function(obj,
 
     AllCombinations = lapply(fmodels, function(x) {
       lapply(x, function(y) {
-        DirectionTagFE(x = y$Result$p.value, threshold = pplevel)
+        DirectionTagFE(x = y$Result$p.value, threshold = rrlevel)
       })
     })
 
@@ -6114,7 +6114,7 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL) {
 ##############################
 annotationChooser = function(statpacket = NULL,
                              level = 10 ^ -4,
-                             pplevel = .005,
+                             rrlevel = .005,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
                              mp_chooser_file = 'mp_chooser_20210324.json.Rdata') {
@@ -6147,7 +6147,7 @@ annotationChooser = function(statpacket = NULL,
     obj = json$Result$`Vector output`[[resultKey]],
     parameter_stable_id = statpacket$V6,
     threshold = level,
-    pplevel = pplevel
+    rrlevel = rrlevel
   )
   ##################################################################
   message('\t Reading the index file ...')
