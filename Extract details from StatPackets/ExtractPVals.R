@@ -141,9 +141,9 @@ SelectAnalysisFE = function(object) {
     unlist0(as.list(object$`Sex FvKO estimate`$`Complete table`)$Value)               ,
     unlist0(as.list(object$`Sex MvKO estimate`$`Complete table`)$Value)               ,
     # effect size
-    unlist0(object$`Genotype effect size`$Value)            ,
-    unlist0(object$`Sex FvKO effect size`$Value)            ,
-    unlist0(object$`Sex MvKO effect size`$Value)            ,
+    NA            ,
+    NA            ,
+    NA            ,
     # Genotype
     unlist0(object$`Genotype p-value`$`Complete table`)                      ,
     unlist0(object$`Genotype standard error`)           ,
