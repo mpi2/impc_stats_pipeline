@@ -102,9 +102,9 @@ SelectAnalysis = function(object) {
     unlist0(object$`Sex FvKO estimate`$Value)               ,
     unlist0(object$`Sex MvKO estimate`$Value)               ,
     # effect size
-    unlist0(object$`Genotype effect size`$Value)            ,
-    unlist0(object$`Sex FvKO effect size`$Value)            ,
-    unlist0(object$`Sex MvKO effect size`$Value)            ,
+    unlist0(as.list(object$`Genotype effect size`)$Value)            ,
+    unlist0(as.list(object$`Sex FvKO effect size`)$Value)            ,
+    unlist0(as.list(object$`Sex MvKO effect size`)$Value)            ,
     # Genotype
     unlist0(object$`Genotype p-value`)                  ,
     unlist0(object$`Genotype standard error`)           ,
