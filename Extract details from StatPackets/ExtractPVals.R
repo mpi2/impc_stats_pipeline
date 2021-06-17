@@ -97,10 +97,14 @@ SelectAnalysis = function(object) {
     # Sexual dymorphism
     unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Criteria)   ,
     unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Note)   ,
-    # effect size
+    # estimates
     unlist0(object$`Genotype estimate`$Value)               ,
     unlist0(object$`Sex FvKO estimate`$Value)               ,
     unlist0(object$`Sex MvKO estimate`$Value)               ,
+    # effect size
+    unlist0(object$`Genotype effect size`$Value)            ,
+    unlist0(object$`Sex FvKO effect size`$Value)            ,
+    unlist0(object$`Sex MvKO effect size`$Value)            ,
     # Genotype
     unlist0(object$`Genotype p-value`)                  ,
     unlist0(object$`Genotype standard error`)           ,
@@ -132,10 +136,14 @@ SelectAnalysisFE = function(object) {
     # Sexual dymorphism
     unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Criteria)   ,
     unlist0(object$`Genotype contribution`$`Sexual dimorphism detected`$Note)   ,
-    # effect size
+    # estimate
     unlist0(as.list(object$`Genotype estimate`$`Complete table`)$Value)               ,
     unlist0(as.list(object$`Sex FvKO estimate`$`Complete table`)$Value)               ,
     unlist0(as.list(object$`Sex MvKO estimate`$`Complete table`)$Value)               ,
+    # effect size
+    unlist0(object$`Genotype effect size`$Value)            ,
+    unlist0(object$`Sex FvKO effect size`$Value)            ,
+    unlist0(object$`Sex MvKO effect size`$Value)            ,
     # Genotype
     unlist0(object$`Genotype p-value`$`Complete table`)                      ,
     unlist0(object$`Genotype standard error`)           ,
@@ -205,6 +213,9 @@ outputNames = function(){
     "Genotype estimate",
     "Sex FvKO estimate",
     "Sex MvKO estimate",
+    "Genotype standardised effect size",
+    "Sex FvKO standardised effect size",
+    "Sex MvKO standardised effect size",
     "Genotype p-value",
     "Genotype standard error",
     "Sex FvKO p-value",
