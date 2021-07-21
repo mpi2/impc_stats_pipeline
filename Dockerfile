@@ -32,6 +32,8 @@ RUN apt-get update
 #RUN apt-get -y install zlib1g-dev
 
 # All above
+RUN apt-get build-dep libcurl4-openssl-dev
+RUN apt-get install libcurl4-openssl-dev
 RUN apt-get update && apt-get -y install libcurl4-gnutls-dev libcurl4-openssl-dev libxml2 libxml2-dev libgsl-dev zlib1g-dev imagemagick libpq-dev  
 
 # data.table R package
