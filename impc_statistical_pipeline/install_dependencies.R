@@ -42,7 +42,7 @@ install.packages.auto <- function(x, v) {
       }
     }
   }
-  
+
   if (!exist) {
     if (x %in% avpackages) {
       tryCatch({
@@ -77,7 +77,7 @@ install.packages.auto <- function(x, v) {
       )))
     }
   }
-  
+
   #require(x)
 }
 
@@ -105,34 +105,35 @@ if (!requireNamespace("Hmisc", quietly = TRUE)) {
 # install packages
 ##########################################
 packages <- c(
- "RcppGSL"      ,"0.3.8"  ,       
- "AICcmodavg"   ,"2.3.1"  ,       
- "nloptr"      , "1.2.2.2",        
- "car"         , "3.0.10" ,        
- "RJSONIO"     , "1.3.1.4",        
- "base64enc"   , "0.1.3"  ,        
- "doParallel"  , "1.0.16" ,        
- "parallel"    , "4.0.2"  ,        
- "abind"       , "1.4.5"  ,        
- "DBI"         , "1.1.1"  ,        
- "plyr"        , "1.8.6"  ,        
- "nortest"     , "1.0.4"  ,        
- "pingr"       , "2.0.1"  ,        
- "RPostgreSQL" , "0.6.2"  ,   
- "quantreg"    , "5.82"   ,   
- "car"        ,  "3.0.10" ,   
- "RcppZiggurat", "0.1.6"  ,  
- "tidyr"      ,  "1.1.2"  ,  
- "methods"    ,  "4.0.2"  ,  
- "jsonlite"   ,  "1.7.2"  ,  
- "foreach"    ,  "1.5.1"  ,  
- "MASS"       ,  "7.3.53" ,  
+ "littler"      ,"0.3.12"  ,
+ "RcppGSL"      ,"0.3.8"  ,
+ "AICcmodavg"   ,"2.3.1"  ,
+ "nloptr"      , "1.2.2.2",
+ "car"         , "3.0.10" ,
+ "RJSONIO"     , "1.3.1.4",
+ "base64enc"   , "0.1.3"  ,
+ "doParallel"  , "1.0.16" ,
+ "parallel"    , "4.0.2"  ,
+ "abind"       , "1.4.5"  ,
+ "DBI"         , "1.1.1"  ,
+ "plyr"        , "1.8.6"  ,
+ "nortest"     , "1.0.4"  ,
+ "pingr"       , "2.0.1"  ,
+ "RPostgreSQL" , "0.6.2"  ,
+ "quantreg"    , "5.82"   ,
+ "car"        ,  "3.0.10" ,
+ "RcppZiggurat", "0.1.6"  ,
+ "tidyr"      ,  "1.1.2"  ,
+ "methods"    ,  "4.0.2"  ,
+ "jsonlite"   ,  "1.7.2"  ,
+ "foreach"    ,  "1.5.1"  ,
+ "MASS"       ,  "7.3.53" ,
  "survival"   ,  "3.2.7"  ,
- "RSQLite"    ,  "2.2.2"  ,  
- "robustbase" ,  "0.93.7" ,  
- "msgps"      ,  "1.3.1"  ,  
- "corrplot"   ,  "0.84"   ,  
- "Tmisc"      ,  "1.0.0"  ,  
+ "RSQLite"    ,  "2.2.2"  ,
+ "robustbase" ,  "0.93.7" ,
+ "msgps"      ,  "1.3.1"  ,
+ "corrplot"   ,  "0.84"   ,
+ "Tmisc"      ,  "1.0.0"  ,
  "Hmisc"       , "4.4.1"  ,
  "summarytools", "0.9.8"  ,
  "lme4"        , "1.1.26" ,
@@ -150,7 +151,7 @@ packages <- c(
  "magick"      , "2.0"    ,
  "Rfast"       , "1.9.4"  ,
  "nloptr"      , "1.2.2.1",
- "tidyr"       , "1.0.2"    
+ "tidyr"       , "1.0.2"
 )
 
 for (i in seq(1,length(packages),by=2)) {
