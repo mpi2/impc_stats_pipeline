@@ -4749,6 +4749,8 @@ StatsPipeline = function(path = getwd(),
   if (!dir.exists(path))
     dir.create(path)
   setwd(path)
+  ### step zeop: remove leftovers from lsf
+  system('find /ebi/lsf/yoda-spool/02/ -user hamedhm -type f | xargs rm -rf', wait = TRUE)
   ### Phase I: Preparing parquet files
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
