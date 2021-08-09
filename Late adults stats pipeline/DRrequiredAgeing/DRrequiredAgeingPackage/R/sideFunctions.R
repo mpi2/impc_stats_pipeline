@@ -4198,7 +4198,7 @@ UpdateTheSkipListfromIMPReSSAPI = function(df) {
   if (is.null(df))
     message0('There is an error in the input data. Please check the IMPReSS website is on!')
   dfSkPar = subset(df, df$isAnnotation == FALSE)
-  dfSkPar = dfSkPar[duplicated(dfSkPar$parameterKey),]
+  dfSkPar = dfSkPar[!duplicated(dfSkPar$parameterKey),]
   ###########
   fileName = system.file("extdata", "ExceptionMap.list", package = "DRrequiredAgeing")
   message0('Reading the current skiplist in the package ...\n\t Path = ',
