@@ -6417,3 +6417,25 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
     )
   }
 }
+
+changeRpackageDirectory = function(path = '~/R/packages') {
+  #system('module load r-4.0.3-gcc-9.3.0-xiarbub',wait = TRUE)
+  v = paste(
+    R.version$major,
+    gsub(
+      pattern = '.',
+      replacement = '_',
+      R.version$minor,
+      fixed = TRUE
+    ),
+    sep = '_',
+    collapse = '_'
+  )
+  wdirc = file.path(path, v)
+  if (!dir.exists(wdirc))
+    dir.create(wdirc,
+               showWarnings = FALSE,
+               recursive = TRUE)
+  .libPaths(new = wdirc)
+  message(' => new package path set to: ', wdirc)
+}
