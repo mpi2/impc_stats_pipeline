@@ -4112,7 +4112,8 @@ updateEquationMap = function(updatePackage = TRUE) {
   parameters = unlist(parameters)
 
   #combine two lists
-  r = apply(expand.grid(centers, parameters), 1, paste, collapse = "_")
+  #r = apply(expand.grid(centers, parameters), 1, paste, collapse = "_")
+  r = as.vector(outer(centers, parameters, paste, sep="_"))
   r = unique(c(orgparsColon, sort(r)))
   if (updatePackage) {
     write.table(
@@ -4169,7 +4170,8 @@ updateMethodMap = function(updatePackage = TRUE) {
   parameters = unlist(parameters)
 
   #combine two lists
-  r = apply(expand.grid(centers, parameters), 1, paste, collapse = "_")
+  #r = apply(expand.grid(centers, parameters), 1, paste, collapse = "_")
+  r = as.vector(outer(centers, parameters, paste, sep="_"))
   r = unique(c(orgparsColon, sort(r)))
   if (updatePackage) {
     write.table(
