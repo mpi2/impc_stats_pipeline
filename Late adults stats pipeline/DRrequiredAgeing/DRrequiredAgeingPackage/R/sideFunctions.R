@@ -6545,7 +6545,7 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
   }
 }
 
-changeRpackageDirectory = function(path = '~/R/packages') {
+changeRpackageDirectory = function(path = '~/DRs/R/packages') {
   #system('module load r-4.0.3-gcc-9.3.0-xiarbub',wait = TRUE)
   v = paste(
     R.version$major,
