@@ -100,6 +100,9 @@ if (!requireNamespace("miniparquet", quietly = TRUE)) {
 if (!requireNamespace("Hmisc", quietly = TRUE)) {
   install.packages('Hmisc', repos = "https://cran.rstudio.com/")
 }
+if (!requireNamespace("Cairo", quietly = TRUE)) {
+  install.packages('Cairo', repos = "https://cran.rstudio.com/")
+}
 
 ##########################################
 # install packages
