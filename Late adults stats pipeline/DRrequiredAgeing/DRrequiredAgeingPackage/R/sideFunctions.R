@@ -4858,7 +4858,34 @@ jobCreator = function(path = getwd(),
 }
 
 
+packageBackup = function(package = NULL,
+                         storepath = NULL,
+                         flags = '-r9Xq') {
+  if (is.null(package)) {
+    message('please specify the package first ...')
+    return(NULL)
+  }
+  for (path in .libPaths()) {
+    ppath = file.path(path, package)
 
+    if (dir.exists(ppath)) {
+      if (!is.null(storepath) && !dir.exists(storepath))
+        dir.create(storepath, recursive = TRUE)
+      zipfile = file.path(ifelse(is.null(storepath), getwd(), storepath),
+                          paste0(
+                            package,
+                            '_',
+                            format(Sys.time(), '%Y-%m-%d %H_%M_%S'),
+                            '.zip'
+                          ))
+      message('\t', package, ' -> backup created in: ', zipfile)
+      zip(zipfile = zipfile  ,
+          files = ppath,
+          flags = flags)
+
+    }
+  }
+}
 
 
 StatsPipeline = function(path = getwd(),
@@ -5033,9 +5060,16 @@ StatsPipeline = function(path = getwd(),
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
-
   message0('Postprocessing the IMPC statistical analyses results ...')
   setwd(SP.results)
+
+  message0('Creating backups from the main R packages ...')
+  if (dir.exists('RPackage_backup')) {
+    system(command = 'rm -rf RPackage_backup', wait = TRUE)
+  }
+  packageBackup('DRrequiredAgeing', storepath = file.path(getwd(), 'RPackage_backup'))
+  packageBackup('OpenStats', storepath = file.path(getwd(), 'RPackage_backup'))
+
   if (dir.exists('logs')) {
     system(command = 'rm -rf logs', wait = TRUE)
   }
