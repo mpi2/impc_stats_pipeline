@@ -136,6 +136,21 @@ mainAgeing = function(file = NULL                                    ,
     sep = sep,
     na.strings = na.strings
   )
+  # for UKBB pipeline
+  rdata$biological_sample_group = rdata$sex
+  rdata$biological_sample_group = as.factor(rdata$biological_sample_group)
+  levels(rdata$biological_sample_group) = c('control', 'experimental')
+  message0(' UKBB synthetic sex levels: ',
+           paste(
+             levels(rdata$biological_sample_group),
+             sep = ', ',
+             collapse = ', '
+           ))
+  rdata$sex = 'male'
+  rdata$biological_sample_group = as.character(rdata$biological_sample_group)
+  rdata = droplevels(rdata)
+  # END of UKBB modification
+
   rdata                 = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
   new.data              = rdata
   new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)), ]
