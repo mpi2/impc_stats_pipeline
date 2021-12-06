@@ -146,8 +146,7 @@ mainAgeing = function(file = NULL                                    ,
              sep = ', ',
              collapse = ', '
            ))
-  rdata$sex = 'male'
-  rdata$biological_sample_group = as.character(rdata$biological_sample_group)
+  rdata$sex = as.factor('female')
   rdata = droplevels(rdata)
   # END of UKBB modification
 
