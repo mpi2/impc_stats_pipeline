@@ -587,7 +587,7 @@ qvalueEstimator = function(x) {
 
 
 
-qvaluesGenerator = function(df,filterdfparameter=NULL) {
+qvaluesGenerator = function(df, filterdfparameter = NULL) {
   df = as.data.frame(df)
   names(df) = outputNames()
   # df = df[df$status == 'Successful' &
@@ -601,6 +601,13 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
   if (nrow(df) < 1)
     return(NULL)
 
+  df$setid = apply(df[, 2:14], 1, function(x) {
+    r = paste(x, sep = '.', collapse = '.')
+    return (r)
+  })
+  df = df[!duplicated(df$setid), ]
+  df$setid = NULL
+
   counter = 1
   d = NULL
   for (centre in unique(df$phenotyping_center)) {
@@ -609,39 +616,39 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
       df2 = subset(df1, df1$procedure_stable_id == procedure)
       for (parameter in unique(df2$parameter_stable_id)) {
         df3 = subset(df2, df2$parameter_stable_id == parameter)
-        for (zygosity in unique(df3$zygosity)) {
-          df4 = subset(df3, df3$zygosity == zygosity)
-          for (strain in unique(df4$strain_accession_id)) {
-            df5 = subset(df4, df4$strain_accession_id == strain)
-            for (metadata in unique(df5$metadata_group)) {
-              df6 = subset(df5, df5$metadata_group == metadata)
-              df6 = droplevels(df6)
+        df4 = df3
+        df5 = df4
+        df6 = df5
+        df6 = droplevels(df6)
 
-              df6$`NGenotype p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
-              df6$`N_Sex FvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
-              df6$`N_Sex MvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
-              df6$`WGenotype p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
-              df6$`W_Sex FvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
-              df6$`W_Sex MvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
+        df6$`NGenotype p-value`[df6$status == 'NotProcessed' &
+                                  df6$'Variation in respone after preprocessing' == FALSE] = 1
+        df6$`N_Sex FvKO p-value`[df6$status == 'NotProcessed' &
+                                   df6$'Variation in respone after preprocessing' == FALSE] = 1
+        df6$`N_Sex MvKO p-value`[df6$status == 'NotProcessed' &
+                                   df6$'Variation in respone after preprocessing' == FALSE] = 1
+        df6$`WGenotype p-value`[df6$status == 'NotProcessed' &
+                                  df6$'Variation in respone after preprocessing' == FALSE] = 1
+        df6$`W_Sex FvKO p-value`[df6$status == 'NotProcessed' &
+                                   df6$'Variation in respone after preprocessing' == FALSE] = 1
+        df6$`W_Sex MvKO p-value`[df6$status == 'NotProcessed' &
+                                   df6$'Variation in respone after preprocessing' == FALSE] = 1
 
 
-              if (counter == 1) {
-                d =  qvalueEstimator(df6)
-              } else{
-                d = rbind(d, qvalueEstimator(df6))
-              }
-              counter = counter + 1
-            }
-
-          }
+        if (counter == 1) {
+          d =  qvalueEstimator(df6)
+        } else{
+          d = rbind(d, qvalueEstimator(df6))
         }
+        counter = counter + 1
+
         cat('\r-->', counter)
       }
     }
   }
-  if(!is.null(d) && nrow(d)>0){
+  if (!is.null(d) && nrow(d) > 0) {
     #d = d[, colSums(is.na(d)) < nrow(d), drop = FALSE]
-    d = d[!duplicated(d),]
+    d = d[!duplicated(d), ]
   }
   return(d)
 
