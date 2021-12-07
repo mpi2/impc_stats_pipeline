@@ -136,35 +136,47 @@ mainAgeing = function(file = NULL                                    ,
     sep = sep,
     na.strings = na.strings
   )
+
   # for UKBB pipeline
-  if (nlevels(rdata$sex) < 2) {
+  rdata = as.data.frame(rdata)
+  rdata = rdata[rdata$biological_sample_group %in% 'control', ]
+  if (length(unique(rdata$sex)) < 2) {
     message0(' Terminated. UKBB synthetic sex levels: ',
-             paste(levels(rdata$sex),
+             paste(unique(rdata$sex),
                    sep = ', ',
                    collapse = ', '))
     return(FALSE)
   }
   rdata$biological_sample_group = rdata$sex
-  rdata$biological_sample_group = as.factor(rdata$biological_sample_group)
-  levels(rdata$biological_sample_group) = c('control', 'experimental')
-  rdata = rdata[rdata$biological_sample_group %in% 'control',]
-  message0(' UKBB synthetic sex levels: ',
+  if (is.factor(rdata$biological_sample_group)) {
+    levels(rdata$biological_sample_group) = c('control', 'experimental')
+  } else{
+    rdata$biological_sample_group[rdata$biological_sample_group %in% 'male'] =
+      'control'
+    rdata$biological_sample_group[rdata$biological_sample_group %in% 'female'] =
+      'experimental'
+  }
+  message0(' UKBB synthetic Genotype levels: ',
            paste(
-             levels(rdata$biological_sample_group),
+             unique(rdata$biological_sample_group),
              sep = ', ',
              collapse = ', '
            ))
-  rdata$sex = as.factor('female')
+
+  rdata$sex = 'female'
+  rdata$biological_sample_group = as.factor(rdata$biological_sample_group)
+  rdata$sex = as.factor(rdata$sex)
   rdata = droplevels(rdata)
   message0(' Data dim: ',
            paste(dim(rdata),
                  sep = ', ',
                  collapse = ', '))
-  if (nrow(rdata) < 1){
+  if (nrow(rdata) < 1) {
     message0('No data left after UKBB filtering')
     return(FALSE)
   }
   # END of UKBB modification
+
   rdata                 = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
   new.data              = rdata
   new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)), ]
