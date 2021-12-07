@@ -137,6 +137,7 @@ mainAgeing = function(file = NULL                                    ,
     na.strings = na.strings
   )
   # for UKBB pipeline
+  rdata = rdata[rdata$biological_sample_group == 'control', ]
   rdata$biological_sample_group = rdata$sex
   rdata$biological_sample_group = as.factor(rdata$biological_sample_group)
   levels(rdata$biological_sample_group) = c('control', 'experimental')
