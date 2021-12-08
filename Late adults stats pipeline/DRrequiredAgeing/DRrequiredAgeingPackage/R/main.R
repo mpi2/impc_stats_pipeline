@@ -140,6 +140,7 @@ mainAgeing = function(file = NULL                                    ,
   # for UKBB pipeline
   rdata = as.data.frame(rdata)
   rdata = rdata[rdata$biological_sample_group %in% 'control',]
+  rdata$date_of_experiment = as.character(rdata$date_of_experiment)
   rdata = rdata[rdata$date_of_experiment >= '2018-01-01T00:00:00Z' &
                   rdata$date_of_experiment <= '2020-12-31T00:00:00Z', ]
   if (length(unique(rdata$sex)) < 2) {
@@ -167,6 +168,7 @@ mainAgeing = function(file = NULL                                    ,
 
   rdata$sex = 'female'
   rdata$biological_sample_group = as.factor(rdata$biological_sample_group)
+  rdata$date_of_experiment = as.factor(rdata$date_of_experiment)
   rdata$sex = as.factor(rdata$sex)
   rdata = droplevels(rdata)
   message0(' Data dim: ',
