@@ -139,7 +139,9 @@ mainAgeing = function(file = NULL                                    ,
 
   # for UKBB pipeline
   rdata = as.data.frame(rdata)
-  rdata = rdata[rdata$biological_sample_group %in% 'control', ]
+  rdata = rdata[rdata$biological_sample_group %in% 'control',]
+  rdata = rdata[rdata$date_of_experiment >= '2018-01-01T00:00:00Z' &
+                  rdata$date_of_experiment <= '2020-12-31T00:00:00Z', ]
   if (length(unique(rdata$sex)) < 2) {
     message0(' Terminated. UKBB synthetic sex levels: ',
              paste(unique(rdata$sex),
