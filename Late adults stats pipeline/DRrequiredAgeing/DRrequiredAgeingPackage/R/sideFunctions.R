@@ -5377,7 +5377,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
 
   DRrequiredAgeing:::message0('Downloading the action script ...')
   system(
-    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/IMPC%20annotation%20pipeline/loader.R',
+    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/IMPC-stats-pipeline-for-the-UKBB-project/IMPC%20annotation%20pipeline/loader.R',
     wait = TRUE
   )
 
