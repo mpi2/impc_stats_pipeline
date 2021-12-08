@@ -5208,7 +5208,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
 
     system('rm -f ExtractPVals.R', wait = TRUE)
     system(
-      'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Extract%20details%20from%20StatPackets/ExtractPVals.R',
+      'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/IMPC-stats-pipeline-for-the-UKBB-project/Extract%20details%20from%20StatPackets/ExtractPVals.R',
       wait = TRUE
     )
     editfile('ExtractPVals.R', 'makejobs()', '#makejobs()')
