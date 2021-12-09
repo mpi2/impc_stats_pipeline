@@ -6282,7 +6282,7 @@ annotationChooser = function(statpacket = NULL,
                              resultKey = 'Normal result',
                              mp_chooser_file = 'mp_chooser_20210324.json.Rdata') {
   changeRpackageDirectory()
-  requireNamespace('RPostgreSQL')
+  #requireNamespace('RPostgreSQL')
   requireNamespace('data.table')
   requireNamespace("data.table")
   requireNamespace("jsonlite")
