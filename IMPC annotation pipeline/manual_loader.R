@@ -17,13 +17,10 @@ changeRpackageDirectory = function(path = '~/DRs/R/packages') {
                showWarnings = FALSE,
                recursive = TRUE)
   .libPaths(new = wdirc)
-  message(' => new package path set to: ', wdirc,'. Please add this to the .bash_profile under R_LIBS_USER  environment variable.')
+  message(' => new package path set to: ', wdirc,'. Please add this to the .bash_profile under R_LIBS_USER  environment variable. [file = manual_loader.R]')
 }
 changeRpackageDirectory()
-library(DRrequiredAgeing)
-
-DRrequiredAgeing:::IMPC_statspipelinePostProcess()
-
+library('DRrequiredAgeing')
 library('RPostgreSQL')
 library('data.table')
 ########################### Annotation pipeline #################################
