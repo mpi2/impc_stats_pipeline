@@ -164,13 +164,9 @@ SelectAnalysisFE = function(object) {
   return(r)
 }
 
-tableCount = function(Gen,
-                      Sex,
-                      levels = c('experimental.male',
-                                 'experimental.female',
-                                 'control.male',
-                                 'control.female')) {
-  t = table(interaction(Gen, Sex, sep = '.'))
+tableCount = function(x,
+                      levels = c('control','experimental')) {
+  t = table(x)
   t = as.data.frame(t)
   ll = length(levels)
   r = c(rep(NA, ll))
@@ -263,10 +259,8 @@ outputNames = function(){
     paste0('W_', c4),
     'URL',
     'Data URL',
-    'Total KO male',
-    'Total KO female',
-    'Total WT male',
-    'Total WT female'
+    'Total female',
+    'Total male'
   )
   return(c5)
 }
@@ -500,8 +494,7 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
         ##### URL
         MakeURL(r0, r1),
         tableCount(
-          Gen = r1$Result$Details$Original_biological_sample_group,
-          Sex = r1$Result$Details$Original_sex
+          r1$Result$Details$Original_biological_sample_group
         )
       )
     } else{
@@ -544,8 +537,7 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
         ##### URL
         MakeURL(r0, r1),
         tableCount(
-          Gen = r1$Result$Details$Original_biological_sample_group,
-          Sex = r1$Result$Details$Original_sex
+          r1$Result$Details$Original_biological_sample_group
         )
       )
     }
