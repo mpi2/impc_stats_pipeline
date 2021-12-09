@@ -166,11 +166,11 @@ SelectAnalysisFE = function(object) {
 
 tableCount = function(Gen,
                       Sex,
-                      levels = c('experimental.male',
-                                 'experimental.female',
-                                 'control.male',
-                                 'control.female')) {
-  t = table(interaction(Gen, Sex, sep = '.'))
+                      levels = c('control',
+                                 'experimental',
+                                 'empty',
+                                 'empty')) {
+  t = table(Gen)
   t = as.data.frame(t)
   ll = length(levels)
   r = c(rep(NA, ll))
