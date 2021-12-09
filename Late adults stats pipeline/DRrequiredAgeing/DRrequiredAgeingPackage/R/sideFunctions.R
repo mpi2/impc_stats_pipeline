@@ -6290,8 +6290,9 @@ annotationChooser = function(statpacket = NULL,
   requireNamespace("Tmisc")
 
   ulistTag3 = MPTERMS = NA
-  message('Running the annotation pipeline')
-  if (is.null(statpacket) ||
+  message('Running the annotation pipeline - Disabled for UKBB project')
+  if ( 1== 1 ||
+      is.null(statpacket) ||
       length(statpacket) < 1 ||
       is.null(statpacket$V2) ||
       length(statpacket$V2)<1 ||
