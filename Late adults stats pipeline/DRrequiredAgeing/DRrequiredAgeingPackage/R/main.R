@@ -139,10 +139,13 @@ mainAgeing = function(file = NULL                                    ,
 
   # for UKBB pipeline
   rdata = as.data.frame(rdata)
-  rdata = rdata[rdata$biological_sample_group %in% 'control',]
+  rdata$data_point = as.numeric(rdata$data_point)
+  rdata$weight = as.numeric(rdata$weight)
+  #rdata = subset(rdata, rdata$zygosity == 'homozygote')
+  rdata = rdata[rdata$biological_sample_group %in% 'control', ]
   rdata$date_of_experiment = as.character(rdata$date_of_experiment)
   rdata = rdata[rdata$date_of_experiment >= '2018-01-01T00:00:00Z' &
-                  rdata$date_of_experiment <= '2020-12-31T00:00:00Z', ]
+                  rdata$date_of_experiment <= '2020-12-31T00:00:00Z',]
   if (length(unique(rdata$sex)) < 2) {
     message0(' Terminated. UKBB synthetic sex levels: ',
              paste(unique(rdata$sex),
@@ -154,9 +157,9 @@ mainAgeing = function(file = NULL                                    ,
   if (is.factor(rdata$biological_sample_group)) {
     levels(rdata$biological_sample_group) = c('control', 'experimental')
   } else{
-    rdata$biological_sample_group[rdata$biological_sample_group %in% 'male'] =
-      'control'
     rdata$biological_sample_group[rdata$biological_sample_group %in% 'female'] =
+      'control'
+    rdata$biological_sample_group[rdata$biological_sample_group %in% 'male'] =
       'experimental'
   }
   message0(' UKBB synthetic Genotype levels: ',
@@ -167,6 +170,7 @@ mainAgeing = function(file = NULL                                    ,
            ))
 
   rdata$sex = 'female'
+  rdata$colony_id = 'IMPC_WT'
   rdata$biological_sample_group = as.factor(rdata$biological_sample_group)
   rdata$date_of_experiment = as.factor(rdata$date_of_experiment)
   rdata$sex = as.factor(rdata$sex)
@@ -180,7 +184,6 @@ mainAgeing = function(file = NULL                                    ,
     return(FALSE)
   }
   # END of UKBB modification
-
   rdata                 = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
   new.data              = rdata
   new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)), ]
@@ -225,13 +228,6 @@ mainAgeing = function(file = NULL                                    ,
       outP      = list()
       n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
       ############## Read The Ageing parameters from Solr
-      if(BatchProducer && combineEAandLA)
-        n3.0 = getEarlyAdultsFromParameterStableIds(
-          LA_parameter_stable_id = parameter    ,
-          map                    = EA2LAMApping ,
-          LA_data                =  n3.0        ,
-          solrBaseURL            = solrBaseURL
-        )
       if(is.null(n3.0))
         next
       ##############
@@ -251,121 +247,6 @@ mainAgeing = function(file = NULL                                    ,
               n3.3.m_zyg = base::subset(n3.3.m, n3.3.m$zygosity %in% zyg)
               colonys    = as.character(unique(na.omit(n3.3.m_zyg$colony_id)))
               nColonies  = length(colonys)
-              if (BatchProducer && nColonies > 0) {
-                #nMax                 = 10000
-                ChunkSizeFromNumbers = ((nrow(n3.3.c) < nMax) * max(1, round(nColonies /
-                                                                               ChunkSize)) +
-                                          (nrow(n3.3.c) >= nMax) * nColonies)
-                minCol = ((nrow(n3.3.c) < nMax) * MinColoniesInChunks + (nrow(n3.3.c) >=
-                                                                           nMax) * 1)
-                ColonyChunks         = chunkVector(
-                  x = colonys,
-                  n = ChunkSizeFromNumbers,
-                  min = minCol,
-                  activate = (nColonies >= MinColoniesInChunks) &&
-                    (nrow(n3.3.c) >= controlSize)
-                )
-                outpDir  = file.path0(
-                  wd,
-                  paste0(Sys.Date(), '_', subdir, '_RawData/'),
-                  check = FALSE,
-                  create = TRUE,
-                  IncludedFileName = FALSE
-                )
-                SubSubDirOrdFileName = RemoveSpecialChars(paste(
-                  Sys.Date()             ,
-                  #RandomRegardSeed()    ,
-                  #procedure             ,
-                  parameter              ,
-                  center                 ,
-                  zyg                    ,
-                  strain                 ,
-                  meta                   ,
-                  collapse = '_'
-                ))
-                outpfile = file.path0(
-                  outpDir,
-                  SubSubDirOrdFileName,
-                  check = FALSE,
-                  create = TRUE,
-                  IncludedFileName = TRUE
-                )
-                mess = paste0(
-                  Sys.time(),
-                  '. Processed file: ',
-                  SubSubDirOrdFileName,
-                  '. #Colonies = ',
-                  nColonies,
-                  ', #Controls = ',
-                  nrow(n3.3.c),
-                  ', Chunks = ',
-                  length(ColonyChunks)
-                )
-                message0(mess, ShowTimeTag = FALSE)
-                write(
-                  x = mess,
-                  file = paste0(
-                    Sys.Date(),
-                    '_',
-                    subdir,
-                    '_DataGenerationLog.log'
-                  ),
-                  10 ^ 5,
-                  append = TRUE
-                )
-                counter = 1
-                for (ChunkedColonies in ColonyChunks) {
-                  BatchData     = rbind (subset(n3.3.m_zyg, n3.3.m_zyg$colony_id %in% ChunkedColonies),
-                                         n3.3.c)
-                  BatchFileName = file.exists0(
-                    paste0(
-                      outpfile,
-                      '_C',
-                      length(ColonyChunks),
-                      '_',
-                      RandomRegardSeed(),
-                      '_',
-                      counter,
-                      '.csv'
-                    ),
-                    overwrite = OverwriteExistingFiles
-                  )
-                  if (all(dim(BatchData) > 0)) {
-                    write.csv(BatchData,
-                              file = BatchFileName,
-                              row.names = FALSE)
-
-                    BatchFileNamezip  = compressFiles(
-                      fileList   = BatchFileName,
-                      dir        = dirname (BatchFileName) ,
-                      filename   = basename(BatchFileName) ,
-                      overwrite  = FALSE                   ,
-                      rmSource   = TRUE
-                    )
-                    if (BatchFileNamezip$status == 0) {
-                      BatchFileName = BatchFileNamezip$file
-                    }
-                    out = BatchGenerator(
-                      file                 = BatchFileName    ,
-                      dir                  = outpDir          ,
-                      procedure            = procedure        ,
-                      parameter            = parameter        ,
-                      center               = center           ,
-                      cpu                  = cpu              ,
-                      memory               = memory           ,
-                      extraBatchParameters =  extraBatchParameters
-                    )
-                    write(
-                      x = out,
-                      file = paste0(outpDir, '/', subdir, '_Batch.bch'),
-                      ncolumns = 10 ^ 5,
-                      append = TRUE
-                    )
-                    counter = counter + 1
-                  }
-                  rm0(c('BatchData', 'BatchFileName'), silent = TRUE)
-                }
-              } else{
                 message0(
                   ' [',
                   paste(
@@ -757,7 +638,7 @@ mainAgeing = function(file = NULL                                    ,
                         length(RepBlank(
                           unique(n3.5.2$colony_id),
                           match = c('', NA, 'NA')
-                        )) > 1 &&
+                        )) >= 1 &&
                         # include 2 colonies (cont & mut)
                         checkGenInCol(n3.5.2) &&
                         # each sex and genotype
@@ -1063,7 +944,6 @@ mainAgeing = function(file = NULL                                    ,
                   counter  = counter  + 1
                   gc()
                 }
-              }
             }
           }
         }
