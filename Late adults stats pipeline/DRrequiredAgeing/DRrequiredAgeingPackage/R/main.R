@@ -483,9 +483,10 @@ mainAgeing = function(file = NULL                                    ,
                       RemoveSpecialChars(center)    ,
                       RemoveSpecialChars(procedure) ,
                       RemoveSpecialChars(parameter) ,
-                      RemoveSpecialChars(paste0(colony,round(runif(1)*1000000)))    ,
+                      RemoveSpecialChars(colony)    ,
                       RemoveSpecialChars(zyg)       ,
                       RemoveSpecialChars(meta)      ,
+                      round(runif(1)*1000000)       ,
                       create = FALSE,
                       check = noSpaceAllowed
                     )
