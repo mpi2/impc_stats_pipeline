@@ -4425,7 +4425,7 @@ RecordSpentTime = function(timeSt               ,
     return(NULL)
   message0('Recording time ...')
   if (!dir.exists(dirName))
-    dir.create(dirName)
+    dir.create0(dirName)
   r = round(difftime(Sys.time() , timeSt, units = 'sec'), 2)
   write(
     c(fileName, r)                                                ,
@@ -4657,7 +4657,7 @@ ETLStep2Parquet2Rdata = function(files) {
 
     outDir = file.path('ProcedureScatterRdata', proc)
     if (!dir.exists(outDir))
-      dir.create(outDir, recursive = TRUE)
+      dir.create0(outDir, recursive = TRUE)
     save(rdata,
          file = file.path(
            outDir,
@@ -4718,7 +4718,7 @@ ETLStep4MergingRdataFiles = function(RootDir) {
     }
     outDir = file.path(getwd(), 'Rdata')
     if (!dir.exists(outDir)) {
-      dir.create(outDir, recursive = TRUE)
+      dir.create0(outDir, recursive = TRUE)
     }
     save(rdata0, file = file.path(outDir                              ,
                                   paste0(
@@ -4824,7 +4824,7 @@ jobCreator = function(path = getwd(),
                       pattern = '.Rdata',
                       JobListFile = 'DataGenerationJobList.bch') {
   if (!dir.exists(file.path('DataGeneratingLog')))
-    dir.create(
+    dir.create0(
       path = file.path('DataGeneratingLog'),
       recursive = TRUE,
       showWarnings = FALSE
@@ -4870,7 +4870,7 @@ packageBackup = function(package = NULL,
 
     if (dir.exists(ppath)) {
       if (!is.null(storepath) && !dir.exists(storepath))
-        dir.create(storepath, recursive = TRUE)
+        dir.create0(storepath, recursive = TRUE)
       zipfile = file.path(ifelse(is.null(storepath), getwd(), storepath),
                           paste0(
                             package,
@@ -4901,7 +4901,7 @@ StatsPipeline = function(path = getwd(),
   path0 = path
   path = SP.results
   if (!dir.exists(path))
-    dir.create(path)
+    dir.create0(path)
   setwd(path)
   ### step zeop: remove leftovers from lsf
   system('find /ebi/lsf/yoda-spool/02/ -user hamedhm -type f | xargs rm -rf', wait = TRUE)
@@ -6519,13 +6519,13 @@ annotationIndexCreator = function(path = getwd(),
   )
 
   if (!dir.exists(file.path(path, 'err')))
-    dir.create(file.path(path, 'err'), recursive = TRUE)
+    dir.create0(file.path(path, 'err'), recursive = TRUE)
 
   if (!dir.exists(file.path(path, 'out')))
-    dir.create(file.path(path, 'out'), recursive = TRUE)
+    dir.create0(file.path(path, 'out'), recursive = TRUE)
 
   if (!dir.exists(file.path(path, 'log')))
-    dir.create(file.path(path, 'log'), recursive = TRUE)
+    dir.create0(file.path(path, 'log'), recursive = TRUE)
 
   err = paste0(' -e ', dirname(lf), '/err/', basename(lf))
   out = paste0(' -o ', dirname(lf), '/out/', basename(lf))
@@ -6553,13 +6553,13 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
     unlink(outputfile)
 
   if (!dir.exists('error'))
-    dir.create('error', recursive = TRUE)
+    dir.create0('error', recursive = TRUE)
 
   if (!dir.exists('output'))
-    dir.create('output', recursive = TRUE)
+    dir.create0('output', recursive = TRUE)
 
   if (!dir.exists('resultF'))
-    dir.create('resultF', recursive = TRUE)
+    dir.create0('resultF', recursive = TRUE)
 
   for (i in 2:(length(ind) + 1)) {
     write(
@@ -6601,7 +6601,7 @@ changeRpackageDirectory = function(path = '~/DRs/R/packages') {
   )
   wdirc = file.path(path, v)
   if (!dir.exists(wdirc))
-    dir.create(wdirc,
+    dir.create0(wdirc,
                showWarnings = FALSE,
                recursive = TRUE)
   .libPaths(new = wdirc)

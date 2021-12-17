@@ -4230,7 +4230,7 @@ RecordSpentTime = function(timeSt               ,
     return(NULL)
   message0('Recording time ...')
   if (!dir.exists(dirName))
-    dir.create(dirName)
+    dir.create0(dirName)
   r = round(difftime(Sys.time() , timeSt, units = 'sec'), 2)
   write(
     c(fileName, r)                                                ,
@@ -4408,7 +4408,7 @@ ETLStep2Parquet2Rdata = function(files) {
 
     outDir = file.path('ProcedureScatterRdata', proc)
     if (!dir.exists(outDir))
-      dir.create(outDir, recursive = TRUE)
+      dir.create0(outDir, recursive = TRUE)
     save(rdata,
          file = file.path(
            outDir,
@@ -4469,7 +4469,7 @@ ETLStep4MergingRdataFiles = function(RootDir) {
     }
     outDir = file.path(getwd(), 'Rdata')
     if (!dir.exists(outDir)) {
-      dir.create(outDir, recursive = TRUE)
+      dir.create0(outDir, recursive = TRUE)
     }
     save(rdata0, file = file.path(outDir                              ,
                                   paste0(
