@@ -273,24 +273,24 @@ mainAgeing = function(file = NULL                                    ,
                   message0('Single core processing in progress ...')
                 }
                 i = 1
-                MultiCoreRes = foreach::foreach (
-                  i = 1:length(colonys),
-                  .packages = c(
-                    'PhenStat'    ,
-                    'SmoothWin'   ,
-                    'base64enc'   ,
-                    'nlme'        ,
-                    'RJSONIO'     ,
-                    'jsonlite'    ,
-                    'OpenStats'  ,
-                    'DRrequiredAgeing',
-                    'DBI'
-                  ),
-                  .errorhandling = c(MultiCoreErrorHandling),
-                  .verbose = verbose                        ,
-                  .inorder = inorder
-                ) %activemulticore% {
-                # for (i in  1:length(colonys)){
+                # MultiCoreRes = foreach::foreach (
+                #   i = 1:length(colonys),
+                #   .packages = c(
+                #     'PhenStat'    ,
+                #     'SmoothWin'   ,
+                #     'base64enc'   ,
+                #     'nlme'        ,
+                #     'RJSONIO'     ,
+                #     'jsonlite'    ,
+                #     'OpenStats'  ,
+                #     'DRrequiredAgeing',
+                #     'DBI'
+                #   ),
+                #   .errorhandling = c(MultiCoreErrorHandling),
+                #   .verbose = verbose                        ,
+                #   .inorder = inorder
+                # ) %activemulticore% {
+                for (i in  1:length(colonys)){
                   message0('*~*~*~*~*~* ', i, '|', length(colonys), ' *~*~*~*~*~*')
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
