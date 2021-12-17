@@ -1668,7 +1668,7 @@ file.exists0 = function(file, overwrite = FALSE, ...) {
   }
   while (!overwrite && file.exists(file, ...)) {
     file = file.path(dirname(path = file),
-                     paste0(name, '_', counter, ext))
+                     paste0(name, '_', counter, colony, round(runif(1) * 1000000), ext))
     counter = counter + 1
   }
   if (counter > 1) {
