@@ -612,12 +612,21 @@ qvaluesGenerator = function(df, filterdfparameter = NULL) {
   if (nrow(df) < 1)
     return(NULL)
 
-  df$setid = apply(df[, 2:ncol(df)], 1, function(x) {
+  df$setid = apply(df[, 2:14], 1, function(x) {
     r = paste(x, sep = '.', collapse = '.')
     return (r)
   })
-  #df = df[!duplicated(df$setid), ]
+  df$orderid = apply(df[, c('Total KO male',
+                            'Total KO female',
+                            'Total WT male',
+                            'Total WT female')], 1, function(x) {
+                              r = sum(x, na.rm = TRUE)
+                              return (r)
+                            })
+  df = df[order(df$orderid, decreasing = TRUE),]
+  df = df[!duplicated(df$setid), ]
   df$setid = NULL
+  df$orderid = NULL
 
   counter = 1
   d = NULL
