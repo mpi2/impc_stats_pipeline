@@ -413,159 +413,169 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
       next
     }
 
-    r0 = fread(
+    r000 = fread(
       file = file,
       header = FALSE,
       sep = '\t',
       quote = "",
       stringsAsFactors = FALSE
     )
-    rN = DRrequiredAgeing:::annotationChooser(statpacket = r0,
-                                              level = .0001)
-    rW = DRrequiredAgeing:::annotationChooser(
-      statpacket = r0,
-      level = .0001,
-      resultKey = 'Windowed result',
-      TermKey = 'WMPTERM'
-    )
-
-
-
-    if (ncol(r0) != 20) {
-      write(file,
-            file = paste0('Error_Overal_', Sys.Date(), '.txt'),
-            append = TRUE)
-      next
-    }
-    r1 =
-      tryCatch(
-        expr =
-          fromJSON(r0$V20, flatten = TRUE),
-        warning = function(w) {
-          write(file,
-                file = paste0('Error_inJSON_', Sys.Date(), '.txt'),
-                append = TRUE)
-          return(NULL)
-        },
-        error = function(e) {
-          write(file,
-                file = paste0('Error_inJSON_', Sys.Date(), '.txt'),
-                append = TRUE)
-          return(NULL)
-        }
+    for (iii in 1:nrow(r000)) {
+      r0 = r000[iii,]
+      rN = DRrequiredAgeing:::annotationChooser(statpacket = r0,
+                                                level = .0001)
+      rW = DRrequiredAgeing:::annotationChooser(
+        statpacket = r0,
+        level = .0001,
+        resultKey = 'Windowed result',
+        TermKey = 'WMPTERM'
       )
-    #method = r1$result$detail$applied_method
-    if (is.null(r1))
-      next
 
 
-    method = r1$Result$Details$`Applied method`
-    message(paste(i, '|',  end , ':', file))
-    if (is.null(method) || method  %in% c('MM', 'RR')) {
-      x = c(
-        unlist(r0[1, 1:19]),
-        unlist0(r1$Result$Details$`Response type`) ,
-        unlist0(r1$Result$Details$`Applied method`),
-        ################# Window parameters
-        # Have you changed that for new structure of l and k output???
-        SelectWindowingParameters(object = r1$Result$Details)                 ,
-        ################# VectorOutput Results
-        SelectAnalysis(r1$Result$`Vector output`$`Normal result`)             ,
-        SelectAnalysis(r1$Result$`Vector output`$`Windowed result`)           ,
-        #SelectAnalysis(r1$Result$`Vector output`$`Full model result`)         ,
-        #SelectAnalysis(r1$Result$`Vector output`$`Full model windowed result`),
-        ################# Other results
-        SelectOthers(r1$Result$Details)                                      ,
-        ################ Ignorome/Reference/Behaviour
-        SelectMISC(r0)                                                       ,
-        ##### Variation in response
-        unlist0(
-          r1$Result$Details$'Variation in respone after preprocessing'[1]
-        )   ,
-        unlist0(
-          r1$Result$Details$'Variation in respone before preprocessing'[1]
-        )   ,
-        ##### Pvals
-        unlist0(
-          r1$Result$`Vector output`$`Normal result`$`Genotype p-value`
-        )      ,
-        unlist0(
-          r1$Result$`Vector output`$`Windowed result`$`Genotype p-value`
-        )    ,
-        #unlist0(r1$Result$`Vector output`$`Full model result`$`Genotype p-value`)  ,
-        #unlist0(r1$Result$`Vector output`$`Full model windowed result`$`Genotype p-value`),
-        ##### MP TERM
-        DRrequiredAgeing:::StratifiedMPTerms(rN),
-        DRrequiredAgeing:::StratifiedMPTerms(rW),
-        ##### URL
-        MakeURL(r0, r1),
-        tableCount(
-          Gen = r1$Result$Details$Original_biological_sample_group,
-          Sex = r1$Result$Details$Original_sex
+
+      if (ncol(r0) != 20) {
+        write(
+          file,
+          file = paste0('Error_Overal_', Sys.Date(), '.txt'),
+          append = TRUE
         )
-      )
-    } else{
-      # FE only
-      x = c(
-        unlist(r0[1, 1:19]),
-        unlist0(r1$Result$Details$`Response type`) ,
-        unlist0(r1$Result$Details$`Applied method`),
-        ################# Window parameters
-        # Have you changed that for new structure of l and k output???
-        SelectWindowingParameters(object = r1$Result$Details)                 ,
-        ################# VectorOutput Results
-        SelectAnalysisFE(r1$Result$`Vector output`$`Normal result`)             ,
-        SelectAnalysisFE(r1$Result$`Vector output`$`Windowed result`)           ,
-        #SelectAnalysis(r1$Result$`Vector output`$`Full model result`)         ,
-        #SelectAnalysis(r1$Result$`Vector output`$`Full model windowed result`),
-        ################# Other results
-        SelectOthers(r1$Result$Details)                                      ,
-        ################ Ignorome/Reference/Behaviour
-        SelectMISC(r0)                                                       ,
-        ##### Variation in response
-        unlist0(
-          r1$Result$Details$'Variation in respone after preprocessing'[1]
-        )   ,
-        unlist0(
-          r1$Result$Details$'Variation in respone before preprocessing'[1]
-        )  ,
-        ##### Pvals
-        unlist0(
-          r1$Result$`Vector output`$`Normal result`$`Genotype p-value`$`Complete table`
-        )      ,
-        unlist0(
-          r1$Result$`Vector output`$`Windowed result`$`Genotype p-value`$`Complete table`
-        )    ,
-        #unlist0(r1$Result$`Vector output`$`Full model result`$`Genotype p-value`)  ,
-        #unlist0(r1$Result$`Vector output`$`Full model windowed result`$`Genotype p-value`),
-        ##### MP TERM
-        DRrequiredAgeing:::StratifiedMPTerms(rN),
-        DRrequiredAgeing:::StratifiedMPTerms(rW),
-        ##### URL
-        MakeURL(r0, r1),
-        tableCount(
-          Gen = r1$Result$Details$Original_biological_sample_group,
-          Sex = r1$Result$Details$Original_sex
+        next
+      }
+      r1 =
+        tryCatch(
+          expr =
+            fromJSON(r0$V20, flatten = TRUE),
+          warning = function(w) {
+            write(
+              file,
+              file = paste0('Error_inJSON_', Sys.Date(), '.txt'),
+              append = TRUE
+            )
+            return(NULL)
+          },
+          error = function(e) {
+            write(
+              file,
+              file = paste0('Error_inJSON_', Sys.Date(), '.txt'),
+              append = TRUE
+            )
+            return(NULL)
+          }
         )
-      )
-    }
-    write(
-      x = paste(x, collapse = '\t'),
-      file = DRrequiredAgeing:::file.path0(
-        paste0(
-          './resultF/',
-          r1$Result$Details$`Response type`,
-          '/',
-          ofname
+      #method = r1$result$detail$applied_method
+      if (is.null(r1))
+        next
+
+
+      method = r1$Result$Details$`Applied method`
+      message(paste(i, '|',  end , ':', file))
+      if (is.null(method) || method  %in% c('MM', 'RR')) {
+        x = c(
+          unlist(r0[1, 1:19]),
+          unlist0(r1$Result$Details$`Response type`) ,
+          unlist0(r1$Result$Details$`Applied method`),
+          ################# Window parameters
+          # Have you changed that for new structure of l and k output???
+          SelectWindowingParameters(object = r1$Result$Details)                 ,
+          ################# VectorOutput Results
+          SelectAnalysis(r1$Result$`Vector output`$`Normal result`)             ,
+          SelectAnalysis(r1$Result$`Vector output`$`Windowed result`)           ,
+          #SelectAnalysis(r1$Result$`Vector output`$`Full model result`)         ,
+          #SelectAnalysis(r1$Result$`Vector output`$`Full model windowed result`),
+          ################# Other results
+          SelectOthers(r1$Result$Details)                                      ,
+          ################ Ignorome/Reference/Behaviour
+          SelectMISC(r0)                                                       ,
+          ##### Variation in response
+          unlist0(
+            r1$Result$Details$'Variation in respone after preprocessing'[1]
+          )   ,
+          unlist0(
+            r1$Result$Details$'Variation in respone before preprocessing'[1]
+          )   ,
+          ##### Pvals
+          unlist0(
+            r1$Result$`Vector output`$`Normal result`$`Genotype p-value`
+          )      ,
+          unlist0(
+            r1$Result$`Vector output`$`Windowed result`$`Genotype p-value`
+          )    ,
+          #unlist0(r1$Result$`Vector output`$`Full model result`$`Genotype p-value`)  ,
+          #unlist0(r1$Result$`Vector output`$`Full model windowed result`$`Genotype p-value`),
+          ##### MP TERM
+          DRrequiredAgeing:::StratifiedMPTerms(rN),
+          DRrequiredAgeing:::StratifiedMPTerms(rW),
+          ##### URL
+          MakeURL(r0, r1),
+          tableCount(
+            Gen = r1$Result$Details$Original_biological_sample_group,
+            Sex = r1$Result$Details$Original_sex
+          )
+        )
+      } else{
+        # FE only
+        x = c(
+          unlist(r0[1, 1:19]),
+          unlist0(r1$Result$Details$`Response type`) ,
+          unlist0(r1$Result$Details$`Applied method`),
+          ################# Window parameters
+          # Have you changed that for new structure of l and k output???
+          SelectWindowingParameters(object = r1$Result$Details)                 ,
+          ################# VectorOutput Results
+          SelectAnalysisFE(r1$Result$`Vector output`$`Normal result`)             ,
+          SelectAnalysisFE(r1$Result$`Vector output`$`Windowed result`)           ,
+          #SelectAnalysis(r1$Result$`Vector output`$`Full model result`)         ,
+          #SelectAnalysis(r1$Result$`Vector output`$`Full model windowed result`),
+          ################# Other results
+          SelectOthers(r1$Result$Details)                                      ,
+          ################ Ignorome/Reference/Behaviour
+          SelectMISC(r0)                                                       ,
+          ##### Variation in response
+          unlist0(
+            r1$Result$Details$'Variation in respone after preprocessing'[1]
+          )   ,
+          unlist0(
+            r1$Result$Details$'Variation in respone before preprocessing'[1]
+          )  ,
+          ##### Pvals
+          unlist0(
+            r1$Result$`Vector output`$`Normal result`$`Genotype p-value`$`Complete table`
+          )      ,
+          unlist0(
+            r1$Result$`Vector output`$`Windowed result`$`Genotype p-value`$`Complete table`
+          )    ,
+          #unlist0(r1$Result$`Vector output`$`Full model result`$`Genotype p-value`)  ,
+          #unlist0(r1$Result$`Vector output`$`Full model windowed result`$`Genotype p-value`),
+          ##### MP TERM
+          DRrequiredAgeing:::StratifiedMPTerms(rN),
+          DRrequiredAgeing:::StratifiedMPTerms(rW),
+          ##### URL
+          MakeURL(r0, r1),
+          tableCount(
+            Gen = r1$Result$Details$Original_biological_sample_group,
+            Sex = r1$Result$Details$Original_sex
+          )
+        )
+      }
+      write(
+        x = paste(x, collapse = '\t'),
+        file = DRrequiredAgeing:::file.path0(
+          paste0(
+            './resultF/',
+            r1$Result$Details$`Response type`,
+            '/',
+            iii,
+            ofname
+          ),
+          create = TRUE,
+          check  = FALSE,
+          IncludedFileName = TRUE
         ),
-        create = TRUE,
-        check  = FALSE,
-        IncludedFileName = TRUE
-      ),
-      append = TRUE,
-      ncolumns = 10 ^ 4
-    )
-    #}
+        append = TRUE,
+        ncolumns = 10 ^ 4
+      )
+      #}
+    }
   }
 }
 
