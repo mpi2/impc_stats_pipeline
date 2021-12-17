@@ -612,7 +612,7 @@ qvaluesGenerator = function(df, filterdfparameter = NULL) {
   if (nrow(df) < 1)
     return(NULL)
 
-  df$setid = apply(df[, 2:14], 1, function(x) {
+  df$setid = apply(df[, 2:ncol(df)], 1, function(x) {
     r = paste(x, sep = '.', collapse = '.')
     return (r)
   })
