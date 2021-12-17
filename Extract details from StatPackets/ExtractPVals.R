@@ -565,6 +565,7 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
             r1$Result$Details$`Response type`,
             '/',
             iii,
+            round(runif(1)*1000000),
             ofname
           ),
           create = TRUE,
@@ -615,7 +616,7 @@ qvaluesGenerator = function(df, filterdfparameter = NULL) {
     r = paste(x, sep = '.', collapse = '.')
     return (r)
   })
-  df = df[!duplicated(df$setid), ]
+  #df = df[!duplicated(df$setid), ]
   df$setid = NULL
 
   counter = 1
