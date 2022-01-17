@@ -74,6 +74,7 @@ mainAgeing = function(file = NULL                                    ,
                       superDebug             = FALSE                      ,
                       subBreakColumns        = NULL,
                       extraBatchParameters   = NULL,
+                      DRversion              = 'not_specified',
                       ...) {
   message0('DRrequiredAgeing loaded')
   message0(
@@ -137,6 +138,13 @@ mainAgeing = function(file = NULL                                    ,
     na.strings = na.strings
   )
   rdata                 = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
+  if (!BatchProducer) {
+    if ('DRversion' %in% names(rdata)) {
+      message0('`DRversion` column already exists in the data and will be used!')
+    } else  {
+      rdata$DRversion       = DRversion
+    }
+  }
   new.data              = rdata
   new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)), ]
   #########

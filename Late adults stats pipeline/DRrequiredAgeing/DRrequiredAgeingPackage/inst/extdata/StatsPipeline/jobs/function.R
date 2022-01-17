@@ -39,7 +39,8 @@ runner = function(file) {
     writeOutputToDB = FALSE,
     solrBaseURL = '',
     measureExecutionTime = FALSE,
-    onlyFillNotExisitingResults = FALSE
+    onlyFillNotExisitingResults = FALSE,
+    DRversion = 'DRversionNotSpecified'
   )
 }
 

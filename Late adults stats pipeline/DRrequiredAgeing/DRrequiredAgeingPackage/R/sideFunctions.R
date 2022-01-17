@@ -4887,12 +4887,38 @@ packageBackup = function(package = NULL,
   }
 }
 
+ReplaceWordInFile = function(file,
+                             pattern = '',
+                             replaceBy = '',
+                             fixed = TRUE,
+                             ...) {
+  if (!file.exists(file)) {
+    message0('file does not exists. file \n\t =>', file)
+    return (invisible(file))
+  }
+  tx  <- readLines(file)
+  tx2  <-
+    gsub(
+      pattern = pattern,
+      replace = replaceBy,
+      x = tx,
+      fixed = fixed,
+      ...
+    )
+  writeLines(tx2, con = file)
+  message0('Replace in file successful. Pattern: ',
+           pattern,
+           ', Replaced by: ',
+           replaceBy)
+  return (invisible(file))
+}
 
 StatsPipeline = function(path = getwd(),
                          SP.results = file.path(getwd(), 'SP'),
                          waitUntillSee = 'No unfinished job found',
                          ignoreThisLineInWaitingCheck = 0,
-                         windowingPipeline =FALSE) {
+                         windowingPipeline = TRUE,
+                         DRversion = 'not_specified') {
   startTime = Sys.time()
   message0('Starting the IMPC statistical pipeline ... ')
   message0('\t Parquet files path:  ', path)
@@ -4903,8 +4929,11 @@ StatsPipeline = function(path = getwd(),
   if (!dir.exists(path))
     dir.create(path)
   setwd(path)
+  currentuser = Sys.info()['user']
   ### step zeop: remove leftovers from lsf
-  system('find /ebi/lsf/yoda-spool/02/ -user hamedhm -type f | xargs rm -rf', wait = TRUE)
+  system(paste0('find /ebi/lsf/yoda-spool/02/ -user ',currentuser,' -type f | xargs rm -rf'), wait = TRUE)
+  system(paste0('find /ebi/lsf/codon-spool/job-spool/ -user ',currentuser,' -type f | xargs rm -rf'), wait = TRUE)
+  system(paste0('find /ebi/lsf/ebi-spool2/01/ -user ',currentuser,' -type f | xargs rm -rf'), wait = TRUE)
   ### Phase I: Preparing parquet files
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
@@ -5052,6 +5081,12 @@ StatsPipeline = function(path = getwd(),
       overwrite = TRUE
     )
   }
+
+  # Specify the DR version in the pipeline
+  ReplaceWordInFile(file.path(path, 'function.R'),
+                    'DRversionNotSpecified',
+                    DRversion)
+
   system('chmod 775 AllJobs.bch', wait = TRUE)
   system('./AllJobs.bch', wait = TRUE)
   waitTillCommandFinish(
