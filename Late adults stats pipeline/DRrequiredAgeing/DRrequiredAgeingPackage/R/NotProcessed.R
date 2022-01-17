@@ -102,8 +102,14 @@ NotProcessedOutput = function(args, writeOutputToDB = FALSE) {
   ### 3 JSON
   message0('Forming the list before applying JSON transformation ...')
   args$note$'Experiment detail'  = experiment_details[-1]
-  datasignFormula = '~DRversion+colony_id+data_point+category+discrete_point+phenotyping_center+procedure_group+procedure_stable_id+parameter_stable_id+allele_accession_id+gene_accession_id+pipeline_stable_id+zygosity+metadata_group+sex+biological_sample_group+strain_accession_id+weight+date_of_experiment+date_of_birth+time_point+text_value'
-  args$note$StatPacket_stable_id = OpenStats:::dataSignature(formula = datasignFormula,data = args$n3.5,digits = 10)
+
+  # Add statpacket ids
+  datasignFormula = '~colony_id+data_point+category+discrete_point+phenotyping_center+procedure_group+procedure_stable_id+parameter_stable_id+allele_accession_id+gene_accession_id+pipeline_stable_id+zygosity+metadata_group+sex+biological_sample_group+strain_accession_id+weight+date_of_experiment+date_of_birth+time_point+text_value'
+  args$note$statpacket_raw_id       = OpenStats:::dataSignature(formula = paste0(datasignFormula,'+DRversion'),data = args$n3.5,digits = 10)
+  args$note$statpacket_universal_id = digest::digest(OpenStats:::dataSignature(formula = paste0(datasignFormula,'+DRversion'),data = args$n3.5,digits = 10))
+  args$note$statpacket_stable_id    = digest::digest(OpenStats:::dataSignature(formula = datasignFormula,data = args$n3.5,digits = 10))
+
+
   listDetails                    = list('Details' = sortList(c(
     NotProcessedLogics,
     args$note
