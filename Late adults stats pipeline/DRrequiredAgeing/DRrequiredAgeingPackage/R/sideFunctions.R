@@ -6635,3 +6635,132 @@ changeRpackageDirectory = function(path = '~/DRs/R/packages') {
   .libPaths(new = wdirc)
   message(' => new package path set to: ', wdirc)
 }
+
+
+IMPC_HadoopLoad = function(SP.results = getwd(),
+                           waitUntillSee = 'No unfinished job found',
+                           ignoreThisLineInWaitingCheck = 0,
+                           ###
+                           mp_chooser_file = 'mp_chooser_20210726.json.Rdata',
+                           host =  "http://hh-hdp-master-02.ebi.ac.uk/",
+                           path = 'impc/dr15.1/stats_packets/',
+                           prefix = 'DRXXX_',
+                           port = '50070',
+                           user = Sys.info()['user'],
+                           password = 'impc',
+                           level = .0001,
+                           rrlevel = .0001
+) {
+
+  configlist = list(
+    mp_chooser_file = mp_chooser_file,
+    host = host,
+    path = path,
+    prefix = prefix,
+    port = port,
+    user = user,
+    password = password,
+    level = level,
+    rrlevel = rrlevel
+  )
+
+  DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index for results')
+  DRrequiredAgeing:::message0('Zipping the logs ...')
+  setwd(file.path(SP.results, '..','..',  'logs'))
+  system(command = 'zip -rm logs.zip *.ClusterErr *.ClusterOut', wait = TRUE)
+
+  DRrequiredAgeing:::message0('Indexing the results ...')
+  setwd(file.path(SP.results))
+
+  system('rm -f minijobs.txt', wait = TRUE)
+  system('rm -f error.err', wait = TRUE)
+  system('rm -f output.out', wait = TRUE)
+  system('rm -f *.Ind', wait = TRUE)
+  system('rm -rf AnnotationExtractorHadoop/', wait = TRUE)
+
+  DRrequiredAgeing:::minijobsCreator()
+  system('chmod 775 minijobs.txt', wait = TRUE)
+  system('./minijobs.txt', wait = TRUE)
+  DRrequiredAgeing:::waitTillCommandFinish(
+    command = 'bjobs',
+    exitIfTheOutputContains = waitUntillSee,
+    ignoreline = ignoreThisLineInWaitingCheck
+  )
+
+  DRrequiredAgeing:::message0('Moving single indeces into a separate directory called AnnotationExtractorHadoop ...')
+  system('rm -rf AnnotationExtractorHadoop/', wait = TRUE)
+  system('mkdir AnnotationExtractorHadoop', wait = TRUE)
+  system('chmod 775 AnnotationExtractorHadoop/', wait = TRUE)
+  system('mv *.Ind AnnotationExtractorHadoop/', wait = TRUE)
+
+  setwd(file.path(SP.results, 'AnnotationExtractorHadoop'))
+  DRrequiredAgeing:::message0('Concating single index files to create a global index for the results ...')
+  system('cat *.Ind >> AllResultsIndeces.txt', wait = TRUE)
+
+  DRrequiredAgeing:::message0('zipping the single indeces ...')
+  system('zip -rm allsingleindeces.zip *.Ind', wait = TRUE)
+
+  system('rm -f split_index_*', wait = TRUE)
+  system('rm -f splits.zip', wait = TRUE)
+  system('split -15000 AllResultsIndeces.txt split_index_', wait = TRUE)
+
+
+  system('rm -f jobs.bch', wait = TRUE)
+  system('rm -f config.Rdata', wait = TRUE)
+  system('rm -f logs.zip' , wait = TRUE)
+  system('rm -f loader.R', wait = TRUE)
+
+  system('rm -rf err', wait = TRUE)
+  system('rm -rf out', wait = TRUE)
+  system('rm -rf log', wait = TRUE)
+
+  DRrequiredAgeing:::message0('Writing the config file ...')
+  save(configlist,file = 'configHadoop.Rdata')
+
+  DRrequiredAgeing:::annotationIndexCreator(
+    path = getwd(),
+    pattern = 'split_index',
+    mem = 12000,
+    outputfile = 'jobs.bch'
+  )
+  system('chmod 775 jobs.bch', wait = TRUE)
+
+
+  if (is.null(mp_chooser_file) || !file.exists(file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file))) {
+    DRrequiredAgeing:::message0(
+      'mp_chooser not found\n\t',
+      file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
+    )
+    mp_chooser_file = 'mp_chooser_20210324.json.Rdata'
+    DRrequiredAgeing:::message0(
+      'mp_chooser defaulted to \n',
+      file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
+    )
+  }
+
+  DRrequiredAgeing:::message0('Downloading the action script ...')
+  system(
+    'wget -O loader.R https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/IMPC%20annotation%20pipeline/loaderHadoop.R',
+    wait = TRUE
+  )
+
+  system('./jobs.bch', wait = TRUE)
+  DRrequiredAgeing:::waitTillCommandFinish(
+    command = 'bjobs',
+    exitIfTheOutputContains = waitUntillSee,
+    ignoreline = ignoreThisLineInWaitingCheck
+  )
+
+  DRrequiredAgeing:::message0('Check for errors in the process ...')
+  setwd(file.path(SP.results, 'AnnotationExtractorHadoop','out'))
+  if(system(command = 'grep "exit" * -lR', wait = TRUE)==0)
+    stop ('Oh no! we found some errors in the process!')
+
+  DRrequiredAgeing:::message0('Zipping logs ...')
+  setwd(file.path(SP.results, 'AnnotationExtractorHadoop'))
+  system('zip -rm logs.zip log/* err/* out/*', wait = TRUE)
+  system('zip -rm splits.zip split_index_*', wait = TRUE)
+
+  DRrequiredAgeing:::message0('Job done.')
+
+}

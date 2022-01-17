@@ -103,6 +103,9 @@ if (!requireNamespace("Hmisc", quietly = TRUE)) {
 if (!requireNamespace("Cairo", quietly = TRUE)) {
   install.packages('Cairo', repos = "https://cran.rstudio.com/")
 }
+if (!requireNamespace("rwebhdfs", quietly = TRUE)) {
+  devtools::install_github(c("saurfang/rwebhdfs"),upgrade = 'always',force = TRUE)
+}
 
 ##########################################
 # install packages
