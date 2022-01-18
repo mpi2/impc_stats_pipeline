@@ -94,9 +94,13 @@ for (i in 1:lflist) {
   )
   gc()
 
-  if (transfered)
+  if (transfered) {
+    message('Transfer successful.')
+    message('Removing the temp statpacket file.')
     unlink(tmplocalfile)
-  else
+    message('Done!')
+  }  else{
     stop('Transfered not successful!')
+  }
 
 }
