@@ -6646,7 +6646,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            ###
                            mp_chooser_file = 'mp_chooser_20210726.json.Rdata',
                            host =  "hh-hdp-master-02.ebi.ac.uk",
-                           path = '/hadoop/user/mi_hadoop/impc/statpackets',
+                           path = 'hadoop/user/mi_hadoop/impc/statpackets/',
                            prefix = 'DRXXX_',
                            port = '50070',
                            user = Sys.info()['user'],
