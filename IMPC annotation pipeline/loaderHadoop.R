@@ -84,7 +84,7 @@ for (i in 1:lflist) {
     )
   rwebhdfs::mkdir(hdfs, dirname(hadoopPath))
 
-  transfered = rwebhdfs::write_file.webhdfs(
+  transfered = rwebhdfs::write_file(
     fs = hdfs,
     targetPath = hadoopPath,
     srcPath = tmplocalfile,
