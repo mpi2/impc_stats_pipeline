@@ -6649,7 +6649,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            path = 'hadoop/user/mi_hadoop/impc/statpackets/',
                            prefix = 'DRXXX_',
                            port = '50070',
-                           user = Sys.info()['user'],
+                           user = 'mi_hadoop',
                            password = 'impc',
                            level = .0001,
                            rrlevel = .0001
