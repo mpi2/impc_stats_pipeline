@@ -4525,12 +4525,15 @@ list.dirsDepth = function(path  = getwd(),
 
 minijobsCreator = function(path  = getwd(),
                            depth = 2,
-                           fname = 'minijobs.txt') {
-  lf =list.dirsDepth(path = path, depth = depth)
+                           fname = 'minijobs.txt',
+                           type = '*.tsv') {
+  lf = list.dirsDepth(path = path, depth = depth)
   a = paste0(
     'bsub -e error.err -o output.out "find ',
     lf,
-    ' -type f > ',
+    ' -type f -name "',
+    type,
+    '" > ',
     path,
     '/FileIndex_',
     basename(lf),
@@ -6643,7 +6646,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            ###
                            mp_chooser_file = 'mp_chooser_20210726.json.Rdata',
                            host =  "http://hh-hdp-master-02.ebi.ac.uk/",
-                           path = 'impc/dr15.1/stats_packets/',
+                           path = '/hadoop/user/mi_hadoop/impc/statpackets',
                            prefix = 'DRXXX_',
                            port = '50070',
                            user = Sys.info()['user'],
@@ -6707,6 +6710,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   system('rm -f jobs.bch', wait = TRUE)
   system('rm -f config.Rdata', wait = TRUE)
+  system('rm -f configHadoop.Rdata', wait = TRUE)
   system('rm -f logs.zip' , wait = TRUE)
   system('rm -f loader.R', wait = TRUE)
 

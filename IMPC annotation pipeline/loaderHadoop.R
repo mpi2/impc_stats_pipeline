@@ -8,18 +8,8 @@ library(jsonlite)
 library(rlist)
 library(Tmisc)
 library(rwebhdfs)
-##############################
-shuffle = function (x = as.numeric(Sys.time()) * 100000,
-                    replace = TRUE,
-                    length = 5) {
-  r = as.numeric(unlist(strsplit(as.character(x), "")))
-  r = sample(r, length, replace = replace)
-  return(paste0(r, collapse = ''))
-}
-
-
 ###########################################
-load('config.Rdata')
+load('configHadoop.Rdata')
 mp_chooser_file = configlist$mp_chooser_file
 host =  configlist$host
 path = configlist$path
@@ -30,10 +20,9 @@ password = configlist$password
 level = configlist$level
 rrlevel = configlist$rrlevel
 ###########################################
-
+today = format(Sys.time(), '%d%m%Y')
 flist = readLines(con = file[1])
 lflist = length(flist)
-id = 1
 statpackets_out = NULL
 for (i in 1:lflist) {
   cat('\r', i, '/', lflist)
@@ -49,13 +38,16 @@ for (i in 1:lflist) {
       quote = "",
       stringsAsFactors = FALSE
     )
-    if (ncol(df) != 20)
+    if (ncol(df) != 20 ||
+        nrow(df) > 1)
       next
     ###################
-    rN = DRrequiredAgeing:::annotationChooser(statpacket = df,
-                                              level = level,
-                                              rrlevel = rrlevel,
-                                              mp_chooser_file = mp_chooser_file)
+    rN = DRrequiredAgeing:::annotationChooser(
+      statpacket = df,
+      level = level,
+      rrlevel = rrlevel,
+      mp_chooser_file = mp_chooser_file
+    )
     rW = DRrequiredAgeing:::annotationChooser(
       statpacket = rN$statpacket,
       level = level,
@@ -64,19 +56,46 @@ for (i in 1:lflist) {
       TermKey = 'WMPTERM',
       mp_chooser_file = mp_chooser_file
     )
-    statpackets_out = c(statpackets_out,rW$statpacket)
+    statpackets_out = c(statpackets_out, rW$statpacket)
   }
-  if (!dir.exists("log")) {
-    dir.create("log")
+
+  # statpackets need to be stored as characters
+  statpackets_out = as.character(statpackets_out)
+
+  # store StatPackets temporary
+  if (!dir.exists("tmp")) {
+    dir.create("tmp")
   }
-  write(
-    paste(file, sep = "\t-->", collapse = "\t-->"),
-    file = paste0("./log/", basename(file[1]), "__Log.log"),
-    append = TRUE
+
+  tmplocalfile    =  file.path('tmp', paste0(basename(file[1]), '_', as.character(runif(1))))
+  writeLines(statpackets_out, con = tmplocalfile)
+
+  # Prepare and transfer files to hadoop
+  hadoopPath = file.path(path,
+                         prefix,
+                         today,
+                         paste0(basename(file[1]), '_.statpackets'))
+  hdfs <-
+    webhdfs(
+      namenode_host = host,
+      namenode_port = port,
+      hdfs_username =  user
+    )
+  rwebhdfs::mkdir(hdfs, dirname(hadoopPath))
+
+  transfered = rwebhdfs::write_file.webhdfs(
+    fs = hdfs,
+    targetPath = hadoopPath,
+    srcPath = tmplocalfile,
+    sizeWarn = 10 ^ 12,
+    append = FALSE,
+    overwrite = TRUE
   )
-  
-  hdfs <- webhdfs(namenode_host = host, namenode_port = port,hdfs_username =  user)
-  write_file(hdfs, file.path(path, format(Sys.time(), '%a%b%d_%Y'), paste0(basename(file[1], '_.json'))))
-  
   gc()
+
+  if (transfered)
+    unlink(tmplocalfile)
+  else
+    stop('Transfered not successful!')
+
 }
