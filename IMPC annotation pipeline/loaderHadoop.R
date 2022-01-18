@@ -75,6 +75,13 @@ for (i in 1:lflist) {
                          prefix,
                          today,
                          paste0(basename(file[1]), '_.statpackets'))
+  hadoopPath = gsub(
+    pattern = '//',
+    replacement = '/',
+    x = hadoopPath,
+    fixed = TRUE
+  )
+
   hdfs <-
     webhdfs(
       namenode_host = host,
