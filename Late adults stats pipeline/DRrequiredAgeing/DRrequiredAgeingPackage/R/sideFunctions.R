@@ -6679,7 +6679,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   system('rm -f error.err', wait = TRUE)
   system('rm -f output.out', wait = TRUE)
   system('rm -f *.Ind', wait = TRUE)
-  system('rm -rf AnnotationExtractorHadoop/', wait = TRUE)
+  system('rm -rf AnnotationExtractorAndHadoopLoader/', wait = TRUE)
 
   DRrequiredAgeing:::minijobsCreator()
   system('chmod 775 minijobs.txt', wait = TRUE)
@@ -6690,13 +6690,13 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
-  DRrequiredAgeing:::message0('Moving single indeces into a separate directory called AnnotationExtractorHadoop ...')
-  system('rm -rf AnnotationExtractorHadoop/', wait = TRUE)
-  system('mkdir AnnotationExtractorHadoop', wait = TRUE)
-  system('chmod 775 AnnotationExtractorHadoop/', wait = TRUE)
-  system('mv *.Ind AnnotationExtractorHadoop/', wait = TRUE)
+  DRrequiredAgeing:::message0('Moving single indeces into a separate directory called AnnotationExtractorAndHadoopLoader ...')
+  system('rm -rf AnnotationExtractorAndHadoopLoader/', wait = TRUE)
+  system('mkdir AnnotationExtractorAndHadoopLoader', wait = TRUE)
+  system('chmod 775 AnnotationExtractorAndHadoopLoader/', wait = TRUE)
+  system('mv *.Ind AnnotationExtractorAndHadoopLoader/', wait = TRUE)
 
-  setwd(file.path(SP.results, 'AnnotationExtractorHadoop'))
+  setwd(file.path(SP.results, 'AnnotationExtractorAndHadoopLoader'))
   DRrequiredAgeing:::message0('Concating single index files to create a global index for the results ...')
   system('cat *.Ind >> AllResultsIndeces.txt', wait = TRUE)
 
@@ -6756,12 +6756,12 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   )
 
   DRrequiredAgeing:::message0('Check for errors in the process ...')
-  setwd(file.path(SP.results, 'AnnotationExtractorHadoop','out'))
+  setwd(file.path(SP.results, 'AnnotationExtractorAndHadoopLoader','out'))
   if(system(command = 'grep "exit" * -lR', wait = TRUE)==0)
     stop ('Oh no! we found some errors in the process!')
 
   DRrequiredAgeing:::message0('Zipping logs ...')
-  setwd(file.path(SP.results, 'AnnotationExtractorHadoop'))
+  setwd(file.path(SP.results, 'AnnotationExtractorAndHadoopLoader'))
   system('zip -rm logs.zip log/* err/* out/*', wait = TRUE)
   system('zip -rm splits.zip split_index_*', wait = TRUE)
 
