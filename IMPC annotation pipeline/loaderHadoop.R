@@ -1,5 +1,5 @@
-file = commandArgs(trailingOnly = TRUE)
-library('RPostgreSQL')
+orgfile = commandArgs(trailingOnly = TRUE)
+file = orgfile
 library('data.table')
 ########################### Annotation pipeline #################################
 ##############################
@@ -67,14 +67,14 @@ for (i in 1:lflist) {
     dir.create("tmp")
   }
 
-  tmplocalfile    =  file.path('tmp', paste0(basename(file[1]), '_', as.character(runif(1))))
+  tmplocalfile    =  file.path('tmp', paste0(basename(orgfile[1]), '_', as.character(runif(1))))
   writeLines(statpackets_out, con = tmplocalfile)
 
   # Prepare and transfer files to hadoop
   hadoopPath = file.path(path,
                          prefix,
                          today,
-                         paste0(basename(file[1]), '_.statpackets'))
+                         paste0(basename(orgfile[1]), '_.statpackets'))
 
   hdfs <-
     webhdfs(
