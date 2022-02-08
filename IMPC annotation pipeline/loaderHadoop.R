@@ -96,8 +96,8 @@ for (i in 1:lflist) {
 
   if (transfered) {
     message('Transfer successful.')
-    #message('Removing the temp statpacket file.')
-    #unlink(tmplocalfile)
+    message('Compressing the temp statpacket file.')
+    system(command = paste0('gzip ', tmplocalfile), wait = TRUE)
     message('Done!')
   }  else{
     stop('Transfered not successful!')
