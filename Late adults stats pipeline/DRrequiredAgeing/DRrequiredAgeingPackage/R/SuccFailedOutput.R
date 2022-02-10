@@ -41,6 +41,11 @@ SuccessfulOutput = function(args, writeOutputToDB = FALSE, b64Encode = TRUE, pla
 
   # Add statpacket ids
   datasignFormula = '~colony_id+data_point+category+discrete_point+phenotyping_center+procedure_group+procedure_stable_id+parameter_stable_id+allele_accession_id+gene_accession_id+pipeline_stable_id+zygosity+metadata_group+sex+biological_sample_group+strain_accession_id+weight+date_of_experiment+date_of_birth+time_point+text_value'
+  args$note$DRversion       = ifelse(
+    is.data.frame(args$n3.5) && 'DRversion' %in% names(args$n3.5),
+    paste(unique(args$n3.5[, 'DRversion']), sep = ' | ', collapse = ' | '),
+    'not_specified'
+  )
   args$note$statpacket_raw_id       = OpenStats:::dataSignature(formula = paste0(datasignFormula,'+DRversion'),data = args$n3.5,digits = 10)
   args$note$statpacket_universal_id = digest::digest(OpenStats:::dataSignature(formula = paste0(datasignFormula,'+DRversion'),data = args$n3.5,digits = 10))
   args$note$statpacket_stable_id    = digest::digest(OpenStats:::dataSignature(formula = datasignFormula,data = args$n3.5,digits = 10))
