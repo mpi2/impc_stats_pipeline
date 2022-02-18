@@ -5291,7 +5291,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
                                       waitUntillSee = 'No unfinished job found',
                                       ignoreThisLineInWaitingCheck = 0,
                                       ###
-                                      mp_chooser_file = 'mp_chooser_20220211.json.Rdata',
+                                      mp_chooser_file = 'mp_chooser_20220218.json.Rdata',
                                       host =  "hh-yoda-05-01",
                                       tablename = paste0('db_',
                                                         DrrequiredAgeing:::RemoveSpecialChars(
@@ -5385,7 +5385,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
       'mp_chooser not found\n\t',
       file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
     )
-    mp_chooser_file = 'mp_chooser_20220211.json.Rdata'
+    mp_chooser_file = 'mp_chooser_20220218.json.Rdata'
     DRrequiredAgeing:::message0(
       'mp_chooser defaulted to \n',
       file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
@@ -6318,7 +6318,7 @@ annotationChooser = function(statpacket = NULL,
                              rrlevel = .005,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
-                             mp_chooser_file = 'mp_chooser_20220211.json.Rdata') {
+                             mp_chooser_file = 'mp_chooser_20220218.json.Rdata') {
   requireNamespace('RPostgreSQL')
   requireNamespace('data.table')
   requireNamespace("data.table")
@@ -6644,7 +6644,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            waitUntillSee = 'No unfinished job found',
                            ignoreThisLineInWaitingCheck = 0,
                            ###
-                           mp_chooser_file = 'mp_chooser_20220211.json.Rdata',
+                           mp_chooser_file = 'mp_chooser_20220218.json.Rdata',
                            host =  "hh-hdp-master-02.ebi.ac.uk",
                            path = 'impc/statpackets',
                            prefix = 'DRXXX_',
@@ -6735,7 +6735,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
       'mp_chooser not found\n\t',
       file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
     )
-    mp_chooser_file = 'mp_chooser_20220211.json.Rdata'
+    mp_chooser_file = 'mp_chooser_20220218.json.Rdata'
     DRrequiredAgeing:::message0(
       'mp_chooser defaulted to \n',
       file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
