@@ -39,8 +39,10 @@ for (i in 1:lflist) {
       stringsAsFactors = FALSE
     )
     if (ncol(df) != 20 ||
-        nrow(df) > 1)
+        nrow(df) > 1) {
+      message('file ignored (!=20 columns): ', file)
       next
+    }
     ###################
     rN = DRrequiredAgeing:::annotationChooser(
       statpacket = df,
@@ -58,49 +60,48 @@ for (i in 1:lflist) {
     )
     statpackets_out = c(statpackets_out, rW$statpacket)
   }
+}
 
-  # statpackets need to be stored as characters
-  statpackets_out = as.character(statpackets_out)
+# statpackets need to be stored as characters
+statpackets_out = as.character(statpackets_out)
 
-  # store StatPackets temporary
-  if (!dir.exists("tmp")) {
-    dir.create("tmp")
-  }
+# store StatPackets temporary
+if (!dir.exists("tmp")) {
+  dir.create("tmp")
+}
 
-  tmplocalfile    =  file.path('tmp', paste0(basename(orgfile[1]), '_', as.character(runif(1))))
-  writeLines(statpackets_out, con = tmplocalfile)
+tmplocalfile    =  file.path('tmp', paste0(basename(orgfile[1]), '_', as.character(runif(1))))
+writeLines(statpackets_out, con = tmplocalfile)
 
-  # Prepare and transfer files to hadoop
-  hadoopPath = file.path(path,
-                         prefix,
-                         today,
-                         paste0(basename(orgfile[1]), '_.statpackets'))
+# Prepare and transfer files to hadoop
+hadoopPath = file.path(path,
+                       prefix,
+                       today,
+                       paste0(basename(orgfile[1]), '_.statpackets'))
 
-  hdfs <-
-    webhdfs(
-      namenode_host = host,
-      namenode_port = port,
-      hdfs_username =  user
-    )
-  rwebhdfs::mkdir(hdfs, dirname(hadoopPath))
-
-  transfered = rwebhdfs::write_file(
-    fs = hdfs,
-    targetPath = hadoopPath,
-    srcPath = tmplocalfile,
-    sizeWarn = 10 ^ 12,
-    append = FALSE,
-    overwrite = TRUE
+hdfs <-
+  webhdfs(
+    namenode_host = host,
+    namenode_port = port,
+    hdfs_username =  user
   )
-  gc()
+rwebhdfs::mkdir(hdfs, dirname(hadoopPath))
 
-  if (transfered) {
-    message('Transfer successful.')
-    message('Compressing the temp statpacket file.')
-    system(command = paste0('gzip ', tmplocalfile), wait = TRUE)
-    message('Done!')
-  }  else{
-    stop('Transfered not successful!')
-  }
+transfered = rwebhdfs::write_file(
+  fs = hdfs,
+  targetPath = hadoopPath,
+  srcPath = tmplocalfile,
+  sizeWarn = 10 ^ 12,
+  append = FALSE,
+  overwrite = TRUE
+)
+gc()
 
+if (transfered) {
+  message('Transfer successful.')
+  message('Compressing the temp statpacket file.')
+  system(command = paste0('gzip ', tmplocalfile), wait = TRUE)
+  message('Done!')
+}  else{
+  stop('Transfered not successful!')
 }
