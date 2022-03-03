@@ -70,7 +70,7 @@ if (!dir.exists("tmp")) {
   dir.create("tmp")
 }
 
-tmplocalfile    =  file.path('tmp', paste0(basename(orgfile[1]), '_', as.character(runif(1))))
+tmplocalfile    =  file.path('tmp', paste0(basename(orgfile[1]), '_.statpackets'))
 writeLines(statpackets_out, con = tmplocalfile)
 
 # Prepare and transfer files to hadoop
