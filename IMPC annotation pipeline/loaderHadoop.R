@@ -23,6 +23,16 @@ rrlevel = configlist$rrlevel
 today = format(Sys.time(), '%d%m%Y')
 flist = readLines(con = file[1])
 lflist = length(flist)
+
+
+# store StatPackets temporary
+if (!dir.exists("tmp")) {
+  dir.create("tmp")
+}
+
+tmplocalfile    =  file.path('tmp', paste0(basename(orgfile[1]), '_.statpackets'))
+
+
 statpackets_out = NULL
 for (i in 1:lflist) {
   cat('\r', i, '/', lflist)
@@ -58,20 +68,18 @@ for (i in 1:lflist) {
       TermKey = 'WMPTERM',
       mp_chooser_file = mp_chooser_file
     )
-    statpackets_out = c(statpackets_out, rW$statpacket)
+
+    write(paste0(as.character(rW$statpacket), collapse = ''),
+          file = tmplocalfile,
+          append = TRUE)
+    #statpackets_out = c(statpackets_out, rW$statpacket)
+    #writeLines(statpackets_out, con = tmplocalfile)
   }
 }
 
 # statpackets need to be stored as characters
-statpackets_out = as.character(statpackets_out)
+# statpackets_out = as.character(statpackets_out)
 
-# store StatPackets temporary
-if (!dir.exists("tmp")) {
-  dir.create("tmp")
-}
-
-tmplocalfile    =  file.path('tmp', paste0(basename(orgfile[1]), '_.statpackets'))
-writeLines(statpackets_out, con = tmplocalfile)
 
 # Prepare and transfer files to hadoop
 hadoopPath = file.path(path,
@@ -96,7 +104,6 @@ transfered = rwebhdfs::write_file(
   overwrite = TRUE
 )
 gc()
-
 if (transfered) {
   message('Transfer successful.')
   message('Compressing the temp statpacket file.')
@@ -105,3 +112,4 @@ if (transfered) {
 }  else{
   stop('Transfered not successful!')
 }
+gc()
