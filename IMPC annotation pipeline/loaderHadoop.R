@@ -99,7 +99,7 @@ transfered = rwebhdfs::write_file(
   fs = hdfs,
   targetPath = hadoopPath,
   srcPath = tmplocalfile,
-  sizeWarn = 10 ^ 12,
+  sizeWarn = 10 ^ 16,
   append = FALSE,
   overwrite = TRUE
 )

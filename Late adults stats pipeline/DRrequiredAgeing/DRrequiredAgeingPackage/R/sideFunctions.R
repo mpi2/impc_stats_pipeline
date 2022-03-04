@@ -6705,7 +6705,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   system('rm -f split_index_*', wait = TRUE)
   system('rm -f splits.zip', wait = TRUE)
-  system('split -1000 AllResultsIndeces.txt split_index_', wait = TRUE)
+  system('split -50 AllResultsIndeces.txt split_index_', wait = TRUE)
 
 
   system('rm -f jobs.bch', wait = TRUE)
@@ -6724,7 +6724,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   DRrequiredAgeing:::annotationIndexCreator(
     path = getwd(),
     pattern = 'split_index',
-    mem = 8000,
+    mem = 5000,
     outputfile = 'jobs.bch'
   )
   system('chmod 775 jobs.bch', wait = TRUE)
