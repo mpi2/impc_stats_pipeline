@@ -5106,7 +5106,6 @@ StatsPipeline = function(path = getwd(),
 IMPC_statspipelinePostProcess = function(SP.results = getwd(),
                                          waitUntillSee = 'No unfinished job found',
                                          ignoreThisLineInWaitingCheck = 0) {
-  changeRpackageDirectory()
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
   DRrequiredAgeing:::message0('Zipping the logs ...')
   setwd(file.path(SP.results, '..','..',  'logs'))
@@ -6281,7 +6280,6 @@ annotationChooser = function(statpacket = NULL,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
                              mp_chooser_file = 'mp_chooser_20210324.json.Rdata') {
-  changeRpackageDirectory()
   #requireNamespace('RPostgreSQL')
   requireNamespace('data.table')
   requireNamespace("data.table")
@@ -6438,7 +6436,6 @@ Write2Postg = function(df,
                                            replaceBy = '_',
                                            what = ' '
                                          ))) {
-  changeRpackageDirectory()
   requireNamespace('RPostgreSQL')
   library(DRrequiredAgeing)
 

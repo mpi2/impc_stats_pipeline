@@ -1,25 +1,4 @@
 file = commandArgs(trailingOnly = TRUE)
-changeRpackageDirectory = function(path = '~/DRs/R/packages') {
-  v = paste(
-    R.version$major,
-    gsub(
-      pattern = '.',
-      replacement = '_',
-      R.version$minor,
-      fixed = TRUE
-    ),
-    sep = '_',
-    collapse = '_'
-  )
-  wdirc = file.path(path, v)
-  if (!dir.exists(wdirc))
-    dir.create(wdirc,
-               showWarnings = FALSE,
-               recursive = TRUE)
-  .libPaths(new = wdirc)
-  message(' => new package path set to: ', wdirc,'. Please add this to the .bash_profile under R_LIBS_USER  environment variable. [file = loader.R]')
-}
-changeRpackageDirectory()
 library('DRrequiredAgeing')
 library('RPostgreSQL')
 library('data.table')
