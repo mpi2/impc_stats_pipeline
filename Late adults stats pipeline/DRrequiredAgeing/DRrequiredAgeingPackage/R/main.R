@@ -153,6 +153,7 @@ mainAgeing = function(file = NULL                                    ,
                    collapse = ', '))
     return(FALSE)
   }
+  rdata$OrgSex = rdata$sex
   rdata$biological_sample_group = rdata$sex
   if (is.factor(rdata$biological_sample_group)) {
     levels(rdata$biological_sample_group) = c('control', 'experimental')
