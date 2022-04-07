@@ -194,7 +194,7 @@ outputNames = function(){
     "zygosity",
     "colony_id"
   )
-  
+
   c2 = c(
     "Applied method",
     "Classification tag",
@@ -218,7 +218,7 @@ outputNames = function(){
     "Weight estimate",
     "Weight standard error"
   )
-  
+
   c3 = c(
     "Concurrent control selection",
     "is referenc gene",
@@ -228,9 +228,9 @@ outputNames = function(){
     "variation_in_respone_before_preprocess",
     "NGenotype p-value",
     "WGenotype p-value"
-    
+
   )
-  
+
   c4 = c('MP_both',
          'MP_male',
          'MP_female')
@@ -284,22 +284,22 @@ DRSummary = function(x) {
   print(length(na.omit(df$N_MP_both)))
   print(length(na.omit(df$N_MP_male)))
   print(length(na.omit(df$N_MP_female)))
-  
+
   print(length(na.omit(df$W_MP_both)))
   print(length(na.omit(df$W_MP_male)))
   print(length(na.omit(df$W_MP_female)))
-  
-  
+
+
   df1 = df[!is.na(df$N_MP_both) | !is.na(df$W_MP_both),]
   table(df1$N_MP_both == df1$W_MP_both,useNA = 'always')
-  
+
   df2 = df[!is.na(df$N_MP_male) | !is.na(df$W_MP_male),]
   table(df2$N_MP_male == df2$W_MP_male,useNA = 'always')
-  
+
   df3 = df[!is.na(df$N_MP_female) | !is.na(df$W_MP_female),]
   table(df3$N_MP_female == df3$W_MP_female,useNA = 'always')
-  
-  
+
+
 }
 
 calculateDiscrepancy = function(x,y){
@@ -311,46 +311,46 @@ DRSummaryAcross = function(x) {
   df12 = data.table::fread(file = '/homes/hamedhm/impc_statistical_pipeline/IMPC_DRs/flatten_observations_dr12.0_15092020/SP/jobs/ExtractPvalues/resultF/data_point_of_type_unidimensional/AllUnidimensionals.tsv',
                            header = FALSE,
                            sep = '\t')
-  
+
   df11 = data.table::fread(file = '/homes/hamedhm/impc_statistical_pipeline/IMPC_DRs/flatten_observations_dr11.0_16092020/SP/jobs/ExtractPvalues/resultF/data_point_of_type_unidimensional/AllDR11Unidimensionals.tsv',
                            header = FALSE,
                            sep = '\t')
-  
-  
+
+
   names(df11)=outputNames()
   names(df12)=outputNames()
-  
-  
-  
+
+
+
   df11$id = makeIndexColumn(df11[,2:19])
   df12$id = makeIndexColumn(df12[,2:19])
-  
+
   mall = merge(df11,df12,by = 'id',all = TRUE,suffixes = c('_dr11','_dr12'))
   m = merge(df11,df12,by = 'id',all = FALSE,suffixes = c('_dr11','_dr12'))
-  
+
   table(m$N_MP_both_dr11==m$N_MP_both_dr12,useNA = 'always')
   calculateDiscrepancy(m$N_MP_both_dr11,m$N_MP_both_dr12)
-  
-  
+
+
   table(m$N_MP_male_dr11==m$N_MP_male_dr12,useNA = 'always')
   calculateDiscrepancy(m$N_MP_male_dr11,m$N_MP_male_dr12)
-  
+
   table(m$N_MP_female_dr11==m$N_MP_female_dr12,useNA = 'always')
   calculateDiscrepancy(m$N_MP_female_dr11,m$N_MP_female_dr12)
-  
+
   # window
-  
+
   table(m$W_MP_both_dr11==m$W_MP_both_dr12,useNA = 'always')
   calculateDiscrepancy(m$W_MP_both_dr11,m$W_MP_both_dr12)
-  
-  
+
+
   table(m$W_MP_male_dr11==m$W_MP_male_dr12,useNA = 'always')
   calculateDiscrepancy(m$W_MP_male_dr11,m$W_MP_male_dr12)
-  
+
   table(m$W_MP_female_dr11==m$W_MP_female_dr12,useNA = 'always')
   calculateDiscrepancy(m$W_MP_female_dr11,m$W_MP_female_dr12)
-  
-  
+
+
 }
 
 
@@ -401,7 +401,7 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
         )
       next
     }
-    
+
     r0 = fread(
       file = file,
       header = FALSE,
@@ -409,7 +409,7 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
       quote = "",
       stringsAsFactors = FALSE
     )
-    
+
     if (ncol(r0) != 19) {
       write(file,
             file = paste0('Error_Overal_', Sys.Date(), '.txt'),
@@ -436,8 +436,8 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
     #method = r1$result$detail$applied_method
     if (is.null(r1))
       next
-    
-    
+
+
     method = r1$Result$Details$`Applied method`
     message(paste(i, '|',  end , ':', file))
     if (!is.null(method) && length(method)>0 && method  %in% c('MM')) {
@@ -449,13 +449,13 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
           r1$Result$`Vector output`$`Normal result`$`Genotype contribution`
         )      ,
         unlist0(r1$Result$`Vector output`$`Normal result`$`Genotype p_Val`)    ,
-        
+
         unlist0(
           r1$Result$`Vector output`$`Windowed result`$`Genotype contribution`
         )    ,
         unlist0(r1$Result$`Vector output`$`Windowed result`$`Genotype p_Val`)
       )
-      
+
       write(
         x = paste(x, collapse = '\t'),
         file = DRrequiredAgeing:::file.path0(
@@ -468,7 +468,7 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
         append = TRUE,
         ncolumns = 10 ^ 4
       )
-      
+
     }
   }
 }
@@ -481,11 +481,11 @@ qvalueEstimator = function(x) {
   x$`NGenotype q-value` = p.adjust(factor2number(x$`NGenotype p-value`))
   x$`N_Sex FvKO q-value` = p.adjust(factor2number(x$`N_Sex FvKO p-value`))
   x$`N_Sex MvKO q-value` = p.adjust(factor2number(x$`N_Sex MvKO p-value`))
-  
+
   x$`WGenotype q-value`  = p.adjust(factor2number(x$`WGenotype p-value`))
   x$`W_Sex FvKO q-value` = p.adjust(factor2number(x$`W_Sex FvKO p-value`))
   x$`W_Sex MvKO q-value` = p.adjust(factor2number(x$`W_Sex MvKO p-value`))
-  
+
   return(x)
 }
 
@@ -498,13 +498,13 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
   #           df$`applied Method` %in% c('MM', 'FE'), ]
   if (nrow(df) < 1)
     return(NULL)
-  
+
   if (!is.null(filterdfparameter))
     df = droplevels(subset(df, df$parameter_stable_id == filterdfparameter))
-  
+
   if (nrow(df) < 1)
     return(NULL)
-  
+
   counter = 1
   d = NULL
   for (centre in unique(df$phenotyping_center)) {
@@ -520,15 +520,15 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
             for (metadata in unique(df5$metadata_group)) {
               df6 = subset(df5, df5$metadata_group == metadata)
               df6 = droplevels(df6)
-              
+
               df6$`NGenotype p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
               df6$`N_Sex FvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
               df6$`N_Sex MvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
               df6$`WGenotype p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
               df6$`W_Sex FvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
               df6$`W_Sex MvKO p-value`[df6$status == 'NotProcessed' & df6$'Variation in respone after preprocessing' == FALSE ]=1
-              
-              
+
+
               if (counter == 1) {
                 d =  qvalueEstimator(df6)
               } else{
@@ -536,7 +536,7 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
               }
               counter = counter + 1
             }
-            
+
           }
         }
         cat('\r-->', counter)
@@ -548,7 +548,7 @@ qvaluesGenerator = function(df,filterdfparameter=NULL) {
     d = d[!duplicated(d),]
   }
   return(d)
-  
+
 }
 
 
@@ -583,12 +583,12 @@ parameter2qvalue = function(parameter, file) {
     sep = '\t',
     stringsAsFactors = TRUE
   )
-  
+
   dir = DRrequiredAgeing:::RemoveSpecialChars(basename(file))
-  
+
   if(!dir.exists(dir))
     dir.create(dir,recursive = TRUE)
-  
+
   d = qvaluesGenerator(df = as.data.frame(df), filterdfparameter = parameter)
   if(!is.null(d) || nrow(d)>0){
     write.csv(
@@ -606,7 +606,7 @@ parameter2qvalue = function(parameter, file) {
   }else{
     return(NULL)
   }
-  
+
 }
 
 makejobs = function(path = getwd()) {
@@ -625,19 +625,19 @@ makejobs = function(path = getwd()) {
       stringsAsFactors = TRUE
     )
     names(df) = outputNames()
-    
+
     parameters = unique(df$parameter_stable_id)
-    
+
     if (!dir.exists('err'))
       dir.create('err')
-    
+
     if (!dir.exists('out'))
       dir.create('out')
-    
+
     bf = basename(file)
     n = length(parameters)
     jobs = paste0 (
-      'bsub -M 8000 -e err/err',
+      'bsub -M 16000 -e err/err',
       bf,
       1:n,
       ' -o out/out',
@@ -655,7 +655,7 @@ makejobs = function(path = getwd()) {
       ncolumns = 10000
     )
   }
-  
+
 }
 
 #makejobs()

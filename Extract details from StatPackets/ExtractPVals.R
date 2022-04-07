@@ -733,7 +733,7 @@ makejobs = function(path = getwd()) {
     bf = basename(file)
     n = length(parameters)
     jobs = paste0 (
-      'bsub -M 8000 -e err/err',
+      'bsub -M 16000 -e err/err',
       bf,
       1:n,
       ' -o out/out',
