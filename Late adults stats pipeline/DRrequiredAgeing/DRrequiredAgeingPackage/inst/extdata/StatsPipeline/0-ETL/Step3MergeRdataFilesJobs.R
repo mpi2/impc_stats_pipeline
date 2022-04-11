@@ -6,7 +6,7 @@ f = function(path = file.path(getwd(), 'ProcedureScatterRdata'),
   ############## jobs creator#
   write(
     paste0(
-      'bsub -M ',
+      'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
       mem,
       ' -e "step4_MergeRdatas_error.log" -o "step4_MergeRdatas_output.log" Rscript Step4MergingRdataFiles.R "',
       unique(na.omit(dirs)),

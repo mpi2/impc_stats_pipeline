@@ -815,7 +815,7 @@ BatchGenerator = function(file                       ,
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
   rf = paste(
-    'bsub '               ,
+    'bsub -J IMPC_stats_pipeline_lsf_jobs '               ,
     extraBatchParameters  ,
     ' -n '                ,
     cpu                   ,
@@ -4529,7 +4529,7 @@ minijobsCreator = function(path  = getwd(),
                            type = '*.tsv') {
   lf = list.dirsDepth(path = path, depth = depth)
   a = paste0(
-    'bsub -e error.err -o output.out "find ',
+    'bsub -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out "find ',
     lf,
     ' -type f -name "',
     type,
@@ -4563,14 +4563,14 @@ minijobsCopyCreator = function(path  = getwd(),
   target = gsub(pattern = getwd(), '', target)
 
   b = paste0(
-    'bsub -e error.err -o output.out \'ssh ',
+    'bsub -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out \'ssh ',
     server,
     ' "mkdir -p ',
     gsub(pattern = paste0(server, ':'), '', target),
     '"\''
   )
 
-  a = paste0('bsub -e error.err -o output.out "scp -r ',
+  a = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out "scp -r ',
              lf,
              '/ ',
              target,
@@ -4593,7 +4593,7 @@ DeleteDirectoryAndSubDirectories = function(path  = getwd(),
                                             depth = 2,
                                             fname = 'deleteFullDirectory.txt') {
   lf = list.dirsDepth(path = path, depth = depth)
-  a = paste0('bsub "rm -rf ',
+  a = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs "rm -rf ',
              lf,
              '"')
   write(
@@ -4617,7 +4617,7 @@ ETLStep1MakePar2RdataJobs = function(path = getwd(),
   )
   write(
     paste0(
-      'bsub -M ',
+      'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
       mem,
       ' -e "step2_Par2Rdata_error.log" -o "Step2_Par2Rdata_output.log" Rscript Step2Parquet2Rdata.R "',
       files,
@@ -4686,7 +4686,7 @@ ETLStep3MergeRdataFilesJobs = function(path = file.path(getwd(), 'ProcedureScatt
   ############## jobs creator#
   write(
     paste0(
-      'bsub -M ',
+      'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
       mem,
       ' -e "step4_MergeRdatas_error.log" -o "step4_MergeRdatas_output.log" Rscript Step4MergingRdataFiles.R "',
       unique(na.omit(dirs)),
@@ -4755,7 +4755,7 @@ dictionary2listConvert = function(x) {
 
 waitTillCommandFinish = function(command = 'bjobs',
                                  checkcommand = 'bjobs',
-                                 exitIfTheOutputContains = 'No unfinished job found',
+                                 exitIfTheOutputContains = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
                                  WaitBeforeRetrySec = 30,
                                  ignoreline = 0,
                                  ...) {
@@ -4845,7 +4845,7 @@ jobCreator = function(path = getwd(),
   proc = tools::file_path_sans_ext(basename(files))
   write(
     paste0(
-      'bsub',
+      'bsub -J IMPC_stats_pipeline_lsf_jobs ',
       ' -e ',
       file.path('DataGeneratingLog', paste0(proc, '_errorlog.log')),
       ' -o ',
@@ -4918,7 +4918,7 @@ ReplaceWordInFile = function(file,
 
 StatsPipeline = function(path = getwd(),
                          SP.results = file.path(getwd(), 'SP'),
-                         waitUntillSee = 'No unfinished job found',
+                         waitUntillSee = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
@@ -5142,7 +5142,7 @@ StatsPipeline = function(path = getwd(),
 
 
 IMPC_statspipelinePostProcess = function(SP.results = getwd(),
-                                         waitUntillSee = 'No unfinished job found',
+                                         waitUntillSee = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
                                          ignoreThisLineInWaitingCheck = 0) {
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
@@ -5288,7 +5288,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
 
 
 IMPC_annotationPostProcess = function(SP.results = getwd(),
-                                      waitUntillSee = 'No unfinished job found',
+                                      waitUntillSee = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
                                       ignoreThisLineInWaitingCheck = 0,
                                       ###
                                       mp_chooser_file = 'mp_chooser_20220218.json.Rdata',
@@ -6560,7 +6560,7 @@ annotationIndexCreator = function(path = getwd(),
 
   err = paste0(' -e ', dirname(lf), '/err/', basename(lf))
   out = paste0(' -o ', dirname(lf), '/out/', basename(lf))
-  batch = paste0('bsub -M ',
+  batch = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
                  mem,
                  ' ',
                  err,
@@ -6595,7 +6595,7 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
   for (i in 2:(length(ind) + 1)) {
     write(
       paste(
-        'bsub  -M ',
+        'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
         mem,
         ' -e "error/err',
         i,
@@ -6641,7 +6641,7 @@ changeRpackageDirectory = function(path = '~/DRs/R/packages') {
 
 
 IMPC_HadoopLoad = function(SP.results = getwd(),
-                           waitUntillSee = 'No unfinished job found',
+                           waitUntillSee = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
                            ignoreThisLineInWaitingCheck = 0,
                            ###
                            mp_chooser_file = 'mp_chooser_20220218.json.Rdata',

@@ -35,7 +35,7 @@ jobCreator = function(path = getwd(),
   proc = tools::file_path_sans_ext(basename(files))
   write(
     paste0(
-      'bsub',
+      'bsub -J IMPC_stats_pipeline_lsf_jobs ',
       ' -e ',
       file.path('DataGeneratingLog', paste0(proc, '_errorlog.log')),
       ' -o ',
