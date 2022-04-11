@@ -4753,24 +4753,24 @@ dictionary2listConvert = function(x) {
 }
 
 
-waitTillCommandFinish = function(command = 'bjobs',
-                                 checkcommand = 'bjobs',
-                                 exitIfTheOutputContains = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
+waitTillCommandFinish = function(command = 'bjobs -w',
+                                 checkcommand = 'bjobs -w',
+                                 WaitIfTheOutputContains = 'IMPC_stats_pipeline_lsf_jobs',
                                  WaitBeforeRetrySec = 30,
                                  ignoreline = 0,
                                  ...) {
-  r = system2(command = checkcommand,
-              wait = TRUE,
-              stdout = TRUE,
-              ...)
+  r = system(command = checkcommand,
+             wait = TRUE,
+             intern = TRUE,
+             ...)
   totalSeconds = 0
   if (any(ignoreline > 0))
     r = r[-c(ignoreline)]
-  while (length(r) > 0 && !all(grepl(
-    pattern = exitIfTheOutputContains,
+  while (length(r) > 0 && any(grepl(
+    pattern = WaitIfTheOutputContains,
     x = r,
     perl = TRUE,
-    ignore.case = TRUE
+    ignore.case = FALSE
   ))) {
     totalSeconds = totalSeconds + WaitBeforeRetrySec
     message0('waiting for ',
@@ -4780,17 +4780,18 @@ waitTillCommandFinish = function(command = 'bjobs',
              totalSeconds,
              's.')
     Sys.sleep(WaitBeforeRetrySec)
-    r = system2(command = checkcommand,
-                wait = TRUE,
-                stdout = TRUE,
-                ...)
+    r = system(command = checkcommand,
+               wait = TRUE,
+               intern = TRUE,
+               ...)
     if (ignoreline > 0)
       r = r[-c(ignoreline)]
 
   }
   message0('continuing the pipeline ...')
   r2 = system(command = command,
-              wait = FALSE,
+              wait = TRUE,
+              intern = TRUE,
               ...)
   return(invisible(r2))
 }
@@ -4918,7 +4919,7 @@ ReplaceWordInFile = function(file,
 
 StatsPipeline = function(path = getwd(),
                          SP.results = file.path(getwd(), 'SP'),
-                         waitUntillSee = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
+                         waitUntillSee = 'IMPC_stats_pipeline_lsf_jobs',
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
@@ -4956,8 +4957,8 @@ StatsPipeline = function(path = getwd(),
   system('chmod 775 jobs_step2_Parquet2Rdata.bch', wait = TRUE)
   system('./jobs_step2_Parquet2Rdata.bch', wait = TRUE)
   waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
   file.remove(file.path(path, 'Step2Parquet2Rdata.R'))
@@ -4984,8 +4985,8 @@ StatsPipeline = function(path = getwd(),
   system('chmod 775 jobs_step4_MergeRdatas.bch', wait = TRUE)
   system('./jobs_step4_MergeRdatas.bch', wait = TRUE)
   waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
   file.remove(file.path(path, 'Step4MergingRdataFiles.R'))
@@ -5014,8 +5015,8 @@ StatsPipeline = function(path = getwd(),
   system('chmod 775 DataGenerationJobList.bch', wait = TRUE)
   system('./DataGenerationJobList.bch', wait = TRUE)
   waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
   file.remove(file.path(path, 'InputDataGenerator.R'))
@@ -5093,8 +5094,8 @@ StatsPipeline = function(path = getwd(),
   system('chmod 775 AllJobs.bch', wait = TRUE)
   system('./AllJobs.bch', wait = TRUE)
   waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
@@ -5142,7 +5143,7 @@ StatsPipeline = function(path = getwd(),
 
 
 IMPC_statspipelinePostProcess = function(SP.results = getwd(),
-                                         waitUntillSee = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
+                                         waitUntillSee = 'IMPC_stats_pipeline_lsf_jobs',
                                          ignoreThisLineInWaitingCheck = 0) {
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
@@ -5159,8 +5160,8 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   system('chmod 775 minijobs.txt', wait = TRUE)
   system('./minijobs.txt', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
   DRrequiredAgeing:::message0('Moving single indeces into a separate directory called SingleIndeces ...')
@@ -5194,8 +5195,8 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
 
   system('./ExtractPValJobs.bch', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
@@ -5249,8 +5250,8 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
     system('chmod 775 Jobs.bch', wait = TRUE)
     system('./Jobs.bch', wait = TRUE)
     DRrequiredAgeing:::waitTillCommandFinish(
-      command = 'bjobs',
-      exitIfTheOutputContains = waitUntillSee,
+      command = 'bjobs -w',
+      WaitIfTheOutputContains = waitUntillSee,
       ignoreline = ignoreThisLineInWaitingCheck
     )
 
@@ -5288,7 +5289,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
 
 
 IMPC_annotationPostProcess = function(SP.results = getwd(),
-                                      waitUntillSee = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
+                                      waitUntillSee = 'IMPC_stats_pipeline_lsf_jobs',
                                       ignoreThisLineInWaitingCheck = 0,
                                       ###
                                       mp_chooser_file = 'mp_chooser_20220218.json.Rdata',
@@ -5336,8 +5337,8 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   system('chmod 775 minijobs.txt', wait = TRUE)
   system('./minijobs.txt', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
@@ -5400,8 +5401,8 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
 
   system('./jobs.bch', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
@@ -6641,7 +6642,7 @@ changeRpackageDirectory = function(path = '~/DRs/R/packages') {
 
 
 IMPC_HadoopLoad = function(SP.results = getwd(),
-                           waitUntillSee = '(No unfinished job found)|(IMPC_stats_pipeline_lsf_jobs)',
+                           waitUntillSee = 'IMPC_stats_pipeline_lsf_jobs',
                            ignoreThisLineInWaitingCheck = 0,
                            ###
                            mp_chooser_file = 'mp_chooser_20220218.json.Rdata',
@@ -6685,8 +6686,8 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   system('chmod 775 minijobs.txt', wait = TRUE)
   system('./minijobs.txt', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
@@ -6750,8 +6751,8 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   system('./jobs.bch', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs',
-    exitIfTheOutputContains = waitUntillSee,
+    command = 'bjobs -w',
+    WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
