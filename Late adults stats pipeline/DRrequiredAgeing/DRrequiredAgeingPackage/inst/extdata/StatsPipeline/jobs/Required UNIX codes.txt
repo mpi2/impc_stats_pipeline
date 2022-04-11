@@ -21,7 +21,7 @@ find . -type f | grep -h "exit" | wc -l
 grep "exit code 2" * -lR
 
 ### Compress a directory
-bsub -J IMPC_stats_pipeline_lsf_jobs -q research-rh74  "tar -zcvf ~/NoBckDir/DR11/jobs/DR11XXXXX_simulation.tar.gz ~/NoBckDir/DR11/jobs/Result_XXXXX/"
+bsub -J IMPC_stats_pipeline_lsf_jobs -q bigmem  "tar -zcvf ~/NoBckDir/DR11/jobs/DR11XXXXX_simulation.tar.gz ~/NoBckDir/DR11/jobs/Result_XXXXX/"
 
 
 # RemoveLSF  cluster tmp

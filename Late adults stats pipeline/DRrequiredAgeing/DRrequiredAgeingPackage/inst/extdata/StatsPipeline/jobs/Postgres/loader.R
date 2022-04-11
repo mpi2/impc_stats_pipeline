@@ -975,5 +975,5 @@ for (i in 1:lflist) {
 # lf = list.files(path = getwd(),pattern = 'split_index',full.names = TRUE,recursive = FALSE,include.dirs = FALSE)
 # err = paste0(' -e ',dirname(lf),'/err/',basename(lf))
 # out = paste0(' -o ',dirname(lf),'/out/',basename(lf))
-# batch = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs -M 12000 ',err,out,' Rscript loader.R "',basename(lf),'"')
+# batch = paste0('bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -M 12000 ',err,out,' Rscript loader.R "',basename(lf),'"')
 # write(batch,'jobs.bch')

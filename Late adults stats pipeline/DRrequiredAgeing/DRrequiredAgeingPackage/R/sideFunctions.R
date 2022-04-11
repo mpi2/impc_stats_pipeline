@@ -815,7 +815,7 @@ BatchGenerator = function(file                       ,
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
   rf = paste(
-    'bsub -J IMPC_stats_pipeline_lsf_jobs '               ,
+    'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs '               ,
     extraBatchParameters  ,
     ' -n '                ,
     cpu                   ,
@@ -4529,7 +4529,7 @@ minijobsCreator = function(path  = getwd(),
                            type = '*.tsv') {
   lf = list.dirsDepth(path = path, depth = depth)
   a = paste0(
-    'bsub -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out "find ',
+    'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out "find ',
     lf,
     ' -type f -name "',
     type,
@@ -4563,14 +4563,14 @@ minijobsCopyCreator = function(path  = getwd(),
   target = gsub(pattern = getwd(), '', target)
 
   b = paste0(
-    'bsub -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out \'ssh ',
+    'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out \'ssh ',
     server,
     ' "mkdir -p ',
     gsub(pattern = paste0(server, ':'), '', target),
     '"\''
   )
 
-  a = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out "scp -r ',
+  a = paste0('bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out "scp -r ',
              lf,
              '/ ',
              target,
@@ -4593,7 +4593,7 @@ DeleteDirectoryAndSubDirectories = function(path  = getwd(),
                                             depth = 2,
                                             fname = 'deleteFullDirectory.txt') {
   lf = list.dirsDepth(path = path, depth = depth)
-  a = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs "rm -rf ',
+  a = paste0('bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs "rm -rf ',
              lf,
              '"')
   write(
@@ -4617,7 +4617,7 @@ ETLStep1MakePar2RdataJobs = function(path = getwd(),
   )
   write(
     paste0(
-      'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
+      'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -M ',
       mem,
       ' -e "step2_Par2Rdata_error.log" -o "Step2_Par2Rdata_output.log" Rscript Step2Parquet2Rdata.R "',
       files,
@@ -4686,7 +4686,7 @@ ETLStep3MergeRdataFilesJobs = function(path = file.path(getwd(), 'ProcedureScatt
   ############## jobs creator#
   write(
     paste0(
-      'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
+      'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -M ',
       mem,
       ' -e "step4_MergeRdatas_error.log" -o "step4_MergeRdatas_output.log" Rscript Step4MergingRdataFiles.R "',
       unique(na.omit(dirs)),
@@ -4846,7 +4846,7 @@ jobCreator = function(path = getwd(),
   proc = tools::file_path_sans_ext(basename(files))
   write(
     paste0(
-      'bsub -J IMPC_stats_pipeline_lsf_jobs ',
+      'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs ',
       ' -e ',
       file.path('DataGeneratingLog', paste0(proc, '_errorlog.log')),
       ' -o ',
@@ -6561,7 +6561,7 @@ annotationIndexCreator = function(path = getwd(),
 
   err = paste0(' -e ', dirname(lf), '/err/', basename(lf))
   out = paste0(' -o ', dirname(lf), '/out/', basename(lf))
-  batch = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
+  batch = paste0('bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -M ',
                  mem,
                  ' ',
                  err,
@@ -6596,7 +6596,7 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
   for (i in 2:(length(ind) + 1)) {
     write(
       paste(
-        'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
+        'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -M ',
         mem,
         ' -e "error/err',
         i,
