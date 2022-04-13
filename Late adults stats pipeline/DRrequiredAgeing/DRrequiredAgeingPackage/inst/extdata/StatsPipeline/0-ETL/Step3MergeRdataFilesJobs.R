@@ -1,5 +1,5 @@
 f = function(path = file.path(getwd(), 'ProcedureScatterRdata'),
-             mem = 40000) {
+             mem = 80000) {
   dirs = list.dirs(path = path,
                    full.names = TRUE ,
                    recursive  = FALSE)

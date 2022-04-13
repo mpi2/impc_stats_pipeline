@@ -894,7 +894,7 @@ BatchGenerator = function(file                       ,
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
   rf = paste(
-    'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs '               ,
+    'bsub -J IMPC_stats_pipeline_lsf_jobs '               ,
     extraBatchParameters  ,
     ' -n '                ,
     cpu                   ,
@@ -4333,7 +4333,7 @@ minijobsCreator = function(path  = getwd(),
                            fname = 'minijobs.txt') {
   lf = DRrequiredAgeing:::list.dirsDepth(path = path, depth = depth)
   a = paste0(
-    'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs "find ',
+    'bsub -J IMPC_stats_pipeline_lsf_jobs "find ',
     lf,
     ' -type f > ',
     path,
@@ -4365,7 +4365,7 @@ ETLStep1MakePar2RdataJobs = function(path = getwd(),
   )
   write(
     paste0(
-      'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -M ',
+      'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
       mem,
       ' -e "step2_Par2Rdata_error.log" -o "Step2_Par2Rdata_output.log" Rscript Step2Parquet2Rdata.R "',
       files,
@@ -4434,7 +4434,7 @@ ETLStep3MergeRdataFilesJobs = function(path = file.path(getwd(), 'ProcedureScatt
   ############## jobs creator#
   write(
     paste0(
-      'bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -M ',
+      'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
       mem,
       ' -e "step4_MergeRdatas_error.log" -o "step4_MergeRdatas_output.log" Rscript Step4MergingRdataFiles.R "',
       unique(na.omit(dirs)),
