@@ -801,8 +801,8 @@ BatchGenerator = function(file                       ,
                           procedure = NULL           ,
                           parameter = NULL           ,
                           center = NULL              ,
-                          cpu = 2                    ,
-                          memory = 5000              ,
+                          cpu = 1                    ,
+                          memory = 7000              ,
                           extraBatchParameters = NULL) {
   dirOut = file.path(dir, 'ClusterOut')
   dirErr = file.path(dir, 'ClusterErr')
@@ -821,8 +821,8 @@ BatchGenerator = function(file                       ,
     cpu                   ,
     ' -M '                ,
     memory                ,
-    ' '                   ,
-    '-R "rusage[mem='        ,
+    ' -q short '          ,
+    '-R "rusage[mem='     ,
     memory                ,
     ']"'                  ,
     ' '                   ,
@@ -4679,14 +4679,14 @@ ETLStep2Parquet2Rdata = function(files) {
 }
 
 ETLStep3MergeRdataFilesJobs = function(path = file.path(getwd(), 'ProcedureScatterRdata'),
-                                       mem = 40000) {
+                                       mem = 80000) {
   dirs = list.dirs(path = path,
                    full.names = TRUE ,
                    recursive  = FALSE)
   ############## jobs creator#
   write(
     paste0(
-      'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
+      'bsub -J -q bigmem IMPC_stats_pipeline_lsf_jobs -M ',
       mem,
       ' -e "step4_MergeRdatas_error.log" -o "step4_MergeRdatas_output.log" Rscript Step4MergingRdataFiles.R "',
       unique(na.omit(dirs)),
