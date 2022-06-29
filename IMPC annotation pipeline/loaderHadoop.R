@@ -69,7 +69,7 @@ for (i in 1:lflist) {
       mp_chooser_file = mp_chooser_file
     )
 
-    write(paste0(as.character(rW$statpacket), collapse = ''),
+    write(paste0(as.character(rW$statpacket$V20), collapse = ''),
           file = tmplocalfile,
           append = TRUE)
     #statpackets_out = c(statpackets_out, rW$statpacket)
