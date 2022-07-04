@@ -72,7 +72,7 @@ GenerateData = function(args, thresh = 4) {
     BatchProducer = TRUE,
     activateMulticore = FALSE,
     cpu = 1,
-    memory = 4000,
+    memory = 8000,
     controlSize = 1500,
     extraBatchParameters = NULL,
     combineEAandLA = FALSE,

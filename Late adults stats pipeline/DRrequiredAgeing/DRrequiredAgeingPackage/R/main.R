@@ -60,7 +60,7 @@ mainAgeing = function(file = NULL                                    ,
                       # Only for Batch generator
                       BatchProducer          =  FALSE      ,
                       cpu = 1                              ,
-                      memory = 4000                        ,
+                      memory = 8000                        ,
                       nMax                   = 10000       ,
                       ChunkSize              = 24          ,
                       MinColoniesInChunks    = 32          ,
