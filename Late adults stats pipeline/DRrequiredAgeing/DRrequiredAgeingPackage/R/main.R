@@ -152,6 +152,22 @@ mainAgeing = function(file = NULL                                    ,
   new.data$external_sample_id = as.factor(new.data$external_sample_id)
   new.data$observation_id     = as.factor(new.data$observation_id)
   new.data$metadata = as.character(new.data$metadata)
+
+  if(length(new.data$metadata)>1) {
+    new.data$experimenter_id = unlist(lapply(strsplit(
+      as.character(new.data$metadata), '::', fixed = TRUE
+    ), function(x) {
+      return(x[grepl('Experimenter ID', x = x, fixed = TRUE)])
+    }))
+    new.data$experimenter_id[is.na(new.data$experimenter_id)]= 'unknown'
+    new.data$experimenter_id = as.factor(new.data$experimenter_id)
+  }
+
+  # log weight
+  new.data$weight[new.data$weight > 0 & !is.na(new.data$weight)] = log(new.data$weight[new.data$weight > 0 & !is.na(new.data$weight)])
+  # log response
+  new.data$data_point[new.data$data_point > 0 & !is.na(new.data$data_point)] = log(new.data$data_point[new.data$data_point > 0 & !is.na(new.data$data_point)])
+
   ################
   # Start analysis
   ################

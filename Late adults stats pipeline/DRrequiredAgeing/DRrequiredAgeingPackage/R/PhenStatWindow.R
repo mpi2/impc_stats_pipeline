@@ -75,12 +75,14 @@ PhenStatWindow = function (phenlistObject                                ,
     message0('Time series detected! Windowing does not apply to the time series ...')
     windowing = FALSE
   } else{
-    RandEffTerm = if (CheckIfNameExistInDataFrame(phenlistObject@datasetPL, 'LifeStage'))
-      as.formula('~ 1 | Batch')
-    else
-      as.formula('~ 1 | Batch')
-    CorrEffect  = NULL
+    if (length(unique(phenlistObject@datasetPL$experimenter_id)) > 1) {
+      RandEffTerm =  ~  1  | experimenter_id / Batch / age_in_days
+    } else{
+      RandEffTerm =  ~  1  |  Batch / age_in_days
+    }
+    CorrEffect  = nlme::corCompSymm()
   }
+  mmfixed = data_point ~ Genotype + Weight + age_in_days
   ###########################
   # Run normal (not windowed) models
   ###########################
@@ -88,6 +90,7 @@ PhenStatWindow = function (phenlistObject                                ,
   message0(method, ' in progress ....')
   object0 =   OpenStats::OpenStatsAnalysis(
     OpenStatsListObject   = phenlistObject,
+    MM_fixed              = mmfixed,
     method                = method,
     MM_random             = RandEffTerm,
     correlation           = CorrEffect,
@@ -106,6 +109,7 @@ PhenStatWindow = function (phenlistObject                                ,
     message0('Running the MM (only ABR) ... ')
     object0 =   OpenStats::OpenStatsAnalysis(
       OpenStatsListObject = phenlistObject,
+      MM_fixed            = mmfixed,
       method              = method,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
       MM_random   = RandEffTerm,
@@ -122,6 +126,7 @@ PhenStatWindow = function (phenlistObject                                ,
     phenlistObject@datasetPL[, depVariable] = jitter(phenlistObject@datasetPL[, depVariable], 0.1)
     object0 =   OpenStats::OpenStatsAnalysis(
       OpenStatsListObject   = phenlistObject,
+      MM_fixed              = mmfixed,
       method                = method,
       MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
       MM_random   = RandEffTerm,
@@ -254,6 +259,7 @@ PhenStatWindow = function (phenlistObject                                ,
           OpenStatsListObject = phenlistObject2,
           method              = method,
           MM_random   = RandEffTerm   ,
+          MM_fixed              = mmfixed,
           correlation = CorrEffect    ,
           MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
           MM_weight   = nlme::varComb(nlme::varFixed(~ 1 / AllModelWeights)),
@@ -265,6 +271,7 @@ PhenStatWindow = function (phenlistObject                                ,
         objectf = OpenStatsAnalysis(
           OpenStatsListObject = phenlistObject,
           method              = method,
+          MM_fixed            = mmfixed,
           MM_random   = RandEffTerm   ,
           correlation = CorrEffect    ,
           MM_BodyWeightIncluded = ifelse(equation %in% 'withWeight', TRUE, FALSE),
