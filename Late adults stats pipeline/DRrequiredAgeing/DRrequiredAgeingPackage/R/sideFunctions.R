@@ -5357,7 +5357,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
 
   system('rm -f split_index_*', wait = TRUE)
   system('rm -f splits.zip', wait = TRUE)
-  system('split -10 AllResultsIndeces.txt split_index_', wait = TRUE)
+  system('split -15000 AllResultsIndeces.txt split_index_', wait = TRUE)
 
 
   system('rm -f jobs.bch', wait = TRUE)
