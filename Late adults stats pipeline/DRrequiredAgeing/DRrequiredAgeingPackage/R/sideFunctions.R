@@ -5185,7 +5185,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   setwd(file.path(SP.results, 'ExtractPvalues'))
   system('cp ../SingleIndeces/AllResultsIndeces.txt .', wait = TRUE)
 
-  DRrequiredAgeing:::splitIndexFileIntoPiecesForPvalueExtraction(indexFilePath = 'AllResultsIndeces.txt',split = 10)
+  DRrequiredAgeing:::splitIndexFileIntoPiecesForPvalueExtraction(indexFilePath = 'AllResultsIndeces.txt',split = 2)
   system('chmod 775 ExtractPValJobs.bch', wait = TRUE)
   system('rm -f ExtractPVals.R',wait = TRUE)
   system(
