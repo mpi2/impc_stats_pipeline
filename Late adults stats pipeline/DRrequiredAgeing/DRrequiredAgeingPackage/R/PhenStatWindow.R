@@ -82,7 +82,7 @@ PhenStatWindow = function (phenlistObject                                ,
     }
     CorrEffect  = nlme::corCompSymm()
   }
-  mmfixed = data_point ~ Genotype + Weight + age_in_days
+  mmfixed = data_point ~ Genotype*Sex + Weight + age_in_days
   ###########################
   # Run normal (not windowed) models
   ###########################
