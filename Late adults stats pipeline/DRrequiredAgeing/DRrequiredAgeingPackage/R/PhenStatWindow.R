@@ -76,13 +76,13 @@ PhenStatWindow = function (phenlistObject                                ,
     windowing = FALSE
   } else{
     if (length(unique(phenlistObject@datasetPL$experimenter_id)) > 1) {
-      RandEffTerm =  ~  1  | experimenter_id / Batch / age_in_days
+      RandEffTerm =  ~  1  | age_in_days / Batch/ experimenter_id
     } else{
-      RandEffTerm =  ~  1  |  Batch / age_in_days
+      RandEffTerm =  ~  1  | age_in_days / Batch
     }
     CorrEffect  = nlme::corCompSymm()
   }
-  mmfixed = data_point ~ Genotype + Weight + age_in_days
+  mmfixed = data_point ~ Genotype*Sex + Weight + age_in_days
   ###########################
   # Run normal (not windowed) models
   ###########################
