@@ -5,7 +5,8 @@ mainAgeing = function(file = NULL                                    ,
                       normalisedPhenlist = FALSE                     ,
                       subdir = 'Results'                             ,
                       seed = 123456                                  ,
-                      MethodOfReadingCategoricalCategories  = 'file' , # `file`, `solr` or `update`
+                      MethodOfReadingCategoricalCategories  = 'file' ,
+                      # `file`, `solr` or `update`
                       OverwriteExistingFiles  = FALSE                ,
                       ignoreSkipList          = FALSE                ,
                       onlyFillNotExisitingResults = FALSE            ,
@@ -21,7 +22,7 @@ mainAgeing = function(file = NULL                                    ,
                       verbose                 = TRUE       ,
                       # OpenStats
                       MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
-                      FERROptimise            = c(TRUE,TRUE)        ,
+                      FERROptimise            = c(TRUE, TRUE)        ,
                       FERRrep                 = 1500       ,
                       equation                = 'auto'     ,
                       # Only for simulations
@@ -95,16 +96,16 @@ mainAgeing = function(file = NULL                                    ,
   message0('Machine info:  ', paste(Sys.info(), collapse = ', '))
   message0('Loading dependent packages ...')
   requireNamespace('PhenStat')
-  requireNamespace('OpenStats'     )
+  requireNamespace('OpenStats')
   requireNamespace('doParallel')
   requireNamespace('parallel')
   requireNamespace('foreach')
   requireNamespace('SmoothWin')
   requireNamespace('nlme')
   requireNamespace('base64enc')
-  requireNamespace('RJSONIO'    )
-  requireNamespace('jsonlite'   )
-  requireNamespace('DBI'        )
+  requireNamespace('RJSONIO')
+  requireNamespace('jsonlite')
+  requireNamespace('DBI')
   # Config files
   message0('Loading configuration ...')
   methodmap                      = readConf('MethodMap.conf')
@@ -115,7 +116,7 @@ mainAgeing = function(file = NULL                                    ,
   exceptionList                  = readFile(file = 'ExceptionMap.list')
   EA2LAMApping                   = read.csv(file = file.path(local(), 'EA2LA_parameter_mappings_2019-09-24.csv'))
   MetaDataList                   = read.csv(file = file.path(local(), 'metadataParameters.csv'))
-  exceptionList                  = unique(c(exceptionList,MetaDataList$parameter_stable_id))
+  exceptionList                  = unique(c(exceptionList, MetaDataList$parameter_stable_id))
   # CategoricalCategoryBlackList   = readFile(file = 'CategoricalCategoryBlackList.list')
   # Main subdirectory/working directory
   message0('Preparing the working directory ...')
@@ -123,11 +124,11 @@ mainAgeing = function(file = NULL                                    ,
   wd  = file.path(cwd,
                   paste(subdir, sep = '_', collapse = '_'))
   dir.create0(wd, recursive = TRUE)
-  wd = CreateVirtualDrive(active = virtualDrive,currentwd = wd)
+  wd = CreateVirtualDrive(active = virtualDrive, currentwd = wd)
   message0('Setting the working directory to: \n\t\t ===> ', wd)
   setwd(dir = wd)
   ################## The rnd must be above seed!
-  initialRandomValue = round(runif(1,min = 1000,max = 9999))
+  initialRandomValue = round(runif(1, min = 1000, max = 9999))
   set.seed(seed)
   # Read file
   rdata = readInputDatafromFile(
@@ -142,10 +143,10 @@ mainAgeing = function(file = NULL                                    ,
   rdata$data_point = as.numeric(rdata$data_point)
   rdata$weight = as.numeric(rdata$weight)
   #rdata = subset(rdata, rdata$zygosity == 'homozygote')
-  rdata = rdata[rdata$biological_sample_group %in% 'control', ]
+  rdata = rdata[rdata$biological_sample_group %in% 'control',]
   rdata$date_of_experiment = as.character(rdata$date_of_experiment)
   rdata = rdata[rdata$date_of_experiment >= '2018-01-01T00:00:00Z' &
-                  rdata$date_of_experiment <= '2020-12-31T00:00:00Z',]
+                  rdata$date_of_experiment <= '2020-12-31T00:00:00Z', ]
   if (length(unique(rdata$sex)) < 2) {
     message0(' Terminated. UKBB synthetic sex levels: ',
              paste(unique(rdata$sex),
@@ -185,9 +186,9 @@ mainAgeing = function(file = NULL                                    ,
     return(FALSE)
   }
   # END of UKBB modification
-  rdata                 = rdata[!is.na(rdata$phenotyping_center), ] # Just to remove NA centers
+  rdata                 = rdata[!is.na(rdata$phenotyping_center),] # Just to remove NA centers
   new.data              = rdata
-  new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)), ]
+  new.data              = new.data[order(Date2Integer(new.data$date_of_experiment)),]
   #########
   new.data$colony_id    = as.character(new.data$colony_id)
   new.data$external_sample_id = as.factor(new.data$external_sample_id)
@@ -229,31 +230,38 @@ mainAgeing = function(file = NULL                                    ,
       outP      = list()
       n3.0 = base::subset(n2.9,  n2.9$parameter_stable_id %in% parameter)
       ############## Read The Ageing parameters from Solr
-      if(is.null(n3.0))
+      if (is.null(n3.0))
         next
       ##############
       centers   = as.character(unique(na.omit(n3.0$phenotyping_center)))
       for (center in centers) {
         n3.1     = base::subset(n3.0, n3.0$phenotyping_center %in% center)
-        strains  = as.character(unique(na.omit(n3.1$strain_accession_id)))
-        for (strain in strains) {
-          n3.2  = base::subset(n3.1,  n3.1$strain_accession_id %in% strain)
-          metas = as.character(unique(na.omit(n3.2$metadata_group)))
-          for (meta in metas) {
-            n3.3   = base::subset(n3.2,  n3.2$metadata_group %in% meta)
-            n3.3.c = base::subset(n3.3,  n3.3$biological_sample_group %in% 'control')
-            n3.3.m = base::subset(n3.3, !(n3.3$biological_sample_group %in% 'control'))
-            zygositys = as.character(unique(na.omit(n3.3.m$zygosity)))
-            for (zyg in zygositys) {
-              n3.3.m_zyg = base::subset(n3.3.m, n3.3.m$zygosity %in% zyg)
-              colonys    = as.character(unique(na.omit(n3.3.m_zyg$colony_id)))
-              nColonies  = length(colonys)
+        pipelines = as.character(unique(na.omit(n3.1$pipeline_stable_id)))
+        for (pipeline in pipelines) {
+          n3.11 = base::subset(n3.1, n3.1$pipeline_stable_id %in% pipeline)
+          strains  = as.character(unique(na.omit(n3.11$strain_accession_id)))
+          for (strain in strains) {
+            n3.2  = base::subset(n3.11,  n3.11$strain_accession_id %in% strain)
+            metas = as.character(unique(na.omit(n3.2$metadata_group)))
+            for (meta in metas) {
+              n3.3   = base::subset(n3.2,  n3.2$metadata_group %in% meta)
+              n3.3.c = base::subset(n3.3,
+                                    n3.3$biological_sample_group %in% 'control')
+              n3.3.m = base::subset(n3.3,
+                                    !(n3.3$biological_sample_group %in% 'control'))
+              zygositys = as.character(unique(na.omit(n3.3.m$zygosity)))
+              for (zyg in zygositys) {
+                n3.3.m_zyg = base::subset(n3.3.m, n3.3.m$zygosity %in% zyg)
+                colonys    = as.character(unique(na.omit(n3.3.m_zyg$colony_id)))
+                nColonies  = length(colonys)
                 message0(
                   ' [',
                   paste(
                     procedure,
                     parameter,
                     center   ,
+                    pipeline ,
+                    pipeline ,
                     strain   ,
                     meta     ,
                     zyg      ,
@@ -291,8 +299,12 @@ mainAgeing = function(file = NULL                                    ,
                 #   .verbose = verbose                        ,
                 #   .inorder = inorder
                 # ) %activemulticore% {
-                for (i in  1:length(colonys)){
-                  message0('*~*~*~*~*~* ', i, '|', length(colonys), ' *~*~*~*~*~*')
+                for (i in  1:length(colonys)) {
+                  message0('*~*~*~*~*~* ',
+                           i,
+                           '|',
+                           length(colonys),
+                           ' *~*~*~*~*~*')
                   for (sim.index in 1:ifelse(simulation, Simulation.iteration, 1)) {
                     # Removing the old objects if exist
                     ObjectsThatMustBeRemovedInEachIteration()
@@ -301,18 +313,22 @@ mainAgeing = function(file = NULL                                    ,
                     note = c(note,
                              list('Random seed' = seed))
                     colony = colonys[i]
-                    message0('Current colony: ',colony)
+                    message0('Current colony: ', colony)
 
-                    n3.4 = base::subset(n3.3.m_zyg,	n3.3.m_zyg$colony_id %in% c(colony))
-                    n3.5 = sortDataset(x = rbind (n3.4, n3.3.c), BatchCol = 'date_of_experiment')
-                    note = c(note,
-                             list(
-                               'Bodyweight included in the input data' = CheckIfNameExistInDataFrame(
-                                 obj   = n3.5,
-                                 name  = 'weight',
-                                 checkLevels = FALSE
-                               )
-                             ))
+                    n3.4 = base::subset(n3.3.m_zyg,
+                                        n3.3.m_zyg$colony_id %in% c(colony))
+                    n3.5 = sortDataset(x = rbind (n3.4, n3.3.c),
+                                       BatchCol = 'date_of_experiment')
+                    note = c(
+                      note,
+                      list(
+                        'Bodyweight included in the input data' = CheckIfNameExistInDataFrame(
+                          obj   = n3.5,
+                          name  = 'weight',
+                          checkLevels = FALSE
+                        )
+                      )
+                    )
                     # Imaginary URLs
                     note$'Gene page URL'        = GenePageURL       = GenePageURL(n3.5)
                     note$'Body weight page URL' = BodyWeightCurvURL = BodyWeightCurvURL(n3.5)
@@ -337,17 +353,21 @@ mainAgeing = function(file = NULL                                    ,
                                                           paste(depVariable$lbl, sep = '.'))
                     note$'Observation type'    =
                       if (!is.null(unique(n3.5$observation_type))) {
-                        paste(unique(n3.5$observation_type),
-                              sep = '~',
-                              collapse = '~')
+                        paste(
+                          unique(n3.5$observation_type),
+                          sep = '~',
+                          collapse = '~'
+                        )
                       } else{
                         NULL
                       }
                     note$'Data type'           =
                       if (!is.null(unique(n3.5$data_type))) {
-                        paste(unique(n3.5$data_type),
-                              sep = '~',
-                              collapse = '~')
+                        paste(
+                          unique(n3.5$data_type),
+                          sep = '~',
+                          collapse = '~'
+                        )
                       } else{
                         NULL
                       }
@@ -380,9 +400,15 @@ mainAgeing = function(file = NULL                                    ,
                       SexGenResLevels = 4
                     }
                     if (!depVariable$accepted) {
-                      write(paste(ReadMeTxt, sep = '\t', collapse = '\t'),
-                            file = 'NotProcessedFileImproperDataType.log',
-                            append = TRUE)
+                      write(
+                        paste(
+                          ReadMeTxt,
+                          sep = '\t',
+                          collapse = '\t'
+                        ),
+                        file = 'NotProcessedFileImproperDataType.log',
+                        append = TRUE
+                      )
                       return('Not a proper dataset!')
                     }
 
@@ -415,12 +441,15 @@ mainAgeing = function(file = NULL                                    ,
                     note         = c(note, n3.5_summary)
                     if (CheckIfNameExistInDataFrame(n3.5, 'LifeStage')) {
                       LifeStageTable = table(n3.5$LifeStage)
-                      message0('LifeStage Summary: ',paste(
-                        names(LifeStageTable),
-                        LifeStageTable       ,
-                        sep      = ':'       ,
-                        collapse = ', '
-                      ))
+                      message0(
+                        'LifeStage Summary: ',
+                        paste(
+                          names(LifeStageTable),
+                          LifeStageTable       ,
+                          sep      = ':'       ,
+                          collapse = ', '
+                        )
+                      )
                     }
                     # Remove zero frequency categories
                     n3.5.1_F_list = RemoveZeroFrequencyCategories(
@@ -483,11 +512,12 @@ mainAgeing = function(file = NULL                                    ,
                     SubSubDirOrdFileName = file.path0(
                       RemoveSpecialChars(center)    ,
                       RemoveSpecialChars(procedure) ,
+                      RemoveSpecialChars(pipeline)  ,
                       RemoveSpecialChars(parameter) ,
                       RemoveSpecialChars(colony)    ,
                       RemoveSpecialChars(zyg)       ,
                       RemoveSpecialChars(meta)      ,
-                      round(runif(1)*1000000)       ,
+                      round(runif(1) * 1000000)     ,
                       create = FALSE,
                       check = noSpaceAllowed
                     )
@@ -507,7 +537,9 @@ mainAgeing = function(file = NULL                                    ,
                              outpfile)
                     if (onlyFillNotExisitingResults) {
                       if (any(file.exists(paste(
-                        outpfile, c('NotProcessed.tsv', 'Successful.tsv'), sep = '_'
+                        outpfile,
+                        c('NotProcessed.tsv', 'Successful.tsv'),
+                        sep = '_'
                       )))) {
                         message0('File already exists then skipped!')
                         return(NULL)
@@ -527,11 +559,12 @@ mainAgeing = function(file = NULL                                    ,
                                   x = x,
                                   fixed = TRUE
                                 )
-                              )
-                          )
+                              ))
                           file.remove(x)
                         })
-                        write(outpfile, file = 'DoesNotExists.log', append = TRUE)
+                        write(outpfile,
+                              file = 'DoesNotExists.log',
+                              append = TRUE)
                       }
                     }
 
@@ -592,11 +625,13 @@ mainAgeing = function(file = NULL                                    ,
                       message = 'Value found in the skip list'
                     ) && !ignoreSkipList
                     n3.5.2  = droplevels0(n3.5.1)
-                    MergLev = MergeLevels(x = n3.5.2[, depVar]                     ,
-                                          listOfLevelMaps = CategoryMap            ,
-                                          parameter_stable_id = parameter          ,
-                                          AllowedParametersList  = MergeCategoryParameters$parameter_stable_id,
-                                          report = TRUE)
+                    MergLev = MergeLevels(
+                      x = n3.5.2[, depVar]                     ,
+                      listOfLevelMaps = CategoryMap            ,
+                      parameter_stable_id = parameter          ,
+                      AllowedParametersList  = MergeCategoryParameters$parameter_stable_id,
+                      report = TRUE
+                    )
                     ###
                     n3.5.2[, depVar] = MergLev$x
                     ################## Only for Gross Morphology group
@@ -624,8 +659,9 @@ mainAgeing = function(file = NULL                                    ,
                     # )
                     # return(NULL)
                     ##################################
-                    n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]),])
-                    n3.5.2OnlyKO     = subset(n3.5.2,n3.5.2$biological_sample_group %in% 'experimental')
+                    n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]), ])
+                    n3.5.2OnlyKO     = subset(n3.5.2,
+                                              n3.5.2$biological_sample_group %in% 'experimental')
                     note$'Relabeled levels for categorical variables'  = MergLev$note
                     if (!is.null(n3.5.2) &&
                         # data.frame is not zero
@@ -634,7 +670,12 @@ mainAgeing = function(file = NULL                                    ,
                         length(unique(n3.5.2$biological_sample_group)) > 1 &&
                         # include mut and cont
                         min0(table(n3.5.2$biological_sample_group)) >= minSampRequired &&
-                        max0(table(n3.5.2OnlyKO$biological_sample_group, n3.5.2OnlyKO$sex)) > 1 &&
+                        max0(
+                          table(
+                            n3.5.2OnlyKO$biological_sample_group,
+                            n3.5.2OnlyKO$sex
+                          )
+                        ) > 1 &&
                         # include at least 4/2 of each genotype
                         #length(unique(n3.5.2$colony_id)) > 1  &&
                         length(RepBlank(
@@ -650,15 +691,26 @@ mainAgeing = function(file = NULL                                    ,
                         # there must be variation in data
                         NonZeroVariation(n3.5.2[, depVar]) &&
                         !isException &&
-                        columnLevelsVariationRadio(dataset = n3.5.2, columnName = depVar) > 0.005 &&
-                        RR_thresholdCheck(data = n3.5.2,depVar = depVar,parameter = parameter,methodmap = methodmap)$'Criteria result' &&
-                        ifelse (skiptimeseries && depVariable$lbl %in% 'time_series', FALSE, TRUE)
-                    ) {
+                        columnLevelsVariationRadio(dataset = n3.5.2,
+                                                   columnName = depVar) > 0.005 &&
+                        RR_thresholdCheck(
+                          data = n3.5.2,
+                          depVar = depVar,
+                          parameter = parameter,
+                          methodmap = methodmap
+                        )$'Criteria result' &&
+                        ifelse (
+                          skiptimeseries && depVariable$lbl %in% 'time_series',
+                          FALSE,
+                          TRUE
+                        )) {
                       message0('Analysing the dataset in progress ...')
                       message0('Creating OpenStats object ...')
                       a = OpenStats::OpenStatsList(
-                        OpenStats:::RemoveSexWithZeroDataPointInGenSexTableOnlyStatsPipelinenotExposed(n3.5.2,
-                                                                                                       cols = c('biological_sample_group', 'sex')),
+                        OpenStats:::RemoveSexWithZeroDataPointInGenSexTableOnlyStatsPipelinenotExposed(
+                          n3.5.2,
+                          cols = c('biological_sample_group', 'sex')
+                        ),
                         testGenotype             = 'experimental',
                         refGenotype              = 'control',
                         dataset.colname.genotype = 'biological_sample_group',
@@ -677,8 +729,14 @@ mainAgeing = function(file = NULL                                    ,
                       #
                       PhenListSpecIds = OtherExtraColumns (
                         obj = a@datasetPL,
-                        ColNames = c('external_sample_id','observation_id'),
-                        names    = c('OpenStatsList external_sample_id','OpenStatsList observation_id')
+                        ColNames = c(
+                          'external_sample_id',
+                          'observation_id'
+                        ),
+                        names    = c(
+                          'OpenStatsList external_sample_id',
+                          'OpenStatsList observation_id'
+                        )
                       )
                       note = c(note, PhenListSpecIds)
                       ### Get method of analysis
@@ -728,28 +786,42 @@ mainAgeing = function(file = NULL                                    ,
                           'Weight column does not exist in the raw data'
                       }
                       # Equation type
-                      message0('equation is set to ',equation)
+                      message0('equation is set to ', equation)
                       if (equation == 'auto') {
                         equationType = ifelse(
                           CheckIfNameExistInDataFrame(a@datasetPL, 'Weight')         &&
-                            MissingPercent(var = 'Weight', data = a@datasetPL) <= .2 &&
+                            MissingPercent(
+                              var = 'Weight',
+                              data = a@datasetPL
+                            ) <= .2 &&
                             EnoughWeightForTheSexGenInteraction(a@datasetPL)         ,
-                          getEquation(var = parameter,
-                                      equationMap = equationmap),
+                          getEquation(
+                            var = parameter,
+                            equationMap = equationmap
+                          ),
                           'withoutWeight'
                         )
                       } else{
                         equationType = equation
                       }
                       # This is the main engine!
-                      note = c(note, list(
-                        'Bodyweight initially included in the full model' = ifelse(method %in% 'MM', equationType, FALSE)
-                      ))
-                      if (normalisedPhenlist){
-                        a = normalisePhenList(phenlist = a, colnames = c(depVar, 'Weight'))
+                      note = c(
+                        note,
+                        list(
+                          'Bodyweight initially included in the full model' = ifelse(method %in% 'MM', equationType, FALSE)
+                        )
+                      )
+                      if (normalisedPhenlist) {
+                        a = normalisePhenList(
+                          phenlist = a,
+                          colnames = c(depVar, 'Weight')
+                        )
                       }
                       message0('Fitting the model ...')
-                      message0('Method: ', method, ', Equation:', equationType)
+                      message0('Method: ',
+                               method,
+                               ', Equation:',
+                               equationType)
                       c.ww0 =	PhenStatWindow(
                         phenlistObject = a,
                         parameter = parameter,
@@ -799,7 +871,8 @@ mainAgeing = function(file = NULL                                    ,
                           reference = wd
                         )
                       )
-                      ExtraCols = c('external_sample_id','observation_id')
+                      ExtraCols = c('external_sample_id',
+                                    'observation_id')
                       ####
                       message0('Preparing the output from VectorOutput function ...')
                       c.ww.vec       = VectorOutput0(
@@ -838,7 +911,8 @@ mainAgeing = function(file = NULL                                    ,
                         !NullOrError(c.ww0$NormalObj$messages) ||
                         (
                           NullOrError(c.ww0$WindowedObj) &&
-                          activeWindowing && (c.ww0$method %in% 'MM')
+                          activeWindowing &&
+                          (c.ww0$method %in% 'MM')
                         )
                       ) &&
                       debug)
@@ -870,16 +944,29 @@ mainAgeing = function(file = NULL                                    ,
                       )
                       StatusSF = !NullOrError(c.ww0$NormalObj) &&
                         NullOrError(c.ww0$NormalObj$messages)
-                      SucFaiFile = paste(outpfile2,
-                                         ifelse(StatusSF,
-                                                'Successful.tsv',
-                                                'Failed_critical_error.tsv'),
-                                         sep =
-                                           '_')
+                      SucFaiFile = paste(
+                        outpfile2,
+                        ifelse(
+                          StatusSF,
+                          'Successful.tsv',
+                          'Failed_critical_error.tsv'
+                        ),
+                        sep =
+                          '_'
+                      )
                       if (!StatusSF) {
-                        write(x    = SucFaiFile,
-                              file = file.path(wd, paste0('Failed_analyses_', Sys.Date(), '.log')),
-                              append = TRUE)
+                        write(
+                          x    = SucFaiFile,
+                          file = file.path(
+                            wd,
+                            paste0(
+                              'Failed_analyses_',
+                              Sys.Date(),
+                              '.log'
+                            )
+                          ),
+                          append = TRUE
+                        )
                       }
                       write.table(
                         x = paste(outP,
@@ -931,14 +1018,17 @@ mainAgeing = function(file = NULL                                    ,
                         col.names = FALSE,
                         quote = FALSE
                       )
-                      if(simulation)
+                      if (simulation)
                         break
                     }
                   }
 
                   message0(
                     'Finished in ',
-                    round(difftime(Sys.time() , Strtime, units = 'sec'), 2),
+                    round(
+                      difftime(Sys.time() , Strtime, units = 'sec'),
+                      2
+                    ),
                     '(s).\n
                   -----------------------------------
                   \n\n '
@@ -946,6 +1036,7 @@ mainAgeing = function(file = NULL                                    ,
                   counter  = counter  + 1
                   gc()
                 }
+              }
             }
           }
         }
@@ -977,5 +1068,3 @@ mainAgeing = function(file = NULL                                    ,
   message0('Cleaning the meamory ...')
   gc()
 }
-
-
