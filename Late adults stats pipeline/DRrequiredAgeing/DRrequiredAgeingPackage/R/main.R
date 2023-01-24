@@ -238,17 +238,20 @@ mainAgeing = function(file = NULL                                    ,
                     create = TRUE,
                     IncludedFileName = FALSE
                   )
-                  SubSubDirOrdFileName = RemoveSpecialChars(paste(
-                    Sys.Date()             ,
-                    #RandomRegardSeed()    ,
-                    #procedure             ,
-                    parameter              ,
-                    center                 ,
-                    zyg                    ,
-                    strain                 ,
-                    meta                   ,
-                    collapse = '_'
-                  ))
+                  SubSubDirOrdFileName = RemoveSpecialChars(
+                    paste(
+                      Sys.Date()             ,
+                      #RandomRegardSeed()    ,
+                      #procedure             ,
+                      parameter              ,
+                      center                 ,
+                      pipeline               ,
+                      zyg                    ,
+                      strain                 ,
+                      meta                   ,
+                      collapse = '_'
+                    )
+                  )
                   outpfile = file.path0(
                     outpDir,
                     SubSubDirOrdFileName,
@@ -341,6 +344,7 @@ mainAgeing = function(file = NULL                                    ,
                       procedure,
                       parameter,
                       center   ,
+                      pipeline ,
                       strain   ,
                       meta     ,
                       zyg      ,
@@ -587,6 +591,7 @@ mainAgeing = function(file = NULL                                    ,
                       SubSubDirOrdFileName = file.path0(
                         RemoveSpecialChars(center)    ,
                         RemoveSpecialChars(procedure) ,
+                        RemoveSpecialChars(pipeline)  ,
                         RemoveSpecialChars(parameter) ,
                         RemoveSpecialChars(colony)    ,
                         RemoveSpecialChars(zyg)       ,
