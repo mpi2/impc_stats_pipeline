@@ -147,6 +147,7 @@ mainAgeing = function(file = NULL                                    ,
   rdata$date_of_experiment = as.character(rdata$date_of_experiment)
   rdata = rdata[rdata$date_of_experiment >= '2018-01-01T00:00:00Z' &
                   rdata$date_of_experiment <= '2020-12-31T00:00:00Z', ]
+  rdata = rdata[rdata$age_in_weeks %in% c(15:18, 56:65, 77:80),]
   if (length(unique(rdata$sex)) < 2) {
     message0(' Terminated. UKBB synthetic sex levels: ',
              paste(unique(rdata$sex),
