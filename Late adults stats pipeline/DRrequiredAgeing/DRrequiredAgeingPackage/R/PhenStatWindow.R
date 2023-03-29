@@ -76,9 +76,9 @@ PhenStatWindow = function (phenlistObject                                ,
     windowing = FALSE
   } else{
     if (length(unique(phenlistObject@datasetPL$experimenter_id)) > 1) {
-      RandEffTerm =  ~  1  | age_in_days / Batch/ experimenter_id
+      RandEffTerm =  ~  1  |  Batch / experimenter_id / age_in_days
     } else{
-      RandEffTerm =  ~  1  | age_in_days / Batch
+      RandEffTerm =  ~  1  |  Batch / age_in_days
     }
     CorrEffect  = nlme::corCompSymm()
   }
