@@ -154,6 +154,10 @@ mainAgeing = function(file = NULL                                    ,
   new.data$observation_id     = as.factor(new.data$observation_id)
   new.data$metadata = as.character(new.data$metadata)
 
+  # Only early and late and no IP
+  new.data = subset(new.data,
+                    new.data$life_stage_name %in% c('Early adult',  'Late adult'))
+
   if (length(new.data$metadata) > 1) {
     new.data$experimenter_id = unlist(lapply(strsplit(
       as.character(new.data$metadata), '::', fixed = TRUE
