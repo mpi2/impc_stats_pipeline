@@ -336,6 +336,7 @@ mainAgeing = function(file = NULL                                    ,
                       counter = counter + 1
                     }
                     rm0(c('BatchData', 'BatchFileName'), silent = TRUE)
+                    gc()
                   }
                 } else{
                   message0(
