@@ -6816,7 +6816,13 @@ HadoopReTransferSCP = function(wd = getwd(),
                          prefix,
                          today)
 
+  files1 = list.files(pattern = '_.statpackets.gz', full.names = TRUE)
+  message('Step1. Deleting .gz files ...')
+  for (file1 in files1) {
+    unlink(file1)
+  }
 
+  message('Step2. Transfering files ...')
   files = list.files(
     wd,
     full.names = TRUE,
@@ -6828,6 +6834,19 @@ HadoopReTransferSCP = function(wd = getwd(),
     message('processing:  ', file)
     hadoopPath = file.path(hadoopbase,
                            basename(file))
+
+    hadoopPath = gsub(
+      pattern = '//',
+      replacement = '/',
+      x = hadoopPath,
+      fixed = TRUE
+    )
+    file = gsub(
+      pattern = '//',
+      replacement = '/',
+      x = file,
+      fixed = TRUE
+    )
 
 
     system(command = paste0('scp ', file, ' ', host, ':', hadoopPath),
