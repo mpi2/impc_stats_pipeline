@@ -6918,3 +6918,169 @@ HadoopReTransfer = function(wd = getwd(),
   return('Done!')
 
 }
+
+#library(quantreg)
+extractRiskyGenesFromDRs = function(newDRReportpath = '../DR18_Reports/DR18StatisticalResultsReportContinuous.csv.gz',
+                      oldDRReportpath = '../DR19_Reports/DR19_AllSuccessful_WithQvaluesAndMPtermsdata_point_of_type_unidimensional.csv.gz') {
+  file = paste0('RiskyGenesToCheck_',
+                DRrequiredAgeing:::RemoveSpecialChars(date()),
+                '.txt')
+  message(
+    'please wait and the results will be displayed on screen (and a version will be stored in ',
+    file,
+    ')'
+  )
+  dfold = read.csv(file = newDRReportpath)
+  dfnew = read.csv(file = oldDRReportpath)
+
+  dfold = subset(dfold, dfold$status == 'Successful')
+  dfnew = subset(dfnew, dfnew$status == 'Successful')
+
+  dfold = subset(dfold, dfold$applied.Method == 'MM')
+  dfnew = subset(dfnew, dfnew$applied.Method == 'MM')
+
+  res10 = paste0('There are ',
+                 nrow(dfnew) - nrow(dfold),
+                 ' more statistical results in the new DR')
+
+
+  res20 = paste0(
+    'There are ',
+    sum(!dfold$metadata_group %in% dfnew$metadata_group),
+    ' metadata in the old DR that does not exist in the new DR'
+  )
+
+  # deep1 = dfold[!dfold$metadata_group %in% dfnew$metadata_group, ]
+  # table(deep1$phenotyping_center)
+
+
+  f1 = function(x) {
+    if (is.numeric(x) && !all(is.na(x)))
+      r = mean(x, na.rm = TRUE)
+    else if ((is.factor(x) || is.character(x)) && !all(is.na(x)))
+      r = paste(unique(as.character(x)),
+                sep = ' | ',
+                collapse = ' | ')
+    else
+      r = NA
+
+    return (r)
+  }
+
+  f2 = function(x) {
+    if (!all(is.na(x)))
+      r = mean(as.numeric(x), na.rm = TRUE)
+    else
+      r = NA
+
+    return (r)
+  }
+
+  f3 = function(x) {
+    if (!all(is.na(x)))
+      r = sum(as.numeric(x), na.rm = TRUE)
+    else
+      r = NA
+
+    return (r)
+  }
+
+  f4 = function(df,
+                col = 'diff',
+                extractcol = 'Group.1',
+                n = 10) {
+    r = df[order(df[, col]), ]
+    r0 = c(head(r[, extractcol], n), tail(r[, extractcol], n))
+    return (r0)
+  }
+
+  aoldmp = aggregate(dfold[, c('Total.KO.female',
+                               'Total.KO.male',
+                               'Total.WT.female',
+                               'Total.WT.male')], by = list(dfold$gene_symbol), f3)
+
+  anewmp = aggregate(dfnew[, c('Total.KO.female',
+                               'Total.KO.male',
+                               'Total.WT.female',
+                               'Total.WT.male')], by = list(dfnew$gene_symbol), f3)
+
+
+  aoldm = aggregate(dfold[, c('Total.KO.female',
+                              'Total.KO.male',
+                              'Total.WT.female',
+                              'Total.WT.male')], by = list(dfold$gene_symbol), f2)
+
+  anewm = aggregate(dfnew[, c('Total.KO.female',
+                              'Total.KO.male',
+                              'Total.WT.female',
+                              'Total.WT.male')], by = list(dfnew$gene_symbol), f2)
+
+
+  aoldm = merge(aoldm,
+                data.frame('Group.1' = aoldmp$Group.1, 'total' = rowSums(aoldmp[, -1])),
+                by = 'Group.1')
+  anewm = merge(anewm,
+                data.frame('Group.1' = anewmp$Group.1, 'total' = rowSums(anewmp[, -1])),
+                by = 'Group.1')
+
+
+  aold = aggregate(dfold$gene_symbol, by = list(dfold$gene_symbol), length)
+  anew = aggregate(dfnew$gene_symbol, by = list(dfnew$gene_symbol), length)
+
+
+  dfm0 = merge(anewm,
+               aoldm,
+               by = 'Group.1',
+               suffixes = c('_dfnew', '_dfold'))
+
+  dfm1 = merge(anew,
+               aold,
+               by = 'Group.1',
+               suffixes = c('_dfnew', '_dfold'))
+  dfm1$diff = dfm1$x_dfnew - dfm1$x_dfold
+  dfm12 = dfm1[dfm1$diff != 0, ]
+  dfm12[order(dfm12$diff), ]
+
+
+  dfm  = merge(dfm0, dfm1, by = 'Group.1')
+  dfm = dfm[, order(names(dfm))]
+
+  dfm$KOFemaleDiff = dfm$Total.KO.female_dfnew < dfm$Total.KO.female_dfold
+  dfm$KOMaleDiff   = dfm$Total.KO.male_dfnew  < dfm$Total.KO.male_dfold
+
+
+  res30 = f4(dfm[dfm$KOFemaleDiff, c('Group.1', 'diff')])
+  res40 = f4(dfm[dfm$KOMaleDiff, c('Group.1', 'diff')])
+
+  res50 = f4(dfm[dfm$Total.WT.female_dfnew < dfm$Total.WT.female_dfold, c('Group.1', 'diff')])
+  res60 = f4(dfm[dfm$Total.WT.male_dfnew < dfm$Total.WT.male_dfold, c('Group.1', 'diff')])
+
+
+  # dif  = log(dfm1$x_dfnew) - log(dfm1$x_dfold)
+  # hist(dif, breaks = 100)
+  # summary(dif)
+  # plot(dfm1$xdfnew,dfm1$xdfold,pch='.')
+  # qline=rq(dfm1$xdfnew~dfm1$xdfold)
+  # abline(qline)
+  #
+  # dfchange = dfm[dfm$x_dfnew < dfm$x_dfold &
+  #                  dfm$total_dfnew < dfm$total_dfold,]
+  # dfchange
+
+  result = unique(c(
+    res10,
+    res20,
+    "Check these risky genes: ",
+    res30,
+    res40,
+    res50,
+    res60
+  ))
+
+  print(result)
+  print(paste0('Check: ./', file))
+  write(result,
+        file)
+  return(invisible(result))
+}
+
