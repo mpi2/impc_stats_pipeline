@@ -6214,11 +6214,12 @@ MoreThan2Length = function(xx,
   return(index)
 }
 
-MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL) {
+MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,json=NULL) {
   fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
   mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
   agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
     !fgrep & !mgrep
+  sexlevels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
 
   if (method %in% 'MM') {
     fgrep = MoreThan2Length(names(x), fgrep, MPTERMS)
@@ -6261,7 +6262,11 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL) {
           'term_id' = ifelse(length(fA(x[agrep], pasteterms = FALSE)) >
                                1, fA(x[agrep], pasteterms = FALSE)[1], fA(x[agrep])),
           event = oevent,
-          sex = "not_considered",
+          sex = ifelse(
+            length(unique(sexlevels)) > 1 ,
+            "not_considered",
+            unique(sexlevels)[1]
+          ),
           otherPossibilities = ifelse(length(fA(x[agrep], pasteterms = FALSE)) >
                                         1, fA(x[agrep]), '')
         )
@@ -6291,14 +6296,16 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL) {
     )
   } else{
     MPTERM = list(
-      NullOrvalueReturn(
-        x[agrep],
-        list(
-          'term_id' = bselect(x[agrep]),
-          event = oevent,
-          sex = "not_considered"
-        )
-      ),
+      NullOrvalueReturn(x[agrep],
+                        list(
+                          'term_id' = bselect(x[agrep]),
+                          event = oevent,
+                          sex = ifelse(
+                            length(unique(sexlevels)) > 1 ,
+                            "not_considered",
+                            unique(sexlevels)[1]
+                          )
+                        )),
       NullOrvalueReturn(x[fgrep], list(
         'term_id' = bselect(x[fgrep]),
         event = fevent,
@@ -6343,7 +6350,7 @@ annotationChooser = function(statpacket = NULL,
   procedure = statpacket$V3
   parameter = statpacket$V6
   json      =  jsonlite::fromJSON(statpacket$V20)
-  method   = GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
+  method   =   GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
   ##################################################################
   Gtag = GenotypeTag(
     obj = json$Result$`Vector output`[[resultKey]],
@@ -6416,7 +6423,7 @@ annotationChooser = function(statpacket = NULL,
         MPTERM = ulistTag3, statpacket = statpacket
       )))
     ##########################
-    ulistTag3 = MatchTheRestHalfWithTheFirstOne(ulistTag3)
+    ulistTag3 =  MatchTheRestHalfWithTheFirstOne(ulistTag3)
     ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
     ##########################
     if (length(ulistTag3) < 1)
@@ -6446,7 +6453,8 @@ annotationChooser = function(statpacket = NULL,
     ################################
     MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
                                            method = method,
-                                           MPTERMS = ulistD)
+                                           MPTERMS = ulistD,
+                                           json = json)
     MPTERMS = rlist::list.clean(MPTERMS)
   }
   if (!is.null(MPTERMS)     &&
