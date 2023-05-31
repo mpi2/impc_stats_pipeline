@@ -6661,7 +6661,8 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            user =  Sys.info()['user'],
                            password = 'impc',
                            level = .0001,
-                           rrlevel = .0001
+                           rrlevel = .0001,
+                           transfer = TRUE
 ) {
 
   configlist = list(
@@ -6673,7 +6674,8 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     user = user,
     password = password,
     level = level,
-    rrlevel = rrlevel
+    rrlevel = rrlevel,
+    transfer = transfer
   )
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index for results')

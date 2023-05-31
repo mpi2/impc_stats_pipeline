@@ -19,6 +19,7 @@ user = configlist$user
 password = configlist$password
 level = configlist$level
 rrlevel = configlist$rrlevel
+transfer = configlist$transfer
 ###########################################
 today = format(Sys.time(), '%d%m%Y')
 flist = readLines(con = file[1])
@@ -80,36 +81,38 @@ for (i in 1:lflist) {
 # statpackets need to be stored as characters
 # statpackets_out = as.character(statpackets_out)
 
+if (transfer) {
+  # Prepare and transfer files to hadoop
+  hadoopPath = file.path(path,
+                         prefix,
+                         today,
+                         paste0(basename(orgfile[1]), '_.statpackets'))
 
-# Prepare and transfer files to hadoop
-hadoopPath = file.path(path,
-                       prefix,
-                       today,
-                       paste0(basename(orgfile[1]), '_.statpackets'))
+  hdfs <-
+    webhdfs(
+      namenode_host = host,
+      namenode_port = port,
+      hdfs_username =  user
+    )
+  rwebhdfs::mkdir(hdfs, dirname(hadoopPath))
 
-hdfs <-
-  webhdfs(
-    namenode_host = host,
-    namenode_port = port,
-    hdfs_username =  user
+  transfered = rwebhdfs::write_file(
+    fs = hdfs,
+    targetPath = hadoopPath,
+    srcPath = tmplocalfile,
+    sizeWarn = 10 ^ 16,
+    append = FALSE,
+    overwrite = TRUE
   )
-rwebhdfs::mkdir(hdfs, dirname(hadoopPath))
-
-transfered = rwebhdfs::write_file(
-  fs = hdfs,
-  targetPath = hadoopPath,
-  srcPath = tmplocalfile,
-  sizeWarn = 10 ^ 16,
-  append = FALSE,
-  overwrite = TRUE
-)
-gc()
-if (transfered) {
-  message('Transfer successful.')
-  message('Compressing the temp statpacket file.')
-  system(command = paste0('gzip ', tmplocalfile), wait = TRUE)
-  message('Done!')
-}  else{
-  stop('Transfered not successful!')
+  gc()
+  if (transfered) {
+    message('Transfer successful.')
+    message('Compressing the temp statpacket file.')
+    system(command = paste0('gzip ', tmplocalfile),
+           wait = TRUE)
+    message('Done!')
+  }  else{
+    stop('Transfered not successful!')
+  }
 }
 gc()
