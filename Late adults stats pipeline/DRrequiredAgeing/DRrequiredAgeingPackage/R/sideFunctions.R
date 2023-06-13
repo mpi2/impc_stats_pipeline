@@ -6916,8 +6916,8 @@ HadoopReTransfer = function(wd = getwd(),
 }
 
 #library(quantreg)
-extractRiskyGenesFromDRs = function(newDRReportpath = '../DR18_Reports/DR18StatisticalResultsReportContinuous.csv.gz',
-                      oldDRReportpath = '../DR19_Reports/DR19_AllSuccessful_WithQvaluesAndMPtermsdata_point_of_type_unidimensional.csv.gz') {
+extractRiskyGenesFromDRs = function(newDRReportpath = '../DR19_Reports/DR19_AllSuccessful_WithQvaluesAndMPtermsdata_point_of_type_unidimensional.csv.gz',
+                                    oldDRReportpath = '../DR18_Reports/DR18StatisticalResultsReportContinuous.csv.gz',) {
   file = paste0('RiskyGenesToCheck_',
                 DRrequiredAgeing:::RemoveSpecialChars(date()),
                 '.txt')
@@ -6926,8 +6926,8 @@ extractRiskyGenesFromDRs = function(newDRReportpath = '../DR18_Reports/DR18Stati
     file,
     ')'
   )
-  dfold = read.csv(file = newDRReportpath)
-  dfnew = read.csv(file = oldDRReportpath)
+  dfold = read.csv(file = oldDRReportpath)
+  dfnew = read.csv(file = newDRReportpath)
 
   dfold = subset(dfold, dfold$status == 'Successful')
   dfnew = subset(dfnew, dfnew$status == 'Successful')
@@ -6985,7 +6985,7 @@ extractRiskyGenesFromDRs = function(newDRReportpath = '../DR18_Reports/DR18Stati
                 col = 'diff',
                 extractcol = 'Group.1',
                 n = 10) {
-    r = df[order(df[, col]), ]
+    r = df[order(df[, col]),]
     r0 = c(head(r[, extractcol], n), tail(r[, extractcol], n))
     return (r0)
   }
@@ -7013,10 +7013,10 @@ extractRiskyGenesFromDRs = function(newDRReportpath = '../DR18_Reports/DR18Stati
 
 
   aoldm = merge(aoldm,
-                data.frame('Group.1' = aoldmp$Group.1, 'total' = rowSums(aoldmp[, -1])),
+                data.frame('Group.1' = aoldmp$Group.1, 'total' = rowSums(aoldmp[,-1])),
                 by = 'Group.1')
   anewm = merge(anewm,
-                data.frame('Group.1' = anewmp$Group.1, 'total' = rowSums(anewmp[, -1])),
+                data.frame('Group.1' = anewmp$Group.1, 'total' = rowSums(anewmp[,-1])),
                 by = 'Group.1')
 
 
@@ -7034,8 +7034,8 @@ extractRiskyGenesFromDRs = function(newDRReportpath = '../DR18_Reports/DR18Stati
                by = 'Group.1',
                suffixes = c('_dfnew', '_dfold'))
   dfm1$diff = dfm1$x_dfnew - dfm1$x_dfold
-  dfm12 = dfm1[dfm1$diff != 0, ]
-  dfm12[order(dfm12$diff), ]
+  dfm12 = dfm1[dfm1$diff != 0,]
+  dfm12[order(dfm12$diff),]
 
 
   dfm  = merge(dfm0, dfm1, by = 'Group.1')
@@ -7079,4 +7079,3 @@ extractRiskyGenesFromDRs = function(newDRReportpath = '../DR18_Reports/DR18Stati
         file)
   return(invisible(result))
 }
-
