@@ -6917,7 +6917,7 @@ HadoopReTransfer = function(wd = getwd(),
 
 #library(quantreg)
 extractRiskyGenesFromDRs = function(newDRReportpath = '../DR19_Reports/DR19_AllSuccessful_WithQvaluesAndMPtermsdata_point_of_type_unidimensional.csv.gz',
-                                    oldDRReportpath = '../DR18_Reports/DR18StatisticalResultsReportContinuous.csv.gz',) {
+                                    oldDRReportpath = '../DR18_Reports/DR18StatisticalResultsReportContinuous.csv.gz') {
   file = paste0('RiskyGenesToCheck_',
                 DRrequiredAgeing:::RemoveSpecialChars(date()),
                 '.txt')
