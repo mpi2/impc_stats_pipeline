@@ -6806,11 +6806,12 @@ ClearReportsAfterCreation = function(dirpath = getwd(),
   return('Done!')
 }
 
+
 HadoopReTransferSCP = function(wd = getwd(),
                                pattern = '_.statpackets',
                                today = format(Sys.time(), '%d%m%Y'),
                                host =  "hadoop-login-02",
-                               path = '/hadoop/user/hamedhm/impc/statpackets/',
+                               path = '/hadoop/user/mi_stats/impc/statpackets/',
                                prefix = 'DRXXX_',
                                user =  Sys.info()['user']) {
   library('data.table')
@@ -6832,37 +6833,22 @@ HadoopReTransferSCP = function(wd = getwd(),
     unlink(file1)
   }
 
-  message('Step2. Transfering files ...')
-  files = list.files(
-    wd,
-    full.names = TRUE,
-    recursive = FALSE,
-    include.dirs = FALSE,
-    pattern = pattern
+  command = paste0('scp -r ', wd, ' ', host, ':', hadoopbase)
+  message('Step2. Transfering files.  \n',
+          command)
+
+  system(paste0('ssh ', host, ' "mkdir -p ', hadoopbase, '"'), wait = TRUE)
+
+  command = gsub(
+    pattern = '//',
+    replacement = '/',
+    x = command,
+    fixed = TRUE
   )
-  for (file in files) {
-    message('processing:  ', file)
-    hadoopPath = file.path(hadoopbase,
-                           basename(file))
 
-    hadoopPath = gsub(
-      pattern = '//',
-      replacement = '/',
-      x = hadoopPath,
-      fixed = TRUE
-    )
-    file = gsub(
-      pattern = '//',
-      replacement = '/',
-      x = file,
-      fixed = TRUE
-    )
+  system(command = command,
+         wait = TRUE)
 
-
-    system(command = paste0('scp ', file, ' ', host, ':', hadoopPath),
-           wait = TRUE)
-    gc()
-  }
   return('Done!')
 
 }
