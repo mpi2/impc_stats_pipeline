@@ -5028,7 +5028,7 @@ StatsPipeline = function(path = getwd(),
     stop('An error occured in Phase II step 1. Packaging the big data into small packages')
 
   ## Compress logs
-  message0('End of pckagin d data. ')
+  message0('End of packagind data. ')
   message0('Phase II. Compressing the log files and house cleaning ... ')
   system(command = 'mv *.R  DataGeneratingLog/', wait = TRUE)
   system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
@@ -5137,7 +5137,7 @@ StatsPipeline = function(path = getwd(),
     'This is the last step. If you see no file in the list below, the SP is successfully completed.'
   )
   setwd(file.path(SP.results, 'logs'))
-  system(command = 'grep "exit" * -lR', wait = TRUE)
+  system(command = 'grep "Exited with exit" * -lR', wait = TRUE)
   message0('SP finished in ', round(difftime(Sys.time(), startTime, units = "min"), 2))
 }
 
