@@ -7,6 +7,7 @@ import zipfile
 
 def divide_chunk(file_ctrl,
                  file_exp,
+                 output_dir_path,
                  control_size=1500,
                  n_max=10000,
                  min_colonies_in_chunks=32,
@@ -20,7 +21,7 @@ def divide_chunk(file_ctrl,
     n_controls = len(csv_control_list)
     csv_experiment = csv.DictReader(open(file_exp))
     data_dict = {}
-    elem_name = file_ctrl.split("_")
+    elem_name = os.path.split(file_ctrl)[1].split("_")
 
     for row in csv_experiment:
         zyg = row["zygosity"]
@@ -48,8 +49,7 @@ def divide_chunk(file_ctrl,
         chunks_list = [exp_chunks[i:i + chunk_size] for i in range(0, len(colonies), chunk_size)]
         for count, chunk in enumerate(chunks_list):
             outfile_name = "_".join(elem_name[:-1] + [zygosity, str(count)])
-            outfile_name_csv =  outfile_name + ".csv"
-            print(outfile_name)
+            outfile_name_csv =  os.path.join(output_dir_path, outfile_name + ".csv")
 
             with open(outfile_name_csv, mode='w') as outfile:
                 out_writer = csv.DictWriter(outfile, fieldnames=csv_experiment.fieldnames)
@@ -62,18 +62,18 @@ def divide_chunk(file_ctrl,
                 for colony in chunk:
                     for row_expr in colony:
                         out_writer.writerow(row_expr)
-            outfile_name_zip = outfile_name + ".zip"
+            outfile_name_zip = os.path.join(output_dir_path, outfile_name + ".zip")
             
             # Compress file with ZIP and remove original CSV file
             with zipfile.ZipFile(outfile_name_zip, "w") as zipf:
                 zipf.write(outfile_name_csv, arcname = os.path.split(outfile_name_csv)[1])
-            print(f"{outfile_name_csv} has been zipped as {outfile_name_zip}")
             os.remove(outfile_name_csv)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="File control and experimental samples parser")
     parser.add_argument("file_ctrl", help="Path to the file with control samples")
     parser.add_argument("file_exp", help="Path to the file with experimental samples")
+    parser.add_argument("output_dir_path", help="Path to the output directory")
     args = parser.parse_args()
 
-    divide_chunk(args.input_file, args.output_dir_path)
+    divide_chunk(args.file_ctrl, args.file_exp, args.output_dir_path)

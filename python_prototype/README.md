@@ -12,11 +12,13 @@ curl "https://www.ebi.ac.uk/mi/impc/solr/experiment/select?q=*:*&wt=csv&rows=${n
 
 ## 3. Sorting the file into preliminary chunks 
 ```bash
-python3 step_1_preliminary_chunking.py data.csv.gz results/
+mkdir intermediate
+python3 step_1_preliminary_chunking.py data.csv.gz intermediate/
 ```
 
 ## 4. Splitting preliminary chunks into final chunks 
 ```bash
-ls results/ | sed -e "s/_control.csv//g" -e "s/_experimental.csv//g" | sort -u > lists_of_chunks.txt
-parallel python3 step_2_final_chunking.py {}_control.csv {}_experimental.csv :::: list_of_chunks.txt
+mkdir results
+ls intermediate/ | sed -e "s/_control.csv//g" -e "s/_experimental.csv//g" | sort -u > list_of_chunks.txt
+parallel --progress python3 step_2_final_chunking.py intermediate/{}_control.csv intermediate/{}_experimental.csv results :::: list_of_chunks.txt
 ```
