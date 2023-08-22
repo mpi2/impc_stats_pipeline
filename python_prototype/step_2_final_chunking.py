@@ -63,7 +63,7 @@ def divide_chunk(file_ctrl,
 
             # Compress file with ZIP and remove original CSV file
             outfile_name_zip = os.path.join(output_dir_path, outfile_name + ".zip")
-            with zipfile.ZipFile(outfile_name_zip, "w") as zipf:
+            with zipfile.ZipFile(outfile_name_zip, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
                 zipf.write(outfile_name_csv, arcname = os.path.split(outfile_name_csv)[1])
             os.remove(outfile_name_csv)
 
