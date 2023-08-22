@@ -97,7 +97,7 @@ def divide_chunk(file_ctrl,
 
         # Finally, compress the control file once
         if n_controls:
-            outfile_basename = "_".join(elem_name + [zygosity, "control"])
+            outfile_basename = "_".join(elem_name + ["control"])
             outfile_zip = os.path.join(output_dir_path, outfile_basename + ".zip")
             with zipfile.ZipFile(outfile_zip, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
                 zipf.write(file_ctrl, arcname = outfile_basename + ".csv")
