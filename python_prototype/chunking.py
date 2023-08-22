@@ -1,14 +1,13 @@
 import argparse
 import csv
 import math
-import gzip
 import os
 import os.path
 import zipfile
 
 
 def chunking(input_file, output_dir_path):
-    csvreader = csv.DictReader(gzip.open(input_file, "rt"))
+    csvreader = csv.DictReader(open(input_file, "rt"))
 
     a = "procedure_stable_id"
     b = "parameter_stable_id"
