@@ -17,8 +17,8 @@ def divide_chunk(file_ctrl,
         print("Either control or experimental file do not exist")
         return
 
-    csv_control_list = [row for row in csv.DictReader(open(file_ctrl))]
-    n_controls = len(csv_control_list)
+    control_data = open(file_ctrl).read()
+    n_controls = control_data.count('\n') - 1
     csv_experiment = csv.DictReader(open(file_exp))
     data_dict = {}
     elem_name = os.path.split(file_ctrl)[1].split("_")
@@ -52,19 +52,17 @@ def divide_chunk(file_ctrl,
             outfile_name_csv =  os.path.join(output_dir_path, outfile_name + ".csv")
 
             with open(outfile_name_csv, mode='w') as outfile:
-                out_writer = csv.DictWriter(outfile, fieldnames=csv_experiment.fieldnames)
-                out_writer.writeheader()
-
                 # Write control to file
-                for row_ctrl in csv_control_list:
-                    out_writer.writerow(row_ctrl)
+                outfile.write(control_data)
+
                 # Write experimental to file
+                out_writer = csv.DictWriter(outfile, fieldnames=csv_experiment.fieldnames)
                 for colony in chunk:
                     for row_expr in colony:
                         out_writer.writerow(row_expr)
-            outfile_name_zip = os.path.join(output_dir_path, outfile_name + ".zip")
-            
+
             # Compress file with ZIP and remove original CSV file
+            outfile_name_zip = os.path.join(output_dir_path, outfile_name + ".zip")
             with zipfile.ZipFile(outfile_name_zip, "w") as zipf:
                 zipf.write(outfile_name_csv, arcname = os.path.split(outfile_name_csv)[1])
             os.remove(outfile_name_csv)
