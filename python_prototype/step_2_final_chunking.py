@@ -21,7 +21,7 @@ def divide_chunk(file_ctrl,
     n_controls = control_data.count('\n') - 1
     csv_experiment = csv.DictReader(open(file_exp))
     data_dict = {}
-    elem_name = os.path.split(file_ctrl)[1].split("_")
+    elem_name = os.path.split(file_ctrl)[1].split("_")[:-1]
 
     for row in csv_experiment:
         zyg = row["zygosity"]
@@ -48,24 +48,28 @@ def divide_chunk(file_ctrl,
         
         chunks_list = [exp_chunks[i:i + chunk_size] for i in range(0, len(colonies), chunk_size)]
         for count, chunk in enumerate(chunks_list):
-            outfile_name = "_".join(elem_name[:-1] + [zygosity, str(count)])
-            outfile_name_csv =  os.path.join(output_dir_path, outfile_name + ".csv")
+            outfile_basename = "_".join(elem_name + [zygosity, str(count)])
+            outfile_csv = os.path.join(output_dir_path, outfile_basename + ".csv")
+            outfile_zip = os.path.join(output_dir_path, outfile_basename + ".zip")
 
-            with open(outfile_name_csv, mode='w') as outfile:
-                # Write control to file
-                outfile.write(control_data)
-
+            with open(outfile_csv, mode='w') as outfile:
                 # Write experimental to file
                 out_writer = csv.DictWriter(outfile, fieldnames=csv_experiment.fieldnames)
+                out_writer.writeheader()
                 for colony in chunk:
                     for row_expr in colony:
                         out_writer.writerow(row_expr)
 
-            # Compress file with ZIP and remove original CSV file
-            outfile_name_zip = os.path.join(output_dir_path, outfile_name + ".zip")
-            with zipfile.ZipFile(outfile_name_zip, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
-                zipf.write(outfile_name_csv, arcname = os.path.split(outfile_name_csv)[1])
-            os.remove(outfile_name_csv)
+            # Compress file with ZIP and remove temporary CSV file
+            with zipfile.ZipFile(outfile_zip, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
+                zipf.write(outfile_csv, arcname = outfile_basename + ".csv")
+            os.remove(outfile_csv)
+
+        # Finally, compress the control file once
+        outfile_basename = "_".join(elem_name + [zygosity, "control"])
+        outfile_zip = os.path.join(output_dir_path, outfile_basename + ".zip")
+        with zipfile.ZipFile(outfile_zip, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
+            zipf.write(file_ctrl, arcname = outfile_basename + ".csv")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="File control and experimental samples parser")
