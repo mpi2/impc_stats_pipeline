@@ -17,10 +17,10 @@ def chunking(input_file, output_dir_path):
     f = "metadata_group"
     g = "biological_sample_group"
 
-    all_chunks = {}
+    all_chunks = set()
     for row in csvreader:
         filename = "_".join([row[a], row[b], row[c], row[d], row[e], row[f], row[g]])
-        all_chunks.add(filename)
+        all_chunks.add(filename[:-1])
         filename = os.path.join(output_dir_path, filename + ".csv")
         with open(filename, mode='a') as outfile:
             out_writer = csv.DictWriter(outfile, fieldnames=csvreader.fieldnames)
@@ -38,12 +38,17 @@ def divide_chunk(file_ctrl,
                  min_colonies_in_chunks=32,
                  chunk_size=24):
     
-    if not (os.path.isfile(file_ctrl) and os.path.isfile(file_exp)):
-        print("Either control or experimental file do not exist")
+    if not os.path.isfile(file_exp):
+        print("Experimental file does not exist")
         return
 
-    control_data = open(file_ctrl).read()
-    n_controls = control_data.count('\n') - 1
+    if os.path.isfile(file_ctrl):
+        control_data = open(file_ctrl).read()
+        n_controls = control_data.count('\n') - 1
+    else:
+        control_data = ''
+        n_controls = 0
+
     csv_experiment = csv.DictReader(open(file_exp))
     data_dict = {}
     elem_name = os.path.split(file_ctrl)[1].split("_")[:-1]
@@ -91,10 +96,11 @@ def divide_chunk(file_ctrl,
             os.remove(outfile_csv)
 
         # Finally, compress the control file once
-        outfile_basename = "_".join(elem_name + [zygosity, "control"])
-        outfile_zip = os.path.join(output_dir_path, outfile_basename + ".zip")
-        with zipfile.ZipFile(outfile_zip, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
-            zipf.write(file_ctrl, arcname = outfile_basename + ".csv")
+        if n_controls:
+            outfile_basename = "_".join(elem_name + [zygosity, "control"])
+            outfile_zip = os.path.join(output_dir_path, outfile_basename + ".zip")
+            with zipfile.ZipFile(outfile_zip, "w", compression=zipfile.ZIP_DEFLATED) as zipf:
+                zipf.write(file_ctrl, arcname = outfile_basename + ".csv")
 
 
 if __name__ == "__main__":
