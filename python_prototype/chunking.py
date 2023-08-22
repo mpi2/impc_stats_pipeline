@@ -19,9 +19,9 @@ def chunking(input_file, output_dir_path):
 
     all_chunks = set()
     for row in csvreader:
-        filename = "_".join([row[a], row[b], row[c], row[d], row[e], row[f], row[g]])
-        all_chunks.add(filename[:-1])
-        filename = os.path.join(output_dir_path, filename + ".csv")
+        base_filename = "_".join([row[a], row[b], row[c], row[d], row[e], row[f]])
+        all_chunks.add(base_filename)
+        filename = os.path.join(output_dir_path, f"{base_filename}_{row[g]}.csv")
         with open(filename, mode='a') as outfile:
             out_writer = csv.DictWriter(outfile, fieldnames=csvreader.fieldnames)
             if outfile.tell() == 0:
@@ -39,7 +39,7 @@ def divide_chunk(file_ctrl,
                  chunk_size=24):
     
     if not os.path.isfile(file_exp):
-        print("Experimental file does not exist")
+        print(f"Experimental file {file_exp} does not exist")
         return
 
     if os.path.isfile(file_ctrl):
