@@ -143,7 +143,6 @@ packages <- c(
  "Hmisc"       , "4.4.1"  ,
  "summarytools", "0.9.8"  ,
  "lme4"        , "1.1.26" ,
- "PhenStat"    , "2.18.0" ,
  "stringi"     , "1.5.3"  ,
  "pingr"       , "2.0.1"  ,
  "nlme"        , "3.1.151",
@@ -172,16 +171,6 @@ for (i in seq(1,length(packages),by=2)) {
 devtools::install_github(
   repo = "mpi2/impc_stats_pipeline/SoftWindowing/SmoothWin/SmoothWinPackage/",
   dependencies = TRUE,
-  upgrade = "never",
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE
-)
-
-# PhenStat
-devtools::install_github(
-  repo = "mpi2/impc_stats_pipeline/Early adults stats pipeline/PhenStat/PhenStatPackage/PhenStat",
-  dependencies = FALSE,
   upgrade = "never",
   force = TRUE,
   build = TRUE,
@@ -224,7 +213,6 @@ pts = c(
   packages[seq(1, length(packages), by = 2)],
   'SmoothWin',
   'OpenStats',
-  'PhenStat',
   'DRrequired',
   'DRrequiredAgeing',
   'latticeExtra',
