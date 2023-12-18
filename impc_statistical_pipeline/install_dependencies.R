@@ -188,16 +188,6 @@ devtools::install_github(
   quiet = FALSE
 )
 
-# DRrequired
-devtools::install_github(
-  repo = "mpi2/impc_stats_pipeline/Early adults stats pipeline/DRrequired/DRrequiredPackage",
-  dependencies = TRUE,
-  upgrade = "never",
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE
-)
-
 # DRrequiredAgeing
 devtools::install_github(
   repo = "mpi2/impc_stats_pipeline/Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage",
