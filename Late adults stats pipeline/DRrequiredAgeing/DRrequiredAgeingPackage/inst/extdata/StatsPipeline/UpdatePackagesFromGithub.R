@@ -1,14 +1,4 @@
 library(devtools)
-# PhenStat
-install_github(
-  repo = 'mpi2/impc_stats_pipeline/Early adults stats pipeline/PhenStat/PhenStatPackage/PhenStat',
-  dependencies = FALSE,
-  upgrade = 'always',
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE
-)
-
 # DRrequired
 install_github(
   repo = 'mpi2/impc_stats_pipeline/Early adults stats pipeline/DRrequired/DRrequiredPackage',
