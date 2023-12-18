@@ -3,7 +3,6 @@ rm(list = ls(all = TRUE))
 # B6N Bottom line, our wildtype control mice are still the best option available to use for the statistical comparison.
 # heard back from Lynette (attached).  The stray het can be excluded for this line (CR1760,1xHet and  16xHoms)
 library(knitr)
-library(PhenStat)
 library(DRrequiredAgeing)
 library(nlme)
 library(plyr)
@@ -676,7 +675,7 @@ for (i in 1:length(files)) {
             # ##############################
             # We process the data using the new IMPC stats pipeline.
             ###############################
-            # Creating a PhenList object. Do not know what is PhenList? Check PhenStat package (?PhenList)
+            # Creating a OpenStatsList object. Do not know what is OpenStatsList? Check OpenStats documentation
             outputFilename <-
               DRrequiredAgeing:::RemoveSpecialChars(
                 paste(round(runif(1, 1, max = 10^5)), centre, colony, zyg, stra, meta, ageGroup, ".tsv", sep = "-"),
@@ -732,7 +731,7 @@ for (i in 1:length(files)) {
               #      main = paste0(unique(df_both$Gene_symbol)[1]),
               #      mfrow = c(2, 2)
               # )
-              # Summary from PhenStatAgeing           ####################
+              # Summary from OpenStats           ####################
               summary(td)
               # Normal Summary/anova from lme package ####################
               summary(td$output$Final.Model)
