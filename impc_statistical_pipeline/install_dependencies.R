@@ -179,7 +179,6 @@ devtools::install_github(
 
 # OpenStats
 devtools::install_github(
-  # repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/OpenStats/OpenStatsPackage/',
   repo = "mpi2/OpenStats",
   dependencies = TRUE,
   upgrade = "never",
