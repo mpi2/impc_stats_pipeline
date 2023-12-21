@@ -1,5 +1,0 @@
-To add a new version:
-
-	1. change the version file
-	2. change the version and year in the Report
-	3. Versions must be like 0.00.0 for instance 2.08.1
