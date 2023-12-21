@@ -95,7 +95,6 @@ mainAgeing = function(file = NULL                                    ,
   message0('Process started ...')
   message0('Machine info:  ', paste(Sys.info(), collapse = ', '))
   message0('Loading dependent packages ...')
-  requireNamespace('PhenStat')
   requireNamespace('OpenStats'     )
   requireNamespace('doParallel')
   requireNamespace('parallel')
@@ -369,7 +368,6 @@ mainAgeing = function(file = NULL                                    ,
                   MultiCoreRes = foreach::foreach (
                     i = 1:length(colonys),
                     .packages = c(
-                      'PhenStat'    ,
                       'SmoothWin'   ,
                       'base64enc'   ,
                       'nlme'        ,

@@ -9,16 +9,6 @@ install_github(
 	quiet = FALSE
 )
 
-# PhenStat
-install_github(
-	repo = 'mpi2/impc_stats_pipeline/Early adults stats pipeline/PhenStat/PhenStatPackage/PhenStat',
-	dependencies = FALSE,
-	upgrade = 'always',
-	force = TRUE,
-	build = TRUE,
-	quiet = FALSE
-)
-
 # OpenStats
 install_github(
 	#repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/OpenStats/OpenStatsPackage/',

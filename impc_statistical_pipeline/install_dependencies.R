@@ -143,7 +143,6 @@ packages <- c(
  "Hmisc"       , "4.4.1"  ,
  "summarytools", "0.9.8"  ,
  "lme4"        , "1.1.26" ,
- "PhenStat"    , "2.18.0" ,
  "stringi"     , "1.5.3"  ,
  "pingr"       , "2.0.1"  ,
  "nlme"        , "3.1.151",
@@ -178,30 +177,10 @@ devtools::install_github(
   quiet = FALSE
 )
 
-# PhenStat
-devtools::install_github(
-  repo = "mpi2/impc_stats_pipeline/Early adults stats pipeline/PhenStat/PhenStatPackage/PhenStat",
-  dependencies = FALSE,
-  upgrade = "never",
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE
-)
-
 # OpenStats
 devtools::install_github(
   # repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/OpenStats/OpenStatsPackage/',
   repo = "mpi2/OpenStats",
-  dependencies = TRUE,
-  upgrade = "never",
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE
-)
-
-# DRrequired
-devtools::install_github(
-  repo = "mpi2/impc_stats_pipeline/Early adults stats pipeline/DRrequired/DRrequiredPackage",
   dependencies = TRUE,
   upgrade = "never",
   force = TRUE,
@@ -224,7 +203,6 @@ pts = c(
   packages[seq(1, length(packages), by = 2)],
   'SmoothWin',
   'OpenStats',
-  'PhenStat',
   'DRrequired',
   'DRrequiredAgeing',
   'latticeExtra',
