@@ -1,7 +1,0 @@
-importFrom("graphics", "abline", "legend", "lines", "par", "pie",
-           "plot")
-importFrom("stats", "cor", "heatmap", "kmeans", "lm", "prcomp",
-           "spline")
-
-
-exportPattern("^[[:alpha:]]+")
