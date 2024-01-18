@@ -5038,10 +5038,8 @@ StatsPipeline = function(path = getwd(),
   message0('Phase II. Compressing the log files and house cleaning ... ')
   system(command = 'mv *.R  DataGeneratingLog/', wait = TRUE)
   system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
-  system(command = 'zip -rm DataGeneratingLog.zip DataGeneratingLog/', wait = TRUE)
-  system(command = 'mkdir DataGeneratingLog', wait = TRUE)
-  system(command = 'mv DataGeneratingLog.zip DataGeneratingLog/', wait = TRUE)
-
+  system(command = 'zip -rm phase2_logs.zip DataGeneratingLog/', wait = TRUE)
+  system(command = 'mv phase2_logs.zip compressed_logs/', wait = TRUE)
 
   ## remove logs
   message0('Removing the log files prior to the run of the statistical anlyses ...')
