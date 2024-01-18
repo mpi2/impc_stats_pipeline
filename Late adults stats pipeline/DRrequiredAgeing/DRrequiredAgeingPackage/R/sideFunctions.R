@@ -5005,8 +5005,7 @@ StatsPipeline = function(path = getwd(),
   ###############################################
   ## Compress logs
   message0('Phase I. Compressing the log files and house cleaning ...')
-  system(command = 'zip -rm Parquet2RdataJobs.zip *.bch', wait = TRUE)
-  system(command = 'zip -rm Parquet2RdataLogs.zip *.log', wait = TRUE)
+  system(command = 'zip -rm compressed_logs/phase1_jobs.zip *.bch', wait = TRUE)
   system(command = 'rm -rf ProcedureScatterRdata', wait = TRUE)
   ###########  END of Phase I ###################
 
