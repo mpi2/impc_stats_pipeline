@@ -58,7 +58,7 @@ flowchart TB
     end
     subgraph further_steps[ ]
         direction LR
-        annotation[Step 2.Annotation\nand transfer pipeline\n±1 Day] --> report[Step 3. Report\ngenerating pipeline\n±half a day]
+        annotation[Step 2.Annotation\nand transfer pipeline\n±1 Day] --> report[Step 3. Report\ngenerating pipeline\n±½ day]
         report --> risky[Step 4. Extraction\nof risky genes pipeline\n±30 minutes]
     end
     input[/ETL Parquet Files\] --> stats_pipeline --> further_steps
@@ -209,7 +209,7 @@ Verify that there are no running jobs on the cluster.<br><br>
 - ***Where are files located on the Hadoop cluster? (Provide the path to Federico)***<br>
 They are in directory YYY [a date in dmyyyy format]<br>
 YYY: Hadoop:`/hadoop/user/mi_stats/impc/statpackets/DRXX.YY/`<br><br>
-- ***How can one determine if a file has not been successfully transferred to the Hadoop cluster??***<br>
+- ***How can one determine if a file has not been successfully transferred to the Hadoop cluster?***<br>
 If a file is located in the DDD directory and is in a gzipped format, it can be considered as successfully transferred.<br>
 DDD: Codon:`nfs/production/tudor/komp/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.YY/SP/jobs/Results_IMPC_SP_Windowed/AnnotationExtractorAndHadoopLoader/tmp`<br><br>
 - ***How can I transfer files that have failed into Hadoop?***<br>
