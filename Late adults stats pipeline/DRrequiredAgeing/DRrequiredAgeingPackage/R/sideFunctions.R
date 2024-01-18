@@ -4998,6 +4998,9 @@ StatsPipeline = function(path = getwd(),
                    extension = '.log',
                    containWhat = 'Exit'))
     stop('An error occured in step 4. Merging Rdata files into one single Rdata file per procedure')
+  
+  system(command = "find . -type f -name '*.log' -exec zip compressed_logs/step4_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.log' -exec zip compressed_logs/step4_logs.zip {} +", wait = TRUE)
 
   ###############################################
   ## Compress logs
