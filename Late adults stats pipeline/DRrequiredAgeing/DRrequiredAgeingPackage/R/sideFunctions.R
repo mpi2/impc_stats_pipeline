@@ -4966,6 +4966,10 @@ StatsPipeline = function(path = getwd(),
                    extension = '.log',
                    containWhat = 'Exit'))
     stop('An error occured in step 2. Parquet2Rdata conversion')
+  
+  system(command = "mkdir compressed_logs", wait = TRUE)
+  system(command = "find . -type f -name '*.log' -exec zip compressed_logs/step2_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.err' -exec zip compressed_logs/step2_logs.zip {} +", wait = TRUE)
 
   ###############################################
   message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
