@@ -4968,8 +4968,8 @@ StatsPipeline = function(path = getwd(),
     stop('An error occured in step 2. Parquet2Rdata conversion')
   
   system(command = "mkdir compressed_logs", wait = TRUE)
-  system(command = "find . -type f -name '*.log' -exec zip compressed_logs/step2_logs.zip {} +", wait = TRUE)
-  system(command = "find . -type f -name '*.err' -exec zip compressed_logs/step2_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.log' -exec zip -m compressed_logs/step2_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.err' -exec zip -m compressed_logs/step2_logs.zip {} +", wait = TRUE)
 
   ###############################################
   message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
@@ -4999,8 +4999,8 @@ StatsPipeline = function(path = getwd(),
                    containWhat = 'Exit'))
     stop('An error occured in step 4. Merging Rdata files into one single Rdata file per procedure')
   
-  system(command = "find . -type f -name '*.log' -exec zip compressed_logs/step4_logs.zip {} +", wait = TRUE)
-  system(command = "find . -type f -name '*.log' -exec zip compressed_logs/step4_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.log' -exec zip -m compressed_logs/step4_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.log' -exec zip -m compressed_logs/step4_logs.zip {} +", wait = TRUE)
 
   ###############################################
   ## Compress logs

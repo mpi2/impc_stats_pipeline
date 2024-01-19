@@ -1,4 +1,4 @@
-############# jobs creator for Par2Rdata
+# Jobs creator for Par2Rdata
 f <- function(path = getwd(), mem = 25000, pattern = ".parquet") {
   files <- list.files(
     path,
@@ -10,8 +10,8 @@ f <- function(path = getwd(), mem = 25000, pattern = ".parquet") {
   write(
     paste0(
       "bsub -J IMPC_stats_pipeline_lsf_jobs -M ", mem,
-      " -e ", files, ".err ",
-      "-o ", files, ".log Rscript Step2Parquet2Rdata.R ",
+      " -e ", files, ".err",
+      " -o ", files, ".log Rscript Step2Parquet2Rdata.R ",
       files
     ),
     file = "jobs_step2_Parquet2Rdata.bch"
