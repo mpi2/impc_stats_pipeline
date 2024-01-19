@@ -808,9 +808,10 @@ BatchGenerator = function(file                       ,
   dirErr = file.path(dir, 'ClusterErr')
   dir.create0(dirOut)
   dir.create0(dirErr)
-
-  oname = file.path(dirOut, paste(procedure, '_', parameter, sep = ''))
-  ename = file.path(dirErr, paste(procedure, '_', parameter, sep = ''))
+  
+  logfile_basename <- basename(file)
+  oname = file.path(dirOut, logfile_basename)
+  ename = file.path(dirErr, logfile_basename)
 
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
