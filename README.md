@@ -171,7 +171,7 @@ DRrequiredAgeing:::IMPC_HadoopLoad(prefix='DR20.2',transfer=FALSE)
 - When you are sure that all files are there, you can share the path with Federico.
 **Note**: in the slides transfer=TRUE, which means we haven't transfered files this time. 
 
-## Step 3. Run the Report generating Pipeline
+## Step 3. Run the Report Generating Pipeline
 This process generates statistical reports typically utilized by the IMPC working groups. 
 1. Navigate to `$KOMP_PATH/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.y/SP/jobs/Results_IMPC_SP_Windowed`
 2. Allocate a high memory machine on cluster and initialise an interactive shell: 
