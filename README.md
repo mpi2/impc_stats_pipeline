@@ -88,14 +88,14 @@ Instructions are made for release 20.2.
 
 1. Create working directory.
 ```console
-mkdir --mode=775 $HOME_PATH/stats_pipeline_input_dr20.2
-cd $HOME_PATH/stats_pipeline_input_dr20.2
+mkdir --mode=775 ${HOME_PATH}/stats_pipeline_input_dr20.2
+cd ${HOME_PATH}/stats_pipeline_input_dr20.2
 ```
 
 2. Copy the input parquet files (±80*10^6 data points) and mp_chooser_json.
 ```console
-cp $KOMP_PATH/data-releases/latest-input/dr20.0/output/flatten_observations_parquet/*.parquet ./
-cp $KOMP_PATH/data-releases/latest-input/dr20.0/output/mp_chooser_json/part-*.txt ./
+cp ${KOMP_PATH}/data-releases/latest-input/dr20.0/output/flatten_observations_parquet/*.parquet ./
+cp ${KOMP_PATH}/data-releases/latest-input/dr20.0/output/mp_chooser_json/part-*.txt ./
 ```
 We copied files from 20.0 release, but next time the location of the input files could differ.<br>
 According to [Observations Output Schema](https://github.com/mpi2/impc-etl/wiki/Observations-Output-Schema) some fields hava array data type. However in current dataset those fields, instead of being array, are comma-separated lists.
@@ -116,8 +116,8 @@ git clone https://github.com/mpi2/impc_stats_pipeline.git
 
 5. Update mp_chooser file in several directories.
 ```console
-cp $HOME_PATH/stats_pipeline_input_dr20.2/mp_chooser_20230411.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/annotation/
-cp $HOME_PATH/stats_pipeline_input_dr20.2/mp_chooser_20230411.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/jobs/Postgres
+cp ${HOME_PATH}/stats_pipeline_input_dr20.2/mp_chooser_20230411.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/annotation/
+cp ${HOME_PATH}/stats_pipeline_input_dr20.2/mp_chooser_20230411.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/jobs/Postgres
 ```
 
 6. Update master branch of the repository on GitHub with the new version of mp_chooser.
@@ -130,7 +130,7 @@ git push origin master
 
 7. Update packages to the latest version.
 ```console
-cd $KOMP_PATH/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2
+cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2
 R
 source('https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R')
 q()
@@ -142,7 +142,7 @@ q()
 cd ~
 screen -S stats-pipeline
 bsub -Is -q long bash
-cd $KOMP_PATH/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2
+cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2
 ```
 
 9. Run statistical pipeline.
@@ -163,7 +163,7 @@ DRrequiredAgeing:::StatsPipeline(DRversion=20.2)
 The `IMPC_HadoopLoad` command uses the power of LSF cluster to assign the annotations to the StatPackets and transfers the files to the Hadoop cluster. The files will be transferred to Hadoop:/hadoop/user/mi_stats/impc/statpackets/DRXX.
 ```console
 q()
-cd $KOMP_PATH/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2/SP/jobs/Results_IMPC_SP_Windowed
+cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2/SP/jobs/Results_IMPC_SP_Windowed
 R
 DRrequiredAgeing:::IMPC_HadoopLoad(prefix='DR20.2',transfer=FALSE)
 ```
@@ -173,10 +173,10 @@ DRrequiredAgeing:::IMPC_HadoopLoad(prefix='DR20.2',transfer=FALSE)
 
 ## Step 3. Run the Report Generating Pipeline
 This process generates statistical reports typically utilized by the IMPC working groups. 
-1. Navigate to `$KOMP_PATH/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.y/SP/jobs/Results_IMPC_SP_Windowed`
+1. Navigate to `${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.y/SP/jobs/Results_IMPC_SP_Windowed`
 2. Allocate a high memory machine on cluster and initialise an interactive shell: 
 `bsub –M 300000 –e errReportGeneratingPipeline –o outReportGeneratingPipeline –Is /bin/bash`
-3. The commands below will generate two CSV files in the `$KOMP_PATH/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.y/SP/jobs/Results_IMPC_SP_Windowed` directory for the unidimentional and categorical results. The files can be gzip and moved to the FTP directory. You can decorate and format the files by using one of the formatted files in the previous data releases.
+3. The commands below will generate two CSV files in the `${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.y/SP/jobs/Results_IMPC_SP_Windowed` directory for the unidimentional and categorical results. The files can be gzip and moved to the FTP directory. You can decorate and format the files by using one of the formatted files in the previous data releases.
 ```console
 R
 DRrequiredAgeing:::IMPC_statspipelinePostProcess()
@@ -220,7 +220,7 @@ They are in directory YYY [a date in dmyyyy format]<br>
 YYY: Hadoop:`/hadoop/user/mi_stats/impc/statpackets/DRXX.YY/`<br><br>
 - ***How can one determine if a file has not been successfully transferred to the Hadoop cluster?***<br>
 If a file is located in the DDD directory and is in a gzipped format, it can be considered as successfully transferred.<br>
-DDD: Codon:`$KOMP_PATH/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.YY/SP/jobs/Results_IMPC_SP_Windowed/AnnotationExtractorAndHadoopLoader/tmp`<br><br>
+DDD: Codon:`${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.YY/SP/jobs/Results_IMPC_SP_Windowed/AnnotationExtractorAndHadoopLoader/tmp`<br><br>
 - ***How can I transfer files that have failed into Hadoop?***<br>
     - First navigate to DDD: `cd DDD`<br>
     - Move the non-gzipped files to YYY using SCP command. Alternatively, if you are using R and have an R session open in the `DDD` directory, you can run the following R command: `DRrequiredAgeing:::HadoopReTransferSCP(prefix=‘DRXX.YY/tmpDir’)`<br>
