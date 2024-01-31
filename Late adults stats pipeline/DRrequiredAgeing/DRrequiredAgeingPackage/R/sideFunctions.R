@@ -5189,7 +5189,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   system('chmod 775 ExtractPValJobs.bch', wait = TRUE)
   system('rm -f ExtractPVals.R',wait = TRUE)
   system(
-    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Extract%20details%20from%20StatPackets/ExtractPVals.R',
+    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/Extract%20details%20from%20StatPackets/ExtractPVals.R',
     wait = TRUE
   )
 
@@ -5226,7 +5226,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
 
     system('rm -f ExtractPVals.R', wait = TRUE)
     system(
-      'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Extract%20details%20from%20StatPackets/ExtractPVals.R',
+      'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/Extract%20details%20from%20StatPackets/ExtractPVals.R',
       wait = TRUE
     )
     editfile('ExtractPVals.R', 'makejobs()', '#makejobs()')
@@ -5395,7 +5395,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
 
   DRrequiredAgeing:::message0('Downloading the action script ...')
   system(
-    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/IMPC%20annotation%20pipeline/loader.R',
+    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/IMPC%20annotation%20pipeline/loader.R',
     wait = TRUE
   )
 
@@ -6755,7 +6755,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   DRrequiredAgeing:::message0('Downloading the action script ...')
   system(
-    'wget -O loader.R https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/IMPC%20annotation%20pipeline/loaderHadoop.R',
+    'wget -O loader.R https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/IMPC%20annotation%20pipeline/loaderHadoop.R',
     wait = TRUE
   )
 
