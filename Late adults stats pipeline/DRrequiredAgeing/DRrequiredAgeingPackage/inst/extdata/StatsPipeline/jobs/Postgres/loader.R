@@ -903,7 +903,7 @@ flist = readLines(con = file[1])
 lflist = length(flist)
 id = 1
 rnd <-
-  DRrequired:::RandomRegardSeed(
+  DRrequiredAgeing:::RandomRegardSeed(
     n = 1,
     decimal = 0,
     stringOutput = 1,
