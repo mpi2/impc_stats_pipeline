@@ -808,9 +808,10 @@ BatchGenerator = function(file                       ,
   dirErr = file.path(dir, 'ClusterErr')
   dir.create0(dirOut)
   dir.create0(dirErr)
-
-  oname = file.path(dirOut, paste(procedure, '_', parameter, sep = ''))
-  ename = file.path(dirErr, paste(procedure, '_', parameter, sep = ''))
+  
+  logfile_basename <- basename(file)
+  oname = file.path(dirOut, logfile_basename)
+  ename = file.path(dirErr, logfile_basename)
 
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
@@ -4966,6 +4967,10 @@ StatsPipeline = function(path = getwd(),
                    extension = '.log',
                    containWhat = 'Exit'))
     stop('An error occured in step 2. Parquet2Rdata conversion')
+  
+  system(command = "mkdir compressed_logs", wait = TRUE)
+  system(command = "find . -type f -name '*.log' -exec zip -m compressed_logs/step2_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.err' -exec zip -m compressed_logs/step2_logs.zip {} +", wait = TRUE)
 
   ###############################################
   message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
@@ -4994,12 +4999,14 @@ StatsPipeline = function(path = getwd(),
                    extension = '.log',
                    containWhat = 'Exit'))
     stop('An error occured in step 4. Merging Rdata files into one single Rdata file per procedure')
+  
+  system(command = "find . -type f -name '*.log' -exec zip -m compressed_logs/step4_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.log' -exec zip -m compressed_logs/step4_logs.zip {} +", wait = TRUE)
 
   ###############################################
   ## Compress logs
   message0('Phase I. Compressing the log files and house cleaning ...')
-  system(command = 'zip -rm Parquet2RdataJobs.zip *.bch', wait = TRUE)
-  system(command = 'zip -rm Parquet2RdataLogs.zip *.log', wait = TRUE)
+  system(command = 'zip -rm compressed_logs/phase1_jobs.zip *.bch', wait = TRUE)
   system(command = 'rm -rf ProcedureScatterRdata', wait = TRUE)
   ###########  END of Phase I ###################
 
@@ -5032,10 +5039,8 @@ StatsPipeline = function(path = getwd(),
   message0('Phase II. Compressing the log files and house cleaning ... ')
   system(command = 'mv *.R  DataGeneratingLog/', wait = TRUE)
   system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
-  system(command = 'zip -rm DataGeneratingLog.zip DataGeneratingLog/', wait = TRUE)
-  system(command = 'mkdir DataGeneratingLog', wait = TRUE)
-  system(command = 'mv DataGeneratingLog.zip DataGeneratingLog/', wait = TRUE)
-
+  system(command = 'zip -rm phase2_logs.zip DataGeneratingLog/', wait = TRUE)
+  system(command = 'mv phase2_logs.zip compressed_logs/', wait = TRUE)
 
   ## remove logs
   message0('Removing the log files prior to the run of the statistical anlyses ...')
