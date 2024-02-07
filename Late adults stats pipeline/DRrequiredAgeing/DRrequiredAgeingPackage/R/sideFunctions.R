@@ -4808,6 +4808,7 @@ filesContain = function(path = getwd(),
     all.files = TRUE,
     full.names = TRUE,
     include.dirs = FALSE,
+    recursive = TRUE,
     ...
   )
   for (file in files) {
@@ -4942,13 +4943,13 @@ StatsPipeline = function(path = getwd(),
   ### Phase I: Preparing parquet files
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
-  message0('Step 1. Reading the data from the parguets directory and creating LSF jobs')
+  message0('Step 1. Reading the data from the parquets directory and creating LSF jobs')
   source(file.path(local(),
                    'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
   f(path0)
   rm0('f')
   ###############################################
-  message0('Step 2. Reading the data from the parguets files and creating psudo Rdata')
+  message0('Step 2. Reading the data from the parquets files and creating psudo Rdata')
   file.copy(
     from = file.path(local(),
                      'StatsPipeline/0-ETL/Step2Parquet2Rdata.R'),
@@ -4963,14 +4964,14 @@ StatsPipeline = function(path = getwd(),
     ignoreline = ignoreThisLineInWaitingCheck
   )
   file.remove(file.path(path, 'Step2Parquet2Rdata.R'))
-  if (filesContain(path = path,
-                   extension = '.log',
+  if (filesContain(path = path0,
+                   extension = '\\.log',
                    containWhat = 'Exit'))
     stop('An error occured in step 2. Parquet2Rdata conversion')
   
-  system(command = "mkdir compressed_logs", wait = TRUE)
-  system(command = "find . -type f -name '*.log' -exec zip -m compressed_logs/step2_logs.zip {} +", wait = TRUE)
-  system(command = "find . -type f -name '*.err' -exec zip -m compressed_logs/step2_logs.zip {} +", wait = TRUE)
+  system(command = "mkdir ../compressed_logs", wait = TRUE)
+  system(command = "find ../ -type f -name '*.log' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
+  system(command = "find ../ -type f -name '*.err' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
 
   ###############################################
   message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
@@ -4996,17 +4997,17 @@ StatsPipeline = function(path = getwd(),
   )
   file.remove(file.path(path, 'Step4MergingRdataFiles.R'))
   if (filesContain(path = path,
-                   extension = '.log',
+                   extension = '\\.log',
                    containWhat = 'Exit'))
     stop('An error occured in step 4. Merging Rdata files into one single Rdata file per procedure')
   
-  system(command = "find . -type f -name '*.log' -exec zip -m compressed_logs/step4_logs.zip {} +", wait = TRUE)
-  system(command = "find . -type f -name '*.log' -exec zip -m compressed_logs/step4_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.log' -exec zip -m ../compressed_logs/step4_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.err' -exec zip -m ../compressed_logs/step4_logs.zip {} +", wait = TRUE)
 
   ###############################################
   ## Compress logs
   message0('Phase I. Compressing the log files and house cleaning ...')
-  system(command = 'zip -rm compressed_logs/phase1_jobs.zip *.bch', wait = TRUE)
+  system(command = 'zip -rm ../compressed_logs/phase1_jobs.zip *.bch', wait = TRUE)
   system(command = 'rm -rf ProcedureScatterRdata', wait = TRUE)
   ###########  END of Phase I ###################
 
@@ -5029,7 +5030,7 @@ StatsPipeline = function(path = getwd(),
   file.remove(file.path(path, 'InputDataGenerator.R'))
   if (filesContain(
     path = file.path(path, 'DataGeneratingLog'),
-    extension = '.log',
+    extension = '\\.log',
     containWhat = 'Exit'
   ))
     stop('An error occured in Phase II step 1. Packaging the big data into small packages')
@@ -5040,7 +5041,7 @@ StatsPipeline = function(path = getwd(),
   system(command = 'mv *.R  DataGeneratingLog/', wait = TRUE)
   system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
   system(command = 'zip -rm phase2_logs.zip DataGeneratingLog/', wait = TRUE)
-  system(command = 'mv phase2_logs.zip compressed_logs/', wait = TRUE)
+  system(command = 'mv phase2_logs.zip ../compressed_logs/', wait = TRUE)
 
   ## remove logs
   message0('Removing the log files prior to the run of the statistical anlyses ...')
