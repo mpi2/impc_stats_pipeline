@@ -41,11 +41,12 @@ f = function(RootDir) {
 }
 
 ###########
-if (!is.null(args[1])   &&
-    length(args[1]) > 0 &&
-    args[1] != '') {
-  message('Parquet2Rdata for each procedure in progress ...')
-  f(args[1])
+filepath <- as.character(args[1])
+if (!is.null(filepath) &&
+      length(filepath) > 0 &&
+      filepath != "") {
+  message("Parquet2Rdata for each procedure in progress ...")
+  f(filepath)
 }
 ###########
 # Do not forget to clean up scatter rdata files
