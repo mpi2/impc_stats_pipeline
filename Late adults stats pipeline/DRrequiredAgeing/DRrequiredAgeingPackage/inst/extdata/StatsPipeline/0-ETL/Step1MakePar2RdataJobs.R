@@ -16,5 +16,5 @@ f <- function(path = getwd(), mem = 25000, pattern = ".parquet") {
     ),
     file = "jobs_step2_Parquet2Rdata.bch"
   )
-  write("", file = "step1_completed.log")
+  write("", file = "../step1_completed.log")
 }
