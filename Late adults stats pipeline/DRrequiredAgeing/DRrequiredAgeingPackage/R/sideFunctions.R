@@ -5122,28 +5122,14 @@ StatsPipeline = function(path = getwd(),
   system(command = 'mkdir logs', wait = TRUE)
 
 
-  system(
-    command = paste0(
-      'find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs cp --backup=numbered -t ',
-      SP.results,
-      '/logs/'
-    ),
-    wait = TRUE
-  )
-  system(
-    command = paste0(
-      'find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs cp --backup=numbered -t ',
-      SP.results,
-      '/logs/'
-    ),
-    wait = TRUE
-  )
+  system(command = "find . -type f -name '*.ClusterOut' -exec zip -m ../compressed_logs/phase3_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.ClusterErr' -exec zip -m ../compressed_logs/phase3_errs.zip {} +", wait = TRUE)
 
   message0(
     'This is the last step. If you see no file in the list below, the SP is successfully completed.'
   )
   setwd(file.path(SP.results, 'logs'))
-  system(command = 'grep "Exited with exit" * -lR', wait = TRUE)
+  
   message0('SP finished in ', round(difftime(Sys.time(), startTime, units = "min"), 2))
 }
 
