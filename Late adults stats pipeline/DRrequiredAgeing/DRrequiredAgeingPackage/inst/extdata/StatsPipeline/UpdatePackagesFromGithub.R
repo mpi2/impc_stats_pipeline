@@ -9,29 +9,33 @@ if (length(commandArgs(trailingOnly = TRUE)) != 2) {
 repository <- commandArgs(trailingOnly = TRUE)[1]
 branch <- commandArgs(trailingOnly = TRUE)[2]
 
-# DRrequiredAgeing
+# Update DRrequiredAgeing
 install_github(
-  repo = "marinak-ebi/impc_stats_pipeline/Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage",
+  repo = paste(repository,
+               "/impc_stats_pipeline/Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage",
+               sep = ""),
   dependencies = FALSE,
   upgrade = "always",
   force = TRUE,
   build = TRUE,
   quiet = FALSE,
-  ref = "debug-pipeline"
+  ref = branch
 )
 
-# SmoothWin
+# Update SmoothWin
 install_github(
-  repo = "marinak-ebi/impc_stats_pipeline/SoftWindowing/SmoothWin/SmoothWinPackage/",
+  repo = paste(repository,
+               "/impc_stats_pipeline/SoftWindowing/SmoothWin/SmoothWinPackage",
+               sep = ""),
   dependencies = FALSE,
   upgrade = "always",
   force = TRUE,
   build = TRUE,
   quiet = FALSE,
-  ref = "debug-pipeline"
+  ref = branch
 )
 
-# OpenStats
+# Update OpenStats
 install_github(
   repo = "mpi2/OpenStats",
   dependencies = FALSE,
