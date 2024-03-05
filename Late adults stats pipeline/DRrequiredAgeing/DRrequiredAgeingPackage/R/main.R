@@ -154,21 +154,6 @@ mainAgeing = function(file = NULL                                    ,
   ################
   # Start analysis
   ################
-  # Initializing cores
-  message0('Initialising cores ...')
-  crs = cores0(coreRatio = coreRatio, activate  = activateMulticore)
-  closeAllConnections()
-  registerDoSEQ()
-  message0('The detected OS: ', .Platform$OS.type)
-  if (.Platform$OS.type == 'windows') {
-    cl = makeCluster(crs,
-                     outfile = outMCoreLog(wd))
-  } else{
-    cl = makeForkCluster(crs,
-                         outfile = outMCoreLog(wd))
-  }
-  registerDoParallel(cl, cores = crs)
-  # End of multicore initialization
   # Get possible categories for the categorical variables
   CatList = GetPossibleCategories (procedure = NULL, method = MethodOfReadingCategoricalCategories)
   message0('Filtering the dataset in progress ....')
