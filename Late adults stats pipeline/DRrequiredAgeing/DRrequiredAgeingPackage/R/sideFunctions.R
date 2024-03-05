@@ -2046,30 +2046,6 @@ IsInList = function(item = NULL,
   return(r)
 }
 
-
-### Multicore log
-outMCoreLog = function(wd, dir = 'Multicore_logs', fname = '_MulCoreLog.txt') {
-  path = file.path0(
-    wd,
-    dir,
-    paste0(
-      Sys.Date(),
-      '_',
-      RandomRegardSeed(1),
-      '_',
-      RemoveSpecialChars(paste(head(Sys.info(
-
-      ), 3), collapse = '-')),
-      fname
-    ),
-    check = FALSE,
-    create = TRUE,
-    IncludedFileName = TRUE
-  )
-  return(path)
-}
-
-
 sortList = function(x,...){
   x[order(names(x),...)]
 }
