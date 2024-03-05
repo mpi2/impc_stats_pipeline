@@ -799,6 +799,7 @@ mainAgeing = function(file = NULL                                    ,
                           return(FALSE)
                         }
                         #### Check for concurrent control selection
+                        concurrentControlSelect = FALSE
                         aTmp = concurrentContSelect(
                           activate = concurrentControlSelect &&
                             (method %in% 'MM') && !activeWindowing,

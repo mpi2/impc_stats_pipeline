@@ -5,7 +5,6 @@ runner = function(file) {
   mainAgeing(
     file = suppressWarnings(tail(UnzipAndfilePath(file), 1)),
     subdir = 'Results_IMPC_SP_Windowed',
-    concurrentControlSelect = FALSE,
     seed = 123456,
     # For windowing only,
     messages = FALSE,
