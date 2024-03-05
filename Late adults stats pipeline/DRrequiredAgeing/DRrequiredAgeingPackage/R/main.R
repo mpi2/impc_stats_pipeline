@@ -12,13 +12,6 @@ mainAgeing = function(file = NULL                                    ,
                       WhiteListMethods  = NULL                       ,
                       # Carefully use this option!
                       # It can remove the entire result file (some colonies in a single output file)
-                      # Only for multicore
-                      activateMulticore       = TRUE       ,
-                      coreRatio = 5 / 14                   ,
-                      concurrentControlSelect = FALSE      ,
-                      MultiCoreErrorHandling  = 'pass'     ,
-                      inorder                 = FALSE      ,
-                      verbose                 = TRUE       ,
                       # OpenStats
                       MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
                       FERROptimise            = c(TRUE,TRUE)        ,
@@ -154,6 +147,7 @@ mainAgeing = function(file = NULL                                    ,
   ################
   # Start analysis
   ################
+  closeAllConnections()
   # Get possible categories for the categorical variables
   CatList = GetPossibleCategories (procedure = NULL, method = MethodOfReadingCategoricalCategories)
   message0('Filtering the dataset in progress ....')
@@ -1100,7 +1094,6 @@ mainAgeing = function(file = NULL                                    ,
   }
   message0('Closing Connections ...')
   stopCluster(cl)
-  registerDoSEQ()
   closeAllConnections()
   stopImplicitCluster()
   message0('Finished.')
