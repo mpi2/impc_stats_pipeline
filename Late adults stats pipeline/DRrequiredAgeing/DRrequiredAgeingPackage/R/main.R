@@ -1094,9 +1094,7 @@ mainAgeing = function(file = NULL                                    ,
     )
   }
   message0('Closing Connections ...')
-  stopCluster(cl)
   closeAllConnections()
-  stopImplicitCluster()
   message0('Finished.')
   setwd(cwd)
   message0('Cleaning the meamory ...')
