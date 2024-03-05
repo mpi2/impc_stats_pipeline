@@ -89,8 +89,6 @@ mainAgeing = function(file = NULL                                    ,
   message0('Machine info:  ', paste(Sys.info(), collapse = ', '))
   message0('Loading dependent packages ...')
   requireNamespace('OpenStats'     )
-  requireNamespace('doParallel')
-  requireNamespace('parallel')
   requireNamespace('foreach')
   requireNamespace('SmoothWin')
   requireNamespace('nlme')
@@ -1097,7 +1095,7 @@ mainAgeing = function(file = NULL                                    ,
   closeAllConnections()
   message0('Finished.')
   setwd(cwd)
-  message0('Cleaning the meamory ...')
+  message0('Cleaning the memory ...')
   gc()
 }
 

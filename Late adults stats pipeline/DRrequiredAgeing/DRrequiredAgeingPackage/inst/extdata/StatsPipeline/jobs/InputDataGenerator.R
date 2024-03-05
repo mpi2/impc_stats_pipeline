@@ -1,8 +1,6 @@
 args = commandArgs(trailingOnly = TRUE)
 library(foreach)
 library(DRrequiredAgeing)
-library(doParallel)
-library(parallel)
 library(foreach)
 library(SmoothWin)
 library(nlme)

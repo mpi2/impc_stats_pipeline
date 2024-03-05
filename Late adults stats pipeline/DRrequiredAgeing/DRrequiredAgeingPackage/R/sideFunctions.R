@@ -5013,7 +5013,7 @@ StatsPipeline = function(path = getwd(),
     stop('An error occured in Phase II step 1. Packaging the big data into small packages')
 
   ## Compress logs
-  message0('End of packagind data. ')
+  message0('End of packaging data. ')
   message0('Phase II. Compressing the log files and house cleaning ... ')
   system(command = 'mv *.R  DataGeneratingLog/', wait = TRUE)
   system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
