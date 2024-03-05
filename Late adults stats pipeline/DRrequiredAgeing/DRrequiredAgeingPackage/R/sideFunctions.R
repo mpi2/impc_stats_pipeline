@@ -2007,29 +2007,6 @@ CheckIfNameExistInDataFrame = function(obj, name, checkLevels = TRUE) {
   return(r)
 }
 
-# System cores set to zero for 1 core
-cores0 = function(coreRatio = .7,
-                  activate = TRUE) {
-  requireNamespace('parallel')
-  if (activate) {
-    if (coreRatio < 1) {
-      crs = max(ceiling(parallel::detectCores() * min(coreRatio, 1)), 1)
-    } else{
-      crs = max(min(parallel::detectCores() , coreRatio)  , 1)
-    }
-  } else{
-    crs = 1
-  }
-  message0(
-    'The total number of cores on this machine: ',
-    detectCores(),
-    '; and ',
-    crs,
-    ' will be used.'
-  )
-  return(crs)
-}
-
 
 # file.path to check for space and special characters in the path
 file.path0 = function(...,
