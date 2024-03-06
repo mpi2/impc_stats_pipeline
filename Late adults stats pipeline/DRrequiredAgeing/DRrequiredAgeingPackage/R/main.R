@@ -10,8 +10,6 @@ mainAgeing = function(file = NULL                                    ,
                       ignoreSkipList          = FALSE                ,
                       onlyFillNotExisitingResults = FALSE            ,
                       WhiteListMethods  = NULL                       ,
-                      # Carefully use this option!
-                      # It can remove the entire result file (some colonies in a single output file)
                       # OpenStats
                       MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
                       FERROptimise            = c(TRUE,TRUE)        ,
