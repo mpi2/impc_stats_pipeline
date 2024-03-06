@@ -329,16 +329,6 @@ mainAgeing = function(file = NULL                                    ,
                     ']'
                   )
                   ### Single or multiple cores?
-                  `%activemulticore%` = ifelse (activateMulticore &&
-                                                  !BatchProducer,
-                                                `%dopar%`       ,
-                                                `%do%`)
-                  if (activateMulticore &&
-                      !BatchProducer) {
-                    message0('Multicore processing in progress ...')
-                  } else{
-                    message0('Single core processing in progress ...')
-                  }
                   i = 1
                   MultiCoreRes = foreach::foreach (
                     i = 1:length(colonys),
