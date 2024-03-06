@@ -342,9 +342,9 @@ mainAgeing = function(file = NULL                                    ,
                       'DRrequiredAgeing',
                       'DBI'
                     ),
-                    .errorhandling = c(MultiCoreErrorHandling),
-                    .verbose = verbose                        ,
-                    .inorder = inorder
+                    .errorhandling = c('stop'),
+                    .verbose = TRUE,
+                    .inorder = FALSE
                   ) %do% {
                     # for (i in  1:length(colonys)){
                     message0('*~*~*~*~*~* ',
