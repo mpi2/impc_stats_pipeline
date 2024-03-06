@@ -328,7 +328,7 @@ mainAgeing = function(file = NULL                                    ,
                     ),
                     ']'
                   )
-                  ### Single or multiple cores?
+                  ### Single core
                   i = 1
                   MultiCoreRes = foreach::foreach (
                     i = 1:length(colonys),
@@ -345,7 +345,7 @@ mainAgeing = function(file = NULL                                    ,
                     .errorhandling = c(MultiCoreErrorHandling),
                     .verbose = verbose                        ,
                     .inorder = inorder
-                  ) %activemulticore% {
+                  ) %do% {
                     # for (i in  1:length(colonys)){
                     message0('*~*~*~*~*~* ',
                              i,
