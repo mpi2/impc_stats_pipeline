@@ -10,15 +10,6 @@ mainAgeing = function(file = NULL                                    ,
                       ignoreSkipList          = FALSE                ,
                       onlyFillNotExisitingResults = FALSE            ,
                       WhiteListMethods  = NULL                       ,
-                      # Carefully use this option!
-                      # It can remove the entire result file (some colonies in a single output file)
-                      # Only for multicore
-                      activateMulticore       = TRUE       ,
-                      coreRatio = 5 / 14                   ,
-                      concurrentControlSelect = FALSE      ,
-                      MultiCoreErrorHandling  = 'pass'     ,
-                      inorder                 = FALSE      ,
-                      verbose                 = TRUE       ,
                       # OpenStats
                       MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
                       FERROptimise            = c(TRUE,TRUE)        ,
@@ -96,8 +87,6 @@ mainAgeing = function(file = NULL                                    ,
   message0('Machine info:  ', paste(Sys.info(), collapse = ', '))
   message0('Loading dependent packages ...')
   requireNamespace('OpenStats'     )
-  requireNamespace('doParallel')
-  requireNamespace('parallel')
   requireNamespace('foreach')
   requireNamespace('SmoothWin')
   requireNamespace('nlme')
@@ -154,21 +143,7 @@ mainAgeing = function(file = NULL                                    ,
   ################
   # Start analysis
   ################
-  # Initializing cores
-  message0('Initialising cores ...')
-  crs = cores0(coreRatio = coreRatio, activate  = activateMulticore)
   closeAllConnections()
-  registerDoSEQ()
-  message0('The detected OS: ', .Platform$OS.type)
-  if (.Platform$OS.type == 'windows') {
-    cl = makeCluster(crs,
-                     outfile = outMCoreLog(wd))
-  } else{
-    cl = makeForkCluster(crs,
-                         outfile = outMCoreLog(wd))
-  }
-  registerDoParallel(cl, cores = crs)
-  # End of multicore initialization
   # Get possible categories for the categorical variables
   CatList = GetPossibleCategories (procedure = NULL, method = MethodOfReadingCategoricalCategories)
   message0('Filtering the dataset in progress ....')
@@ -353,17 +328,7 @@ mainAgeing = function(file = NULL                                    ,
                     ),
                     ']'
                   )
-                  ### Single or multiple cores?
-                  `%activemulticore%` = ifelse (activateMulticore &&
-                                                  !BatchProducer,
-                                                `%dopar%`       ,
-                                                `%do%`)
-                  if (activateMulticore &&
-                      !BatchProducer) {
-                    message0('Multicore processing in progress ...')
-                  } else{
-                    message0('Single core processing in progress ...')
-                  }
+                  ### Single core
                   i = 1
                   MultiCoreRes = foreach::foreach (
                     i = 1:length(colonys),
@@ -377,10 +342,10 @@ mainAgeing = function(file = NULL                                    ,
                       'DRrequiredAgeing',
                       'DBI'
                     ),
-                    .errorhandling = c(MultiCoreErrorHandling),
-                    .verbose = verbose                        ,
-                    .inorder = inorder
-                  ) %activemulticore% {
+                    .errorhandling = c('stop'),
+                    .verbose = TRUE,
+                    .inorder = FALSE
+                  ) %do% {
                     # for (i in  1:length(colonys)){
                     message0('*~*~*~*~*~* ',
                              i,
@@ -820,6 +785,7 @@ mainAgeing = function(file = NULL                                    ,
                           return(FALSE)
                         }
                         #### Check for concurrent control selection
+                        concurrentControlSelect = FALSE
                         aTmp = concurrentContSelect(
                           activate = concurrentControlSelect &&
                             (method %in% 'MM') && !activeWindowing,
@@ -1114,13 +1080,10 @@ mainAgeing = function(file = NULL                                    ,
     )
   }
   message0('Closing Connections ...')
-  stopCluster(cl)
-  registerDoSEQ()
   closeAllConnections()
-  stopImplicitCluster()
   message0('Finished.')
   setwd(cwd)
-  message0('Cleaning the meamory ...')
+  message0('Cleaning the memory ...')
   gc()
 }
 

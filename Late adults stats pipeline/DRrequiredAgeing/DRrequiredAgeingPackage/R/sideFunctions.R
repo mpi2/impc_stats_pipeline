@@ -2007,29 +2007,6 @@ CheckIfNameExistInDataFrame = function(obj, name, checkLevels = TRUE) {
   return(r)
 }
 
-# System cores set to zero for 1 core
-cores0 = function(coreRatio = .7,
-                  activate = TRUE) {
-  requireNamespace('parallel')
-  if (activate) {
-    if (coreRatio < 1) {
-      crs = max(ceiling(parallel::detectCores() * min(coreRatio, 1)), 1)
-    } else{
-      crs = max(min(parallel::detectCores() , coreRatio)  , 1)
-    }
-  } else{
-    crs = 1
-  }
-  message0(
-    'The total number of cores on this machine: ',
-    detectCores(),
-    '; and ',
-    crs,
-    ' will be used.'
-  )
-  return(crs)
-}
-
 
 # file.path to check for space and special characters in the path
 file.path0 = function(...,
@@ -2068,30 +2045,6 @@ IsInList = function(item = NULL,
   }
   return(r)
 }
-
-
-### Multicore log
-outMCoreLog = function(wd, dir = 'Multicore_logs', fname = '_MulCoreLog.txt') {
-  path = file.path0(
-    wd,
-    dir,
-    paste0(
-      Sys.Date(),
-      '_',
-      RandomRegardSeed(1),
-      '_',
-      RemoveSpecialChars(paste(head(Sys.info(
-
-      ), 3), collapse = '-')),
-      fname
-    ),
-    check = FALSE,
-    create = TRUE,
-    IncludedFileName = TRUE
-  )
-  return(path)
-}
-
 
 sortList = function(x,...){
   x[order(names(x),...)]
@@ -5036,7 +4989,7 @@ StatsPipeline = function(path = getwd(),
     stop('An error occured in Phase II step 1. Packaging the big data into small packages')
 
   ## Compress logs
-  message0('End of packagind data. ')
+  message0('End of packaging data. ')
   message0('Phase II. Compressing the log files and house cleaning ... ')
   system(command = 'mv *.R  DataGeneratingLog/', wait = TRUE)
   system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
