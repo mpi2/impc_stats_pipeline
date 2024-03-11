@@ -733,7 +733,7 @@ makejobs = function(path = getwd()) {
     bf = basename(file)
     n = length(parameters)
     jobs = paste0 (
-      'bsub -J IMPC_stats_pipeline_lsf_jobs -M 16000 -e err/err',
+      'bsub -J impc_stats_pipeline_job -M 16000 -e err/err',
       bf,
       1:n,
       ' -o out/out',

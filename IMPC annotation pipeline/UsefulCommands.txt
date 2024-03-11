@@ -20,4 +20,4 @@ cat *.tsv >> all.tsv
 
 
 ### Compress a directory
-bsub -J IMPC_stats_pipeline_lsf_jobs -q research-rh74  "tar -zcvf ~/NoBckDir/DR9.2/jo
+bsub -J impc_stats_pipeline_job -q research-rh74  "tar -zcvf ~/NoBckDir/DR9.2/jo

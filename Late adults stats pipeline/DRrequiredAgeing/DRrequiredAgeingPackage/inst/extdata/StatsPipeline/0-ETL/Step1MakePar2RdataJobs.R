@@ -9,7 +9,7 @@ f <- function(path = getwd(), mem = 25000, pattern = ".parquet") {
   )
   write(
     paste0(
-      "bsub -J IMPC_stats_pipeline_lsf_jobs -M ", mem,
+      "bsub -J impc_stats_pipeline_job -M ", mem,
       " -e ", files, ".err",
       " -o ", files, ".log Rscript Step2Parquet2Rdata.R ",
       files

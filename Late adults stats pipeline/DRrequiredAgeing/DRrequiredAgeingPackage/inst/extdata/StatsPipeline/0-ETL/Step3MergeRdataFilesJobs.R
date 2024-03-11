@@ -6,7 +6,7 @@ f <- function(path = file.path(getwd(), "ProcedureScatterRdata"), mem = 80000) {
   unique_dirs <- unique(na.omit(dirs))
   write(
     paste0(
-      "bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -M ", mem,
+      "bsub -q bigmem -J impc_stats_pipeline_job -M ", mem,
       " -e ", unique_dirs, "/step4_merge_rdatas.err",
       " -o ", unique_dirs, "/step4_merge_rdatas.log ",
       "Rscript Step4MergingRdataFiles.R ", unique_dirs
