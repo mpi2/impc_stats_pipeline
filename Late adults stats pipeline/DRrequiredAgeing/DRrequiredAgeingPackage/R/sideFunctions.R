@@ -4559,26 +4559,6 @@ DeleteDirectoryAndSubDirectories = function(path  = getwd(),
   )
 }
 #### Only for the ETL process step 1,2,3,4
-ETLStep3MergeRdataFilesJobs = function(path = file.path(getwd(), 'ProcedureScatterRdata'),
-                                       mem = 80000) {
-  dirs = list.dirs(path = path,
-                   full.names = TRUE ,
-                   recursive  = FALSE)
-  ############## jobs creator#
-  write(
-    paste0(
-      'bsub -J -q bigmem impc_stats_pipeline_job -M ',
-      mem,
-      ' -e "step4_MergeRdatas_error.log" -o "step4_MergeRdatas_output.log" Rscript Step4MergingRdataFiles.R "',
-      unique(na.omit(dirs)),
-      '"'
-    ),
-    file = 'jobs_step4_MergeRdatas.bch'
-  )
-  write('',file = 'Step3 completed.log')
-}
-
-
 ETLStep4MergingRdataFiles = function(RootDir) {
   for (dir in RootDir) {
     message('Merging data in ', dir)
