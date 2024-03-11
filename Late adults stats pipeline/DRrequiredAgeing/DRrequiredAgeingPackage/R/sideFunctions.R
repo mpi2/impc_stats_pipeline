@@ -4646,11 +4646,13 @@ filesContain = function(path = getwd(),
 }
 
 jobCreator = function(path = getwd(),
-                      pattern = '.Rdata',
-                      JobListFile = 'DataGenerationJobList.bch') {
-  if (!dir.exists(file.path('DataGeneratingLog')))
+                      pattern = "\\.Rdata",
+                      JobListFile = "DataGenerationJobList.bch",
+                      mem = "45G",
+                      time = "6-00") {
+  if (!dir.exists(file.path("DataGeneratingLog")))
     dir.create(
-      path = file.path('DataGeneratingLog'),
+      path = file.path("DataGeneratingLog"),
       recursive = TRUE,
       showWarnings = FALSE
     )
@@ -4667,12 +4669,13 @@ jobCreator = function(path = getwd(),
   proc = tools::file_path_sans_ext(basename(files))
   write(
     paste0(
-      'bsub -J impc_stats_pipeline_job ',
+      "sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
+      " --time=", time,
       ' -e ',
       file.path('DataGeneratingLog', paste0(proc, '_errorlog.log')),
       ' -o ',
       file.path('DataGeneratingLog', paste0(proc, '_outputlog.log')),
-      ' -n 1 -M 49000 Rscript InputDataGenerator.R "',
+      ' Rscript InputDataGenerator.R "',
       files,
       '" "',
       proc,
