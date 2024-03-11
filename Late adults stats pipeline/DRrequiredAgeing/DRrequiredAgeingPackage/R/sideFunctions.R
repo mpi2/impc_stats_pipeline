@@ -802,7 +802,8 @@ BatchGenerator = function(file                       ,
                           parameter = NULL           ,
                           center = NULL              ,
                           cpu = 1                    ,
-                          memory = 7000              ,
+                          memory = "7G"              ,
+                          time = "08:00:00"          ,
                           extraBatchParameters = NULL) {
   dirOut = file.path(dir, 'ClusterOut')
   dirErr = file.path(dir, 'ClusterErr')
@@ -816,16 +817,11 @@ BatchGenerator = function(file                       ,
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
   rf = paste(
-    'bsub -J impc_stats_pipeline_job '               ,
+    "sbatch --job-name=impc_stats_pipeline_job --mem=", memory,
+    " --time=", time,
     extraBatchParameters  ,
-    ' -n '                ,
+    ' --cpus-per-task='                ,
     cpu                   ,
-    ' -M '                ,
-    memory                ,
-    ' -q short '          ,
-    '-R "rusage[mem='     ,
-    memory                ,
-    ']"'                  ,
     ' '                   ,
     re                    ,
     ' '                   ,
@@ -4875,14 +4871,14 @@ StatsPipeline = function(path = getwd(),
          wait = TRUE)
 
   ## Add all single jobs into one single job
-  message0('Appending all procdure based LSF jobs into one single file ...')
+  message0('Appending all procedure based LSF jobs into one single file ...')
   if (!dir.exists('jobs'))
     system(command = 'mkdir jobs', wait = TRUE)
   if (file.exists('jobs/AllJobs.bch'))
     system(command = 'rm jobs/AllJobs.bch', wait = TRUE)
   system(command = 'find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch', wait = TRUE)
 
-  message0('Phase III. Initialising the statistical analyses ...')
+  message0('Phase III. Initialising the statistical analysis ...')
   path = file.path(path, 'jobs')
   setwd(path)
 

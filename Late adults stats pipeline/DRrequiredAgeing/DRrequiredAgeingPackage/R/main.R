@@ -51,7 +51,8 @@ mainAgeing = function(file = NULL                                    ,
                       # Only for Batch generator
                       BatchProducer          =  FALSE      ,
                       cpu = 1                              ,
-                      memory = 8000                        ,
+                      memory = "7G"                        ,
+                      time = "08:00:00"                    ,
                       nMax                   = 10000       ,
                       ChunkSize              = 24          ,
                       MinColoniesInChunks    = 32          ,
@@ -299,6 +300,7 @@ mainAgeing = function(file = NULL                                    ,
                         center               = center           ,
                         cpu                  = cpu              ,
                         memory               = memory           ,
+                        time                 = time             ,
                         extraBatchParameters =  extraBatchParameters
                       )
                       write(
