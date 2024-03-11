@@ -4559,30 +4559,6 @@ DeleteDirectoryAndSubDirectories = function(path  = getwd(),
   )
 }
 #### Only for the ETL process step 1,2,3,4
-ETLStep1MakePar2RdataJobs = function(path = getwd(),
-                                     mem = 25000,
-                                     pattern = '.parquet') {
-  files = list.files(
-    path = paste0(path, '/'),
-    pattern = pattern,
-    full.names = TRUE,
-    recursive = TRUE,
-    include.dirs = FALSE
-  )
-  write(
-    paste0(
-      'bsub -J impc_stats_pipeline_job -M ',
-      mem,
-      ' -e "step2_Par2Rdata_error.log" -o "Step2_Par2Rdata_output.log" Rscript Step2Parquet2Rdata.R "',
-      files,
-      '" ""'
-    ),
-    file = 'jobs_step2_Parquet2Rdata.bch'
-  )
-  write('', file = 'Step1 completed.log')
-}
-
-
 ETLStep2Parquet2Rdata = function(files) {
   requireNamespace(miniparquet)
   df = lapply(seq_along(files),
