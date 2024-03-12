@@ -4479,7 +4479,7 @@ minijobsCreator = function(path  = getwd(),
                            type = '*.tsv') {
   lf = list.dirsDepth(path = path, depth = depth)
   a = paste0(
-    'bsub -J impc_stats_pipeline_job -e error.err -o output.out "find ',
+    'sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 -e error.err -o output.out "find ',
     lf,
     ' -type f -name "',
     type,
