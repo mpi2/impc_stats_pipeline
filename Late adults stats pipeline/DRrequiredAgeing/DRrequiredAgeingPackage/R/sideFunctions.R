@@ -4500,45 +4500,6 @@ minijobsCreator = function(path  = getwd(),
   )
 }
 
-minijobsCopyCreator = function(path  = getwd(),
-                               depth = 2,
-                               server = 'ebi-cli',
-                               destination = '~/NoBckDir/',
-                               fname = 'miniCopyjobs.txt') {
-  lf = list.dirsDepth(path = path,
-                                         depth = depth,
-                                         full.names = TRUE)
-
-  target = paste0(server, ':', destination ,  '/',  lf)
-  target = gsub(pattern = getwd(), '', target)
-
-  b = paste0(
-    'bsub -J impc_stats_pipeline_job -e error.err -o output.out \'ssh ',
-    server,
-    ' "mkdir -p ',
-    gsub(pattern = paste0(server, ':'), '', target),
-    '"\''
-  )
-
-  a = paste0('bsub -J impc_stats_pipeline_job -e error.err -o output.out "scp -r ',
-             lf,
-             '/ ',
-             target,
-             '"')
-
-  for (i in 1:100) {
-    a =  gsub(pattern = '//', replacement = '/', a)
-    b =  gsub(pattern = '//', replacement = '/', b)
-  }
-  write(
-    x = c(b, a),
-    file = fname,
-    ncolumns = 10 ^ 5,
-    append = FALSE,
-    sep = '\n'
-  )
-}
-
 DeleteDirectoryAndSubDirectories = function(path  = getwd(),
                                             depth = 2,
                                             fname = 'deleteFullDirectory.txt') {
