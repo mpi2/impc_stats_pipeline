@@ -826,8 +826,9 @@ BatchGenerator = function(file                       ,
     re                    ,
     ' '                   ,
     ro                    ,
-    ' Rscript function.R ',
+    " --wrap=\'Rscript function.R ",
     paste('"', file, '"', sep = ''),
+    "\'",
     sep = ''
   )
   return(rf)
@@ -4479,7 +4480,7 @@ minijobsCreator = function(path  = getwd(),
                            type = '*.tsv') {
   lf = list.dirsDepth(path = path, depth = depth)
   a = paste0(
-    'sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 -e error.err -o output.out "find ',
+    'sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 -e error.err -o output.out --wrap="find ',
     lf,
     ' -type f -name "',
     type,
@@ -4616,11 +4617,13 @@ jobCreator = function(path = getwd(),
       file.path('DataGeneratingLog', paste0(proc, '_errorlog.log')),
       ' -o ',
       file.path('DataGeneratingLog', paste0(proc, '_outputlog.log')),
-      ' Rscript InputDataGenerator.R "',
+      " --wrap='Rscript InputDataGenerator.R ",
+      '"',
       files,
       '" "',
       proc,
-      '"'
+      '"',
+      "'"
     ),
     file = JobListFile
   )
@@ -6328,9 +6331,11 @@ annotationIndexCreator = function(path = getwd(),
                  ' ',
                  err,
                  out,
-                 ' Rscript loader.R "',
+                 " --wrap='Rscript loader.R ",
+                 '"',
                  basename(lf),
-                 '"')
+                 '"',
+                 "'")
   write(batch, outputfile)
 }
 ##########################################
@@ -6365,13 +6370,15 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
         i,
         '" -o "output/out',
         i,
-        '" Rscript ExtractPVals.R ',
+        '" ',
+        "--wrap='Rscript ExtractPVals.R ",
         ind[i - 1],
         ' ',
         ind[i] - 1,
         ' "',
         indexFilePath,
         '"',
+        "'",
         sep = ''
       ),
       file = outputfile,

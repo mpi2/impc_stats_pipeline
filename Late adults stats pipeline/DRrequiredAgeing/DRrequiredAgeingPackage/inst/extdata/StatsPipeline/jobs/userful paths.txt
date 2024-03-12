@@ -16,7 +16,7 @@ find . -type f | grep -h "exit" | wc -l
 grep "exit code 2" * -lR
 
 ### Compress a directory: don't forget to specify memory and time
-sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=xx:xx:xx --wrap "tar -zcvf ~/NoBckDir/DR11/jobs/DR11XXXXX_simulation.tar.gz ~/NoBckDir/DR11/jobs/Result_XXXXX/"
+sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=xx:xx:xx --wrap="tar -zcvf ~/NoBckDir/DR11/jobs/DR11XXXXX_simulation.tar.gz ~/NoBckDir/DR11/jobs/Result_XXXXX/"
 
 # Split a text files based on #lines
 split -50000 Index_DR101_V1.txt split_index_

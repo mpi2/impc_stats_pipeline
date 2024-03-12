@@ -643,7 +643,7 @@ makejobs = function(path = getwd()) {
       ' -o out/out',
       bf,
       1:n,
-      ' "Rscript ExtractPVals.R ',
+      ' --wrap="Rscript ExtractPVals.R ',
       parameters,
       ' ',
       file,

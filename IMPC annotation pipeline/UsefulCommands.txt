@@ -16,4 +16,4 @@ find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs rm
 cat *.tsv >> all.tsv
 
 ### Compress a directory: don't forget to specify memory and time
-sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=xx:xx:xx --wrap "tar -zcvf ~/NoBckDir/DR9.2/jo"
+sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=xx:xx:xx --wrap="tar -zcvf ~/NoBckDir/DR9.2/jo"

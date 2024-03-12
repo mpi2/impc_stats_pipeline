@@ -15,8 +15,9 @@ f <- function(path = getwd(),
       "sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
       " --time=", time,
       " -e ", files, ".err",
-      " -o ", files, ".log Rscript Step2Parquet2Rdata.R ",
-      files
+      " -o ", files, ".log --wrap='Rscript Step2Parquet2Rdata.R ",
+      files,
+      "'"
     ),
     file = "jobs_step2_Parquet2Rdata.bch"
   )
