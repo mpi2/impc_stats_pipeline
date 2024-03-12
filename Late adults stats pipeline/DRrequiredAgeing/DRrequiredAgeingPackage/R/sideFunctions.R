@@ -6341,7 +6341,8 @@ annotationIndexCreator = function(path = getwd(),
 ##########################################
 splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
                                                        split = 1500,
-                                                       mem = 8500,
+                                                       mem = "9G",
+                                                       time = "2-00",
                                                        outputfile = 'ExtractPValJobs.bch') {
   ldf = length(readLines(indexFilePath))
   ind = round(seq(1, ldf, length.out = split))
@@ -6361,8 +6362,8 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
   for (i in 2:(length(ind) + 1)) {
     write(
       paste(
-        'bsub -J impc_stats_pipeline_job -M ',
-        mem,
+        "sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
+        " --time=", time,
         ' -e "error/err',
         i,
         '" -o "output/out',
