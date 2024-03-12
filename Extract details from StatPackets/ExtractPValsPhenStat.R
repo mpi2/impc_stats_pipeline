@@ -637,7 +637,7 @@ makejobs = function(path = getwd()) {
     bf = basename(file)
     n = length(parameters)
     jobs = paste0 (
-      'bsub -J impc_stats_pipeline_job -M 16000 -e err/err',
+      'sbatch --job-name=impc_stats_pipeline_job --mem=16G --time=2-00 -e err/err',
       bf,
       1:n,
       ' -o out/out',
