@@ -1,7 +1,7 @@
 # Split a text files based on #lines
 split -8500 Index_DR101_V1.txt split_index_
 
-# for creating LSF jobs in R
+# for creating jobs in R
 DRrequiredAgeing:::annotationIndexCreator()
 
 ### Logs

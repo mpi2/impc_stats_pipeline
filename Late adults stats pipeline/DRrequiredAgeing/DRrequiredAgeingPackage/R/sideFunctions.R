@@ -4703,7 +4703,7 @@ StatsPipeline = function(path = getwd(),
   ### Phase I: Preparing parquet files
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
-  message0('Step 1. Reading the data from the parquets directory and creating LSF jobs')
+  message0('Step 1. Reading the data from the parquets directory and creating jobs')
   source(file.path(local(),
                    'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
   f(path0)
@@ -4734,7 +4734,7 @@ StatsPipeline = function(path = getwd(),
   system(command = "find ../ -type f -name '*.err' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
 
   ###############################################
-  message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
+  message0('Step 3. Merging psudo Rdata files into single file for each procedure - jobs creator')
   source(file.path(local(),
                    'StatsPipeline/0-ETL/Step3MergeRdataFilesJobs.R'))
   f(file.path(path, 'ProcedureScatterRdata'))
@@ -4813,7 +4813,7 @@ StatsPipeline = function(path = getwd(),
          wait = TRUE)
 
   ## Add all single jobs into one single job
-  message0('Appending all procedure based LSF jobs into one single file ...')
+  message0('Appending all procedure based jobs into one single file ...')
   if (!dir.exists('jobs'))
     system(command = 'mkdir jobs', wait = TRUE)
   if (file.exists('jobs/AllJobs.bch'))
@@ -4834,7 +4834,7 @@ StatsPipeline = function(path = getwd(),
     saveRdata = FALSE
   )
 
-  message0('Running the IMPC statistical pipeline by submitting LSF jobs ...')
+  message0('Running the IMPC statistical pipeline by submitting jobs ...')
   # copy stats pipeline driver script
   if (windowingPipeline) {
     file.copy(
