@@ -5130,7 +5130,8 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   DRrequiredAgeing:::annotationIndexCreator(
     path = getwd(),
     pattern = 'split_index',
-    mem = 12000,
+    mem = "12G",
+    time = "2-00",
     outputfile = 'jobs.bch'
   )
   system('chmod 775 jobs.bch', wait = TRUE)
@@ -6303,7 +6304,8 @@ StratifiedMPTerms = function(object, name = 'MPTERM') {
 
 annotationIndexCreator = function(path = getwd(),
                                   pattern = 'split_index',
-                                  mem = 12000,
+                                  mem = "12G",
+                                  time = "2-00",
                                   outputfile = 'jobs.bch') {
   lf = list.files(
     path = path,
@@ -6324,8 +6326,8 @@ annotationIndexCreator = function(path = getwd(),
 
   err = paste0(' -e ', dirname(lf), '/err/', basename(lf))
   out = paste0(' -o ', dirname(lf), '/out/', basename(lf))
-  batch = paste0('bsub -J impc_stats_pipeline_job -M ',
-                 mem,
+  batch = paste0("sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
+                 " --time=", time,
                  ' ',
                  err,
                  out,
@@ -6490,7 +6492,8 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   DRrequiredAgeing:::annotationIndexCreator(
     path = getwd(),
     pattern = 'split_index',
-    mem = 5000,
+    mem = "5G",
+    time = "2-00",
     outputfile = 'jobs.bch'
   )
   system('chmod 775 jobs.bch', wait = TRUE)
