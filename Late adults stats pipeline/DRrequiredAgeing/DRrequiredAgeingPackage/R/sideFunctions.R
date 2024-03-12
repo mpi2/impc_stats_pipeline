@@ -4500,22 +4500,6 @@ minijobsCreator = function(path  = getwd(),
   )
 }
 
-DeleteDirectoryAndSubDirectories = function(path  = getwd(),
-                                            depth = 2,
-                                            fname = 'deleteFullDirectory.txt') {
-  lf = list.dirsDepth(path = path, depth = depth)
-  a = paste0('bsub -J impc_stats_pipeline_job "rm -rf ',
-             lf,
-             '"')
-  write(
-    x = a,
-    file = fname,
-    ncolumns = 10 ^ 5,
-    append = FALSE,
-    sep = '\n'
-  )
-}
-
 dictionary2listConvert = function(x) {
   if (is.null(x) || !is(x, 'list'))
     return(x)
