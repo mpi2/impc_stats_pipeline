@@ -4699,10 +4699,7 @@ StatsPipeline = function(path = getwd(),
     dir.create(path)
   setwd(path)
   currentuser = Sys.info()['user']
-  ### step zeop: remove leftovers from lsf
-  system(paste0('find /ebi/lsf/yoda-spool/02/ -user ',currentuser,' -type f | xargs rm -rf'), wait = TRUE)
-  system(paste0('find /ebi/lsf/codon-spool/job-spool/ -user ',currentuser,' -type f | xargs rm -rf'), wait = TRUE)
-  system(paste0('find /ebi/lsf/ebi-spool2/01/ -user ',currentuser,' -type f | xargs rm -rf'), wait = TRUE)
+
   ### Phase I: Preparing parquet files
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
