@@ -4714,7 +4714,7 @@ StatsPipeline = function(path = getwd(),
     overwrite = TRUE
   )
   system('chmod 775 jobs_step2_Parquet2Rdata.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="./jobs_step2_Parquet2Rdata.bch"', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash ./jobs_step2_Parquet2Rdata.bch"', wait = TRUE)
   waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -4745,7 +4745,7 @@ StatsPipeline = function(path = getwd(),
     overwrite = TRUE
   )
   system('chmod 775 jobs_step4_MergeRdatas.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="./jobs_step4_MergeRdatas.bch"', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash ./jobs_step4_MergeRdatas.bch"', wait = TRUE)
   waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -4776,7 +4776,7 @@ StatsPipeline = function(path = getwd(),
     overwrite = TRUE
   )
   system('chmod 775 DataGenerationJobList.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/phase2_job_id.txt --wrap="./DataGenerationJobList.bch"', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/phase2_job_id.txt --wrap="bash ./DataGenerationJobList.bch"', wait = TRUE)
   waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -4852,7 +4852,7 @@ StatsPipeline = function(path = getwd(),
                     DRversion)
 
   system('chmod 775 AllJobs.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=05:00:00 --mem=1G -o ../compressed_logs/phase3_job_id.txt --wrap="./AllJobs.bch"', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=05:00:00 --mem=1G -o ../compressed_logs/phase3_job_id.txt --wrap="bash ./AllJobs.bch"', wait = TRUE)
   waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -4937,7 +4937,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
     wait = TRUE
   )
 
-  system('sbatch --job-name=impc_stats_pipeline_job --time=03:00:00 --mem=1G -o ../../../../compressed_logs/extract_pval_job_id.txt --wrap="./ExtractPValJobs.bch"', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=03:00:00 --mem=1G -o ../../../../compressed_logs/extract_pval_job_id.txt --wrap="bash ./ExtractPValJobs.bch"', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -4994,7 +4994,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
     job_to_submit <- paste(
       "sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../../../../../../compressed_logs/extract_pval_",
       dir,
-      '_job_id.txt --wrap="./Jobs.bch"',
+      '_job_id.txt --wrap="bash ./Jobs.bch"',
       sep=""
     )
     system(job_to_submit, wait = TRUE)
@@ -5147,7 +5147,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
     wait = TRUE
   )
 
-  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../annotation_postprocess_job_id.txt --wrap="./jobs.bch"', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../annotation_postprocess_job_id.txt --wrap="bash ./jobs.bch"', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -6513,7 +6513,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   )
 
   system('./jobs.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=03:00:00 --mem=1G -o ../../../../compressed_logs/hadoop_load_job_id.txt --wrap="./jobs.bch"', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=03:00:00 --mem=1G -o ../../../../compressed_logs/hadoop_load_job_id.txt --wrap="bash ./jobs.bch"', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
