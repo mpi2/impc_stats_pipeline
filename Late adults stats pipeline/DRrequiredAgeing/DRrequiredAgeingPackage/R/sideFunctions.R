@@ -802,8 +802,8 @@ BatchGenerator = function(file                       ,
                           parameter = NULL           ,
                           center = NULL              ,
                           cpu = 1                    ,
-                          memory = "7G"              ,
-                          time = "08:00:00"          ,
+                          memory = "8G"              ,
+                          time = "10:00:00"          ,
                           extraBatchParameters = NULL) {
   dirOut = file.path(dir, 'ClusterOut')
   dirErr = file.path(dir, 'ClusterErr')
@@ -4858,7 +4858,7 @@ StatsPipeline = function(path = getwd(),
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
-  message0('Postprocessing the IMPC statistical analyses results ...')
+  message0('Postprocessing the IMPC statistical analysis results ...')
   setwd(SP.results)
 
   message0('Creating backups from the main R packages ...')

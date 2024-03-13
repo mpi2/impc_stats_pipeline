@@ -1,7 +1,7 @@
 # Jobs creator for MergeRdatas
 f <- function(path = file.path(getwd(), "ProcedureScatterRdata"),
-              mem = "30G",
-              time = "00:55:00") {
+              mem = "50G",
+              time = "01:30:00") {
   dirs <- list.dirs(path = path,
                     full.names = TRUE,
                     recursive  = FALSE)

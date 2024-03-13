@@ -1,8 +1,8 @@
 # Jobs creator for Par2Rdata
 f <- function(path = getwd(),
               pattern = ".parquet",
-              mem = "5G",
-              time = "00:05:00") {
+              mem = "10G",
+              time = "00:10:00") {
   files <- list.files(
     path,
     pattern = pattern,
