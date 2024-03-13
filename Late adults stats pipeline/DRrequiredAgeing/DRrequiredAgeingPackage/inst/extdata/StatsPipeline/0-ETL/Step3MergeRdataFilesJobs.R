@@ -12,7 +12,8 @@ f <- function(path = file.path(getwd(), "ProcedureScatterRdata"),
       " --time=", time,
       " -e ", unique_dirs, "/step4_merge_rdatas.err",
       " -o ", unique_dirs, "/step4_merge_rdatas.log",
-      " --wrap Rscript Step4MergingRdataFiles.R ", unique_dirs
+      " --wrap='Rscript Step4MergingRdataFiles.R ", unique_dirs,
+      "'"
     ),
     file = "jobs_step4_MergeRdatas.bch"
   )
