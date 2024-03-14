@@ -4852,7 +4852,7 @@ StatsPipeline = function(path = getwd(),
                     DRversion)
 
   system('chmod 775 AllJobs.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=05:00:00 --mem=1G -o ../compressed_logs/phase3_job_id.txt --wrap="bash ./AllJobs.bch"', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=05:00:00 --mem=1G -o ../../compressed_logs/phase3_job_id.txt --wrap="bash ./AllJobs.bch"', wait = TRUE)
   waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
