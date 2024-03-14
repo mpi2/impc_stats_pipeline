@@ -4515,7 +4515,7 @@ dictionary2listConvert = function(x) {
 }
 
 
-waitTillCommandFinish = function(checkcommand = 'squeue -l --Format Name',
+waitTillCommandFinish = function(checkcommand = 'squeue --format="%A %.30j"',
                                  WaitIfTheOutputContains = 'impc_stats_pipeline_job',
                                  WaitBeforeRetrySec = 60,
                                  ignoreline = 0,
