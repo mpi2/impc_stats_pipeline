@@ -4562,7 +4562,6 @@ submit_limit_jobs = function(bch_file,
     while(TRUE) {
       num_running <- as.integer(system("squeue | wc -l", wait=TRUE, intern = TRUE))
       if(num_running <= max_jobs) {
-        message0("We are inside of break")
         break
       }
       Sys.sleep(1)
