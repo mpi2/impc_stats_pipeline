@@ -4552,8 +4552,8 @@ waitTillCommandFinish = function(checkcommand = 'squeue --format="%A %.30j"',
   message0('continuing the pipeline ...')
 }
 
-submit_limit_jobs = function(bch_file, 
-                             job_id_logfile, 
+submit_limit_jobs = function(bch_file,
+                             job_id_logfile,
                              max_jobs=1500) {
   message0("Start submit_limit_jobs")
   system(paste("echo > ", job_id_logfile))
@@ -4874,7 +4874,7 @@ StatsPipeline = function(path = getwd(),
                     DRversion)
 
   system('chmod 775 AllJobs.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=05:00:00 --mem=1G -o ../../compressed_logs/phase3_job_id.txt --wrap="bash ./AllJobs.bch"', wait = TRUE)
+  submit_limit_jobs(bch_file="AllJobs.bch", job_id_logfile="../../compressed_logs/phase3_job_id.txt")
   waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
