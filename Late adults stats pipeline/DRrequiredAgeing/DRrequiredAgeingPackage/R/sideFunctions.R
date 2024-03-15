@@ -4552,6 +4552,28 @@ waitTillCommandFinish = function(checkcommand = 'squeue --format="%A %.30j"',
   message0('continuing the pipeline ...')
 }
 
+submit_limit_jobs = function(bch_file, 
+                             job_id_logfile, 
+                             max_jobs=1500) {
+  message0("Start submit_limit_jobs")
+  system(paste("echo > ", job_id_logfile))
+  file <- file(bch_file, "r")
+  while (length(command <- readLines(file, n = 1, warn = FALSE)) > 0) {
+    while(TRUE) {
+      num_running <- as.integer(system("squeue | wc -l", wait=TRUE, intern = TRUE))
+      if(num_running <= max_jobs) {
+        message0("We are inside of break")
+        break
+      }
+      Sys.sleep(1)
+    }
+    job_id <- system(command, wait=TRUE, intern = TRUE)
+    system(paste("echo '", job_id, "' >> ", job_id_logfile))
+  }
+  close(file)
+  message0("End submit_limit_jobs")
+}
+
 filesContain = function(path = getwd(),
                         extension = NULL,
                         containWhat = 'Exit',
