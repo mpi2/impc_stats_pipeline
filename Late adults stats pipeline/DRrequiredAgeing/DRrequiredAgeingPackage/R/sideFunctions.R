@@ -808,9 +808,10 @@ BatchGenerator = function(file                       ,
   dirErr = file.path(dir, 'ClusterErr')
   dir.create0(dirOut)
   dir.create0(dirErr)
-
-  oname = file.path(dirOut, paste(procedure, '_', parameter, sep = ''))
-  ename = file.path(dirErr, paste(procedure, '_', parameter, sep = ''))
+  
+  logfile_basename <- basename(file)
+  oname = file.path(dirOut, logfile_basename)
+  ename = file.path(dirErr, logfile_basename)
 
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
@@ -2006,29 +2007,6 @@ CheckIfNameExistInDataFrame = function(obj, name, checkLevels = TRUE) {
   return(r)
 }
 
-# System cores set to zero for 1 core
-cores0 = function(coreRatio = .7,
-                  activate = TRUE) {
-  requireNamespace('parallel')
-  if (activate) {
-    if (coreRatio < 1) {
-      crs = max(ceiling(parallel::detectCores() * min(coreRatio, 1)), 1)
-    } else{
-      crs = max(min(parallel::detectCores() , coreRatio)  , 1)
-    }
-  } else{
-    crs = 1
-  }
-  message0(
-    'The total number of cores on this machine: ',
-    detectCores(),
-    '; and ',
-    crs,
-    ' will be used.'
-  )
-  return(crs)
-}
-
 
 # file.path to check for space and special characters in the path
 file.path0 = function(...,
@@ -2067,30 +2045,6 @@ IsInList = function(item = NULL,
   }
   return(r)
 }
-
-
-### Multicore log
-outMCoreLog = function(wd, dir = 'Multicore_logs', fname = '_MulCoreLog.txt') {
-  path = file.path0(
-    wd,
-    dir,
-    paste0(
-      Sys.Date(),
-      '_',
-      RandomRegardSeed(1),
-      '_',
-      RemoveSpecialChars(paste(head(Sys.info(
-
-      ), 3), collapse = '-')),
-      fname
-    ),
-    check = FALSE,
-    create = TRUE,
-    IncludedFileName = TRUE
-  )
-  return(path)
-}
-
 
 sortList = function(x,...){
   x[order(names(x),...)]
@@ -4807,6 +4761,7 @@ filesContain = function(path = getwd(),
     all.files = TRUE,
     full.names = TRUE,
     include.dirs = FALSE,
+    recursive = TRUE,
     ...
   )
   for (file in files) {
@@ -4941,13 +4896,13 @@ StatsPipeline = function(path = getwd(),
   ### Phase I: Preparing parquet files
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
-  message0('Step 1. Reading the data from the parguets directory and creating LSF jobs')
+  message0('Step 1. Reading the data from the parquets directory and creating LSF jobs')
   source(file.path(local(),
                    'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
   f(path0)
   rm0('f')
   ###############################################
-  message0('Step 2. Reading the data from the parguets files and creating psudo Rdata')
+  message0('Step 2. Reading the data from the parquets files and creating psudo Rdata')
   file.copy(
     from = file.path(local(),
                      'StatsPipeline/0-ETL/Step2Parquet2Rdata.R'),
@@ -4962,10 +4917,14 @@ StatsPipeline = function(path = getwd(),
     ignoreline = ignoreThisLineInWaitingCheck
   )
   file.remove(file.path(path, 'Step2Parquet2Rdata.R'))
-  if (filesContain(path = path,
-                   extension = '.log',
+  if (filesContain(path = path0,
+                   extension = '\\.log',
                    containWhat = 'Exit'))
     stop('An error occured in step 2. Parquet2Rdata conversion')
+  
+  system(command = "mkdir ../compressed_logs", wait = TRUE)
+  system(command = "find ../ -type f -name '*.log' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
+  system(command = "find ../ -type f -name '*.err' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
 
   ###############################################
   message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
@@ -4991,15 +4950,17 @@ StatsPipeline = function(path = getwd(),
   )
   file.remove(file.path(path, 'Step4MergingRdataFiles.R'))
   if (filesContain(path = path,
-                   extension = '.log',
+                   extension = '\\.log',
                    containWhat = 'Exit'))
     stop('An error occured in step 4. Merging Rdata files into one single Rdata file per procedure')
+  
+  system(command = "find . -type f -name '*.log' -exec zip -m ../compressed_logs/step4_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.err' -exec zip -m ../compressed_logs/step4_logs.zip {} +", wait = TRUE)
 
   ###############################################
   ## Compress logs
   message0('Phase I. Compressing the log files and house cleaning ...')
-  system(command = 'zip -rm Parquet2RdataJobs.zip *.bch', wait = TRUE)
-  system(command = 'zip -rm Parquet2RdataLogs.zip *.log', wait = TRUE)
+  system(command = 'zip -rm ../compressed_logs/phase1_jobs.zip *.bch', wait = TRUE)
   system(command = 'rm -rf ProcedureScatterRdata', wait = TRUE)
   ###########  END of Phase I ###################
 
@@ -5022,20 +4983,18 @@ StatsPipeline = function(path = getwd(),
   file.remove(file.path(path, 'InputDataGenerator.R'))
   if (filesContain(
     path = file.path(path, 'DataGeneratingLog'),
-    extension = '.log',
+    extension = '\\.log',
     containWhat = 'Exit'
   ))
     stop('An error occured in Phase II step 1. Packaging the big data into small packages')
 
   ## Compress logs
-  message0('End of packagind data. ')
+  message0('End of packaging data. ')
   message0('Phase II. Compressing the log files and house cleaning ... ')
   system(command = 'mv *.R  DataGeneratingLog/', wait = TRUE)
   system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
-  system(command = 'zip -rm DataGeneratingLog.zip DataGeneratingLog/', wait = TRUE)
-  system(command = 'mkdir DataGeneratingLog', wait = TRUE)
-  system(command = 'mv DataGeneratingLog.zip DataGeneratingLog/', wait = TRUE)
-
+  system(command = 'zip -rm phase2_logs.zip DataGeneratingLog/', wait = TRUE)
+  system(command = 'mv phase2_logs.zip ../compressed_logs/', wait = TRUE)
 
   ## remove logs
   message0('Removing the log files prior to the run of the statistical anlyses ...')
@@ -5116,28 +5075,14 @@ StatsPipeline = function(path = getwd(),
   system(command = 'mkdir logs', wait = TRUE)
 
 
-  system(
-    command = paste0(
-      'find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs cp --backup=numbered -t ',
-      SP.results,
-      '/logs/'
-    ),
-    wait = TRUE
-  )
-  system(
-    command = paste0(
-      'find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs cp --backup=numbered -t ',
-      SP.results,
-      '/logs/'
-    ),
-    wait = TRUE
-  )
+  system(command = "find . -type f -name '*.ClusterOut' -exec zip -m ../compressed_logs/phase3_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.ClusterErr' -exec zip -m ../compressed_logs/phase3_errs.zip {} +", wait = TRUE)
 
   message0(
     'This is the last step. If you see no file in the list below, the SP is successfully completed.'
   )
   setwd(file.path(SP.results, 'logs'))
-  system(command = 'grep "Exited with exit" * -lR', wait = TRUE)
+  
   message0('SP finished in ', round(difftime(Sys.time(), startTime, units = "min"), 2))
 }
 
@@ -5189,7 +5134,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   system('chmod 775 ExtractPValJobs.bch', wait = TRUE)
   system('rm -f ExtractPVals.R',wait = TRUE)
   system(
-    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Extract%20details%20from%20StatPackets/ExtractPVals.R',
+    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/Extract%20details%20from%20StatPackets/ExtractPVals.R',
     wait = TRUE
   )
 
@@ -5226,7 +5171,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
 
     system('rm -f ExtractPVals.R', wait = TRUE)
     system(
-      'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Extract%20details%20from%20StatPackets/ExtractPVals.R',
+      'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/Extract%20details%20from%20StatPackets/ExtractPVals.R',
       wait = TRUE
     )
     editfile('ExtractPVals.R', 'makejobs()', '#makejobs()')
@@ -5395,7 +5340,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
 
   DRrequiredAgeing:::message0('Downloading the action script ...')
   system(
-    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/IMPC%20annotation%20pipeline/loader.R',
+    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/IMPC%20annotation%20pipeline/loader.R',
     wait = TRUE
   )
 
@@ -6755,7 +6700,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   DRrequiredAgeing:::message0('Downloading the action script ...')
   system(
-    'wget -O loader.R https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/IMPC%20annotation%20pipeline/loaderHadoop.R',
+    'wget -O loader.R https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/IMPC%20annotation%20pipeline/loaderHadoop.R',
     wait = TRUE
   )
 

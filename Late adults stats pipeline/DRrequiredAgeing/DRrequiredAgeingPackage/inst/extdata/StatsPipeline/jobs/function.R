@@ -5,7 +5,6 @@ runner = function(file) {
   mainAgeing(
     file = suppressWarnings(tail(UnzipAndfilePath(file), 1)),
     subdir = 'Results_IMPC_SP',
-    concurrentControlSelect = FALSE,
     seed = 123456,
     # For windowing only,
     messages = FALSE,
@@ -25,12 +24,6 @@ runner = function(file) {
     ####
     MMOptimise = c(1,1,1,1,1,1),
     FERRrep = 0, # decision on 19-8-2020 12.00 AM to turn this option off
-    ####
-    activateMulticore = FALSE,
-    coreRatio = 1,
-    MultiCoreErrorHandling = 'stop',
-    inorder = FALSE,
-    verbose = TRUE,
     ### Just for the certain situations (must be removed in FUTURE)
     OverwriteExistingFiles = FALSE,
     storeRawData = TRUE,

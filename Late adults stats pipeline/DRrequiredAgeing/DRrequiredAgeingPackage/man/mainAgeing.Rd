@@ -33,13 +33,6 @@ mainAgeing(
   WhiteListMethods  = NULL                       ,
   # Carefully use this option!
   # It can remove the entire result file (some colonies in a single output file)
-  # Only for multicore
-  activateMulticore       = TRUE       ,
-  coreRatio = 5 / 14                   ,
-  concurrentControlSelect = FALSE      ,
-  MultiCoreErrorHandling  = 'pass'     ,
-  inorder                 = FALSE      ,
-  verbose                 = TRUE       ,
   # OpenStats
   MMOptimise              = c(1, 1, 1, 1, 1, 1) ,
   FERROptimise            = c(TRUE, TRUE)        ,
@@ -133,24 +126,6 @@ mainAgeing(
 }
   \item{WhiteListMethods}{
   Choose between "MM", "FE" and "RR". If set to any, then the other methods and their corresponding datasets will be ignored. Default NULL (all method will be applied)
-}
-  \item{activateMulticore}{
-  Set to TRUE to activate multicore functioning of the pipeline. See "foreach" R package. Not recommended unless unlimited computing power/memory available. Default FALSE.
-}
-  \item{coreRatio}{
-  A number in [0,1] interval. The core ratio for the multicore analysis. For example, if set to 0 then only 1 core will be used and if set to 1 then all cores for the computing machine will be used. The formula is ceiling(cores available on the machine*coreRatio). Default is 5/14.
-}
-  \item{concurrentControlSelect}{
-  Only applies to the continues variables. Activate the concurrent control selection strategy. This will search for the same day controls as mutants. Min control required is 4 for each sex. Default FALSE.
-}
-  \item{MultiCoreErrorHandling}{
-  See ".errorhandling" in the "foreach" R package. Options are "pass" and "stop". Default "pass"
-}
-  \item{inorder}{
-  Does the order of processes need to be preserved? if set to TRUE then one analysis must be finish before the other one starts. See ".inorder" in "foreach" R package. Default FALSE
-}
-  \item{verbose}{
-  Shows the progress of the multicore function. See "verbose" in the "foreach" R package. Default TRUE
 }
   \item{MMOptimise}{
   See "MM_optimise" in the "OpenStatsAnalysis" function manual from "OpenStats" R package.

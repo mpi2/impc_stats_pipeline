@@ -1,50 +1,45 @@
 library(devtools)
-# PhenStat
+
+# Check if the correct number of arguments is provided
+if (length(commandArgs(trailingOnly = TRUE)) != 2) {
+  stop("Please provide exactly two arguments: repository name and branch name.")
+}
+
+# Retrieve the command line arguments
+repository <- commandArgs(trailingOnly = TRUE)[1]
+branch <- commandArgs(trailingOnly = TRUE)[2]
+
+# Update DRrequiredAgeing
 install_github(
-  repo = 'mpi2/impc_stats_pipeline/Early adults stats pipeline/PhenStat/PhenStatPackage/PhenStat',
+  repo = paste(repository,
+               "/impc_stats_pipeline/Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage",
+               sep = ""),
   dependencies = FALSE,
-  upgrade = 'always',
+  upgrade = "always",
   force = TRUE,
   build = TRUE,
-  quiet = FALSE
+  quiet = FALSE,
+  ref = branch
 )
 
-# DRrequired
+# Update SmoothWin
 install_github(
-  repo = 'mpi2/impc_stats_pipeline/Early adults stats pipeline/DRrequired/DRrequiredPackage',
+  repo = paste(repository,
+               "/impc_stats_pipeline/SoftWindowing/SmoothWin/SmoothWinPackage",
+               sep = ""),
   dependencies = FALSE,
-  upgrade = 'always',
+  upgrade = "always",
   force = TRUE,
   build = TRUE,
-  quiet = FALSE
+  quiet = FALSE,
+  ref = branch
 )
 
-# DRrequiredAgeing
+# Update OpenStats
 install_github(
-  repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage',
+  repo = "mpi2/OpenStats",
   dependencies = FALSE,
-  upgrade = 'always',
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE
-)
-
-# SmoothWin
-install_github(
-  repo = 'mpi2/impc_stats_pipeline/SoftWindowing/SmoothWin/SmoothWinPackage/',
-  dependencies = FALSE,
-  upgrade = 'always',
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE
-)
-
-# OpenStats
-install_github(
-  #repo = 'mpi2/impc_stats_pipeline/Late adults stats pipeline/OpenStats/OpenStatsPackage/',
-  repo = 'mpi2/OpenStats',
-  dependencies = FALSE,
-  upgrade = 'always',
+  upgrade = "always",
   force = TRUE,
   build = TRUE,
   quiet = FALSE

@@ -40,7 +40,6 @@ PhenStatWindow = function (phenlistObject                                ,
                            FERRrep                                       ,
                            ...)
 {
-  requireNamespace('PhenStat')
   requireNamespace('SmoothWin')
   requireNamespace('OpenStats')
   requireNamespace('nlme')
@@ -274,7 +273,7 @@ PhenStatWindow = function (phenlistObject                                ,
       }
       windowingNote$'Windowing analysis'$'Final model' = objectf$messages
       # Full model windowing
-      message0('Fitting the windowing weights into the full PhenStat model ...')
+      message0('Fitting the windowing weights into the full OpenStats model ...')
       # objectfulw = OpenStatsAnalysis(
       #   OpenStatsListObject = phenlistObject,
       #   method              = method,

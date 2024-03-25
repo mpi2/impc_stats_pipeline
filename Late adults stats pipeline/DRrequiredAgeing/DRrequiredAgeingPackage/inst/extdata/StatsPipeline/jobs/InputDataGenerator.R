@@ -1,10 +1,6 @@
 args = commandArgs(trailingOnly = TRUE)
 library(foreach)
-#library(DRrequired)
 library(DRrequiredAgeing)
-library(PhenStat)
-library(doParallel)
-library(parallel)
 library(foreach)
 library(SmoothWin)
 library(nlme)
@@ -67,10 +63,8 @@ GenerateData = function(args, thresh = 4) {
   trash = mainAgeing(
     file = args[1],
     subdir = args[2],
-    coreRatio = 0 / 14,
     seed = 123456,
     BatchProducer = TRUE,
-    activateMulticore = FALSE,
     cpu = 1,
     memory = 8000,
     controlSize = 1500,
