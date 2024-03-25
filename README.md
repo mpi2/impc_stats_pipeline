@@ -88,8 +88,8 @@ Instructions are made for release 20.2.
 
 1. Create working directory.
 ```console
-mkdir --mode=775 ${HOME_PATH}/stats_pipeline_input_dr20.2
-cd ${HOME_PATH}/stats_pipeline_input_dr20.2
+mkdir --mode=775 ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2
+cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2
 ```
 
 2. Copy the input parquet files (±80*10^6 data points) and mp_chooser_json.
@@ -102,9 +102,7 @@ According to [Observations Output Schema](https://github.com/mpi2/impc-etl/wiki/
 
 3. Convert JSON mp_chooser file to Rdata.
 ```console
-R
-a = jsonlite::fromJSON('part-*.txt');save(a,file='mp_chooser_20230411.json.Rdata')
-q()
+R -e "a = jsonlite::fromJSON('part-00000-b2483dca-4c84-4c90-a79b-e97df8c95091-c000.txt');save(a,file='mp_chooser_20230411.json.Rdata')"
 ```
 **Note:** we kept the name of the mp_chooser file exactly as mp_chooser_20230411.json.Rdata, because it is used on the code.
 
@@ -116,8 +114,8 @@ git clone https://github.com/mpi2/impc_stats_pipeline.git
 
 5. Update mp_chooser file in several directories.
 ```console
-cp ${HOME_PATH}/stats_pipeline_input_dr20.2/mp_chooser_20230411.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/annotation/
-cp ${HOME_PATH}/stats_pipeline_input_dr20.2/mp_chooser_20230411.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/jobs/Postgres
+cp ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2/mp_chooser_20230411.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/annotation/
+cp ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2/mp_chooser_20230411.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/jobs/Postgres
 ```
 
 6. Update master branch of the repository on GitHub with the new version of mp_chooser.
@@ -131,9 +129,9 @@ git push origin master
 7. Update packages to the latest version.
 ```console
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2
-R
-source('https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R')
-q()
+wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R
+Rscript UpdatePackagesFromGithub.R mpi2 master
+rm UpdatePackagesFromGithub.R
 ```
 
 ### Run Statistical Pipeline
@@ -141,14 +139,13 @@ q()
 ```console
 cd ~
 screen -S stats-pipeline
-bsub -Is -q long bash
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2
 ```
 
 9. Run statistical pipeline.
 ```console
-R
-DRrequiredAgeing:::StatsPipeline(DRversion=20.2)
+alias bsub-1gb='bsub -q long -R "select[type==X86_64 && mem > 1000] rusage[mem=1000]" -M1000'
+bsub-1gb -o ../stats_pipeline_logs/stats_pipeline_20.2.log -e ../stats_pipeline_logs/stats_pipeline_20.2.err R -e 'DRrequiredAgeing:::StatsPipeline(DRversion=20.2)'
 ```
 - To leave screen press combination `Ctrl + A + D`.
 - Don't forget to write down the number that will appear after leaving the screen, for example, 3507472, and number of cluster node.
@@ -162,10 +159,9 @@ DRrequiredAgeing:::StatsPipeline(DRversion=20.2)
 ## Step 2. Run Annotation Pipeline
 The `IMPC_HadoopLoad` command uses the power of LSF cluster to assign the annotations to the StatPackets and transfers the files to the Hadoop cluster. The files will be transferred to Hadoop:/hadoop/user/mi_stats/impc/statpackets/DRXX.
 ```console
-q()
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2/SP/jobs/Results_IMPC_SP_Windowed
-R
-DRrequiredAgeing:::IMPC_HadoopLoad(prefix='DR20.2',transfer=FALSE)
+alias bsub-1gb='bsub -q long -R "select[type==X86_64 && mem > 1000] rusage[mem=1000]" -M1000'
+bsub-1gb -o ../stats_pipeline_logs/annotation_pipeline_20.2.log -e ../stats_pipeline_logs/annotation_pipeline_20.2.err R -e 'DRrequiredAgeing:::IMPC_HadoopLoad(prefix="DR20.2",transfer=FALSE)'
 ```
 - The most complex part of this process is that some files will fail to transfer and you need to use scp command to transfer files to the Hadoop cluster manually.
 - When you are sure that all files are there, you can share the path with Federico.
