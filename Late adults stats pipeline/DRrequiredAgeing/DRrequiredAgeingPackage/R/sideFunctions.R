@@ -802,7 +802,8 @@ BatchGenerator = function(file                       ,
                           parameter = NULL           ,
                           center = NULL              ,
                           cpu = 1                    ,
-                          memory = 7000              ,
+                          memory = "8G"              ,
+                          time = "10:00:00"          ,
                           extraBatchParameters = NULL) {
   dirOut = file.path(dir, 'ClusterOut')
   dirErr = file.path(dir, 'ClusterErr')
@@ -816,22 +817,18 @@ BatchGenerator = function(file                       ,
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
   rf = paste(
-    'bsub -J IMPC_stats_pipeline_lsf_jobs '               ,
+    "sbatch --job-name=impc_stats_pipeline_job --mem=", memory,
+    " --time=", time,
     extraBatchParameters  ,
-    ' -n '                ,
+    ' --cpus-per-task='                ,
     cpu                   ,
-    ' -M '                ,
-    memory                ,
-    ' -q short '          ,
-    '-R "rusage[mem='     ,
-    memory                ,
-    ']"'                  ,
     ' '                   ,
     re                    ,
     ' '                   ,
     ro                    ,
-    ' Rscript function.R ',
+    " --wrap=\'Rscript function.R ",
     paste('"', file, '"', sep = ''),
+    "\'",
     sep = ''
   )
   return(rf)
@@ -4483,7 +4480,7 @@ minijobsCreator = function(path  = getwd(),
                            type = '*.tsv') {
   lf = list.dirsDepth(path = path, depth = depth)
   a = paste0(
-    'bsub -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out "find ',
+    'sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 -e error.err -o output.out --wrap="find ',
     lf,
     ' -type f -name "',
     type,
@@ -4504,195 +4501,6 @@ minijobsCreator = function(path  = getwd(),
   )
 }
 
-minijobsCopyCreator = function(path  = getwd(),
-                               depth = 2,
-                               server = 'ebi-cli',
-                               destination = '~/NoBckDir/',
-                               fname = 'miniCopyjobs.txt') {
-  lf = list.dirsDepth(path = path,
-                                         depth = depth,
-                                         full.names = TRUE)
-
-  target = paste0(server, ':', destination ,  '/',  lf)
-  target = gsub(pattern = getwd(), '', target)
-
-  b = paste0(
-    'bsub -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out \'ssh ',
-    server,
-    ' "mkdir -p ',
-    gsub(pattern = paste0(server, ':'), '', target),
-    '"\''
-  )
-
-  a = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs -e error.err -o output.out "scp -r ',
-             lf,
-             '/ ',
-             target,
-             '"')
-
-  for (i in 1:100) {
-    a =  gsub(pattern = '//', replacement = '/', a)
-    b =  gsub(pattern = '//', replacement = '/', b)
-  }
-  write(
-    x = c(b, a),
-    file = fname,
-    ncolumns = 10 ^ 5,
-    append = FALSE,
-    sep = '\n'
-  )
-}
-
-DeleteDirectoryAndSubDirectories = function(path  = getwd(),
-                                            depth = 2,
-                                            fname = 'deleteFullDirectory.txt') {
-  lf = list.dirsDepth(path = path, depth = depth)
-  a = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs "rm -rf ',
-             lf,
-             '"')
-  write(
-    x = a,
-    file = fname,
-    ncolumns = 10 ^ 5,
-    append = FALSE,
-    sep = '\n'
-  )
-}
-#### Only for the ETL process step 1,2,3,4
-ETLStep1MakePar2RdataJobs = function(path = getwd(),
-                                     mem = 25000,
-                                     pattern = '.parquet') {
-  files = list.files(
-    path = paste0(path, '/'),
-    pattern = pattern,
-    full.names = TRUE,
-    recursive = TRUE,
-    include.dirs = FALSE
-  )
-  write(
-    paste0(
-      'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
-      mem,
-      ' -e "step2_Par2Rdata_error.log" -o "Step2_Par2Rdata_output.log" Rscript Step2Parquet2Rdata.R "',
-      files,
-      '" ""'
-    ),
-    file = 'jobs_step2_Parquet2Rdata.bch'
-  )
-  write('', file = 'Step1 completed.log')
-}
-
-
-ETLStep2Parquet2Rdata = function(files) {
-  requireNamespace(miniparquet)
-  df = lapply(seq_along(files),
-              function(i) {
-                message(i, '|', length(files), ' ~> ', files[i])
-                r = miniparquet::parquet_read(files[i])
-                return(r)
-              })
-  ###############
-  procedure_list = na.omit(unique(unlist(lapply(df, function(x) {
-    unique(x$procedure_group)
-  }))))
-
-  for (proc in procedure_list) {
-    message(which(procedure_list == proc),
-            '/',
-            length(procedure_list),
-            ' Checking for ',
-            proc)
-    rdata = data.table::rbindlist(lapply(df, function(x) {
-      r = subset(x, x$procedure_group == proc)
-      return(r)
-    }))
-
-    if (!is.null(rdata) &&
-        nrow    (rdata) > 0) {
-      rdata = rdata[!duplicated(rdata),]
-    }
-
-    outDir = file.path('ProcedureScatterRdata', proc)
-    if (!dir.exists(outDir))
-      dir.create(outDir, recursive = TRUE)
-    save(rdata,
-         file = file.path(
-           outDir,
-           paste(
-             round(runif(1) * 10 ^ 6)  ,
-             proc                  ,
-             '.Rdata'              ,
-             sep = '_'             ,
-             collapse = '_'
-           )
-         ),
-         compress = FALSE)
-    rm(rdata)
-    gc()
-  }
-}
-
-ETLStep3MergeRdataFilesJobs = function(path = file.path(getwd(), 'ProcedureScatterRdata'),
-                                       mem = 80000) {
-  dirs = list.dirs(path = path,
-                   full.names = TRUE ,
-                   recursive  = FALSE)
-  ############## jobs creator#
-  write(
-    paste0(
-      'bsub -J -q bigmem IMPC_stats_pipeline_lsf_jobs -M ',
-      mem,
-      ' -e "step4_MergeRdatas_error.log" -o "step4_MergeRdatas_output.log" Rscript Step4MergingRdataFiles.R "',
-      unique(na.omit(dirs)),
-      '"'
-    ),
-    file = 'jobs_step4_MergeRdatas.bch'
-  )
-  write('',file = 'Step3 completed.log')
-}
-
-
-ETLStep4MergingRdataFiles = function(RootDir) {
-  for (dir in RootDir) {
-    message('Merging data in ', dir)
-    rdata0 = NULL
-    fs = list.files(
-      path = dir,
-      pattern = 'Rdata',
-      full.names = TRUE,
-      recursive = FALSE,
-      ignore.case = TRUE
-    )
-    if (length(fs) < 1)
-      next
-    for (f in fs) {
-      if (!grepl(pattern = '.Rdata', x = f))
-        next
-      message('\t file: ', f)
-      load(f)
-      rdata0 = rbind(rdata0, rdata)
-      rm(rdata)
-    }
-    outDir = file.path(getwd(), 'Rdata')
-    if (!dir.exists(outDir)) {
-      dir.create(outDir, recursive = TRUE)
-    }
-    save(rdata0, file = file.path(outDir                              ,
-                                  paste0(
-                                    # Sys.Date(),
-                                    #'_',
-                                    unique(rdata0$procedure_group),
-                                    '.Rdata',
-                                    collapse = '_'
-                                  )))
-    rm(rdata0)
-    gc()
-  }
-}
-
-
-
-
 dictionary2listConvert = function(x) {
   if (is.null(x) || !is(x, 'list'))
     return(x)
@@ -4707,10 +4515,9 @@ dictionary2listConvert = function(x) {
 }
 
 
-waitTillCommandFinish = function(command = 'bjobs -w',
-                                 checkcommand = 'bjobs -w',
-                                 WaitIfTheOutputContains = 'IMPC_stats_pipeline_lsf_jobs',
-                                 WaitBeforeRetrySec = 30,
+waitTillCommandFinish = function(checkcommand = 'squeue --format="%A %.30j"',
+                                 WaitIfTheOutputContains = 'impc_stats_pipeline_job',
+                                 WaitBeforeRetrySec = 60,
                                  ignoreline = 0,
                                  ...) {
   r = system(command = checkcommand,
@@ -4743,11 +4550,6 @@ waitTillCommandFinish = function(command = 'bjobs -w',
 
   }
   message0('continuing the pipeline ...')
-  r2 = system(command = command,
-              wait = TRUE,
-              intern = TRUE,
-              ...)
-  return(invisible(r2))
 }
 
 filesContain = function(path = getwd(),
@@ -4780,11 +4582,13 @@ filesContain = function(path = getwd(),
 }
 
 jobCreator = function(path = getwd(),
-                      pattern = '.Rdata',
-                      JobListFile = 'DataGenerationJobList.bch') {
-  if (!dir.exists(file.path('DataGeneratingLog')))
+                      pattern = "\\.Rdata",
+                      JobListFile = "DataGenerationJobList.bch",
+                      mem = "45G",
+                      time = "6-00") {
+  if (!dir.exists(file.path("DataGeneratingLog")))
     dir.create(
-      path = file.path('DataGeneratingLog'),
+      path = file.path("DataGeneratingLog"),
       recursive = TRUE,
       showWarnings = FALSE
     )
@@ -4801,16 +4605,19 @@ jobCreator = function(path = getwd(),
   proc = tools::file_path_sans_ext(basename(files))
   write(
     paste0(
-      'bsub -J IMPC_stats_pipeline_lsf_jobs ',
+      "sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
+      " --time=", time,
       ' -e ',
       file.path('DataGeneratingLog', paste0(proc, '_errorlog.log')),
       ' -o ',
       file.path('DataGeneratingLog', paste0(proc, '_outputlog.log')),
-      ' -n 1 -M 49000 Rscript InputDataGenerator.R "',
+      " --wrap='Rscript InputDataGenerator.R ",
+      '"',
       files,
       '" "',
       proc,
-      '"'
+      '"',
+      "'"
     ),
     file = JobListFile
   )
@@ -4874,7 +4681,7 @@ ReplaceWordInFile = function(file,
 
 StatsPipeline = function(path = getwd(),
                          SP.results = file.path(getwd(), 'SP'),
-                         waitUntillSee = 'IMPC_stats_pipeline_lsf_jobs',
+                         waitUntillSee = 'impc_stats_pipeline_job',
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
@@ -4889,14 +4696,11 @@ StatsPipeline = function(path = getwd(),
     dir.create(path)
   setwd(path)
   currentuser = Sys.info()['user']
-  ### step zeop: remove leftovers from lsf
-  system(paste0('find /ebi/lsf/yoda-spool/02/ -user ',currentuser,' -type f | xargs rm -rf'), wait = TRUE)
-  system(paste0('find /ebi/lsf/codon-spool/job-spool/ -user ',currentuser,' -type f | xargs rm -rf'), wait = TRUE)
-  system(paste0('find /ebi/lsf/ebi-spool2/01/ -user ',currentuser,' -type f | xargs rm -rf'), wait = TRUE)
+
   ### Phase I: Preparing parquet files
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
-  message0('Step 1. Reading the data from the parquets directory and creating LSF jobs')
+  message0('Step 1. Reading the data from the parquets directory and creating jobs')
   source(file.path(local(),
                    'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
   f(path0)
@@ -4910,9 +4714,8 @@ StatsPipeline = function(path = getwd(),
     overwrite = TRUE
   )
   system('chmod 775 jobs_step2_Parquet2Rdata.bch', wait = TRUE)
-  system('./jobs_step2_Parquet2Rdata.bch', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash ./jobs_step2_Parquet2Rdata.bch"', wait = TRUE)
   waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
@@ -4927,7 +4730,7 @@ StatsPipeline = function(path = getwd(),
   system(command = "find ../ -type f -name '*.err' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
 
   ###############################################
-  message0('Step 3. Merging psudo Rdata files into single file for each procedure - LSF jobs creator')
+  message0('Step 3. Merging psudo Rdata files into single file for each procedure - jobs creator')
   source(file.path(local(),
                    'StatsPipeline/0-ETL/Step3MergeRdataFilesJobs.R'))
   f(file.path(path, 'ProcedureScatterRdata'))
@@ -4942,9 +4745,8 @@ StatsPipeline = function(path = getwd(),
     overwrite = TRUE
   )
   system('chmod 775 jobs_step4_MergeRdatas.bch', wait = TRUE)
-  system('./jobs_step4_MergeRdatas.bch', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash ./jobs_step4_MergeRdatas.bch"', wait = TRUE)
   waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
@@ -4974,9 +4776,8 @@ StatsPipeline = function(path = getwd(),
     overwrite = TRUE
   )
   system('chmod 775 DataGenerationJobList.bch', wait = TRUE)
-  system('./DataGenerationJobList.bch', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/phase2_job_id.txt --wrap="bash ./DataGenerationJobList.bch"', wait = TRUE)
   waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
@@ -5006,14 +4807,14 @@ StatsPipeline = function(path = getwd(),
          wait = TRUE)
 
   ## Add all single jobs into one single job
-  message0('Appending all procdure based LSF jobs into one single file ...')
+  message0('Appending all procedure based jobs into one single file ...')
   if (!dir.exists('jobs'))
     system(command = 'mkdir jobs', wait = TRUE)
   if (file.exists('jobs/AllJobs.bch'))
     system(command = 'rm jobs/AllJobs.bch', wait = TRUE)
   system(command = 'find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch', wait = TRUE)
 
-  message0('Phase III. Initialising the statistical analyses ...')
+  message0('Phase III. Initialising the statistical analysis ...')
   path = file.path(path, 'jobs')
   setwd(path)
 
@@ -5027,7 +4828,7 @@ StatsPipeline = function(path = getwd(),
     saveRdata = FALSE
   )
 
-  message0('Running the IMPC statistical pipeline by submitting LSF jobs ...')
+  message0('Running the IMPC statistical pipeline by submitting jobs ...')
   # copy stats pipeline driver script
   if (windowingPipeline) {
     file.copy(
@@ -5051,14 +4852,13 @@ StatsPipeline = function(path = getwd(),
                     DRversion)
 
   system('chmod 775 AllJobs.bch', wait = TRUE)
-  system('./AllJobs.bch', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=05:00:00 --mem=1G -o ../../compressed_logs/phase3_job_id.txt --wrap="bash ./AllJobs.bch"', wait = TRUE)
   waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
 
-  message0('Postprocessing the IMPC statistical analyses results ...')
+  message0('Postprocessing the IMPC statistical analysis results ...')
   setwd(SP.results)
 
   message0('Creating backups from the main R packages ...')
@@ -5088,7 +4888,7 @@ StatsPipeline = function(path = getwd(),
 
 
 IMPC_statspipelinePostProcess = function(SP.results = getwd(),
-                                         waitUntillSee = 'IMPC_stats_pipeline_lsf_jobs',
+                                         waitUntillSee = 'impc_stats_pipeline_job',
                                          ignoreThisLineInWaitingCheck = 0) {
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
@@ -5105,7 +4905,6 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   system('chmod 775 minijobs.txt', wait = TRUE)
   system('./minijobs.txt', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
@@ -5138,9 +4937,8 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
     wait = TRUE
   )
 
-  system('./ExtractPValJobs.bch', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=03:00:00 --mem=1G -o ../../../../compressed_logs/extract_pval_job_id.txt --wrap="bash ./ExtractPValJobs.bch"', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
@@ -5193,9 +4991,14 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
     }
 
     system('chmod 775 Jobs.bch', wait = TRUE)
-    system('./Jobs.bch', wait = TRUE)
+    job_to_submit <- paste(
+      "sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../../../../../../compressed_logs/extract_pval_",
+      dir,
+      '_job_id.txt --wrap="bash ./Jobs.bch"',
+      sep=""
+    )
+    system(job_to_submit, wait = TRUE)
     DRrequiredAgeing:::waitTillCommandFinish(
-      command = 'bjobs -w',
       WaitIfTheOutputContains = waitUntillSee,
       ignoreline = ignoreThisLineInWaitingCheck
     )
@@ -5234,7 +5037,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
 
 
 IMPC_annotationPostProcess = function(SP.results = getwd(),
-                                      waitUntillSee = 'IMPC_stats_pipeline_lsf_jobs',
+                                      waitUntillSee = 'impc_stats_pipeline_job',
                                       ignoreThisLineInWaitingCheck = 0,
                                       ###
                                       mp_chooser_file = 'mp_chooser_20230411.json.Rdata',
@@ -5282,7 +5085,6 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   system('chmod 775 minijobs.txt', wait = TRUE)
   system('./minijobs.txt', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
@@ -5320,7 +5122,8 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   DRrequiredAgeing:::annotationIndexCreator(
     path = getwd(),
     pattern = 'split_index',
-    mem = 12000,
+    mem = "12G",
+    time = "2-00",
     outputfile = 'jobs.bch'
   )
   system('chmod 775 jobs.bch', wait = TRUE)
@@ -5344,9 +5147,8 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
     wait = TRUE
   )
 
-  system('./jobs.bch', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../annotation_postprocess_job_id.txt --wrap="bash ./jobs.bch"', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
@@ -6493,7 +6295,8 @@ StratifiedMPTerms = function(object, name = 'MPTERM') {
 
 annotationIndexCreator = function(path = getwd(),
                                   pattern = 'split_index',
-                                  mem = 12000,
+                                  mem = "12G",
+                                  time = "2-00",
                                   outputfile = 'jobs.bch') {
   lf = list.files(
     path = path,
@@ -6514,14 +6317,16 @@ annotationIndexCreator = function(path = getwd(),
 
   err = paste0(' -e ', dirname(lf), '/err/', basename(lf))
   out = paste0(' -o ', dirname(lf), '/out/', basename(lf))
-  batch = paste0('bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
-                 mem,
+  batch = paste0("sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
+                 " --time=", time,
                  ' ',
                  err,
                  out,
-                 ' Rscript loader.R "',
+                 " --wrap='Rscript loader.R ",
+                 '"',
                  basename(lf),
-                 '"')
+                 '"',
+                 "'")
   write(batch, outputfile)
 }
 ##########################################
@@ -6529,7 +6334,8 @@ annotationIndexCreator = function(path = getwd(),
 ##########################################
 splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
                                                        split = 1500,
-                                                       mem = 8500,
+                                                       mem = "9G",
+                                                       time = "2-00",
                                                        outputfile = 'ExtractPValJobs.bch') {
   ldf = length(readLines(indexFilePath))
   ind = round(seq(1, ldf, length.out = split))
@@ -6549,19 +6355,21 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
   for (i in 2:(length(ind) + 1)) {
     write(
       paste(
-        'bsub -J IMPC_stats_pipeline_lsf_jobs -M ',
-        mem,
+        "sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
+        " --time=", time,
         ' -e "error/err',
         i,
         '" -o "output/out',
         i,
-        '" Rscript ExtractPVals.R ',
+        '" ',
+        "--wrap='Rscript ExtractPVals.R ",
         ind[i - 1],
         ' ',
         ind[i] - 1,
         ' "',
         indexFilePath,
         '"',
+        "'",
         sep = ''
       ),
       file = outputfile,
@@ -6595,7 +6403,7 @@ changeRpackageDirectory = function(path = '~/DRs/R/packages') {
 
 
 IMPC_HadoopLoad = function(SP.results = getwd(),
-                           waitUntillSee = 'IMPC_stats_pipeline_lsf_jobs',
+                           waitUntillSee = 'impc_stats_pipeline_job',
                            ignoreThisLineInWaitingCheck = 0,
                            ###
                            mp_chooser_file = 'mp_chooser_20230411.json.Rdata',
@@ -6641,7 +6449,6 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   system('chmod 775 minijobs.txt', wait = TRUE)
   system('./minijobs.txt', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
@@ -6680,7 +6487,8 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   DRrequiredAgeing:::annotationIndexCreator(
     path = getwd(),
     pattern = 'split_index',
-    mem = 5000,
+    mem = "5G",
+    time = "2-00",
     outputfile = 'jobs.bch'
   )
   system('chmod 775 jobs.bch', wait = TRUE)
@@ -6705,8 +6513,8 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   )
 
   system('./jobs.bch', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=03:00:00 --mem=1G -o ../../../../compressed_logs/hadoop_load_job_id.txt --wrap="bash ./jobs.bch"', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
-    command = 'bjobs -w',
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )

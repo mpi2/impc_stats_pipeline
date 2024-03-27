@@ -733,13 +733,13 @@ makejobs = function(path = getwd()) {
     bf = basename(file)
     n = length(parameters)
     jobs = paste0 (
-      'bsub -J IMPC_stats_pipeline_lsf_jobs -M 16000 -e err/err',
+      'sbatch --job-name=impc_stats_pipeline_job --mem=16G --time=2-00 -e err/err',
       bf,
       1:n,
       ' -o out/out',
       bf,
       1:n,
-      ' "Rscript ExtractPVals.R ',
+      ' --wrap="Rscript ExtractPVals.R ',
       parameters,
       ' ',
       file,

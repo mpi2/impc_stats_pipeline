@@ -216,13 +216,13 @@ mainAgeing(
   Setting this option to TRUE will write the output of the statistical pipeline to the individual sqlitDB in the /db/ directory. This can stretch the execution time significantly. Default FALSE
 }
   \item{BatchProducer}{
-  This parameter activates the preprocessing step. In this step, no statistical analysis will be performed on the data but the data packages will be created. The big datasets will be breaking into small packages. The new directory structure with the data and the LSF jobs will be created. The resources such as CPU/memory allocated to the LSF jobs are specified by the parameters below. Default FALSE.
+  This parameter activates the preprocessing step. In this step, no statistical analysis will be performed on the data but the data packages will be created. The big datasets will be breaking into small packages. The new directory structure with the data and the jobs will be created. The resources such as CPU/memory allocated to the jobs are specified by the parameters below. Default FALSE.
 }
   \item{cpu}{
-  For the preprocessing only. How many CPUs needed to be allocated for each LSF job? Default 4
+  For the preprocessing only. How many CPUs needed to be allocated for each job? Default 4
 }
   \item{memory}{
-  For the preprocessing only. How much memory needed to be allocated for each LSF job? Default 9 GB
+  For the preprocessing only. How much memory needed to be allocated for each job? Default 9 GB
 }
   \item{nMax}{
   For the preprocessing only. The maximum number of samples allowed in a package. Default 10K
