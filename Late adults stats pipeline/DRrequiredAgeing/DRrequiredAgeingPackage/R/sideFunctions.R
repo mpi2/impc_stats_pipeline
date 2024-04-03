@@ -6472,8 +6472,9 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     ignoreline = ignoreThisLineInWaitingCheck
   )
   
-  system(command = "find . -type f -name '*.log' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
-  system(command = "find . -type f -name '*.err' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
+  system('mv minijobs.bch ../../../compressed_logs', wait = TRUE)
+  system(command = "find . -type f -name '*_output.log' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*_error.err' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
 
   DRrequiredAgeing:::message0('Moving single indeces into a separate directory called AnnotationExtractorAndHadoopLoader ...')
   system('rm -rf AnnotationExtractorAndHadoopLoader/', wait = TRUE)
@@ -6534,7 +6535,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     wait = TRUE
   )
 
-  DRrequiredAgeing:::submit_limit_jobs(bch_file="annotation_jobs.bch", job_id_logfile="../../../../compressed_logs/hadoop_load_job_id.txt")
+  DRrequiredAgeing:::submit_limit_jobs(bch_file="annotation_jobs.bch", job_id_logfile="../../../../compressed_logs/annotation_job_id.txt")
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -6547,6 +6548,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   DRrequiredAgeing:::message0('Zipping logs ...')
   setwd(file.path(SP.results, 'AnnotationExtractorAndHadoopLoader'))
+  system('mv annotation_jobs.bch ../../../../compressed_logs', wait = TRUE)
   system('zip -rm ../../../../compressed_logs/annotation_logs.zip log/* err/* out/*', wait = TRUE)
   system('zip -rm splits.zip split_index_*', wait = TRUE)
 
