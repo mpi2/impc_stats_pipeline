@@ -6453,10 +6453,6 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   )
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index for results')
-  DRrequiredAgeing:::message0('Zipping the logs ...')
-  setwd(file.path(SP.results, '..','..',  'logs'))
-  system(command = 'zip -rm logs.zip *.ClusterErr *.ClusterOut', wait = TRUE)
-
   DRrequiredAgeing:::message0('Indexing the results ...')
   setwd(file.path(SP.results))
 
