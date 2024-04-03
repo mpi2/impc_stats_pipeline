@@ -4476,11 +4476,13 @@ list.dirsDepth = function(path  = getwd(),
 
 minijobsCreator = function(path  = getwd(),
                            depth = 2,
-                           fname = 'minijobs.txt',
+                           fname = 'minijobs.bch',
                            type = '*.tsv') {
   lf = list.dirsDepth(path = path, depth = depth)
   a = paste0(
-    'sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 -e error.err -o output.out --wrap="find ',
+    'sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00',
+    ' -e ', basename(lf), '_error.err',
+    ' -o ', basename(lf), '_output.log --wrap="find ',
     lf,
     ' -type f -name "',
     type,
@@ -4920,11 +4922,11 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Indexing the results ...')
   setwd(file.path(SP.results))
 
-  system('rm -f minijobs.txt', wait = TRUE)
+  system('rm -f minijobs.bch', wait = TRUE)
   system('rm -f *.Ind', wait = TRUE)
   DRrequiredAgeing:::minijobsCreator()
-  system('chmod 775 minijobs.txt', wait = TRUE)
-  system('./minijobs.txt', wait = TRUE)
+  system('chmod 775 minijobs.bch', wait = TRUE)
+  system('./minijobs.bch', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -5096,15 +5098,15 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Indexing the results ...')
   setwd(file.path(SP.results))
 
-  system('rm -f minijobs.txt', wait = TRUE)
+  system('rm -f minijobs.bch', wait = TRUE)
   system('rm -f error.err', wait = TRUE)
   system('rm -f output.out', wait = TRUE)
   system('rm -f *.Ind', wait = TRUE)
   system('rm -rf AnnotationExtractor/', wait = TRUE)
 
   DRrequiredAgeing:::minijobsCreator()
-  system('chmod 775 minijobs.txt', wait = TRUE)
-  system('./minijobs.txt', wait = TRUE)
+  system('chmod 775 minijobs.bch', wait = TRUE)
+  system('./minijobs.bch', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -5128,7 +5130,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   system('split -15000 AllResultsIndeces.txt split_index_', wait = TRUE)
 
 
-  system('rm -f jobs.bch', wait = TRUE)
+  system('rm -f annotation_jobs.bch', wait = TRUE)
   system('rm -f config.Rdata', wait = TRUE)
   system('rm -f logs.zip' , wait = TRUE)
   system('rm -f loader.R', wait = TRUE)
@@ -5145,9 +5147,9 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
     pattern = 'split_index',
     mem = "12G",
     time = "2-00",
-    outputfile = 'jobs.bch'
+    outputfile = 'annotation_jobs.bch'
   )
-  system('chmod 775 jobs.bch', wait = TRUE)
+  system('chmod 775 annotation_jobs.bch', wait = TRUE)
 
 
   if (is.null(mp_chooser_file) || !file.exists(file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file))) {
@@ -5168,7 +5170,7 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
     wait = TRUE
   )
 
-  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../annotation_postprocess_job_id.txt --wrap="bash ./jobs.bch"', wait = TRUE)
+  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../annotation_postprocess_job_id.txt --wrap="bash ./annotation_jobs.bch"', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -6318,7 +6320,7 @@ annotationIndexCreator = function(path = getwd(),
                                   pattern = 'split_index',
                                   mem = "12G",
                                   time = "2-00",
-                                  outputfile = 'jobs.bch') {
+                                  outputfile = 'annotation_jobs.bch') {
   lf = list.files(
     path = path,
     pattern = pattern,
@@ -6453,26 +6455,26 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   )
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index for results')
-  DRrequiredAgeing:::message0('Zipping the logs ...')
-  setwd(file.path(SP.results, '..','..',  'logs'))
-  system(command = 'zip -rm logs.zip *.ClusterErr *.ClusterOut', wait = TRUE)
-
   DRrequiredAgeing:::message0('Indexing the results ...')
   setwd(file.path(SP.results))
 
-  system('rm -f minijobs.txt', wait = TRUE)
+  system('rm -f minijobs.bch', wait = TRUE)
   system('rm -f error.err', wait = TRUE)
   system('rm -f output.out', wait = TRUE)
   system('rm -f *.Ind', wait = TRUE)
   system('rm -rf AnnotationExtractorAndHadoopLoader/', wait = TRUE)
 
   DRrequiredAgeing:::minijobsCreator()
-  system('chmod 775 minijobs.txt', wait = TRUE)
-  system('./minijobs.txt', wait = TRUE)
+  system('chmod 775 minijobs.bch', wait = TRUE)
+  DRrequiredAgeing:::submit_limit_jobs(bch_file="minijobs.bch", job_id_logfile="../../../compressed_logs/minijobs_job_id.txt")
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
+  
+  system('mv minijobs.bch ../../../compressed_logs', wait = TRUE)
+  system(command = "find . -type f -name '*_output.log' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*_error.err' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
 
   DRrequiredAgeing:::message0('Moving single indeces into a separate directory called AnnotationExtractorAndHadoopLoader ...')
   system('rm -rf AnnotationExtractorAndHadoopLoader/', wait = TRUE)
@@ -6484,7 +6486,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Concating single index files to create a global index for the results ...')
   system('cat *.Ind >> AllResultsIndeces.txt', wait = TRUE)
 
-  DRrequiredAgeing:::message0('zipping the single indeces ...')
+  DRrequiredAgeing:::message0('Zipping the single indeces ...')
   system('zip -rm allsingleindeces.zip *.Ind', wait = TRUE)
 
   system('rm -f split_index_*', wait = TRUE)
@@ -6492,7 +6494,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   system('split -50 AllResultsIndeces.txt split_index_', wait = TRUE)
 
 
-  system('rm -f jobs.bch', wait = TRUE)
+  system('rm -f annotation_jobs.bch', wait = TRUE)
   system('rm -f config.Rdata', wait = TRUE)
   system('rm -f configHadoop.Rdata', wait = TRUE)
   system('rm -f logs.zip' , wait = TRUE)
@@ -6510,9 +6512,9 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     pattern = 'split_index',
     mem = "5G",
     time = "2-00",
-    outputfile = 'jobs.bch'
+    outputfile = 'annotation_jobs.bch'
   )
-  system('chmod 775 jobs.bch', wait = TRUE)
+  system('chmod 775 annotation_jobs.bch', wait = TRUE)
 
 
   if (is.null(mp_chooser_file) || !file.exists(file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file))) {
@@ -6533,8 +6535,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     wait = TRUE
   )
 
-  system('./jobs.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=03:00:00 --mem=1G -o ../../../../compressed_logs/hadoop_load_job_id.txt --wrap="bash ./jobs.bch"', wait = TRUE)
+  DRrequiredAgeing:::submit_limit_jobs(bch_file="annotation_jobs.bch", job_id_logfile="../../../../compressed_logs/annotation_job_id.txt")
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -6547,7 +6548,8 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   DRrequiredAgeing:::message0('Zipping logs ...')
   setwd(file.path(SP.results, 'AnnotationExtractorAndHadoopLoader'))
-  system('zip -rm logs.zip log/* err/* out/*', wait = TRUE)
+  system('mv annotation_jobs.bch ../../../../compressed_logs', wait = TRUE)
+  system('zip -rm ../../../../compressed_logs/annotation_logs.zip log/* err/* out/*', wait = TRUE)
   system('zip -rm splits.zip split_index_*', wait = TRUE)
 
   DRrequiredAgeing:::message0('Job done.')
