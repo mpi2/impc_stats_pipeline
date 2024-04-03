@@ -751,8 +751,7 @@ f = function(statpacket = NULL,
   )
   ##################################################################
   message('\t Reading the index file ...')
-  #a <- jsonlite:::fromJSON(txt = '~/../Downloads/mp_chooser_20230411.json.Rdata')
-  load('mp_chooser_20230411.json.Rdata')
+  load('mp_chooser.json.Rdata')
   message(
     '\t~>',
     paste(
