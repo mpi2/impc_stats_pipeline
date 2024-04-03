@@ -4476,7 +4476,7 @@ list.dirsDepth = function(path  = getwd(),
 
 minijobsCreator = function(path  = getwd(),
                            depth = 2,
-                           fname = 'minijobs.txt',
+                           fname = 'minijobs.bch',
                            type = '*.tsv') {
   lf = list.dirsDepth(path = path, depth = depth)
   a = paste0(
@@ -4920,11 +4920,11 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Indexing the results ...')
   setwd(file.path(SP.results))
 
-  system('rm -f minijobs.txt', wait = TRUE)
+  system('rm -f minijobs.bch', wait = TRUE)
   system('rm -f *.Ind', wait = TRUE)
   DRrequiredAgeing:::minijobsCreator()
-  system('chmod 775 minijobs.txt', wait = TRUE)
-  system('./minijobs.txt', wait = TRUE)
+  system('chmod 775 minijobs.bch', wait = TRUE)
+  system('./minijobs.bch', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -5096,15 +5096,15 @@ IMPC_annotationPostProcess = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Indexing the results ...')
   setwd(file.path(SP.results))
 
-  system('rm -f minijobs.txt', wait = TRUE)
+  system('rm -f minijobs.bch', wait = TRUE)
   system('rm -f error.err', wait = TRUE)
   system('rm -f output.out', wait = TRUE)
   system('rm -f *.Ind', wait = TRUE)
   system('rm -rf AnnotationExtractor/', wait = TRUE)
 
   DRrequiredAgeing:::minijobsCreator()
-  system('chmod 775 minijobs.txt', wait = TRUE)
-  system('./minijobs.txt', wait = TRUE)
+  system('chmod 775 minijobs.bch', wait = TRUE)
+  system('./minijobs.bch', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -6456,15 +6456,15 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Indexing the results ...')
   setwd(file.path(SP.results))
 
-  system('rm -f minijobs.txt', wait = TRUE)
+  system('rm -f minijobs.bch', wait = TRUE)
   system('rm -f error.err', wait = TRUE)
   system('rm -f output.out', wait = TRUE)
   system('rm -f *.Ind', wait = TRUE)
   system('rm -rf AnnotationExtractorAndHadoopLoader/', wait = TRUE)
 
   DRrequiredAgeing:::minijobsCreator()
-  system('chmod 775 minijobs.txt', wait = TRUE)
-  system('./minijobs.txt', wait = TRUE)
+  system('chmod 775 minijobs.bch', wait = TRUE)
+  system('./minijobs.bch', wait = TRUE)
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
