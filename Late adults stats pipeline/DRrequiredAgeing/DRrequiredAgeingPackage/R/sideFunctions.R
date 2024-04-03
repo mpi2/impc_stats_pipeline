@@ -4480,7 +4480,9 @@ minijobsCreator = function(path  = getwd(),
                            type = '*.tsv') {
   lf = list.dirsDepth(path = path, depth = depth)
   a = paste0(
-    'sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 -e error.err -o output.out --wrap="find ',
+    'sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00',
+    ' -e ', basename(lf), '_error.err',
+    ' -o ', basename(lf), '_output.log --wrap="find ',
     lf,
     ' -type f -name "',
     type,
@@ -6464,11 +6466,14 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   DRrequiredAgeing:::minijobsCreator()
   system('chmod 775 minijobs.bch', wait = TRUE)
-  submit_limit_jobs(bch_file="minijobs.bch", job_id_logfile="../../../compressed_logs/minijobs_job_id.txt")
+  DRrequiredAgeing:::submit_limit_jobs(bch_file="minijobs.bch", job_id_logfile="../../../compressed_logs/minijobs_job_id.txt")
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
   )
+  
+  system(command = "find . -type f -name '*.log' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
+  system(command = "find . -type f -name '*.err' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
 
   DRrequiredAgeing:::message0('Moving single indeces into a separate directory called AnnotationExtractorAndHadoopLoader ...')
   system('rm -rf AnnotationExtractorAndHadoopLoader/', wait = TRUE)
@@ -6529,7 +6534,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     wait = TRUE
   )
 
-  submit_limit_jobs(bch_file="annotation_jobs.bch", job_id_logfile="../../../../compressed_logs/hadoop_load_job_id.txt")
+  DRrequiredAgeing:::submit_limit_jobs(bch_file="annotation_jobs.bch", job_id_logfile="../../../../compressed_logs/hadoop_load_job_id.txt")
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -6542,7 +6547,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   DRrequiredAgeing:::message0('Zipping logs ...')
   setwd(file.path(SP.results, 'AnnotationExtractorAndHadoopLoader'))
-  system('zip -rm logs.zip log/* err/* out/*', wait = TRUE)
+  system('zip -rm ../../../../compressed_logs/annotation_logs.zip log/* err/* out/*', wait = TRUE)
   system('zip -rm splits.zip split_index_*', wait = TRUE)
 
   DRrequiredAgeing:::message0('Job done.')
