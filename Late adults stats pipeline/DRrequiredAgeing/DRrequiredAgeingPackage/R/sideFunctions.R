@@ -6464,7 +6464,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   DRrequiredAgeing:::minijobsCreator()
   system('chmod 775 minijobs.bch', wait = TRUE)
-  system('./minijobs.bch', wait = TRUE)
+  submit_limit_jobs(bch_file="minijobs.bch", job_id_logfile="../../../compressed_logs/minijobs_job_id.txt")
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
@@ -6480,7 +6480,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Concating single index files to create a global index for the results ...')
   system('cat *.Ind >> AllResultsIndeces.txt', wait = TRUE)
 
-  DRrequiredAgeing:::message0('zipping the single indeces ...')
+  DRrequiredAgeing:::message0('Zipping the single indeces ...')
   system('zip -rm allsingleindeces.zip *.Ind', wait = TRUE)
 
   system('rm -f split_index_*', wait = TRUE)
@@ -6529,8 +6529,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     wait = TRUE
   )
 
-  system('./jobs.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=03:00:00 --mem=1G -o ../../../../compressed_logs/hadoop_load_job_id.txt --wrap="bash ./jobs.bch"', wait = TRUE)
+  submit_limit_jobs(bch_file="jobs.bch", job_id_logfile="../../../../compressed_logs/hadoop_load_job_id.txt")
   DRrequiredAgeing:::waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
     ignoreline = ignoreThisLineInWaitingCheck
