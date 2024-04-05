@@ -4912,7 +4912,8 @@ StatsPipeline = function(path = getwd(),
 
 IMPC_statspipelinePostProcess = function(SP.results = getwd(),
                                          waitUntillSee = 'impc_stats_pipeline_job',
-                                         ignoreThisLineInWaitingCheck = 0) {
+                                         ignoreThisLineInWaitingCheck = 0,
+                                         mp_chooser_file = NULL) {
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
   DRrequiredAgeing:::message0('Zipping the logs ...')
@@ -4952,7 +4953,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   setwd(file.path(SP.results, 'ExtractPvalues'))
   system('cp ../SingleIndeces/AllResultsIndeces.txt .', wait = TRUE)
 
-  DRrequiredAgeing:::splitIndexFileIntoPiecesForPvalueExtraction(indexFilePath = 'AllResultsIndeces.txt')
+  DRrequiredAgeing:::splitIndexFileIntoPiecesForPvalueExtraction(indexFilePath = 'AllResultsIndeces.txt', mp_chooser_file = mp_chooser_file)
   system('chmod 775 ExtractPValJobs.bch', wait = TRUE)
   system('rm -f ExtractPVals.R',wait = TRUE)
   system(
@@ -5965,7 +5966,7 @@ annotationChooser = function(statpacket = NULL,
                              rrlevel = .005,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
-                             mp_chooser_file = 'mp_chooser.json.Rdata') {
+                             mp_chooser_file = NULL) {
   requireNamespace('RPostgreSQL')
   requireNamespace('data.table')
   requireNamespace("data.table")
@@ -5999,7 +6000,7 @@ annotationChooser = function(statpacket = NULL,
   )
   ##################################################################
   message('\t Reading the index file ...')
-  load(file.path(local(),'annotation',mp_chooser_file))
+  load(mp_chooser_file)
   message(
     '\t~>',
     paste(
@@ -6228,7 +6229,8 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
                                                        split = 1500,
                                                        mem = "9G",
                                                        time = "2-00",
-                                                       outputfile = 'ExtractPValJobs.bch') {
+                                                       outputfile = 'ExtractPValJobs.bch',
+                                                       mp_chooser_file = NULL) {
   ldf = length(readLines(indexFilePath))
   ind = round(seq(1, ldf, length.out = split))
 
@@ -6260,6 +6262,8 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
         ind[i] - 1,
         ' "',
         indexFilePath,
+        '" "',
+        mp_chooser_file,
         '"',
         "'",
         sep = ''
@@ -6298,7 +6302,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            waitUntillSee = 'impc_stats_pipeline_job',
                            ignoreThisLineInWaitingCheck = 0,
                            ###
-                           mp_chooser_file = 'mp_chooser.json.Rdata',
+                           mp_chooser_file = NULL,
                            host =  "hh-hdp-master-02.ebi.ac.uk",
                            path = 'impc/statpackets',
                            prefix = 'DRXXX_',
@@ -6376,6 +6380,14 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Writing the config file ...')
   save(configlist,file = 'configHadoop.Rdata')
 
+  if (is.null(mp_chooser_file) || !file.exists(mp_chooser_file)) {
+    DRrequiredAgeing:::message0(
+      'ERROR: mp_chooser not found at location\n\t',
+      mp_chooser_file
+    )
+    quit()
+  }
+
   DRrequiredAgeing:::annotationIndexCreator(
     path = getwd(),
     pattern = 'split_index',
@@ -6384,19 +6396,6 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     outputfile = 'annotation_jobs.bch'
   )
   system('chmod 775 annotation_jobs.bch', wait = TRUE)
-
-
-  if (is.null(mp_chooser_file) || !file.exists(file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file))) {
-    DRrequiredAgeing:::message0(
-      'mp_chooser not found\n\t',
-      file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
-    )
-    mp_chooser_file = 'mp_chooser.json.Rdata'
-    DRrequiredAgeing:::message0(
-      'mp_chooser defaulted to \n',
-      file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
-    )
-  }
 
   DRrequiredAgeing:::message0('Downloading the action script ...')
   system(
