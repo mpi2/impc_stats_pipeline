@@ -83,73 +83,71 @@ These instructions are tailored for Release 21.0.
 
 ## Step 1. Data Preprocessing and Analysis
 ### Preparation
-0. Switch to the mi_stats virtual user:
+0. Start screen
+```
+screen -S stats_pipeline
+```
+
+1. Switch to the mi_stats virtual user:
 ```console
 become mi_stats
 ```
 
-1. Set necessary variables:
+2. Set necessary variables:
 ```console
-export KOMP_PATH="<path_to_directory>"
 export VERSION="21.0"
+export REMOTE="mpi2"
+export BRANCH="master"
+export KOMP_PATH="<absolute_path_to_directory>"
 ```
 
-2. Create a working directory:
+3. Create a working directory:
 ```console
 mkdir --mode=775 ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
 ```
 
-3. Copy the input parquet files (±80*10^6 data points) and `mp_chooser_json`:
+4. Copy the input parquet files (±80*10^6 data points) and `mp_chooser_json`:
 ```console
 cp ${KOMP_PATH}/data-releases/latest-input/dr${VERSION}/output/flatten_observations_parquet/*.parquet ./
-cp ${KOMP_PATH}/data-releases/latest-input/dr${VERSION}/output/mp_chooser_json/part-*.txt ./
+cp ${KOMP_PATH}/data-releases/latest-input/dr${VERSION}/output/mp_chooser_json/part-*.txt ./mp_chooser.json
 ```
 **Note:** Be cautious, the location of the input files may vary.<br>
 Refer to the [Observations Output Schema](https://github.com/mpi2/impc-etl/wiki/Observations-Output-Schema). In the current dataset, some fields that should be arrays are presented as comma-separated lists.
 
-4. Convert the mp_chooser JSON file to Rdata:
+5. Convert the mp_chooser JSON file to Rdata:
 ```console
-R -e "a = jsonlite::fromJSON('part-00000-b2483dca-4c84-4c90-a79b-e97df8c95091-c000.txt');save(a,file='mp_chooser.json.Rdata')"
+R -e "a = jsonlite::fromJSON('mp_chooser.json');save(a,file='mp_chooser.json.Rdata')"
+export MP_CHOOSER_FILE=$(realpath mp_chooser.json.Rdata)
 ```
 
-5. Clone the `impc_stats_pipeline` repository:
-```console
-cd /tmp
-git clone https://github.com/mpi2/impc_stats_pipeline.git
-```
-
-6. Update mp_chooser file in following directories:
-```console
-cp ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2/mp_chooser.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/annotation/
-cp ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr20.2/mp_chooser.json.Rdata /tmp/impc_stats_pipeline/Late\ adults\ stats\ pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/jobs/Postgres
-```
-
-7. Update the master branch of the repository on GitHub with the new version of mp_chooser:
-```console
-git add mp_chooser.json.Rdata
-git commit -m "Update an mp_chooser"
-git push origin master
-```
-**Note:** Log in with your [credentials](https://www.ebi.ac.uk/seqdb/confluence/display/MouseInformatics/GitHub+Machine+User) using personal access token for `impc-stats-pipeline` repository.
-
-8. Update packages to the latest version:
+6. Update packages to the latest version:
 ```console
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
-wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R
-Rscript UpdatePackagesFromGithub.R mpi2 master
+wget https://raw.githubusercontent.com/${REMOTE}/impc_stats_pipeline/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R
+Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH}
 rm UpdatePackagesFromGithub.R
 ```
 
 ### Run Statistical Pipeline
-9. Execute the `StatsPipeline` function on SLURM:
+7. Execute the `StatsPipeline` function on SLURM:
 ```console
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
-sbatch --time=30-00:00:00 --mem=8G -o ../stats_pipeline_logs/stats_pipeline_${VERSION}.log -e ../stats_pipeline_logs/stats_pipeline_${VERSION}.err --wrap="R -e 'DRrequiredAgeing:::StatsPipeline(DRversion=${VERSION})'"
+sbatch \
+    --time=30-00:00:00 \
+    --mem=8G \
+    -o ../stats_pipeline_logs/stats_pipeline_${VERSION}.log \
+    -e ../stats_pipeline_logs/stats_pipeline_${VERSION}.err \
+    --wrap="R -e 'DRrequiredAgeing:::StatsPipeline(DRversion=${VERSION})'"
 ```
 **Note:** Remember to note down the job ID number that will appear after submitting the job.
 
-10. Monitor progress using the following commands:
+- To leave screen, press combination `Ctrl + A + D`.
+- Don't forget to write down the number that will appear after leaving the screen, for example, 3507472, and number of cluster node.
+- Also make sure to remember which login node you started the screen session on.
+
+8. Monitor progress using the following commands:
+- Activate screen to check progress: `screen -r 3507472.stats-pipeline`
 - Use `squeue` to check job status.
 - Review the log files:
 ```console
@@ -159,23 +157,28 @@ less ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_logs/stats_p
 
 ## Step 2. Run Annotation Pipeline
 The `IMPC_HadoopLoad` command uses the power of cluster to assign the annotations to the StatPackets and transfers the files to the Hadoop cluster. The files will be transferred to Hadoop:/hadoop/user/mi_stats/impc/statpackets/DRXX.
-1. Set necessary variables:
+1. Reconnect to screen session
+Make sure to connect to the same login node you used to start the screen session.
 ```console
-export KOMP_PATH="<path_to_directory>"
-export VERSION="21.0"
+screen -r 3507472.stats-pipeline
 ```
 
 2. Update packages to the latest version:
 ```console
-wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/master/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R
-Rscript UpdatePackagesFromGithub.R mpi2 master
+wget https://raw.githubusercontent.com/${REMOTE}/impc_stats_pipeline/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R
+Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH}
 rm UpdatePackagesFromGithub.R
 ```
 
 3. Run annotation pipeline without exporting it to Hadoop: `transfer=FALSE`
 ```console
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}/SP/jobs/Results_IMPC_SP_Windowed
-sbatch --time=3-00:00:00 --mem=8G -o ../../../../stats_pipeline_logs/annotation_pipeline_${VERSION}.log -e ../../../../stats_pipeline_logs/annotation_pipeline_${VERSION}.err --wrap="R -e 'DRrequiredAgeing:::IMPC_HadoopLoad(prefix=${VERSION},transfer=FALSE)'"'
+sbatch \
+    --time=3-00:00:00 \
+    --mem=8G \
+    -o ../../../../stats_pipeline_logs/annotation_pipeline_${VERSION}.log \
+    -e ../../../../stats_pipeline_logs/annotation_pipeline_${VERSION}.err \
+    --wrap="R -e 'DRrequiredAgeing:::IMPC_HadoopLoad(prefix=${VERSION},transfer=FALSE,mp_chooser_file=${MP_CHOOSER_FILE})'"
 ```
 
 - The most complex part of this process is that some files will fail to transfer and you need to use scp command to transfer files to the Hadoop cluster manually.
@@ -190,7 +193,7 @@ This process generates statistical reports typically utilized by the IMPC workin
 3. The commands below will generate two CSV files in the `${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.y/SP/jobs/Results_IMPC_SP_Windowed` directory for the unidimentional and categorical results. The files can be gzip and moved to the FTP directory. You can decorate and format the files by using one of the formatted files in the previous data releases.
 ```console
 R
-DRrequiredAgeing:::IMPC_statspipelinePostProcess()
+DRrequiredAgeing:::IMPC_statspipelinePostProcess(mp_chooser_file=${MP_CHOOSER_FILE})
 DRrequiredAgeing:::ClearReportsAfterCreation()
 ```
 
