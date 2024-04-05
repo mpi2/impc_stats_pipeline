@@ -85,7 +85,7 @@ These instructions are tailored for Release 21.0.
 ### Preparation
 0. Start screen
 ```
-screen -S stats_pipeline
+screen -S stats-pipeline
 ```
 
 1. Switch to the mi_stats virtual user:
@@ -118,7 +118,7 @@ Refer to the [Observations Output Schema](https://github.com/mpi2/impc-etl/wiki/
 5. Convert the mp_chooser JSON file to Rdata:
 ```console
 R -e "a = jsonlite::fromJSON('mp_chooser.json');save(a,file='mp_chooser.json.Rdata')"
-export MP_CHOOSER_FILE=$(realpath mp_chooser.json.Rdata)
+export MP_CHOOSER_FILE=$(echo -n '"'; realpath mp_chooser.json.Rdata | tr -d '\n'; echo -n '"')
 ```
 
 6. Update packages to the latest version:
