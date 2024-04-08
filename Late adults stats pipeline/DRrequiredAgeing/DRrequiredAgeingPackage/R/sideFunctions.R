@@ -4566,7 +4566,7 @@ submit_limit_jobs = function(bch_file,
       if(num_running <= max_jobs) {
         break
       }
-      Sys.sleep(1)
+      Sys.sleep(0.5)
     }
     job_id <- system(command, wait=TRUE, intern = TRUE)
     system(paste("echo '", job_id, "' >> ", job_id_logfile))
@@ -4748,7 +4748,6 @@ StatsPipeline = function(path = getwd(),
                    containWhat = 'Exit'))
     stop('An error occured in step 2. Parquet2Rdata conversion')
   
-  system(command = "mkdir ../compressed_logs", wait = TRUE)
   system(command = "find ../ -type f -name '*.log' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
   system(command = "find ../ -type f -name '*.err' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
 
@@ -4815,19 +4814,9 @@ StatsPipeline = function(path = getwd(),
   ## Compress logs
   message0('End of packaging data. ')
   message0('Phase II. Compressing the log files and house cleaning ... ')
-  system(command = 'mv *.R  DataGeneratingLog/', wait = TRUE)
   system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
   system(command = 'zip -rm phase2_logs.zip DataGeneratingLog/', wait = TRUE)
   system(command = 'mv phase2_logs.zip ../compressed_logs/', wait = TRUE)
-
-  ## remove logs
-  message0('Removing the log files prior to the run of the statistical anlyses ...')
-  system(command = 'find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs rm',
-         ignore.stdout = TRUE,
-         wait = TRUE)
-  system(command = 'find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs rm',
-         ignore.stdout = TRUE,
-         wait = TRUE)
 
   ## Add all single jobs into one single job
   message0('Appending all procedure based jobs into one single file ...')
