@@ -1,5 +1,8 @@
 # Jobs creator for Par2Rdata
-f <- function(path = getwd(), mem = 25000, pattern = ".parquet") {
+f <- function(path = getwd(),
+              pattern = ".parquet",
+              mem = "10G",
+              time = "00:10:00") {
   files <- list.files(
     path,
     pattern = pattern,
@@ -9,10 +12,12 @@ f <- function(path = getwd(), mem = 25000, pattern = ".parquet") {
   )
   write(
     paste0(
-      "bsub -J IMPC_stats_pipeline_lsf_jobs -M ", mem,
+      "sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
+      " --time=", time,
       " -e ", files, ".err",
-      " -o ", files, ".log Rscript Step2Parquet2Rdata.R ",
-      files
+      " -o ", files, ".log --wrap='Rscript Step2Parquet2Rdata.R ",
+      files,
+      "'"
     ),
     file = "jobs_step2_Parquet2Rdata.bch"
   )

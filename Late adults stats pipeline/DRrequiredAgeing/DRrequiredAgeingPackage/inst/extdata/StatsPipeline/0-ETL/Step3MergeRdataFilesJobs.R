@@ -1,15 +1,19 @@
 # Jobs creator for MergeRdatas
-f <- function(path = file.path(getwd(), "ProcedureScatterRdata"), mem = 80000) {
+f <- function(path = file.path(getwd(), "ProcedureScatterRdata"),
+              mem = "50G",
+              time = "01:30:00") {
   dirs <- list.dirs(path = path,
                     full.names = TRUE,
                     recursive  = FALSE)
   unique_dirs <- unique(na.omit(dirs))
   write(
     paste0(
-      "bsub -q bigmem -J IMPC_stats_pipeline_lsf_jobs -M ", mem,
+      "sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
+      " --time=", time,
       " -e ", unique_dirs, "/step4_merge_rdatas.err",
-      " -o ", unique_dirs, "/step4_merge_rdatas.log ",
-      "Rscript Step4MergingRdataFiles.R ", unique_dirs
+      " -o ", unique_dirs, "/step4_merge_rdatas.log",
+      " --wrap='Rscript Step4MergingRdataFiles.R ", unique_dirs,
+      "'"
     ),
     file = "jobs_step4_MergeRdatas.bch"
   )

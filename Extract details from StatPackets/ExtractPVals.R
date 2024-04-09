@@ -367,7 +367,7 @@ DRSummaryAcross = function(x) {
 
 
 ########## Main function
-f = function(start, end, file = 'Index_DR101_V1.txt') {
+f = function(start, end, file = 'Index_DR101_V1.txt', mp_chooser_file = mp_chooser_file) {
   if (is.na(end))
     end = start
   ofname = paste0('R', '_', start, '-', end, '_pval.tsv')
@@ -421,12 +421,14 @@ f = function(start, end, file = 'Index_DR101_V1.txt') {
       stringsAsFactors = FALSE
     )
     rN = DRrequiredAgeing:::annotationChooser(statpacket = r0,
-                                              level = .0001)
+                                              level = .0001,
+                                              mp_chooser_file = mp_chooser_file)
     rW = DRrequiredAgeing:::annotationChooser(
       statpacket = r0,
       level = .0001,
       resultKey = 'Windowed result',
-      TermKey = 'WMPTERM'
+      TermKey = 'WMPTERM',
+      mp_chooser_file = mp_chooser_file
     )
 
 
@@ -733,13 +735,13 @@ makejobs = function(path = getwd()) {
     bf = basename(file)
     n = length(parameters)
     jobs = paste0 (
-      'bsub -J IMPC_stats_pipeline_lsf_jobs -M 16000 -e err/err',
+      'sbatch --job-name=impc_stats_pipeline_job --mem=16G --time=2-00 -e err/err',
       bf,
       1:n,
       ' -o out/out',
       bf,
       1:n,
-      ' "Rscript ExtractPVals.R ',
+      ' --wrap="Rscript ExtractPVals.R ',
       parameters,
       ' ',
       file,
@@ -758,7 +760,7 @@ makejobs = function(path = getwd()) {
 #makejobs()
 #qvalue2AllZips()
 #parameter2qvalue(args[1], args[2])
-ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
+ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]), file = args[3], mp_chooser_file = args[4])
 
 
 
