@@ -106,7 +106,7 @@ mainAgeing = function(file = NULL                                    ,
   EA2LAMApping                   = read.csv(file = file.path(local(), 'EA2LA_parameter_mappings_2019-09-24.csv'))
   MetaDataList                   = read.csv(file = file.path(local(), 'metadataParameters.csv'))
   exceptionList                  = unique(c(exceptionList,MetaDataList$parameter_stable_id))
-  # CategoricalCategoryBlackList   = readFile(file = 'CategoricalCategoryBlackList.list')
+  
   # Main subdirectory/working directory
   message0('Preparing the working directory ...')
   cwd = getwd()
