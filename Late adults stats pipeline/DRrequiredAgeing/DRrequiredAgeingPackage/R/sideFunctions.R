@@ -4912,7 +4912,8 @@ StatsPipeline = function(path = getwd(),
 
 IMPC_statspipelinePostProcess = function(SP.results = getwd(),
                                          waitUntillSee = 'impc_stats_pipeline_job',
-                                         ignoreThisLineInWaitingCheck = 0) {
+                                         ignoreThisLineInWaitingCheck = 0,
+                                         mp_chooser_file = NULL) {
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
   DRrequiredAgeing:::message0('Zipping the logs ...')
@@ -4952,7 +4953,7 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
   setwd(file.path(SP.results, 'ExtractPvalues'))
   system('cp ../SingleIndeces/AllResultsIndeces.txt .', wait = TRUE)
 
-  DRrequiredAgeing:::splitIndexFileIntoPiecesForPvalueExtraction(indexFilePath = 'AllResultsIndeces.txt')
+  DRrequiredAgeing:::splitIndexFileIntoPiecesForPvalueExtraction(indexFilePath = 'AllResultsIndeces.txt', mp_chooser_file = mp_chooser_file)
   system('chmod 775 ExtractPValJobs.bch', wait = TRUE)
   system('rm -f ExtractPVals.R',wait = TRUE)
   system(
@@ -5058,137 +5059,6 @@ IMPC_statspipelinePostProcess = function(SP.results = getwd(),
 
 }
 
-
-IMPC_annotationPostProcess = function(SP.results = getwd(),
-                                      waitUntillSee = 'impc_stats_pipeline_job',
-                                      ignoreThisLineInWaitingCheck = 0,
-                                      ###
-                                      mp_chooser_file = 'mp_chooser.json.Rdata',
-                                      host =  "hh-yoda-05-01",
-                                      tablename = paste0('db_',
-                                                        DrrequiredAgeing:::RemoveSpecialChars(
-                                                          format(Sys.time(), '%a%b%d %Y'),
-                                                          replaceBy = '_',
-                                                          what = ' '
-                                                        )),
-                                      dbname = 'test',
-                                      port = '5432',
-                                      user = 'impc',
-                                      password = 'impc',
-                                      level = .0001,
-                                      rrlevel = .0001) {
-
-  configlist = list(
-    mp_chooser_file = mp_chooser_file,
-    host = host,
-    tablename = tablename,
-    dbname = dbname,
-    port = port,
-    user = user,
-    password = password,
-    level = level,
-    rrlevel = rrlevel
-  )
-
-  DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index of results')
-  DRrequiredAgeing:::message0('Zipping the logs ...')
-  setwd(file.path(SP.results, '..','..',  'logs'))
-  system(command = 'zip -rm logs.zip *.ClusterErr *.ClusterOut', wait = TRUE)
-
-  DRrequiredAgeing:::message0('Indexing the results ...')
-  setwd(file.path(SP.results))
-
-  system('rm -f minijobs.bch', wait = TRUE)
-  system('rm -f error.err', wait = TRUE)
-  system('rm -f output.out', wait = TRUE)
-  system('rm -f *.Ind', wait = TRUE)
-  system('rm -rf AnnotationExtractor/', wait = TRUE)
-
-  DRrequiredAgeing:::minijobsCreator()
-  system('chmod 775 minijobs.bch', wait = TRUE)
-  system('./minijobs.bch', wait = TRUE)
-  DRrequiredAgeing:::waitTillCommandFinish(
-    WaitIfTheOutputContains = waitUntillSee,
-    ignoreline = ignoreThisLineInWaitingCheck
-  )
-
-  DRrequiredAgeing:::message0('Moving single indeces into a separate directory called AnnotationExtractor ...')
-  system('rm -rf AnnotationExtractor/', wait = TRUE)
-  system('mkdir AnnotationExtractor', wait = TRUE)
-  system('chmod 775 AnnotationExtractor/', wait = TRUE)
-  system('mv *.Ind AnnotationExtractor/', wait = TRUE)
-
-  setwd(file.path(SP.results, 'AnnotationExtractor'))
-  DRrequiredAgeing:::message0('Concating single index files to create a global index for the results ...')
-  system('cat *.Ind >> AllResultsIndeces.txt', wait = TRUE)
-
-  DRrequiredAgeing:::message0('zipping the single indeces ...')
-  system('zip -rm allsingleindeces.zip *.Ind', wait = TRUE)
-
-  system('rm -f split_index_*', wait = TRUE)
-  system('rm -f splits.zip', wait = TRUE)
-  system('split -15000 AllResultsIndeces.txt split_index_', wait = TRUE)
-
-
-  system('rm -f annotation_jobs.bch', wait = TRUE)
-  system('rm -f config.Rdata', wait = TRUE)
-  system('rm -f logs.zip' , wait = TRUE)
-  system('rm -f loader.R', wait = TRUE)
-
-  system('rm -rf err', wait = TRUE)
-  system('rm -rf out', wait = TRUE)
-  system('rm -rf log', wait = TRUE)
-
-  DRrequiredAgeing:::message0('Writing the config file ...')
-  save(configlist,file = 'config.Rdata')
-
-  DRrequiredAgeing:::annotationIndexCreator(
-    path = getwd(),
-    pattern = 'split_index',
-    mem = "12G",
-    time = "2-00",
-    outputfile = 'annotation_jobs.bch'
-  )
-  system('chmod 775 annotation_jobs.bch', wait = TRUE)
-
-
-  if (is.null(mp_chooser_file) || !file.exists(file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file))) {
-    DRrequiredAgeing:::message0(
-      'mp_chooser not found\n\t',
-      file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
-    )
-    mp_chooser_file = 'mp_chooser.json.Rdata'
-    DRrequiredAgeing:::message0(
-      'mp_chooser defaulted to \n',
-      file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
-    )
-  }
-
-  DRrequiredAgeing:::message0('Downloading the action script ...')
-  system(
-    'wget https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/IMPC%20annotation%20pipeline/loader.R',
-    wait = TRUE
-  )
-
-  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../annotation_postprocess_job_id.txt --wrap="bash ./annotation_jobs.bch"', wait = TRUE)
-  DRrequiredAgeing:::waitTillCommandFinish(
-    WaitIfTheOutputContains = waitUntillSee,
-    ignoreline = ignoreThisLineInWaitingCheck
-  )
-
-  DRrequiredAgeing:::message0('Check for errors in the process ...')
-  setwd(file.path(SP.results, 'AnnotationExtractor','out'))
-  if(system(command = 'grep "exit" * -lR', wait = TRUE)==0)
-    stop ('Oh no! we found some errors in the process!')
-
-  DRrequiredAgeing:::message0('Zipping logs ...')
-  setwd(file.path(SP.results, 'AnnotationExtractor'))
-  system('zip -rm logs.zip log/* err/* out/*', wait = TRUE)
-  system('zip -rm splits.zip split_index_*', wait = TRUE)
-
-  DRrequiredAgeing:::message0('Job done.')
-
-}
 
 editfile = function(file,
                     searchwhat = '',
@@ -6096,7 +5966,7 @@ annotationChooser = function(statpacket = NULL,
                              rrlevel = .005,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
-                             mp_chooser_file = 'mp_chooser.json.Rdata') {
+                             mp_chooser_file = NULL) {
   requireNamespace('RPostgreSQL')
   requireNamespace('data.table')
   requireNamespace("data.table")
@@ -6130,7 +6000,7 @@ annotationChooser = function(statpacket = NULL,
   )
   ##################################################################
   message('\t Reading the index file ...')
-  load(file.path(local(),'annotation',mp_chooser_file))
+  load(mp_chooser_file)
   message(
     '\t~>',
     paste(
@@ -6359,7 +6229,8 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
                                                        split = 1500,
                                                        mem = "9G",
                                                        time = "2-00",
-                                                       outputfile = 'ExtractPValJobs.bch') {
+                                                       outputfile = 'ExtractPValJobs.bch',
+                                                       mp_chooser_file = NULL) {
   ldf = length(readLines(indexFilePath))
   ind = round(seq(1, ldf, length.out = split))
 
@@ -6391,6 +6262,8 @@ splitIndexFileIntoPiecesForPvalueExtraction = function(indexFilePath = NULL,
         ind[i] - 1,
         ' "',
         indexFilePath,
+        '" "',
+        mp_chooser_file,
         '"',
         "'",
         sep = ''
@@ -6429,7 +6302,7 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            waitUntillSee = 'impc_stats_pipeline_job',
                            ignoreThisLineInWaitingCheck = 0,
                            ###
-                           mp_chooser_file = 'mp_chooser.json.Rdata',
+                           mp_chooser_file = NULL,
                            host =  "hh-hdp-master-02.ebi.ac.uk",
                            path = 'impc/statpackets',
                            prefix = 'DRXXX_',
@@ -6507,6 +6380,14 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
   DRrequiredAgeing:::message0('Writing the config file ...')
   save(configlist,file = 'configHadoop.Rdata')
 
+  if (is.null(mp_chooser_file) || !file.exists(mp_chooser_file)) {
+    DRrequiredAgeing:::message0(
+      'ERROR: mp_chooser not found at location\n\t',
+      mp_chooser_file
+    )
+    quit()
+  }
+
   DRrequiredAgeing:::annotationIndexCreator(
     path = getwd(),
     pattern = 'split_index',
@@ -6515,19 +6396,6 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
     outputfile = 'annotation_jobs.bch'
   )
   system('chmod 775 annotation_jobs.bch', wait = TRUE)
-
-
-  if (is.null(mp_chooser_file) || !file.exists(file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file))) {
-    DRrequiredAgeing:::message0(
-      'mp_chooser not found\n\t',
-      file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
-    )
-    mp_chooser_file = 'mp_chooser.json.Rdata'
-    DRrequiredAgeing:::message0(
-      'mp_chooser defaulted to \n',
-      file.path(DRrequiredAgeing:::local(), 'annotation', mp_chooser_file)
-    )
-  }
 
   DRrequiredAgeing:::message0('Downloading the action script ...')
   system(

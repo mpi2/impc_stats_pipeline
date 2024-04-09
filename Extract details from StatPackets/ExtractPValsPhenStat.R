@@ -661,7 +661,7 @@ makejobs = function(path = getwd()) {
 #makejobs()
 #qvalue2AllZips()
 #parameter2qvalue(args[1], args[2])
-ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]),file = args[3])
+ignore.my.name = f(start =  as.numeric(args[1]), end = as.numeric(args[2]), file = args[3])
 
 
 
