@@ -4556,7 +4556,7 @@ waitTillCommandFinish = function(checkcommand = 'squeue --format="%A %.30j"',
 
 submit_limit_jobs = function(bch_file,
                              job_id_logfile,
-                             max_jobs=400) {
+                             max_jobs=600) {
   message0("Start submit_limit_jobs")
   system(paste("echo > ", job_id_logfile))
   file <- file(bch_file, "r")
