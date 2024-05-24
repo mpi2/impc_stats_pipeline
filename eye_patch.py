@@ -1,6 +1,7 @@
 """This is a temporary module to synchronise the parameters/options lists with IMPRESS.
-Given the size of the files (CategoryRemapping.tsv, MergeParameterList.txt), it's impossible to modify them byhand, so this module is used instead.
-In the future, parameter mapping and representation will be improved and refactored, so this module will no longer be necessary."""
+Given the size of the files (CategoryRemapping.tsv, MergeParameterList.txt), it's impossible
+to modify them by hand, so this module is used instead. In the future, parameter mapping
+and representation will be improved and refactored, so this module will no longer be necessary."""
 
 import csv
 
