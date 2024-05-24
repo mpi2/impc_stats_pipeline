@@ -2703,3 +2703,1183 @@ MGP_CSD_116_001	As expected	0
 MGP_CSD_116_001	Curved	1
 MGP_CSD_116_001	Kinked	1
 MGP_CSD_116_001	Other abnormal tail morphology	1
+RBRCLA_EYE_002_001	absent	0
+RBRCLA_EYE_002_001	present right eye	1
+RBRCLA_EYE_002_001	present left eye	1
+RBRCLA_EYE_002_001	present both eyes	1
+RBRCLA_EYE_003_001	absent	0
+RBRCLA_EYE_003_001	present right eye	1
+RBRCLA_EYE_003_001	present left eye	1
+RBRCLA_EYE_003_001	present both eyes	1
+RBRCLA_EYE_004_001	both eyes abnormal	1
+RBRCLA_EYE_004_001	left eye abnormal	1
+RBRCLA_EYE_004_001	right eye abnormal	1
+RBRCLA_EYE_004_001	normal	0
+RBRCLA_EYE_005_001	both eyes closed	1
+RBRCLA_EYE_005_001	left eye closed	1
+RBRCLA_EYE_005_001	right eye closed	1
+RBRCLA_EYE_005_001	normal	0
+RBRCLA_EYE_006_001	both eyes abnormal	1
+RBRCLA_EYE_006_001	left eye abnormal	1
+RBRCLA_EYE_006_001	right eye abnormal	1
+RBRCLA_EYE_006_001	normal	0
+RBRCLA_EYE_007_001	both eyes abnormal	1
+RBRCLA_EYE_007_001	left eye abnormal	1
+RBRCLA_EYE_007_001	right eye abnormal	1
+RBRCLA_EYE_007_001	normal	0
+RBRCLA_EYE_008_001	absent	0
+RBRCLA_EYE_008_001	present right eye	1
+RBRCLA_EYE_008_001	present left eye	1
+RBRCLA_EYE_008_001	present both eyes	1
+RBRCLA_EYE_009_001	absent	0
+RBRCLA_EYE_009_001	present right eye	1
+RBRCLA_EYE_009_001	present left eye	1
+RBRCLA_EYE_009_001	present both eyes	1
+RBRCLA_EYE_010_001	both eyes abnormal	1
+RBRCLA_EYE_010_001	left eye abnormal	1
+RBRCLA_EYE_010_001	right eye abnormal	1
+RBRCLA_EYE_010_001	normal	0
+RBRCLA_EYE_011_001	both eyes abnormal	1
+RBRCLA_EYE_011_001	left eye abnormal	1
+RBRCLA_EYE_011_001	right eye abnormal	1
+RBRCLA_EYE_011_001	normal	0
+RBRCLA_EYE_012_001	both eyes abnormal	1
+RBRCLA_EYE_012_001	left eye abnormal	1
+RBRCLA_EYE_012_001	right eye abnormal	1
+RBRCLA_EYE_012_001	normal	0
+RBRCLA_EYE_013_001	both eyes dilated	1
+RBRCLA_EYE_013_001	left eye dilated	1
+RBRCLA_EYE_013_001	right eye dilated	1
+RBRCLA_EYE_013_001	normal	0
+RBRCLA_EYE_014_001	both eyes abnormal	1
+RBRCLA_EYE_014_001	left eye abnormal	1
+RBRCLA_EYE_014_001	right eye abnormal	1
+RBRCLA_EYE_014_001	normal	0
+RBRCLA_EYE_015_001	both eyes abnormal	1
+RBRCLA_EYE_015_001	left eye abnormal	1
+RBRCLA_EYE_015_001	right eye abnormal	1
+RBRCLA_EYE_015_001	normal	0
+RBRCLA_EYE_016_001	both eyes abnormal	1
+RBRCLA_EYE_016_001	left eye abnormal	1
+RBRCLA_EYE_016_001	right eye abnormal	1
+RBRCLA_EYE_016_001	normal	0
+RBRCLA_EYE_017_001	absent	0
+RBRCLA_EYE_017_001	present right eye	1
+RBRCLA_EYE_017_001	present left eye	1
+RBRCLA_EYE_017_001	present both eyes	1
+RBRCLA_EYE_018_001	absent	0
+RBRCLA_EYE_018_001	present right eye	1
+RBRCLA_EYE_018_001	present left eye	1
+RBRCLA_EYE_018_001	present both eyes	1
+RBRCLA_EYE_019_001	absent	0
+RBRCLA_EYE_019_001	present right eye	1
+RBRCLA_EYE_019_001	present left eye	1
+RBRCLA_EYE_019_001	present both eyes	1
+RBRCLA_EYE_020_001	both eyes abnormal	1
+RBRCLA_EYE_020_001	left eye abnormal	1
+RBRCLA_EYE_020_001	right eye abnormal	1
+RBRCLA_EYE_020_001	normal	0
+RBRCLA_EYE_021_001	both eyes abnormal	1
+RBRCLA_EYE_021_001	left eye abnormal	1
+RBRCLA_EYE_021_001	right eye abnormal	1
+RBRCLA_EYE_021_001	normal	0
+RBRCLA_EYE_022_001	both eyes abnormal	1
+RBRCLA_EYE_022_001	left eye abnormal	1
+RBRCLA_EYE_022_001	right eye abnormal	1
+RBRCLA_EYE_022_001	normal	0
+RBRCLA_EYE_023_001	both eyes abnormal	1
+RBRCLA_EYE_023_001	left eye abnormal	1
+RBRCLA_EYE_023_001	right eye abnormal	1
+RBRCLA_EYE_023_001	normal	0
+RBRCLA_EYE_024_001	both eyes abnormal	1
+RBRCLA_EYE_024_001	left eye abnormal	1
+RBRCLA_EYE_024_001	right eye abnormal	1
+RBRCLA_EYE_024_001	normal	0
+RBRCLA_EYE_025_001	both eyes abnormal	1
+RBRCLA_EYE_025_001	left eye abnormal	1
+RBRCLA_EYE_025_001	right eye abnormal	1
+RBRCLA_EYE_025_001	normal	0
+RBRCLA_EYE_026_001	both eyes abnormal	1
+RBRCLA_EYE_026_001	left eye abnormal	1
+RBRCLA_EYE_026_001	right eye abnormal	1
+RBRCLA_EYE_026_001	normal	0
+RBRCLA_EYE_027_001	absent	0
+RBRCLA_EYE_027_001	present right eye	1
+RBRCLA_EYE_027_001	present left eye	1
+RBRCLA_EYE_027_001	present both eyes	1
+RBRCLA_EYE_080_001	absent	0
+RBRCLA_EYE_080_001	present right eye	1
+RBRCLA_EYE_080_001	present left eye	1
+RBRCLA_EYE_080_001	present both eyes	1
+RBRCLA_EYE_081_001	absent	0
+RBRCLA_EYE_081_001	present right eye	1
+RBRCLA_EYE_081_001	present left eye	1
+RBRCLA_EYE_081_001	present both eyes	1
+RBRCLA_EYE_082_001	both eyes abnormal	1
+RBRCLA_EYE_082_001	left eye abnormal	1
+RBRCLA_EYE_082_001	right eye abnormal	1
+RBRCLA_EYE_082_001	normal	0
+RBRCLA_EYE_083_001	both eyes abnormal	1
+RBRCLA_EYE_083_001	left eye abnormal	1
+RBRCLA_EYE_083_001	right eye abnormal	1
+RBRCLA_EYE_083_001	normal	0
+RBRCLA_EYE_084_001	absent	0
+RBRCLA_EYE_084_001	present right eye	1
+RBRCLA_EYE_084_001	present left eye	1
+RBRCLA_EYE_084_001	present both eyes	1
+RBRCLA_EYE_085_001	absent	0
+RBRCLA_EYE_085_001	present right eye	1
+RBRCLA_EYE_085_001	present left eye	1
+RBRCLA_EYE_085_001	present both eyes	1
+RBRCLA_EYE_086_001	absent	0
+RBRCLA_EYE_086_001	present right eye	1
+RBRCLA_EYE_086_001	present left eye	1
+RBRCLA_EYE_086_001	present both eyes	1
+TCPLA_EYE_080_001	absent	0
+TCPLA_EYE_080_001	present right eye	1
+TCPLA_EYE_080_001	present left eye	1
+TCPLA_EYE_080_001	present both eyes	1
+TCPLA_EYE_085_001	absent	0
+TCPLA_EYE_085_001	present right eye	1
+TCPLA_EYE_085_001	present left eye	1
+TCPLA_EYE_085_001	present both eyes	1
+TCPLA_EYE_010_001	both eyes abnormal	1
+TCPLA_EYE_010_001	left eye abnormal	1
+TCPLA_EYE_010_001	right eye abnormal	1
+TCPLA_EYE_010_001	normal	0
+TCPLA_EYE_082_001	both eyes abnormal	1
+TCPLA_EYE_082_001	left eye abnormal	1
+TCPLA_EYE_082_001	right eye abnormal	1
+TCPLA_EYE_082_001	normal	0
+TCPLA_EYE_019_001	absent	0
+TCPLA_EYE_019_001	present right eye	1
+TCPLA_EYE_019_001	present left eye	1
+TCPLA_EYE_019_001	present both eyes	1
+TCPLA_EYE_014_001	both eyes abnormal	1
+TCPLA_EYE_014_001	left eye abnormal	1
+TCPLA_EYE_014_001	right eye abnormal	1
+TCPLA_EYE_014_001	normal	0
+TCPLA_EYE_081_001	absent	0
+TCPLA_EYE_081_001	present right eye	1
+TCPLA_EYE_081_001	present left eye	1
+TCPLA_EYE_081_001	present both eyes	1
+TCPLA_EYE_025_001	both eyes abnormal	1
+TCPLA_EYE_025_001	left eye abnormal	1
+TCPLA_EYE_025_001	right eye abnormal	1
+TCPLA_EYE_025_001	normal	0
+TCPLA_EYE_002_001	absent	0
+TCPLA_EYE_002_001	present right eye	1
+TCPLA_EYE_002_001	present left eye	1
+TCPLA_EYE_002_001	present both eyes	1
+TCPLA_EYE_018_001	absent	0
+TCPLA_EYE_018_001	present right eye	1
+TCPLA_EYE_018_001	present left eye	1
+TCPLA_EYE_018_001	present both eyes	1
+TCPLA_EYE_011_001	both eyes abnormal	1
+TCPLA_EYE_011_001	left eye abnormal	1
+TCPLA_EYE_011_001	right eye abnormal	1
+TCPLA_EYE_011_001	normal	0
+TCPLA_EYE_016_001	both eyes abnormal	1
+TCPLA_EYE_016_001	left eye abnormal	1
+TCPLA_EYE_016_001	right eye abnormal	1
+TCPLA_EYE_016_001	normal	0
+TCPLA_EYE_005_001	both eyes closed	1
+TCPLA_EYE_005_001	left eye closed	1
+TCPLA_EYE_005_001	right eye closed	1
+TCPLA_EYE_005_001	normal	0
+TCPLA_EYE_017_001	absent	0
+TCPLA_EYE_017_001	present right eye	1
+TCPLA_EYE_017_001	present left eye	1
+TCPLA_EYE_017_001	present both eyes	1
+TCPLA_EYE_083_001	both eyes abnormal	1
+TCPLA_EYE_083_001	left eye abnormal	1
+TCPLA_EYE_083_001	right eye abnormal	1
+TCPLA_EYE_083_001	normal	0
+TCPLA_EYE_084_001	absent	0
+TCPLA_EYE_084_001	present right eye	1
+TCPLA_EYE_084_001	present left eye	1
+TCPLA_EYE_084_001	present both eyes	1
+TCPLA_EYE_026_001	both eyes abnormal	1
+TCPLA_EYE_026_001	left eye abnormal	1
+TCPLA_EYE_026_001	right eye abnormal	1
+TCPLA_EYE_026_001	normal	0
+TCPLA_EYE_027_001	absent	0
+TCPLA_EYE_027_001	present right eye	1
+TCPLA_EYE_027_001	present left eye	1
+TCPLA_EYE_027_001	present both eyes	1
+TCPLA_EYE_023_001	both eyes abnormal	1
+TCPLA_EYE_023_001	left eye abnormal	1
+TCPLA_EYE_023_001	right eye abnormal	1
+TCPLA_EYE_023_001	normal	0
+TCPLA_EYE_024_001	both eyes abnormal	1
+TCPLA_EYE_024_001	left eye abnormal	1
+TCPLA_EYE_024_001	right eye abnormal	1
+TCPLA_EYE_024_001	normal	0
+TCPLA_EYE_004_001	both eyes abnormal	1
+TCPLA_EYE_004_001	left eye abnormal	1
+TCPLA_EYE_004_001	right eye abnormal	1
+TCPLA_EYE_004_001	normal	0
+TCPLA_EYE_007_001	both eyes abnormal	1
+TCPLA_EYE_007_001	left eye abnormal	1
+TCPLA_EYE_007_001	right eye abnormal	1
+TCPLA_EYE_007_001	normal	0
+TCPLA_EYE_015_001	both eyes abnormal	1
+TCPLA_EYE_015_001	left eye abnormal	1
+TCPLA_EYE_015_001	right eye abnormal	1
+TCPLA_EYE_015_001	normal	0
+TCPLA_EYE_013_001	both eyes dilated	1
+TCPLA_EYE_013_001	left eye dilated	1
+TCPLA_EYE_013_001	right eye dilated	1
+TCPLA_EYE_013_001	normal	0
+TCPLA_EYE_008_001	absent	0
+TCPLA_EYE_008_001	present right eye	1
+TCPLA_EYE_008_001	present left eye	1
+TCPLA_EYE_008_001	present both eyes	1
+TCPLA_EYE_006_001	both eyes abnormal	1
+TCPLA_EYE_006_001	left eye abnormal	1
+TCPLA_EYE_006_001	right eye abnormal	1
+TCPLA_EYE_006_001	normal	0
+TCPLA_EYE_086_001	absent	0
+TCPLA_EYE_086_001	present right eye	1
+TCPLA_EYE_086_001	present left eye	1
+TCPLA_EYE_086_001	present both eyes	1
+TCPLA_EYE_009_001	absent	0
+TCPLA_EYE_009_001	present right eye	1
+TCPLA_EYE_009_001	present left eye	1
+TCPLA_EYE_009_001	present both eyes	1
+TCPLA_EYE_012_001	both eyes abnormal	1
+TCPLA_EYE_012_001	left eye abnormal	1
+TCPLA_EYE_012_001	right eye abnormal	1
+TCPLA_EYE_012_001	normal	0
+TCPLA_EYE_003_001	absent	0
+TCPLA_EYE_003_001	present right eye	1
+TCPLA_EYE_003_001	present left eye	1
+TCPLA_EYE_003_001	present both eyes	1
+UCDLA_EYE_011_001	both eyes abnormal	1
+UCDLA_EYE_011_001	left eye abnormal	1
+UCDLA_EYE_011_001	right eye abnormal	1
+UCDLA_EYE_011_001	normal	0
+UCDLA_EYE_082_001	both eyes abnormal	1
+UCDLA_EYE_082_001	left eye abnormal	1
+UCDLA_EYE_082_001	right eye abnormal	1
+UCDLA_EYE_082_001	normal	0
+UCDLA_EYE_083_001	both eyes abnormal	1
+UCDLA_EYE_083_001	left eye abnormal	1
+UCDLA_EYE_083_001	right eye abnormal	1
+UCDLA_EYE_083_001	normal	0
+UCDLA_EYE_002_001	absent	0
+UCDLA_EYE_002_001	present right eye	1
+UCDLA_EYE_002_001	present left eye	1
+UCDLA_EYE_002_001	present both eyes	1
+UCDLA_EYE_084_001	absent	0
+UCDLA_EYE_084_001	present right eye	1
+UCDLA_EYE_084_001	present left eye	1
+UCDLA_EYE_084_001	present both eyes	1
+UCDLA_EYE_023_001	both eyes abnormal	1
+UCDLA_EYE_023_001	left eye abnormal	1
+UCDLA_EYE_023_001	right eye abnormal	1
+UCDLA_EYE_023_001	normal	0
+UCDLA_EYE_015_001	both eyes abnormal	1
+UCDLA_EYE_015_001	left eye abnormal	1
+UCDLA_EYE_015_001	right eye abnormal	1
+UCDLA_EYE_015_001	normal	0
+UCDLA_EYE_004_001	both eyes abnormal	1
+UCDLA_EYE_004_001	left eye abnormal	1
+UCDLA_EYE_004_001	right eye abnormal	1
+UCDLA_EYE_004_001	normal	0
+UCDLA_EYE_027_001	absent	0
+UCDLA_EYE_027_001	present right eye	1
+UCDLA_EYE_027_001	present left eye	1
+UCDLA_EYE_027_001	present both eyes	1
+UCDLA_EYE_013_001	both eyes dilated	1
+UCDLA_EYE_013_001	left eye dilated	1
+UCDLA_EYE_013_001	right eye dilated	1
+UCDLA_EYE_013_001	normal	0
+UCDLA_EYE_016_001	both eyes abnormal	1
+UCDLA_EYE_016_001	left eye abnormal	1
+UCDLA_EYE_016_001	right eye abnormal	1
+UCDLA_EYE_016_001	normal	0
+UCDLA_EYE_009_001	absent	0
+UCDLA_EYE_009_001	present right eye	1
+UCDLA_EYE_009_001	present left eye	1
+UCDLA_EYE_009_001	present both eyes	1
+UCDLA_EYE_080_001	absent	0
+UCDLA_EYE_080_001	present right eye	1
+UCDLA_EYE_080_001	present left eye	1
+UCDLA_EYE_080_001	present both eyes	1
+UCDLA_EYE_003_001	absent	0
+UCDLA_EYE_003_001	present right eye	1
+UCDLA_EYE_003_001	present left eye	1
+UCDLA_EYE_003_001	present both eyes	1
+UCDLA_EYE_007_001	both eyes abnormal	1
+UCDLA_EYE_007_001	left eye abnormal	1
+UCDLA_EYE_007_001	right eye abnormal	1
+UCDLA_EYE_007_001	normal	0
+UCDLA_EYE_085_001	absent	0
+UCDLA_EYE_085_001	present right eye	1
+UCDLA_EYE_085_001	present left eye	1
+UCDLA_EYE_085_001	present both eyes	1
+UCDLA_EYE_086_001	absent	0
+UCDLA_EYE_086_001	present right eye	1
+UCDLA_EYE_086_001	present left eye	1
+UCDLA_EYE_086_001	present both eyes	1
+UCDLA_EYE_018_001	absent	0
+UCDLA_EYE_018_001	present right eye	1
+UCDLA_EYE_018_001	present left eye	1
+UCDLA_EYE_018_001	present both eyes	1
+UCDLA_EYE_008_001	absent	0
+UCDLA_EYE_008_001	present right eye	1
+UCDLA_EYE_008_001	present left eye	1
+UCDLA_EYE_008_001	present both eyes	1
+UCDLA_EYE_012_001	both eyes abnormal	1
+UCDLA_EYE_012_001	left eye abnormal	1
+UCDLA_EYE_012_001	right eye abnormal	1
+UCDLA_EYE_012_001	normal	0
+UCDLA_EYE_081_001	absent	0
+UCDLA_EYE_081_001	present right eye	1
+UCDLA_EYE_081_001	present left eye	1
+UCDLA_EYE_081_001	present both eyes	1
+UCDLA_EYE_010_001	both eyes abnormal	1
+UCDLA_EYE_010_001	left eye abnormal	1
+UCDLA_EYE_010_001	right eye abnormal	1
+UCDLA_EYE_010_001	normal	0
+UCDLA_EYE_019_001	absent	0
+UCDLA_EYE_019_001	present right eye	1
+UCDLA_EYE_019_001	present left eye	1
+UCDLA_EYE_019_001	present both eyes	1
+UCDLA_EYE_024_001	both eyes abnormal	1
+UCDLA_EYE_024_001	left eye abnormal	1
+UCDLA_EYE_024_001	right eye abnormal	1
+UCDLA_EYE_024_001	normal	0
+UCDLA_EYE_026_001	both eyes abnormal	1
+UCDLA_EYE_026_001	left eye abnormal	1
+UCDLA_EYE_026_001	right eye abnormal	1
+UCDLA_EYE_026_001	normal	0
+UCDLA_EYE_005_001	both eyes closed	1
+UCDLA_EYE_005_001	left eye closed	1
+UCDLA_EYE_005_001	right eye closed	1
+UCDLA_EYE_005_001	normal	0
+UCDLA_EYE_017_001	absent	0
+UCDLA_EYE_017_001	present right eye	1
+UCDLA_EYE_017_001	present left eye	1
+UCDLA_EYE_017_001	present both eyes	1
+UCDLA_EYE_025_001	both eyes abnormal	1
+UCDLA_EYE_025_001	left eye abnormal	1
+UCDLA_EYE_025_001	right eye abnormal	1
+UCDLA_EYE_025_001	normal	0
+UCDLA_EYE_014_001	both eyes abnormal	1
+UCDLA_EYE_014_001	left eye abnormal	1
+UCDLA_EYE_014_001	right eye abnormal	1
+UCDLA_EYE_014_001	normal	0
+UCDLA_EYE_006_001	both eyes abnormal	1
+UCDLA_EYE_006_001	left eye abnormal	1
+UCDLA_EYE_006_001	right eye abnormal	1
+UCDLA_EYE_006_001	normal	0
+BCMLA_EYE_015_001	both eyes abnormal	1
+BCMLA_EYE_015_001	left eye abnormal	1
+BCMLA_EYE_015_001	right eye abnormal	1
+BCMLA_EYE_015_001	normal	0
+BCMLA_EYE_012_001	both eyes abnormal	1
+BCMLA_EYE_012_001	left eye abnormal	1
+BCMLA_EYE_012_001	right eye abnormal	1
+BCMLA_EYE_012_001	normal	0
+BCMLA_EYE_020_001	both eyes abnormal	1
+BCMLA_EYE_020_001	left eye abnormal	1
+BCMLA_EYE_020_001	right eye abnormal	1
+BCMLA_EYE_020_001	normal	0
+BCMLA_EYE_010_001	both eyes abnormal	1
+BCMLA_EYE_010_001	left eye abnormal	1
+BCMLA_EYE_010_001	right eye abnormal	1
+BCMLA_EYE_010_001	normal	0
+BCMLA_EYE_082_001	both eyes abnormal	1
+BCMLA_EYE_082_001	left eye abnormal	1
+BCMLA_EYE_082_001	right eye abnormal	1
+BCMLA_EYE_082_001	normal	0
+BCMLA_EYE_026_001	both eyes abnormal	1
+BCMLA_EYE_026_001	left eye abnormal	1
+BCMLA_EYE_026_001	right eye abnormal	1
+BCMLA_EYE_026_001	normal	0
+BCMLA_EYE_027_001	absent	0
+BCMLA_EYE_027_001	present right eye	1
+BCMLA_EYE_027_001	present left eye	1
+BCMLA_EYE_027_001	present both eyes	1
+BCMLA_EYE_014_001	both eyes abnormal	1
+BCMLA_EYE_014_001	left eye abnormal	1
+BCMLA_EYE_014_001	right eye abnormal	1
+BCMLA_EYE_014_001	normal	0
+BCMLA_EYE_007_001	both eyes abnormal	1
+BCMLA_EYE_007_001	left eye abnormal	1
+BCMLA_EYE_007_001	right eye abnormal	1
+BCMLA_EYE_007_001	normal	0
+BCMLA_EYE_018_001	absent	0
+BCMLA_EYE_018_001	present right eye	1
+BCMLA_EYE_018_001	present left eye	1
+BCMLA_EYE_018_001	present both eyes	1
+BCMLA_EYE_021_001	both eyes abnormal	1
+BCMLA_EYE_021_001	left eye abnormal	1
+BCMLA_EYE_021_001	right eye abnormal	1
+BCMLA_EYE_021_001	normal	0
+BCMLA_EYE_025_001	both eyes abnormal	1
+BCMLA_EYE_025_001	left eye abnormal	1
+BCMLA_EYE_025_001	right eye abnormal	1
+BCMLA_EYE_025_001	normal	0
+BCMLA_EYE_008_001	absent	0
+BCMLA_EYE_008_001	present right eye	1
+BCMLA_EYE_008_001	present left eye	1
+BCMLA_EYE_008_001	present both eyes	1
+BCMLA_EYE_023_001	both eyes abnormal	1
+BCMLA_EYE_023_001	left eye abnormal	1
+BCMLA_EYE_023_001	right eye abnormal	1
+BCMLA_EYE_023_001	normal	0
+BCMLA_EYE_083_001	both eyes abnormal	1
+BCMLA_EYE_083_001	left eye abnormal	1
+BCMLA_EYE_083_001	right eye abnormal	1
+BCMLA_EYE_083_001	normal	0
+BCMLA_EYE_086_001	absent	0
+BCMLA_EYE_086_001	present right eye	1
+BCMLA_EYE_086_001	present left eye	1
+BCMLA_EYE_086_001	present both eyes	1
+BCMLA_EYE_019_001	absent	0
+BCMLA_EYE_019_001	present right eye	1
+BCMLA_EYE_019_001	present left eye	1
+BCMLA_EYE_019_001	present both eyes	1
+BCMLA_EYE_016_001	both eyes abnormal	1
+BCMLA_EYE_016_001	left eye abnormal	1
+BCMLA_EYE_016_001	right eye abnormal	1
+BCMLA_EYE_016_001	normal	0
+BCMLA_EYE_084_001	absent	0
+BCMLA_EYE_084_001	present right eye	1
+BCMLA_EYE_084_001	present left eye	1
+BCMLA_EYE_084_001	present both eyes	1
+BCMLA_EYE_011_001	both eyes abnormal	1
+BCMLA_EYE_011_001	left eye abnormal	1
+BCMLA_EYE_011_001	right eye abnormal	1
+BCMLA_EYE_011_001	normal	0
+BCMLA_EYE_006_001	both eyes abnormal	1
+BCMLA_EYE_006_001	left eye abnormal	1
+BCMLA_EYE_006_001	right eye abnormal	1
+BCMLA_EYE_006_001	normal	0
+BCMLA_EYE_003_001	absent	0
+BCMLA_EYE_003_001	present right eye	1
+BCMLA_EYE_003_001	present left eye	1
+BCMLA_EYE_003_001	present both eyes	1
+BCMLA_EYE_004_001	both eyes abnormal	1
+BCMLA_EYE_004_001	left eye abnormal	1
+BCMLA_EYE_004_001	right eye abnormal	1
+BCMLA_EYE_004_001	normal	0
+BCMLA_EYE_005_001	both eyes closed	1
+BCMLA_EYE_005_001	left eye closed	1
+BCMLA_EYE_005_001	right eye closed	1
+BCMLA_EYE_005_001	normal	0
+BCMLA_EYE_024_001	both eyes abnormal	1
+BCMLA_EYE_024_001	left eye abnormal	1
+BCMLA_EYE_024_001	right eye abnormal	1
+BCMLA_EYE_024_001	normal	0
+BCMLA_EYE_022_001	both eyes abnormal	1
+BCMLA_EYE_022_001	left eye abnormal	1
+BCMLA_EYE_022_001	right eye abnormal	1
+BCMLA_EYE_022_001	normal	0
+BCMLA_EYE_013_001	both eyes dilated	1
+BCMLA_EYE_013_001	left eye dilated	1
+BCMLA_EYE_013_001	right eye dilated	1
+BCMLA_EYE_013_001	normal	0
+BCMLA_EYE_009_001	absent	0
+BCMLA_EYE_009_001	present right eye	1
+BCMLA_EYE_009_001	present left eye	1
+BCMLA_EYE_009_001	present both eyes	1
+BCMLA_EYE_002_001	absent	0
+BCMLA_EYE_002_001	present right eye	1
+BCMLA_EYE_002_001	present left eye	1
+BCMLA_EYE_002_001	present both eyes	1
+BCMLA_EYE_085_001	absent	0
+BCMLA_EYE_085_001	present right eye	1
+BCMLA_EYE_085_001	present left eye	1
+BCMLA_EYE_085_001	present both eyes	1
+BCMLA_EYE_080_001	absent	0
+BCMLA_EYE_080_001	present right eye	1
+BCMLA_EYE_080_001	present left eye	1
+BCMLA_EYE_080_001	present both eyes	1
+BCMLA_EYE_081_001	absent	0
+BCMLA_EYE_081_001	present right eye	1
+BCMLA_EYE_081_001	present left eye	1
+BCMLA_EYE_081_001	present both eyes	1
+BCMLA_EYE_017_001	absent	0
+BCMLA_EYE_017_001	present right eye	1
+BCMLA_EYE_017_001	present left eye	1
+BCMLA_EYE_017_001	present both eyes	1
+ICSLA_EYE_015_001	both eyes abnormal	1
+ICSLA_EYE_015_001	left eye abnormal	1
+ICSLA_EYE_015_001	right eye abnormal	1
+ICSLA_EYE_015_001	normal	0
+ICSLA_EYE_003_001	absent	0
+ICSLA_EYE_003_001	present right eye	1
+ICSLA_EYE_003_001	present left eye	1
+ICSLA_EYE_003_001	present both eyes	1
+ICSLA_EYE_010_001	both eyes abnormal	1
+ICSLA_EYE_010_001	left eye abnormal	1
+ICSLA_EYE_010_001	right eye abnormal	1
+ICSLA_EYE_010_001	normal	0
+ICSLA_EYE_006_001	both eyes abnormal	1
+ICSLA_EYE_006_001	left eye abnormal	1
+ICSLA_EYE_006_001	right eye abnormal	1
+ICSLA_EYE_006_001	normal	0
+ICSLA_EYE_084_001	absent	0
+ICSLA_EYE_084_001	present right eye	1
+ICSLA_EYE_084_001	present left eye	1
+ICSLA_EYE_084_001	present both eyes	1
+ICSLA_EYE_005_001	both eyes closed	1
+ICSLA_EYE_005_001	left eye closed	1
+ICSLA_EYE_005_001	right eye closed	1
+ICSLA_EYE_005_001	normal	0
+ICSLA_EYE_085_001	absent	0
+ICSLA_EYE_085_001	present right eye	1
+ICSLA_EYE_085_001	present left eye	1
+ICSLA_EYE_085_001	present both eyes	1
+ICSLA_EYE_009_001	absent	0
+ICSLA_EYE_009_001	present right eye	1
+ICSLA_EYE_009_001	present left eye	1
+ICSLA_EYE_009_001	present both eyes	1
+ICSLA_EYE_017_001	absent	0
+ICSLA_EYE_017_001	present right eye	1
+ICSLA_EYE_017_001	present left eye	1
+ICSLA_EYE_017_001	present both eyes	1
+ICSLA_EYE_027_001	absent	0
+ICSLA_EYE_027_001	present right eye	1
+ICSLA_EYE_027_001	present left eye	1
+ICSLA_EYE_027_001	present both eyes	1
+ICSLA_EYE_019_001	absent	0
+ICSLA_EYE_019_001	present right eye	1
+ICSLA_EYE_019_001	present left eye	1
+ICSLA_EYE_019_001	present both eyes	1
+ICSLA_EYE_018_001	absent	0
+ICSLA_EYE_018_001	present right eye	1
+ICSLA_EYE_018_001	present left eye	1
+ICSLA_EYE_018_001	present both eyes	1
+ICSLA_EYE_013_001	both eyes dilated	1
+ICSLA_EYE_013_001	left eye dilated	1
+ICSLA_EYE_013_001	right eye dilated	1
+ICSLA_EYE_013_001	normal	0
+ICSLA_EYE_014_001	both eyes abnormal	1
+ICSLA_EYE_014_001	left eye abnormal	1
+ICSLA_EYE_014_001	right eye abnormal	1
+ICSLA_EYE_014_001	normal	0
+ICSLA_EYE_083_001	both eyes abnormal	1
+ICSLA_EYE_083_001	left eye abnormal	1
+ICSLA_EYE_083_001	right eye abnormal	1
+ICSLA_EYE_083_001	normal	0
+ICSLA_EYE_002_001	absent	0
+ICSLA_EYE_002_001	present right eye	1
+ICSLA_EYE_002_001	present left eye	1
+ICSLA_EYE_002_001	present both eyes	1
+ICSLA_EYE_012_001	both eyes abnormal	1
+ICSLA_EYE_012_001	left eye abnormal	1
+ICSLA_EYE_012_001	right eye abnormal	1
+ICSLA_EYE_012_001	normal	0
+ICSLA_EYE_007_001	both eyes abnormal	1
+ICSLA_EYE_007_001	left eye abnormal	1
+ICSLA_EYE_007_001	right eye abnormal	1
+ICSLA_EYE_007_001	normal	0
+ICSLA_EYE_086_001	absent	0
+ICSLA_EYE_086_001	present right eye	1
+ICSLA_EYE_086_001	present left eye	1
+ICSLA_EYE_086_001	present both eyes	1
+ICSLA_EYE_026_001	both eyes abnormal	1
+ICSLA_EYE_026_001	left eye abnormal	1
+ICSLA_EYE_026_001	right eye abnormal	1
+ICSLA_EYE_026_001	normal	0
+ICSLA_EYE_008_001	absent	0
+ICSLA_EYE_008_001	present right eye	1
+ICSLA_EYE_008_001	present left eye	1
+ICSLA_EYE_008_001	present both eyes	1
+ICSLA_EYE_016_001	both eyes abnormal	1
+ICSLA_EYE_016_001	left eye abnormal	1
+ICSLA_EYE_016_001	right eye abnormal	1
+ICSLA_EYE_016_001	normal	0
+ICSLA_EYE_080_001	absent	0
+ICSLA_EYE_080_001	present right eye	1
+ICSLA_EYE_080_001	present left eye	1
+ICSLA_EYE_080_001	present both eyes	1
+ICSLA_EYE_082_001	both eyes abnormal	1
+ICSLA_EYE_082_001	left eye abnormal	1
+ICSLA_EYE_082_001	right eye abnormal	1
+ICSLA_EYE_082_001	normal	0
+ICSLA_EYE_024_001	both eyes abnormal	1
+ICSLA_EYE_024_001	left eye abnormal	1
+ICSLA_EYE_024_001	right eye abnormal	1
+ICSLA_EYE_024_001	normal	0
+ICSLA_EYE_081_001	absent	0
+ICSLA_EYE_081_001	present right eye	1
+ICSLA_EYE_081_001	present left eye	1
+ICSLA_EYE_081_001	present both eyes	1
+ICSLA_EYE_025_001	both eyes abnormal	1
+ICSLA_EYE_025_001	left eye abnormal	1
+ICSLA_EYE_025_001	right eye abnormal	1
+ICSLA_EYE_025_001	normal	0
+ICSLA_EYE_023_001	both eyes abnormal	1
+ICSLA_EYE_023_001	left eye abnormal	1
+ICSLA_EYE_023_001	right eye abnormal	1
+ICSLA_EYE_023_001	normal	0
+ICSLA_EYE_004_001	both eyes abnormal	1
+ICSLA_EYE_004_001	left eye abnormal	1
+ICSLA_EYE_004_001	right eye abnormal	1
+ICSLA_EYE_004_001	normal	0
+ICSLA_EYE_011_001	both eyes abnormal	1
+ICSLA_EYE_011_001	left eye abnormal	1
+ICSLA_EYE_011_001	right eye abnormal	1
+ICSLA_EYE_011_001	normal	0
+NINGLA_EYE_081_001	absent	0
+NINGLA_EYE_081_001	present right eye	1
+NINGLA_EYE_081_001	present left eye	1
+NINGLA_EYE_081_001	present both eyes	1
+NINGLA_EYE_014_001	both eyes abnormal	1
+NINGLA_EYE_014_001	left eye abnormal	1
+NINGLA_EYE_014_001	right eye abnormal	1
+NINGLA_EYE_014_001	normal	0
+NINGLA_EYE_024_001	both eyes abnormal	1
+NINGLA_EYE_024_001	left eye abnormal	1
+NINGLA_EYE_024_001	right eye abnormal	1
+NINGLA_EYE_024_001	normal	0
+NINGLA_EYE_085_001	absent	0
+NINGLA_EYE_085_001	present right eye	1
+NINGLA_EYE_085_001	present left eye	1
+NINGLA_EYE_085_001	present both eyes	1
+NINGLA_EYE_025_001	both eyes abnormal	1
+NINGLA_EYE_025_001	left eye abnormal	1
+NINGLA_EYE_025_001	right eye abnormal	1
+NINGLA_EYE_025_001	normal	0
+NINGLA_EYE_017_001	absent	0
+NINGLA_EYE_017_001	present right eye	1
+NINGLA_EYE_017_001	present left eye	1
+NINGLA_EYE_017_001	present both eyes	1
+NINGLA_EYE_010_001	both eyes abnormal	1
+NINGLA_EYE_010_001	left eye abnormal	1
+NINGLA_EYE_010_001	right eye abnormal	1
+NINGLA_EYE_010_001	normal	0
+NINGLA_EYE_027_001	absent	0
+NINGLA_EYE_027_001	present right eye	1
+NINGLA_EYE_027_001	present left eye	1
+NINGLA_EYE_027_001	present both eyes	1
+NINGLA_EYE_002_001	absent	0
+NINGLA_EYE_002_001	present right eye	1
+NINGLA_EYE_002_001	present left eye	1
+NINGLA_EYE_002_001	present both eyes	1
+NINGLA_EYE_008_001	absent	0
+NINGLA_EYE_008_001	present right eye	1
+NINGLA_EYE_008_001	present left eye	1
+NINGLA_EYE_008_001	present both eyes	1
+NINGLA_EYE_009_001	absent	0
+NINGLA_EYE_009_001	present right eye	1
+NINGLA_EYE_009_001	present left eye	1
+NINGLA_EYE_009_001	present both eyes	1
+NINGLA_EYE_016_001	both eyes abnormal	1
+NINGLA_EYE_016_001	left eye abnormal	1
+NINGLA_EYE_016_001	right eye abnormal	1
+NINGLA_EYE_016_001	normal	0
+NINGLA_EYE_082_001	both eyes abnormal	1
+NINGLA_EYE_082_001	left eye abnormal	1
+NINGLA_EYE_082_001	right eye abnormal	1
+NINGLA_EYE_082_001	normal	0
+NINGLA_EYE_086_001	absent	0
+NINGLA_EYE_086_001	present right eye	1
+NINGLA_EYE_086_001	present left eye	1
+NINGLA_EYE_086_001	present both eyes	1
+NINGLA_EYE_006_001	both eyes abnormal	1
+NINGLA_EYE_006_001	left eye abnormal	1
+NINGLA_EYE_006_001	right eye abnormal	1
+NINGLA_EYE_006_001	normal	0
+NINGLA_EYE_022_001	both eyes abnormal	1
+NINGLA_EYE_022_001	left eye abnormal	1
+NINGLA_EYE_022_001	right eye abnormal	1
+NINGLA_EYE_022_001	normal	0
+NINGLA_EYE_004_001	both eyes abnormal	1
+NINGLA_EYE_004_001	left eye abnormal	1
+NINGLA_EYE_004_001	right eye abnormal	1
+NINGLA_EYE_004_001	normal	0
+NINGLA_EYE_020_001	both eyes abnormal	1
+NINGLA_EYE_020_001	left eye abnormal	1
+NINGLA_EYE_020_001	right eye abnormal	1
+NINGLA_EYE_020_001	normal	0
+NINGLA_EYE_011_001	both eyes abnormal	1
+NINGLA_EYE_011_001	left eye abnormal	1
+NINGLA_EYE_011_001	right eye abnormal	1
+NINGLA_EYE_011_001	normal	0
+NINGLA_EYE_019_001	absent	0
+NINGLA_EYE_019_001	present right eye	1
+NINGLA_EYE_019_001	present left eye	1
+NINGLA_EYE_019_001	present both eyes	1
+NINGLA_EYE_083_001	both eyes abnormal	1
+NINGLA_EYE_083_001	left eye abnormal	1
+NINGLA_EYE_083_001	right eye abnormal	1
+NINGLA_EYE_083_001	normal	0
+NINGLA_EYE_080_001	absent	0
+NINGLA_EYE_080_001	present right eye	1
+NINGLA_EYE_080_001	present left eye	1
+NINGLA_EYE_080_001	present both eyes	1
+NINGLA_EYE_018_001	absent	0
+NINGLA_EYE_018_001	present right eye	1
+NINGLA_EYE_018_001	present left eye	1
+NINGLA_EYE_018_001	present both eyes	1
+NINGLA_EYE_026_001	both eyes abnormal	1
+NINGLA_EYE_026_001	left eye abnormal	1
+NINGLA_EYE_026_001	right eye abnormal	1
+NINGLA_EYE_026_001	normal	0
+NINGLA_EYE_012_001	both eyes abnormal	1
+NINGLA_EYE_012_001	left eye abnormal	1
+NINGLA_EYE_012_001	right eye abnormal	1
+NINGLA_EYE_012_001	normal	0
+NINGLA_EYE_003_001	absent	0
+NINGLA_EYE_003_001	present right eye	1
+NINGLA_EYE_003_001	present left eye	1
+NINGLA_EYE_003_001	present both eyes	1
+NINGLA_EYE_084_001	absent	0
+NINGLA_EYE_084_001	present right eye	1
+NINGLA_EYE_084_001	present left eye	1
+NINGLA_EYE_084_001	present both eyes	1
+NINGLA_EYE_013_001	both eyes dilated	1
+NINGLA_EYE_013_001	left eye dilated	1
+NINGLA_EYE_013_001	right eye dilated	1
+NINGLA_EYE_013_001	normal	0
+NINGLA_EYE_005_001	both eyes closed	1
+NINGLA_EYE_005_001	left eye closed	1
+NINGLA_EYE_005_001	right eye closed	1
+NINGLA_EYE_005_001	normal	0
+NINGLA_EYE_023_001	both eyes abnormal	1
+NINGLA_EYE_023_001	left eye abnormal	1
+NINGLA_EYE_023_001	right eye abnormal	1
+NINGLA_EYE_023_001	normal	0
+NINGLA_EYE_021_001	both eyes abnormal	1
+NINGLA_EYE_021_001	left eye abnormal	1
+NINGLA_EYE_021_001	right eye abnormal	1
+NINGLA_EYE_021_001	normal	0
+NINGLA_EYE_007_001	both eyes abnormal	1
+NINGLA_EYE_007_001	left eye abnormal	1
+NINGLA_EYE_007_001	right eye abnormal	1
+NINGLA_EYE_007_001	normal	0
+NINGLA_EYE_015_001	both eyes abnormal	1
+NINGLA_EYE_015_001	left eye abnormal	1
+NINGLA_EYE_015_001	right eye abnormal	1
+NINGLA_EYE_015_001	normal	0
+KMPCLA_EYE_013_001	both eyes dilated	1
+KMPCLA_EYE_013_001	left eye dilated	1
+KMPCLA_EYE_013_001	right eye dilated	1
+KMPCLA_EYE_013_001	normal	0
+KMPCLA_EYE_083_001	both eyes abnormal	1
+KMPCLA_EYE_083_001	left eye abnormal	1
+KMPCLA_EYE_083_001	right eye abnormal	1
+KMPCLA_EYE_083_001	normal	0
+KMPCLA_EYE_025_001	both eyes abnormal	1
+KMPCLA_EYE_025_001	left eye abnormal	1
+KMPCLA_EYE_025_001	right eye abnormal	1
+KMPCLA_EYE_025_001	normal	0
+KMPCLA_EYE_002_001	absent	0
+KMPCLA_EYE_002_001	present right eye	1
+KMPCLA_EYE_002_001	present left eye	1
+KMPCLA_EYE_002_001	present both eyes	1
+KMPCLA_EYE_005_001	both eyes closed	1
+KMPCLA_EYE_005_001	left eye closed	1
+KMPCLA_EYE_005_001	right eye closed	1
+KMPCLA_EYE_005_001	normal	0
+KMPCLA_EYE_008_001	absent	0
+KMPCLA_EYE_008_001	present right eye	1
+KMPCLA_EYE_008_001	present left eye	1
+KMPCLA_EYE_008_001	present both eyes	1
+KMPCLA_EYE_084_001	absent	0
+KMPCLA_EYE_084_001	present right eye	1
+KMPCLA_EYE_084_001	present left eye	1
+KMPCLA_EYE_084_001	present both eyes	1
+KMPCLA_EYE_018_001	absent	0
+KMPCLA_EYE_018_001	present right eye	1
+KMPCLA_EYE_018_001	present left eye	1
+KMPCLA_EYE_018_001	present both eyes	1
+KMPCLA_EYE_024_001	both eyes abnormal	1
+KMPCLA_EYE_024_001	left eye abnormal	1
+KMPCLA_EYE_024_001	right eye abnormal	1
+KMPCLA_EYE_024_001	normal	0
+KMPCLA_EYE_010_001	both eyes abnormal	1
+KMPCLA_EYE_010_001	left eye abnormal	1
+KMPCLA_EYE_010_001	right eye abnormal	1
+KMPCLA_EYE_010_001	normal	0
+KMPCLA_EYE_017_001	absent	0
+KMPCLA_EYE_017_001	present right eye	1
+KMPCLA_EYE_017_001	present left eye	1
+KMPCLA_EYE_017_001	present both eyes	1
+KMPCLA_EYE_011_001	both eyes abnormal	1
+KMPCLA_EYE_011_001	left eye abnormal	1
+KMPCLA_EYE_011_001	right eye abnormal	1
+KMPCLA_EYE_011_001	normal	0
+KMPCLA_EYE_020_001	both eyes abnormal	1
+KMPCLA_EYE_020_001	left eye abnormal	1
+KMPCLA_EYE_020_001	right eye abnormal	1
+KMPCLA_EYE_020_001	normal	0
+KMPCLA_EYE_085_001	absent	0
+KMPCLA_EYE_085_001	present right eye	1
+KMPCLA_EYE_085_001	present left eye	1
+KMPCLA_EYE_085_001	present both eyes	1
+KMPCLA_EYE_015_001	both eyes abnormal	1
+KMPCLA_EYE_015_001	left eye abnormal	1
+KMPCLA_EYE_015_001	right eye abnormal	1
+KMPCLA_EYE_015_001	normal	0
+KMPCLA_EYE_003_001	absent	0
+KMPCLA_EYE_003_001	present right eye	1
+KMPCLA_EYE_003_001	present left eye	1
+KMPCLA_EYE_003_001	present both eyes	1
+KMPCLA_EYE_026_001	both eyes abnormal	1
+KMPCLA_EYE_026_001	left eye abnormal	1
+KMPCLA_EYE_026_001	right eye abnormal	1
+KMPCLA_EYE_026_001	normal	0
+KMPCLA_EYE_004_001	both eyes abnormal	1
+KMPCLA_EYE_004_001	left eye abnormal	1
+KMPCLA_EYE_004_001	right eye abnormal	1
+KMPCLA_EYE_004_001	normal	0
+KMPCLA_EYE_027_001	absent	0
+KMPCLA_EYE_027_001	present right eye	1
+KMPCLA_EYE_027_001	present left eye	1
+KMPCLA_EYE_027_001	present both eyes	1
+KMPCLA_EYE_021_001	both eyes abnormal	1
+KMPCLA_EYE_021_001	left eye abnormal	1
+KMPCLA_EYE_021_001	right eye abnormal	1
+KMPCLA_EYE_021_001	normal	0
+KMPCLA_EYE_014_001	both eyes abnormal	1
+KMPCLA_EYE_014_001	left eye abnormal	1
+KMPCLA_EYE_014_001	right eye abnormal	1
+KMPCLA_EYE_014_001	normal	0
+KMPCLA_EYE_081_001	absent	0
+KMPCLA_EYE_081_001	present right eye	1
+KMPCLA_EYE_081_001	present left eye	1
+KMPCLA_EYE_081_001	present both eyes	1
+KMPCLA_EYE_019_001	absent	0
+KMPCLA_EYE_019_001	present right eye	1
+KMPCLA_EYE_019_001	present left eye	1
+KMPCLA_EYE_019_001	present both eyes	1
+KMPCLA_EYE_080_001	absent	0
+KMPCLA_EYE_080_001	present right eye	1
+KMPCLA_EYE_080_001	present left eye	1
+KMPCLA_EYE_080_001	present both eyes	1
+KMPCLA_EYE_016_001	both eyes abnormal	1
+KMPCLA_EYE_016_001	left eye abnormal	1
+KMPCLA_EYE_016_001	right eye abnormal	1
+KMPCLA_EYE_016_001	normal	0
+KMPCLA_EYE_012_001	both eyes abnormal	1
+KMPCLA_EYE_012_001	left eye abnormal	1
+KMPCLA_EYE_012_001	right eye abnormal	1
+KMPCLA_EYE_012_001	normal	0
+KMPCLA_EYE_006_001	both eyes abnormal	1
+KMPCLA_EYE_006_001	left eye abnormal	1
+KMPCLA_EYE_006_001	right eye abnormal	1
+KMPCLA_EYE_006_001	normal	0
+KMPCLA_EYE_022_001	both eyes abnormal	1
+KMPCLA_EYE_022_001	left eye abnormal	1
+KMPCLA_EYE_022_001	right eye abnormal	1
+KMPCLA_EYE_022_001	normal	0
+KMPCLA_EYE_023_001	both eyes abnormal	1
+KMPCLA_EYE_023_001	left eye abnormal	1
+KMPCLA_EYE_023_001	right eye abnormal	1
+KMPCLA_EYE_023_001	normal	0
+KMPCLA_EYE_086_001	absent	0
+KMPCLA_EYE_086_001	present right eye	1
+KMPCLA_EYE_086_001	present left eye	1
+KMPCLA_EYE_086_001	present both eyes	1
+KMPCLA_EYE_009_001	absent	0
+KMPCLA_EYE_009_001	present right eye	1
+KMPCLA_EYE_009_001	present left eye	1
+KMPCLA_EYE_009_001	present both eyes	1
+KMPCLA_EYE_082_001	both eyes abnormal	1
+KMPCLA_EYE_082_001	left eye abnormal	1
+KMPCLA_EYE_082_001	right eye abnormal	1
+KMPCLA_EYE_082_001	normal	0
+KMPCLA_EYE_007_001	both eyes abnormal	1
+KMPCLA_EYE_007_001	left eye abnormal	1
+KMPCLA_EYE_007_001	right eye abnormal	1
+KMPCLA_EYE_007_001	normal	0
+HRWLLA_EYE_026_001	both eyes abnormal	1
+HRWLLA_EYE_026_001	left eye abnormal	1
+HRWLLA_EYE_026_001	right eye abnormal	1
+HRWLLA_EYE_026_001	normal	0
+HRWLLA_EYE_024_001	both eyes abnormal	1
+HRWLLA_EYE_024_001	left eye abnormal	1
+HRWLLA_EYE_024_001	right eye abnormal	1
+HRWLLA_EYE_024_001	normal	0
+HRWLLA_EYE_014_001	both eyes abnormal	1
+HRWLLA_EYE_014_001	left eye abnormal	1
+HRWLLA_EYE_014_001	right eye abnormal	1
+HRWLLA_EYE_014_001	normal	0
+HRWLLA_EYE_008_001	absent	0
+HRWLLA_EYE_008_001	present right eye	1
+HRWLLA_EYE_008_001	present left eye	1
+HRWLLA_EYE_008_001	present both eyes	1
+HRWLLA_EYE_016_001	both eyes abnormal	1
+HRWLLA_EYE_016_001	left eye abnormal	1
+HRWLLA_EYE_016_001	right eye abnormal	1
+HRWLLA_EYE_016_001	normal	0
+HRWLLA_EYE_006_001	both eyes abnormal	1
+HRWLLA_EYE_006_001	left eye abnormal	1
+HRWLLA_EYE_006_001	right eye abnormal	1
+HRWLLA_EYE_006_001	normal	0
+HRWLLA_EYE_084_001	absent	0
+HRWLLA_EYE_084_001	present right eye	1
+HRWLLA_EYE_084_001	present left eye	1
+HRWLLA_EYE_084_001	present both eyes	1
+HRWLLA_EYE_082_001	both eyes abnormal	1
+HRWLLA_EYE_082_001	left eye abnormal	1
+HRWLLA_EYE_082_001	right eye abnormal	1
+HRWLLA_EYE_082_001	normal	0
+HRWLLA_EYE_010_001	both eyes abnormal	1
+HRWLLA_EYE_010_001	left eye abnormal	1
+HRWLLA_EYE_010_001	right eye abnormal	1
+HRWLLA_EYE_010_001	normal	0
+HRWLLA_EYE_081_001	absent	0
+HRWLLA_EYE_081_001	present right eye	1
+HRWLLA_EYE_081_001	present left eye	1
+HRWLLA_EYE_081_001	present both eyes	1
+HRWLLA_EYE_022_001	both eyes abnormal	1
+HRWLLA_EYE_022_001	left eye abnormal	1
+HRWLLA_EYE_022_001	right eye abnormal	1
+HRWLLA_EYE_022_001	normal	0
+HRWLLA_EYE_004_001	both eyes abnormal	1
+HRWLLA_EYE_004_001	left eye abnormal	1
+HRWLLA_EYE_004_001	right eye abnormal	1
+HRWLLA_EYE_004_001	normal	0
+HRWLLA_EYE_019_001	absent	0
+HRWLLA_EYE_019_001	present right eye	1
+HRWLLA_EYE_019_001	present left eye	1
+HRWLLA_EYE_019_001	present both eyes	1
+HRWLLA_EYE_020_001	both eyes abnormal	1
+HRWLLA_EYE_020_001	left eye abnormal	1
+HRWLLA_EYE_020_001	right eye abnormal	1
+HRWLLA_EYE_020_001	normal	0
+HRWLLA_EYE_085_001	absent	0
+HRWLLA_EYE_085_001	present right eye	1
+HRWLLA_EYE_085_001	present left eye	1
+HRWLLA_EYE_085_001	present both eyes	1
+HRWLLA_EYE_018_001	absent	0
+HRWLLA_EYE_018_001	present right eye	1
+HRWLLA_EYE_018_001	present left eye	1
+HRWLLA_EYE_018_001	present both eyes	1
+HRWLLA_EYE_005_001	both eyes closed	1
+HRWLLA_EYE_005_001	left eye closed	1
+HRWLLA_EYE_005_001	right eye closed	1
+HRWLLA_EYE_005_001	normal	0
+HRWLLA_EYE_027_001	absent	0
+HRWLLA_EYE_027_001	present right eye	1
+HRWLLA_EYE_027_001	present left eye	1
+HRWLLA_EYE_027_001	present both eyes	1
+HRWLLA_EYE_021_001	both eyes abnormal	1
+HRWLLA_EYE_021_001	left eye abnormal	1
+HRWLLA_EYE_021_001	right eye abnormal	1
+HRWLLA_EYE_021_001	normal	0
+HRWLLA_EYE_080_001	absent	0
+HRWLLA_EYE_080_001	present right eye	1
+HRWLLA_EYE_080_001	present left eye	1
+HRWLLA_EYE_080_001	present both eyes	1
+HRWLLA_EYE_023_001	both eyes abnormal	1
+HRWLLA_EYE_023_001	left eye abnormal	1
+HRWLLA_EYE_023_001	right eye abnormal	1
+HRWLLA_EYE_023_001	normal	0
+HRWLLA_EYE_017_001	absent	0
+HRWLLA_EYE_017_001	present right eye	1
+HRWLLA_EYE_017_001	present left eye	1
+HRWLLA_EYE_017_001	present both eyes	1
+HRWLLA_EYE_011_001	both eyes abnormal	1
+HRWLLA_EYE_011_001	left eye abnormal	1
+HRWLLA_EYE_011_001	right eye abnormal	1
+HRWLLA_EYE_011_001	normal	0
+HRWLLA_EYE_013_001	both eyes dilated	1
+HRWLLA_EYE_013_001	left eye dilated	1
+HRWLLA_EYE_013_001	right eye dilated	1
+HRWLLA_EYE_013_001	normal	0
+HRWLLA_EYE_003_001	absent	0
+HRWLLA_EYE_003_001	present right eye	1
+HRWLLA_EYE_003_001	present left eye	1
+HRWLLA_EYE_003_001	present both eyes	1
+HRWLLA_EYE_086_001	absent	0
+HRWLLA_EYE_086_001	present right eye	1
+HRWLLA_EYE_086_001	present left eye	1
+HRWLLA_EYE_086_001	present both eyes	1
+HRWLLA_EYE_083_001	both eyes abnormal	1
+HRWLLA_EYE_083_001	left eye abnormal	1
+HRWLLA_EYE_083_001	right eye abnormal	1
+HRWLLA_EYE_083_001	normal	0
+HRWLLA_EYE_009_001	absent	0
+HRWLLA_EYE_009_001	present right eye	1
+HRWLLA_EYE_009_001	present left eye	1
+HRWLLA_EYE_009_001	present both eyes	1
+HRWLLA_EYE_002_001	absent	0
+HRWLLA_EYE_002_001	present right eye	1
+HRWLLA_EYE_002_001	present left eye	1
+HRWLLA_EYE_002_001	present both eyes	1
+HRWLLA_EYE_012_001	both eyes abnormal	1
+HRWLLA_EYE_012_001	left eye abnormal	1
+HRWLLA_EYE_012_001	right eye abnormal	1
+HRWLLA_EYE_012_001	normal	0
+HRWLLA_EYE_015_001	both eyes abnormal	1
+HRWLLA_EYE_015_001	left eye abnormal	1
+HRWLLA_EYE_015_001	right eye abnormal	1
+HRWLLA_EYE_015_001	normal	0
+HRWLLA_EYE_025_001	both eyes abnormal	1
+HRWLLA_EYE_025_001	left eye abnormal	1
+HRWLLA_EYE_025_001	right eye abnormal	1
+HRWLLA_EYE_025_001	normal	0
+HRWLLA_EYE_007_001	both eyes abnormal	1
+HRWLLA_EYE_007_001	left eye abnormal	1
+HRWLLA_EYE_007_001	right eye abnormal	1
+HRWLLA_EYE_007_001	normal	0
+JAXLA_EYE_086_001	absent	0
+JAXLA_EYE_086_001	present right eye	1
+JAXLA_EYE_086_001	present left eye	1
+JAXLA_EYE_086_001	present both eyes	1
+JAXLA_EYE_009_001	absent	0
+JAXLA_EYE_009_001	present right eye	1
+JAXLA_EYE_009_001	present left eye	1
+JAXLA_EYE_009_001	present both eyes	1
+JAXLA_EYE_006_001	both eyes abnormal	1
+JAXLA_EYE_006_001	left eye abnormal	1
+JAXLA_EYE_006_001	right eye abnormal	1
+JAXLA_EYE_006_001	normal	0
+JAXLA_EYE_002_001	absent	0
+JAXLA_EYE_002_001	present right eye	1
+JAXLA_EYE_002_001	present left eye	1
+JAXLA_EYE_002_001	present both eyes	1
+JAXLA_EYE_083_001	both eyes abnormal	1
+JAXLA_EYE_083_001	left eye abnormal	1
+JAXLA_EYE_083_001	right eye abnormal	1
+JAXLA_EYE_083_001	normal	0
+JAXLA_EYE_023_001	both eyes abnormal	1
+JAXLA_EYE_023_001	left eye abnormal	1
+JAXLA_EYE_023_001	right eye abnormal	1
+JAXLA_EYE_023_001	normal	0
+JAXLA_EYE_027_001	absent	0
+JAXLA_EYE_027_001	present right eye	1
+JAXLA_EYE_027_001	present left eye	1
+JAXLA_EYE_027_001	present both eyes	1
+JAXLA_EYE_016_001	both eyes abnormal	1
+JAXLA_EYE_016_001	left eye abnormal	1
+JAXLA_EYE_016_001	right eye abnormal	1
+JAXLA_EYE_016_001	normal	0
+JAXLA_EYE_018_001	absent	0
+JAXLA_EYE_018_001	present right eye	1
+JAXLA_EYE_018_001	present left eye	1
+JAXLA_EYE_018_001	present both eyes	1
+JAXLA_EYE_024_001	both eyes abnormal	1
+JAXLA_EYE_024_001	left eye abnormal	1
+JAXLA_EYE_024_001	right eye abnormal	1
+JAXLA_EYE_024_001	normal	0
+JAXLA_EYE_015_001	both eyes abnormal	1
+JAXLA_EYE_015_001	left eye abnormal	1
+JAXLA_EYE_015_001	right eye abnormal	1
+JAXLA_EYE_015_001	normal	0
+JAXLA_EYE_021_001	both eyes abnormal	1
+JAXLA_EYE_021_001	left eye abnormal	1
+JAXLA_EYE_021_001	right eye abnormal	1
+JAXLA_EYE_021_001	normal	0
+JAXLA_EYE_082_001	both eyes abnormal	1
+JAXLA_EYE_082_001	left eye abnormal	1
+JAXLA_EYE_082_001	right eye abnormal	1
+JAXLA_EYE_082_001	normal	0
+JAXLA_EYE_005_001	both eyes closed	1
+JAXLA_EYE_005_001	left eye closed	1
+JAXLA_EYE_005_001	right eye closed	1
+JAXLA_EYE_005_001	normal	0
+JAXLA_EYE_026_001	both eyes abnormal	1
+JAXLA_EYE_026_001	left eye abnormal	1
+JAXLA_EYE_026_001	right eye abnormal	1
+JAXLA_EYE_026_001	normal	0
+JAXLA_EYE_080_001	absent	0
+JAXLA_EYE_080_001	present right eye	1
+JAXLA_EYE_080_001	present left eye	1
+JAXLA_EYE_080_001	present both eyes	1
+JAXLA_EYE_008_001	absent	0
+JAXLA_EYE_008_001	present right eye	1
+JAXLA_EYE_008_001	present left eye	1
+JAXLA_EYE_008_001	present both eyes	1
+JAXLA_EYE_011_001	both eyes abnormal	1
+JAXLA_EYE_011_001	left eye abnormal	1
+JAXLA_EYE_011_001	right eye abnormal	1
+JAXLA_EYE_011_001	normal	0
+JAXLA_EYE_084_001	absent	0
+JAXLA_EYE_084_001	present right eye	1
+JAXLA_EYE_084_001	present left eye	1
+JAXLA_EYE_084_001	present both eyes	1
+JAXLA_EYE_085_001	absent	0
+JAXLA_EYE_085_001	present right eye	1
+JAXLA_EYE_085_001	present left eye	1
+JAXLA_EYE_085_001	present both eyes	1
+JAXLA_EYE_010_001	both eyes abnormal	1
+JAXLA_EYE_010_001	left eye abnormal	1
+JAXLA_EYE_010_001	right eye abnormal	1
+JAXLA_EYE_010_001	normal	0
+JAXLA_EYE_003_001	absent	0
+JAXLA_EYE_003_001	present right eye	1
+JAXLA_EYE_003_001	present left eye	1
+JAXLA_EYE_003_001	present both eyes	1
+JAXLA_EYE_007_001	both eyes abnormal	1
+JAXLA_EYE_007_001	left eye abnormal	1
+JAXLA_EYE_007_001	right eye abnormal	1
+JAXLA_EYE_007_001	normal	0
+JAXLA_EYE_025_001	both eyes abnormal	1
+JAXLA_EYE_025_001	left eye abnormal	1
+JAXLA_EYE_025_001	right eye abnormal	1
+JAXLA_EYE_025_001	normal	0
+JAXLA_EYE_012_001	both eyes abnormal	1
+JAXLA_EYE_012_001	left eye abnormal	1
+JAXLA_EYE_012_001	right eye abnormal	1
+JAXLA_EYE_012_001	normal	0
+JAXLA_EYE_014_001	both eyes abnormal	1
+JAXLA_EYE_014_001	left eye abnormal	1
+JAXLA_EYE_014_001	right eye abnormal	1
+JAXLA_EYE_014_001	normal	0
+JAXLA_EYE_020_001	both eyes abnormal	1
+JAXLA_EYE_020_001	left eye abnormal	1
+JAXLA_EYE_020_001	right eye abnormal	1
+JAXLA_EYE_020_001	normal	0
+JAXLA_EYE_022_001	both eyes abnormal	1
+JAXLA_EYE_022_001	left eye abnormal	1
+JAXLA_EYE_022_001	right eye abnormal	1
+JAXLA_EYE_022_001	normal	0
+JAXLA_EYE_017_001	absent	0
+JAXLA_EYE_017_001	present right eye	1
+JAXLA_EYE_017_001	present left eye	1
+JAXLA_EYE_017_001	present both eyes	1
+JAXLA_EYE_013_001	both eyes dilated	1
+JAXLA_EYE_013_001	left eye dilated	1
+JAXLA_EYE_013_001	right eye dilated	1
+JAXLA_EYE_013_001	normal	0
+JAXLA_EYE_019_001	absent	0
+JAXLA_EYE_019_001	present right eye	1
+JAXLA_EYE_019_001	present left eye	1
+JAXLA_EYE_019_001	present both eyes	1
+JAXLA_EYE_081_001	absent	0
+JAXLA_EYE_081_001	present right eye	1
+JAXLA_EYE_081_001	present left eye	1
+JAXLA_EYE_081_001	present both eyes	1
+JAXLA_EYE_004_001	both eyes abnormal	1
+JAXLA_EYE_004_001	left eye abnormal	1
+JAXLA_EYE_004_001	right eye abnormal	1
+JAXLA_EYE_004_001	normal	0
+TCPLA_EYE_092_002	both eyes abnormal	1
+TCPLA_EYE_092_002	left eye abnormal	1
+TCPLA_EYE_092_002	right eye abnormal	1
+TCPLA_EYE_092_002	normal	0
+UCDLA_EYE_092_002	both eyes abnormal	1
+UCDLA_EYE_092_002	left eye abnormal	1
+UCDLA_EYE_092_002	right eye abnormal	1
+UCDLA_EYE_092_002	normal	0
+ICSLA_EYE_092_002	both eyes abnormal	1
+ICSLA_EYE_092_002	left eye abnormal	1
+ICSLA_EYE_092_002	right eye abnormal	1
+ICSLA_EYE_092_002	normal	0
+HRWLLA_EYE_092_002	both eyes abnormal	1
+HRWLLA_EYE_092_002	left eye abnormal	1
+HRWLLA_EYE_092_002	right eye abnormal	1
+HRWLLA_EYE_092_002	normal	0
+JAXLA_EYE_092_002	both eyes abnormal	1
+JAXLA_EYE_092_002	left eye abnormal	1
+JAXLA_EYE_092_002	right eye abnormal	1
+JAXLA_EYE_092_002	normal	0
+BCMLA_EYE_092_002	both eyes abnormal	1
+BCMLA_EYE_092_002	left eye abnormal	1
+BCMLA_EYE_092_002	right eye abnormal	1
+BCMLA_EYE_092_002	normal	0
+KMPCLA_EYE_092_002	both eyes abnormal	1
+KMPCLA_EYE_092_002	left eye abnormal	1
+KMPCLA_EYE_092_002	right eye abnormal	1
+KMPCLA_EYE_092_002	normal	0
