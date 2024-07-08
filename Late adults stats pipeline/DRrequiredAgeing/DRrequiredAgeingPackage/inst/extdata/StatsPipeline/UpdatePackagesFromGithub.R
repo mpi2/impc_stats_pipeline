@@ -8,7 +8,7 @@ if (length(commandArgs(trailingOnly = TRUE)) != 3) {
 # Retrieve the command line arguments.
 repository <- commandArgs(trailingOnly = TRUE)[1]
 branch <- commandArgs(trailingOnly = TRUE)[2]
-dependencies <- commandArgs(trailingOnly = TRUE)[3]
+dependencies <- as.logical(commandArgs(trailingOnly = TRUE)[3])
 
 # Update SmoothWin.
 install_github(
