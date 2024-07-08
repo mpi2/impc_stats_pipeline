@@ -14,7 +14,7 @@ install_github(
   repo = paste(repository,
                "/impc_stats_pipeline/Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage",
                sep = ""),
-  dependencies = FALSE,
+  dependencies = TRUE,
   upgrade = "always",
   force = TRUE,
   build = TRUE,
@@ -27,7 +27,7 @@ install_github(
   repo = paste(repository,
                "/impc_stats_pipeline/SoftWindowing/SmoothWin/SmoothWinPackage",
                sep = ""),
-  dependencies = FALSE,
+  dependencies = TRUE,
   upgrade = "always",
   force = TRUE,
   build = TRUE,
@@ -38,7 +38,7 @@ install_github(
 # Update OpenStats
 install_github(
   repo = "mpi2/OpenStats",
-  dependencies = FALSE,
+  dependencies = TRUE,
   upgrade = "always",
   force = TRUE,
   build = TRUE,
