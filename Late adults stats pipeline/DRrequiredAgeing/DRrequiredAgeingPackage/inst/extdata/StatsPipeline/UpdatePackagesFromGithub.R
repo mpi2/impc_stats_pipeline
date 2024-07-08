@@ -9,19 +9,6 @@ if (length(commandArgs(trailingOnly = TRUE)) != 2) {
 repository <- commandArgs(trailingOnly = TRUE)[1]
 branch <- commandArgs(trailingOnly = TRUE)[2]
 
-# Update DRrequiredAgeing
-install_github(
-  repo = paste(repository,
-               "/impc_stats_pipeline/Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage",
-               sep = ""),
-  dependencies = TRUE,
-  upgrade = "always",
-  force = TRUE,
-  build = TRUE,
-  quiet = FALSE,
-  ref = branch
-)
-
 # Update SmoothWin
 install_github(
   repo = paste(repository,
@@ -43,4 +30,17 @@ install_github(
   force = TRUE,
   build = TRUE,
   quiet = FALSE
+)
+
+# Update DRrequiredAgeing
+install_github(
+  repo = paste(repository,
+               "/impc_stats_pipeline/Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage",
+               sep = ""),
+  dependencies = TRUE,
+  upgrade = "always",
+  force = TRUE,
+  build = TRUE,
+  quiet = FALSE,
+  ref = branch
 )
