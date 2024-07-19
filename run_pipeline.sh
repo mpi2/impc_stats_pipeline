@@ -35,7 +35,7 @@ Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH}
 rm UpdatePackagesFromGithub.R
 echo "Update completed"
 
-# Run Statistical Pipeline
+# Run statistical pipeline
 job1_txt=$(sbatch \
     --job-name=statistical_pipeline \
     --time=30-00:00:00 \
@@ -53,4 +53,8 @@ job2_txt=$(sbatch \
     --mem=8G \
     -o ../stats_pipeline_logs/annotation_pipeline_${VERSION}.log \
     -e ../stats_pipeline_logs/annotation_pipeline_${VERSION}.err \
-    --wrap="cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}/SP/jobs/Results_IMPC_SP_Windowed && R -e 'DRrequiredAgeing:::IMPC_HadoopLoad(prefix=${VERSION},transfer=FALSE,mp_chooser_file=${MP_CHOOSER_FILE})'"
+    --wrap="cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}/SP/jobs/Results_IMPC_SP_Windowed && R -e 'DRrequiredAgeing:::IMPC_HadoopLoad(prefix=${VERSION},transfer=FALSE,mp_chooser_file=${MP_CHOOSER_FILE})'")
+job2_id=$(echo $job2_txt | cut -d" " -f4)
+
+echo "Statistical pipeline job ID: ${job1_id}"
+echo "Annotation pipeline job ID: ${job2_id}"
