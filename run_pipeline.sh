@@ -31,7 +31,7 @@ export MP_CHOOSER_FILE=$(echo -n '"'; realpath mp_chooser.json.Rdata | tr -d '\n
 echo "Update started"
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
 wget https://raw.githubusercontent.com/${REMOTE}/impc_stats_pipeline/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R
-Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH} FALSE
+Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH}
 rm UpdatePackagesFromGithub.R
 echo "Update completed"
 
@@ -46,12 +46,11 @@ job1_txt=$(sbatch \
 job1_id=$(echo $job1_txt | cut -d" " -f4)
 
 # Run annotation pipeline
-sbatch \
+job2_txt=$(sbatch \
     --job-name=annotation_pipeline \
     --dependency=afterok:"${job1_id}" \
     --time=3-00:00:00 \
     --mem=8G \
-    -o ../../../../stats_pipeline_logs/annotation_pipeline_${VERSION}.log \
-    -e ../../../../stats_pipeline_logs/annotation_pipeline_${VERSION}.err \
+    -o ../stats_pipeline_logs/annotation_pipeline_${VERSION}.log \
+    -e ../stats_pipeline_logs/annotation_pipeline_${VERSION}.err \
     --wrap="cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}/SP/jobs/Results_IMPC_SP_Windowed && R -e 'DRrequiredAgeing:::IMPC_HadoopLoad(prefix=${VERSION},transfer=FALSE,mp_chooser_file=${MP_CHOOSER_FILE})'"
-
