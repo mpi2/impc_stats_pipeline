@@ -78,22 +78,16 @@ flowchart TB
     classDef title font-size:30px
     class stats_pipeline title
 ```
-# How to Run IMPC Statistical Pipeline
-These instructions are tailored for Release 21.0.
+# How to Run IMPC Statistical and Annotation Pipeline
+These instructions are tailored for Release 21.0. To know more about input files for statistical pipeline refer to the [Observations Output Schema](https://github.com/mpi2/impc-etl/wiki/Observations-Output-Schema). In the current dataset, some fields that should be arrays are presented as comma-separated lists.
 
 ## Step 1. Data Preprocessing and Analysis
-### Preparation
-0. Start screen
-```
-screen -S stats-pipeline
-```
-
-1. Switch to the mi_stats virtual user:
+### 0. Switch to the mi_stats virtual user
 ```console
 become mi_stats
 ```
 
-2. Set necessary variables:
+### 1. Set necessary variables
 ```console
 export VERSION="21.0"
 export REMOTE="mpi2"
@@ -101,91 +95,38 @@ export BRANCH="master"
 export KOMP_PATH="<absolute_path_to_directory>"
 ```
 
-3. Create a working directory:
+### 2. Download script `run_pipeline.sh` that run both statistical and annotation pipeline on SLURM and add execute permission to a file
 ```console
-mkdir --mode=775 ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
-cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
+wget https://raw.githubusercontent.com/${REMOTE}/impc_stats_pipeline/${BRANCH}/run_pipeline.sh
+chmod +x run_pipeline.sh
 ```
 
-4. Copy the input parquet files (±80*10^6 data points) and `mp_chooser_json`:
+### 3. Execute `run_pipeline.sh` script
 ```console
-cp ${KOMP_PATH}/data-releases/latest-input/dr${VERSION}/output/flatten_observations_parquet/*.parquet ./
-cp ${KOMP_PATH}/data-releases/latest-input/dr${VERSION}/output/mp_chooser_json/part-*.txt ./mp_chooser.json
+./run_pipeline.sh ${VERSION} ${REMOTE} ${BRANCH} ${KOMP_PATH} ${KOMP_PATH}/data-releases/latest-input/dr${VERSION}/output/flatten_observations_parquet/ ${KOMP_PATH}/data-releases/latest-input/dr${VERSION}/output/mp_chooser_json/
 ```
-**Note:** Be cautious, the location of the input files may vary.<br>
-Refer to the [Observations Output Schema](https://github.com/mpi2/impc-etl/wiki/Observations-Output-Schema). In the current dataset, some fields that should be arrays are presented as comma-separated lists.
+After executing the script make sure that you wrote down job ID for both statistical and annotation pipeline. 
+**Note:** Be cautious, the location of the input files may vary.
+To execute `run_pipeline.sh` we need to pass six parameters:
 
-5. Convert the mp_chooser JSON file to Rdata:
-```console
-R -e "a = jsonlite::fromJSON('mp_chooser.json');save(a,file='mp_chooser.json.Rdata')"
-export MP_CHOOSER_FILE=$(echo -n '"'; realpath mp_chooser.json.Rdata | tr -d '\n'; echo -n '"')
-```
+  1. Version of the data release.
+  2. Remote name.
+  3. Branch name.
+  4. Path to the initial directory.
+  5. Path to the input parquet files.
+  6. Path to the MP chooser file.
 
-6. Update packages to the latest version:
-```console
-cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
-wget https://raw.githubusercontent.com/${REMOTE}/impc_stats_pipeline/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R
-Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH}
-rm UpdatePackagesFromGithub.R
-```
-
-### Run Statistical Pipeline
-7. Execute the `StatsPipeline` function on SLURM:
-```console
-cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
-sbatch \
-    --time=30-00:00:00 \
-    --mem=8G \
-    -o ../stats_pipeline_logs/stats_pipeline_${VERSION}.log \
-    -e ../stats_pipeline_logs/stats_pipeline_${VERSION}.err \
-    --wrap="R -e 'DRrequiredAgeing:::StatsPipeline(DRversion=${VERSION})'"
-```
-**Note:** Remember to note down the job ID number that will appear after submitting the job.
-
-- To leave screen, press combination `Ctrl + A + D`.
-- Don't forget to write down the number that will appear after leaving the screen, for example, 3507472, and number of cluster node.
-- Also make sure to remember which login node you started the screen session on.
-
-8. Monitor progress using the following commands:
-- Activate screen to check progress: `screen -r 3507472.stats-pipeline`
-- Use `squeue` to check job status.
+### Monitor progress using the following commands
+- Use `squeue` to check list of running jobs.
+- Use `jobinfo -v <job_id>` to check the job status.
 - Review the log files:
 ```console
 less ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_logs/stats_pipeline_${VERSION}.log
 less ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_logs/stats_pipeline_${VERSION}.err
 ```
 
-## Step 2. Run Annotation Pipeline
-The `IMPC_HadoopLoad` command uses the power of cluster to assign the annotations to the StatPackets and transfers the files to the Hadoop cluster. The files will be transferred to Hadoop:/hadoop/user/mi_stats/impc/statpackets/DRXX.
-1. Reconnect to screen session
-Make sure to connect to the same login node you used to start the screen session.
-```console
-screen -r 3507472.stats-pipeline
-```
-
-2. Update packages to the latest version:
-```console
-wget https://raw.githubusercontent.com/${REMOTE}/impc_stats_pipeline/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R
-Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH}
-rm UpdatePackagesFromGithub.R
-```
-
-3. Run annotation pipeline without exporting it to Hadoop: `transfer=FALSE`
-```console
-cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}/SP/jobs/Results_IMPC_SP_Windowed
-sbatch \
-    --time=3-00:00:00 \
-    --mem=8G \
-    -o ../../../../stats_pipeline_logs/annotation_pipeline_${VERSION}.log \
-    -e ../../../../stats_pipeline_logs/annotation_pipeline_${VERSION}.err \
-    --wrap="R -e 'DRrequiredAgeing:::IMPC_HadoopLoad(prefix=${VERSION},transfer=FALSE,mp_chooser_file=${MP_CHOOSER_FILE})'"
-```
-
-- The most complex part of this process is that some files will fail to transfer and you need to use scp command to transfer files to the Hadoop cluster manually.
-- When you are sure that all files are there, you can share the path with Federico.
-**Note**: in the slides transfer=TRUE, which means we haven't transfered files this time. 
-
-## Step 3. Run the Report Generating Pipeline
+## Outdated Steps
+### Step 2. Run the Report Generating Pipeline
 This process generates statistical reports typically utilized by the IMPC working groups. 
 1. Navigate to `${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.y/SP/jobs/Results_IMPC_SP_Windowed`
 2. Allocate a high memory machine on cluster and initialise an interactive shell: 
@@ -197,7 +138,7 @@ DRrequiredAgeing:::IMPC_statspipelinePostProcess(mp_chooser_file=${MP_CHOOSER_FI
 DRrequiredAgeing:::ClearReportsAfterCreation()
 ```
 
-## Step 4. Run the Extraction of Risky Genes Pipeline
+### Step 3. Run the Extraction of Risky Genes Pipeline
 This process generates a list of risky genes to check manually.
 1. Allocate a machine on codon cluster: `bsub –M 8000 –Is /bin/bash`
 2. Open an R session: `R`
@@ -207,12 +148,12 @@ This process generates a list of risky genes to check manually.
 
 # FAQ
 - ***When will the pipeline be completed?***<br>
-When there are no jobs running under the mi_stats user.<br><br>
+When there are no jobs running under the mi_stats user and all jobs are successfully completed.<br><br>
 - ***Do you expect any errors from the stats pipeline?***<br>
 Yes, having a few errors is normal. If you observe more than a few errors, you may want to run the GapFilling pipeline. Refer to the Step_1.2_RunGapFillingPipeline.mp4 [video](https://www.ebi.ac.uk/seqdb/confluence/display/MouseInformatics/How+to+run+the+IMPC+statistical+pipeline). Make sure to log in to Confluence first.<br><br>
 ## Step 1 FAQ
 - ***How can you determine on step 1 if the pipeline is still running?***<br>
-The simplest method is to execute the `bjobs` command. During the first 4 days of running the pipeline, there should be less than 20 jobs running. Otherwise, there should be 5000+ jobs running on the codon cluster.<br><br>
+The simplest method is to execute the `squeue` command. During the first 4 days of running the pipeline, there should be less than 20 jobs running. Otherwise, there should be 5000+ jobs running on the codon cluster.<br><br>
 - ***How to determine if step 1 is finished?***<br>
 When there are no jobs running in the cluster, it indicates that the pipeline has been completed.<br><br>
 - ***How to retrieve logs from the pipeline step 1?***<br>
@@ -220,13 +161,16 @@ When there are no jobs running in the cluster, it indicates that the pipeline ha
     - Long answer (applicable if the pipeline fails during execution): Log files are distributed for individual jobs and are not located in a single directory. To consolidate the log files into a destination directory, you can use the following commands in bash."
 ```console
 cd <stats pipeline directory>/SP
-find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f  |xargs cp --backup=numbered -t <path to a log directory>
-find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f  |xargs cp --backup=numbered -t <path to a log directory>
+find ./*/*_RawData/ClusterOut/ -name *ClusterOut -type f | xargs cp --backup=numbered -t <path to a log directory>
+find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f | xargs cp --backup=numbered -t <path to a log directory>
 ```
 - ***When should you run the gap filling pipeline after completing step 1?***<br>
 In very rare cases, the stats pipeline may fail for unknown reasons.To resume the pipeline from the point of failure, you can use the GapFilling Pipeline. This is equivalent to running the pipeline by navigating to `<stats pipeline directory>/SP/jobs` and executing `AllJobs.bch`. Before doing so, make sure to edit function.R and set the parameter `onlyFillNonExistingResults` to TRUE. After making this change, run the pipeline by executing `./AllJobs.bch` and wait for the pipeline to fill in the missing analyses. Please note that this process may take up to 2 days.<br><br>
 
 ## Step 2 Annotation Pipeline FAQ
+The `IMPC_HadoopLoad` command uses the power of cluster to assign the annotations to the StatPackets and transfers the files to the Hadoop cluster (transfer=TRUE). The files will be transferred to `Hadoop:/hadoop/user/mi_stats/impc/statpackets/DRXX`.
+**Note**: we run annotation pipeline with transfer=FALSE, so we don't transfer it now. 
+
 - ***How to determine if the annotation pipeline has finished?***<br>
 Verify that there are no running jobs on the cluster.<br><br>
 - ***Where are files located on the Hadoop cluster? (Provide the path to Federico)***<br>
