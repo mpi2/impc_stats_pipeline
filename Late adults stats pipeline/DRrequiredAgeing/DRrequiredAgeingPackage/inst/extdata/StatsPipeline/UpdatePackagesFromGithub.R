@@ -33,6 +33,16 @@ install_github(
   quiet = FALSE
 )
 
+# Update rwebhdfs.
+install_github(
+  repo = c("saurfang/rwebhdfs"),
+  dependencies = dependencies,
+  upgrade = "always",
+  force = TRUE,
+  build = TRUE,
+  quiet = FALSE
+)
+
 # Update DRrequiredAgeing.
 install_github(
   repo = paste(repository,
