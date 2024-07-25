@@ -126,19 +126,7 @@ less ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_logs/stats_p
 ```
 
 ## Outdated Steps
-### Step 2. Run the Report Generating Pipeline
-This process generates statistical reports typically utilized by the IMPC working groups. 
-1. Navigate to `${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.y/SP/jobs/Results_IMPC_SP_Windowed`
-2. Allocate a high memory machine on cluster and initialise an interactive shell: 
-`bsub –M 300000 –e errReportGeneratingPipeline –o outReportGeneratingPipeline –Is /bin/bash`
-3. The commands below will generate two CSV files in the `${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_drXX.y/SP/jobs/Results_IMPC_SP_Windowed` directory for the unidimentional and categorical results. The files can be gzip and moved to the FTP directory. You can decorate and format the files by using one of the formatted files in the previous data releases.
-```console
-R
-DRrequiredAgeing:::IMPC_statspipelinePostProcess(mp_chooser_file=${MP_CHOOSER_FILE})
-DRrequiredAgeing:::ClearReportsAfterCreation()
-```
-
-### Step 3. Run the Extraction of Risky Genes Pipeline
+### Step 2. Run the Extraction of Risky Genes Pipeline
 This process generates a list of risky genes to check manually.
 1. Allocate a machine on codon cluster: `bsub –M 8000 –Is /bin/bash`
 2. Open an R session: `R`
@@ -151,7 +139,7 @@ This process generates a list of risky genes to check manually.
 When there are no jobs running under the mi_stats user and all jobs are successfully completed.<br><br>
 - ***Do you expect any errors from the stats pipeline?***<br>
 Yes, having a few errors is normal. If you observe more than a few errors, you may want to run the GapFilling pipeline. Refer to the Step_1.2_RunGapFillingPipeline.mp4 [video](https://www.ebi.ac.uk/seqdb/confluence/display/MouseInformatics/How+to+run+the+IMPC+statistical+pipeline). Make sure to log in to Confluence first.<br><br>
-## Step 1 FAQ
+## Statistical Pipeline FAQ
 - ***How can you determine on step 1 if the pipeline is still running?***<br>
 The simplest method is to execute the `squeue` command. During the first 4 days of running the pipeline, there should be less than 20 jobs running. Otherwise, there should be 5000+ jobs running on the codon cluster.<br><br>
 - ***How to determine if step 1 is finished?***<br>
@@ -167,7 +155,7 @@ find ./*/*_RawData/ClusterErr/ -name *ClusterErr -type f | xargs cp --backup=num
 - ***When should you run the gap filling pipeline after completing step 1?***<br>
 In very rare cases, the stats pipeline may fail for unknown reasons.To resume the pipeline from the point of failure, you can use the GapFilling Pipeline. This is equivalent to running the pipeline by navigating to `<stats pipeline directory>/SP/jobs` and executing `AllJobs.bch`. Before doing so, make sure to edit function.R and set the parameter `onlyFillNonExistingResults` to TRUE. After making this change, run the pipeline by executing `./AllJobs.bch` and wait for the pipeline to fill in the missing analyses. Please note that this process may take up to 2 days.<br><br>
 
-## Step 2 Annotation Pipeline FAQ
+## Annotation Pipeline FAQ
 The `IMPC_HadoopLoad` command uses the power of cluster to assign the annotations to the StatPackets and transfers the files to the Hadoop cluster (transfer=TRUE). The files will be transferred to `Hadoop:/hadoop/user/mi_stats/impc/statpackets/DRXX`.
 **Note**: we run annotation pipeline with transfer=FALSE, so we don't transfer it now. 
 
