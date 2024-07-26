@@ -31,7 +31,7 @@ export MP_CHOOSER_FILE=$(echo -n '"'; realpath mp_chooser.json.Rdata | tr -d '\n
 echo "Update started"
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
 wget https://raw.githubusercontent.com/${REMOTE}/impc_stats_pipeline/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/UpdatePackagesFromGithub.R
-Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH}
+Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH} FALSE
 rm UpdatePackagesFromGithub.R
 echo "Update completed"
 

@@ -3,11 +3,11 @@ args = commandArgs(trailingOnly = TRUE)
 ##################### STEP 1 #######################
 ####################################################
 f = function(files) {
-  requireNamespace("miniparquet")
+  requireNamespace("arrow")
   df = lapply(seq_along(files),
               function(i) {
                 message(i, '|', length(files), ' ~> ', files[i])
-                r = miniparquet::parquet_read(files[i])
+                r = as.data.frame(arrow::read_parquet(files[i]))
                 return(r)
               })
   ###############
