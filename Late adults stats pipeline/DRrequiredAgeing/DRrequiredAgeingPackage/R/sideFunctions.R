@@ -576,26 +576,6 @@ getMethodi =  function(var,
   return(method)
 }
 
-# Equation map
-getEquation =  function(var,
-                        equationMap = NULL)
-{
-  matched001 = sapply(names(equationMap), grepl, var)
-  if (sum(matched001) > 0) {
-    if (sum(matched001) > 1) {
-      equationMapReduced = equationMap[matched001]
-      mappedPatternLengths = nchar(names(equationMapReduced))
-      equation =
-        unlist(equationMapReduced[which(mappedPatternLengths ==  max(mappedPatternLengths))])
-    } else {
-      equation = unlist(equationMap[matched001])
-    }
-  } else{
-    equation = 'withWeight'
-  }
-  return(equation)
-}
-
 local =  function(x=NULL){
   r= system.file("extdata", package = "DRrequiredAgeing")
   return(r)
