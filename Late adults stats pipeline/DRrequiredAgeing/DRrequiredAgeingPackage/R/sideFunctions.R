@@ -4009,64 +4009,6 @@ requiredDataColumns = function(x){
   return(ColumnsList)
 }
 
-updateEquationMap = function(updatePackage = TRUE) {
-  # Extract Centers name from the skip list
-  metapars = read.csv(file = file.path(local(), 'metadataParameters.csv'))
-  centers = lapply(strsplit(
-    metapars$parameter_stable_id,
-    split = '_',
-    fixed = TRUE
-  ), function(x) {
-    return (x[1])
-  })
-  centers = unique(unlist(centers))
-
-  # Extract parameters from the method map
-  methodmap = readConf('EquationMap.conf')
-  orgparsColon = paste(names(methodmap), methodmap, sep = ':')
-  orgpars = paste(names(methodmap), methodmap, sep = '_')
-  parameters = lapply(strsplit(orgpars,
-                               split = '_',
-                               fixed = TRUE), function(x) {
-                                 if (length(x) <= 5) {
-                                   r = c()
-                                   for (i in 1:6) {
-                                     y = x
-                                     y[length(y) - 1] = paste(paste0('00', i, collapse = ''), y[length(y)], sep=':',collapse = ':')
-                                     r = c(r, paste(y[-c(1,length(y))], sep = '_', collapse = '_'))
-                                   }
-                                   return (r)
-                                 } else{
-                                   return(NULL)
-                                 }
-                               })
-  parameters = unlist(parameters)
-
-  #combine two lists
-  #r = apply(expand.grid(centers, parameters), 1, paste, collapse = "_")
-  r = as.vector(outer(centers, parameters, paste, sep="_"))
-  r = unique(c(orgparsColon, sort(r)))
-  if (updatePackage) {
-    write.table(
-      r,
-      file = system.file("extdata", "EquationMap.conf", package = "DRrequiredAgeing"),
-      row.names = FALSE,
-      col.names = FALSE,
-      quote = FALSE
-    )
-  } else{
-    write.table(
-      r,
-      file = file.path(getwd(), "EquationMap.conf"),
-      row.names = FALSE,
-      col.names = FALSE,
-      quote = FALSE
-    )
-  }
-  gc()
-  return(invisible(r))
-}
-
 updateMethodMap = function(updatePackage = TRUE) {
   # Extract Centers name from the skip list
   metapars = read.csv(file = file.path(local(), 'metadataParameters.csv'))
@@ -4240,10 +4182,6 @@ updateImpress = function(updateImpressFileInThePackage = FALSE,
   ###################################################
   if(updateMethodMapHuristic){
     updateMethodMap(updateImpressFileInThePackage)
-  }
-  ###################################################
-  if(updateEquationMapHuristic){
-    updateEquationMap(updateImpressFileInThePackage)
   }
   ###################################################
   return(invisible(list(
