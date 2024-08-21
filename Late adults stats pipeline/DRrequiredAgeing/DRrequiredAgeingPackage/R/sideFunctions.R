@@ -4627,15 +4627,6 @@ StatsPipeline = function(path = getwd(),
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
   startTime = Sys.time()
-  message0('Starting the IMPC statistical pipeline ... ')
-  message0('\t Parquet files path:  ', path)
-  message0('\t Output path: ', SP.results)
-  ###############################################
-  path0 = path
-  path = SP.results
-  if (!dir.exists(path))
-    dir.create(path)
-  setwd(path)
   currentuser = Sys.info()['user']
 
   ### Phase I: Preparing parquet files
