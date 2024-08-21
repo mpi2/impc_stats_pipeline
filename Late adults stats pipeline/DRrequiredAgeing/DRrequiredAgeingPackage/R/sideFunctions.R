@@ -4626,8 +4626,6 @@ StatsPipeline = function(path = getwd(),
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
-  startTime = Sys.time()
-
   ### Phase I: Preparing parquet files
   ###############################################
   message0('Phase I. Converting parquet files into Rdata ...')
@@ -4802,8 +4800,6 @@ StatsPipeline = function(path = getwd(),
     'This is the last step. If you see no file in the list below, the SP is successfully completed.'
   )
   setwd(file.path(SP.results, 'logs'))
-  
-  message0('SP finished in ', round(difftime(Sys.time(), startTime, units = "min"), 2))
 }
 
 install.packages.auto <- function(x) {
