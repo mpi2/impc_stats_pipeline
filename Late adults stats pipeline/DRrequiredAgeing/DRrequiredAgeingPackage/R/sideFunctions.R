@@ -4627,7 +4627,6 @@ StatsPipeline = function(path = getwd(),
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
   startTime = Sys.time()
-  currentuser = Sys.info()['user']
 
   ### Phase I: Preparing parquet files
   ###############################################
