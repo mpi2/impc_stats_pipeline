@@ -4626,14 +4626,7 @@ StatsPipeline = function(path = getwd(),
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
-  message0('Step 2. Reading the data from the parquets files and creating psudo Rdata')
-  file.copy(
-    from = file.path(local(),
-                     'StatsPipeline/0-ETL/Step2Parquet2Rdata.R'),
-    to = file.path(path, 'Step2Parquet2Rdata.R'),
-    overwrite = TRUE
-  )
-  system('chmod 775 jobs_step2_Parquet2Rdata.bch', wait = TRUE)
+  
   system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash ./jobs_step2_Parquet2Rdata.bch"', wait = TRUE)
   waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
