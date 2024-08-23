@@ -4626,15 +4626,6 @@ StatsPipeline = function(path = getwd(),
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
-  ### Phase I: Preparing parquet files
-  ###############################################
-  message0('Phase I. Converting parquet files into Rdata ...')
-  message0('Step 1. Reading the data from the parquets directory and creating jobs')
-  source(file.path(local(),
-                   'StatsPipeline/0-ETL/Step1MakePar2RdataJobs.R'))
-  f(path0)
-  rm0('f')
-  ###############################################
   message0('Step 2. Reading the data from the parquets files and creating psudo Rdata')
   file.copy(
     from = file.path(local(),
