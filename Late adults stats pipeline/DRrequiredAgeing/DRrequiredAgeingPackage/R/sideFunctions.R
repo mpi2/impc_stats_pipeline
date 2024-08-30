@@ -4589,13 +4589,6 @@ StatsPipeline = function(path = getwd(),
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
 
-  ###############################################
-  ## Compress logs
-  message0('Phase I. Compressing the log files and house cleaning ...')
-  system(command = 'zip -rm ../compressed_logs/phase1_jobs.zip *.bch', wait = TRUE)
-  system(command = 'rm -rf ProcedureScatterRdata', wait = TRUE)
-  ###########  END of Phase I ###################
-
   ##### Phase II. Reprocessing the data
   message0('Starting Phase II, packaging the big data into small packages ...')
   jobCreator(path = file.path(path, 'Rdata/'))

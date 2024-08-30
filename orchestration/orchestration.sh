@@ -61,10 +61,9 @@ rm Step4MergingRdataFiles.R
 find . -type f -name '*.log' -exec zip -m ../compressed_logs/step4_logs.zip {} +
 find . -type f -name '*.err' -exec zip -m ../compressed_logs/step4_logs.zip {} +
 
-
-
-
-
+message0 "Phase I. Compressing the log files and house cleaning..."
+zip -rm ../compressed_logs/phase1_jobs.zip *.bch
+rm -rf ProcedureScatterRdata
 
 # Calculate total execution time.
 end_time=$(date '+%Y-%m-%d %H:%M:%S')
