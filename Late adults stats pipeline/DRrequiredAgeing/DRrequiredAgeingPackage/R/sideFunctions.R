@@ -4484,49 +4484,6 @@ filesContain = function(path = getwd(),
   return(res)
 }
 
-jobCreator = function(path = getwd(),
-                      pattern = "\\.Rdata",
-                      JobListFile = "DataGenerationJobList.bch",
-                      mem = "45G",
-                      time = "6-00") {
-  if (!dir.exists(file.path("DataGeneratingLog")))
-    dir.create(
-      path = file.path("DataGeneratingLog"),
-      recursive = TRUE,
-      showWarnings = FALSE
-    )
-  if (file.exists(JobListFile))
-    unlink(JobListFile)
-  files = list.files(
-    path = path,
-    pattern = pattern,
-    full.names = TRUE,
-    recursive = FALSE,
-    include.dirs = FALSE,
-    all.files = TRUE
-  )
-  proc = tools::file_path_sans_ext(basename(files))
-  write(
-    paste0(
-      "sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
-      " --time=", time,
-      ' -e ',
-      file.path('DataGeneratingLog', paste0(proc, '_errorlog.log')),
-      ' -o ',
-      file.path('DataGeneratingLog', paste0(proc, '_outputlog.log')),
-      " --wrap='Rscript InputDataGenerator.R ",
-      '"',
-      files,
-      '" "',
-      proc,
-      '"',
-      "'"
-    ),
-    file = JobListFile
-  )
-}
-
-
 packageBackup = function(package = NULL,
                          storepath = NULL,
                          flags = '-r9Xq') {
@@ -4588,44 +4545,6 @@ StatsPipeline = function(path = getwd(),
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
-
-  ##### Phase II. Reprocessing the data
-  message0('Starting Phase II, packaging the big data into small packages ...')
-  jobCreator(path = file.path(path, 'Rdata/'))
-  file.copy(
-    from = file.path(local(),
-                     'StatsPipeline/jobs/InputDataGenerator.R'),
-    to = file.path(path, 'InputDataGenerator.R'),
-    overwrite = TRUE
-  )
-  system('chmod 775 DataGenerationJobList.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/phase2_job_id.txt --wrap="bash ./DataGenerationJobList.bch"', wait = TRUE)
-  waitTillCommandFinish(
-    WaitIfTheOutputContains = waitUntillSee,
-    ignoreline = ignoreThisLineInWaitingCheck
-  )
-  file.remove(file.path(path, 'InputDataGenerator.R'))
-  if (filesContain(
-    path = file.path(path, 'DataGeneratingLog'),
-    extension = '\\.log',
-    containWhat = 'Exit'
-  ))
-    stop('An error occured in Phase II step 1. Packaging the big data into small packages')
-
-  ## Compress logs
-  message0('End of packaging data. ')
-  message0('Phase II. Compressing the log files and house cleaning ... ')
-  system(command = 'mv *.bch  DataGeneratingLog/', wait = TRUE)
-  system(command = 'zip -rm phase2_logs.zip DataGeneratingLog/', wait = TRUE)
-  system(command = 'mv phase2_logs.zip ../compressed_logs/', wait = TRUE)
-
-  ## Add all single jobs into one single job
-  message0('Appending all procedure based jobs into one single file ...')
-  if (!dir.exists('jobs'))
-    system(command = 'mkdir jobs', wait = TRUE)
-  if (file.exists('jobs/AllJobs.bch'))
-    system(command = 'rm jobs/AllJobs.bch', wait = TRUE)
-  system(command = 'find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch', wait = TRUE)
 
   message0('Phase III. Initialising the statistical analysis ...')
   path = file.path(path, 'jobs')

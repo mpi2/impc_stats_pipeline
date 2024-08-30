@@ -18,8 +18,14 @@ function waitTillCommandFinish() {
             message0 "Done waiting for SLURM jobs to complete."
             break
         fi
-        sleep 60
+        sleep 5
     done
+}
+
+# Function to fetch a specific R script.
+function fetch_script() {
+    file_name=$(basename $0)
+    wget -O ${file_name} --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/$0"
 }
 
 # Statistical pipeline.
@@ -40,7 +46,7 @@ for file in $step1_files; do
 done
 
 message0 "Step 2. Read parquet files and create pseudo Rdata"
-wget --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/0-ETL/Step2Parquet2Rdata.R"
+fetch_script 0-ETL/Step2Parquet2Rdata.R
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash jobs_step2_Parquet2Rdata.bch"
 waitTillCommandFinish
 rm Step2Parquet2Rdata.R
@@ -54,7 +60,7 @@ for dir in $dirs; do
 done
 
 message0 "Step 4. Merging pseudo Rdata files into single files per procedure"
-wget --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/0-ETL/Step4MergingRdataFiles.R"
+fetch_script 0-ETL/Step4MergingRdataFiles.R
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash jobs_step4_MergeRdatas.bch"
 waitTillCommandFinish
 rm Step4MergingRdataFiles.R
@@ -62,6 +68,26 @@ find . -type f -name '*.log' -exec zip -q -m ../compressed_logs/step4_logs.zip {
 find . -type f -name '*.err' -exec zip -q -m ../compressed_logs/step4_logs.zip {} +
 
 message0 "Phase I. Compressing the log files and house cleaning..."
-zip -rm ../compressed_logs/phase1_jobs.zip *.bch
+zip -q -rm ../compressed_logs/phase1_jobs.zip *.bch
 rm -rf ProcedureScatterRdata
 
+message0 "Starting Phase II, packaging the big data into small packages ..."
+mkdir DataGeneratingLog
+for file in $(find Rdata -type f -exec realpath {} \;); do
+  file_basename=$(basename $file .Rdata)
+  echo "sbatch --job-name=impc_stats_pipeline_job --mem=45G --time=6-00 -e DataGeneratingLog/${file_basename}_errorlog.log -o DataGeneratingLog/${file_basename}_outputlog.log --wrap='Rscript InputDataGenerator.R ${file} ${file_basename}'" >> DataGenerationJobList.bch
+done
+fetch_script jobs/InputDataGenerator.R
+sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/phase2_job_id.txt --wrap="bash DataGenerationJobList.bch"
+waitTillCommandFinish
+rm InputDataGenerator.R
+
+message0 "End of packaging data."
+message0 "Phase II. Compressing the log files and house cleaning..."
+mv *.bch  DataGeneratingLog/
+zip -q -rm phase2_logs.zip DataGeneratingLog/
+mv phase2_logs.zip ../compressed_logs/
+
+message0 "Appending all procedure based jobs into one single file..."
+mkdir jobs
+find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch
