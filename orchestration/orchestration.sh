@@ -1,4 +1,5 @@
 #!/bin/bash
+set -ex
 
 # Assign arguments to variables.
 VERSION="$1"
@@ -44,8 +45,8 @@ wget --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Lat
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash jobs_step2_Parquet2Rdata.bch"
 waitTillCommandFinish
 rm Step2Parquet2Rdata.R
-find ../ -type f -name '*.log' -exec zip -m ../compressed_logs/step2_logs.zip {} +
-find ../ -type f -name '*.err' -exec zip -m ../compressed_logs/step2_logs.zip {} +
+find ../ -type f -name '*.log' -exec zip -q -m ../compressed_logs/step2_logs.zip {} +
+find ../ -type f -name '*.err' -exec zip -q -m ../compressed_logs/step2_logs.zip {} +
 
 message0 "Step 3. Merging pseudo Rdata files into single file for each procedure - jobs creator"
 dirs=$(find "${sp_results}/ProcedureScatterRdata" -maxdepth 1 -type d)
@@ -58,8 +59,8 @@ wget --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Lat
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash jobs_step4_MergeRdatas.bch"
 waitTillCommandFinish
 rm Step4MergingRdataFiles.R
-find . -type f -name '*.log' -exec zip -m ../compressed_logs/step4_logs.zip {} +
-find . -type f -name '*.err' -exec zip -m ../compressed_logs/step4_logs.zip {} +
+find . -type f -name '*.log' -exec zip -q -m ../compressed_logs/step4_logs.zip {} +
+find . -type f -name '*.err' -exec zip -q -m ../compressed_logs/step4_logs.zip {} +
 
 message0 "Phase I. Compressing the log files and house cleaning..."
 zip -rm ../compressed_logs/phase1_jobs.zip *.bch
