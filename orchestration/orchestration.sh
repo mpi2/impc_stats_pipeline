@@ -24,8 +24,8 @@ function waitTillCommandFinish() {
 
 # Function to fetch a specific R script.
 function fetch_script() {
-    file_name=$(basename $0)
-    wget -O ${file_name} --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/$0"
+    file_name=$(basename $1)
+    wget -O ${file_name} --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/$1"
 }
 
 # Statistical pipeline.
