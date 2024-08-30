@@ -4588,24 +4588,7 @@ StatsPipeline = function(path = getwd(),
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
-  
-  file.remove(file.path(path, 'Step2Parquet2Rdata.R'))
-  if (filesContain(path = path0,
-                   extension = '\\.log',
-                   containWhat = 'Exit'))
-    stop('An error occured in step 2. Parquet2Rdata conversion')
-  
-  system(command = "find ../ -type f -name '*.log' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
-  system(command = "find ../ -type f -name '*.err' -exec zip -m ../compressed_logs/step2_logs.zip {} +", wait = TRUE)
 
-  ###############################################
-  message0('Step 3. Merging psudo Rdata files into single file for each procedure - jobs creator')
-  source(file.path(local(),
-                   'StatsPipeline/0-ETL/Step3MergeRdataFilesJobs.R'))
-  f(file.path(path, 'ProcedureScatterRdata'))
-  rm0('f')
-
-  ###############################################
   message0('Step 4. Merging psudo Rdata files into single files per procedure')
   file.copy(
     from = file.path(local(),

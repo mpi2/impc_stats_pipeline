@@ -24,12 +24,12 @@ function waitTillCommandFinish() {
 # Statistical pipeline.
 export start_time=$(date '+%Y-%m-%d %H:%M:%S')
 message0 "Starting the IMPC statistical pipeline..."
-mkdir SP
+mkdir SP compressed_logs
 export input_path=$(realpath .)
 export sp_results=$(realpath SP)
 message0 "Parquet files path: ${input_path}"
 message0 "Output path: ${sp_results}"
-cd SP compressed_logs
+cd SP
 
 # Phase I: Prepare parquet files.
 message0 "Phase I. Convert parquet files into Rdata..."
@@ -43,10 +43,19 @@ done
 chmod 775 jobs_step2_Parquet2Rdata.bch
 
 message0 "Step 2. Read parquet files and create pseudo Rdata"
-# Download script.
 wget --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/0-ETL/Step2Parquet2Rdata.R"
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash jobs_step2_Parquet2Rdata.bch"
 waitTillCommandFinish
+rm Step2Parquet2Rdata.R
+find ../ -type f -name '*.log' -exec zip -m ../compressed_logs/step2_logs.zip {} +
+find ../ -type f -name '*.err' -exec zip -m ../compressed_logs/step2_logs.zip {} +
+
+message0 "Step 3. Merging pseudo Rdata files into single file for each procedure - jobs creator"
+dirs=$(find "${sp_results}/ProcedureScatterRdata" -maxdepth 1 -type d)
+for dir in $dirs; do
+  echo "sbatch --job-name=impc_stats_pipeline_job --mem=50G --time=01:30:00 -e ${dir}/step4_merge_rdatas.err -o ${dir}/step4_merge_rdatas.log --wrap='Rscript Step4MergingRdataFiles.R ${dir}'" >> jobs_step4_MergeRdatas.bch
+done
+
 
 
 
