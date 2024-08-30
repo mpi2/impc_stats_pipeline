@@ -4589,28 +4589,6 @@ StatsPipeline = function(path = getwd(),
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
 
-  message0('Step 4. Merging psudo Rdata files into single files per procedure')
-  file.copy(
-    from = file.path(local(),
-                     'StatsPipeline/0-ETL/Step4MergingRdataFiles.R'),
-    to = file.path(path, 'Step4MergingRdataFiles.R'),
-    overwrite = TRUE
-  )
-  system('chmod 775 jobs_step4_MergeRdatas.bch', wait = TRUE)
-  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash ./jobs_step4_MergeRdatas.bch"', wait = TRUE)
-  waitTillCommandFinish(
-    WaitIfTheOutputContains = waitUntillSee,
-    ignoreline = ignoreThisLineInWaitingCheck
-  )
-  file.remove(file.path(path, 'Step4MergingRdataFiles.R'))
-  if (filesContain(path = path,
-                   extension = '\\.log',
-                   containWhat = 'Exit'))
-    stop('An error occured in step 4. Merging Rdata files into one single Rdata file per procedure')
-  
-  system(command = "find . -type f -name '*.log' -exec zip -m ../compressed_logs/step4_logs.zip {} +", wait = TRUE)
-  system(command = "find . -type f -name '*.err' -exec zip -m ../compressed_logs/step4_logs.zip {} +", wait = TRUE)
-
   ###############################################
   ## Compress logs
   message0('Phase I. Compressing the log files and house cleaning ...')

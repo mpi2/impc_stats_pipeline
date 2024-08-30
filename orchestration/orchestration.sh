@@ -31,16 +31,13 @@ message0 "Parquet files path: ${input_path}"
 message0 "Output path: ${sp_results}"
 cd SP
 
-# Phase I: Prepare parquet files.
 message0 "Phase I. Convert parquet files into Rdata..."
+
 message0 "Step 1. Create jobs"
 step1_files=$(find .. -type f -name '*.parquet' -exec realpath {} \;)
-
-# Generate file with jobs.
 for file in $step1_files; do
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=10G --time=00:10:00 -e ${file}.err -o ${file}.log --wrap='Rscript Step2Parquet2Rdata.R $file'" >> jobs_step2_Parquet2Rdata.bch
 done
-chmod 775 jobs_step2_Parquet2Rdata.bch
 
 message0 "Step 2. Read parquet files and create pseudo Rdata"
 wget --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/0-ETL/Step2Parquet2Rdata.R"
@@ -55,6 +52,16 @@ dirs=$(find "${sp_results}/ProcedureScatterRdata" -maxdepth 1 -type d)
 for dir in $dirs; do
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=50G --time=01:30:00 -e ${dir}/step4_merge_rdatas.err -o ${dir}/step4_merge_rdatas.log --wrap='Rscript Step4MergingRdataFiles.R ${dir}'" >> jobs_step4_MergeRdatas.bch
 done
+
+message0 "Step 4. Merging psudo Rdata files into single files per procedure"
+wget --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/0-ETL/Step4MergingRdataFiles.R"
+sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash jobs_step4_MergeRdatas.bch"
+waitTillCommandFinish
+rm Step4MergingRdataFiles.R
+find . -type f -name '*.log' -exec zip -m ../compressed_logs/step4_logs.zip {} +
+find . -type f -name '*.err' -exec zip -m ../compressed_logs/step4_logs.zip {} +
+
+
 
 
 
