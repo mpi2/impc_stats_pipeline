@@ -4434,44 +4434,6 @@ dictionary2listConvert = function(x) {
   return(r2)
 }
 
-
-waitTillCommandFinish = function(checkcommand = 'squeue --format="%A %.30j"',
-                                 WaitIfTheOutputContains = 'impc_stats_pipeline_job',
-                                 WaitBeforeRetrySec = 60,
-                                 ignoreline = 0,
-                                 ...) {
-  r = system(command = checkcommand,
-             wait = TRUE,
-             intern = TRUE,
-             ...)
-  totalSeconds = 0
-  if (any(ignoreline > 0))
-    r = r[-c(ignoreline)]
-  while (length(r) > 0 && any(grepl(
-    pattern = WaitIfTheOutputContains,
-    x = r,
-    perl = TRUE,
-    ignore.case = FALSE
-  ))) {
-    totalSeconds = totalSeconds + WaitBeforeRetrySec
-    message0('waiting for ',
-             WaitBeforeRetrySec,
-             's',
-             '. Total waiting time: ',
-             totalSeconds,
-             's.')
-    Sys.sleep(WaitBeforeRetrySec)
-    r = system(command = checkcommand,
-               wait = TRUE,
-               intern = TRUE,
-               ...)
-    if (ignoreline > 0)
-      r = r[-c(ignoreline)]
-
-  }
-  message0('continuing the pipeline ...')
-}
-
 submit_limit_jobs = function(bch_file,
                              job_id_logfile,
                              max_jobs=800) {
@@ -4627,11 +4589,6 @@ StatsPipeline = function(path = getwd(),
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
   
-  system('sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash ./jobs_step2_Parquet2Rdata.bch"', wait = TRUE)
-  waitTillCommandFinish(
-    WaitIfTheOutputContains = waitUntillSee,
-    ignoreline = ignoreThisLineInWaitingCheck
-  )
   file.remove(file.path(path, 'Step2Parquet2Rdata.R'))
   if (filesContain(path = path0,
                    extension = '\\.log',

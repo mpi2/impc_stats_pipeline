@@ -10,6 +10,17 @@ function message0() {
     echo "$(date '+%Y-%m-%d %H:%M:%S.') $1"
 }
 
+# Function to wait until all jobs on SLURM complete.
+function waitTillCommandFinish() {
+    while true; do
+        if ! (squeue --format="%A %.30j" | grep -q "impc_stats_pipeline_job"); then
+            message0 "Done waiting for SLURM jobs to complete."
+            break
+        fi
+        sleep 60
+    done
+}
+
 # Statistical pipeline.
 export start_time=$(date '+%Y-%m-%d %H:%M:%S')
 message0 "Starting the IMPC statistical pipeline..."
@@ -18,12 +29,12 @@ export input_path=$(realpath .)
 export sp_results=$(realpath SP)
 message0 "Parquet files path: ${input_path}"
 message0 "Output path: ${sp_results}"
-cd SP
+cd SP compressed_logs
 
 # Phase I: Prepare parquet files.
 message0 "Phase I. Convert parquet files into Rdata..."
 message0 "Step 1. Create jobs"
-step1_files=$(find .. -type f -name "*.parquet" -exec realpath {} \;)
+step1_files=$(find .. -type f -name '*.parquet' -exec realpath {} \;)
 
 # Generate file with jobs.
 for file in $step1_files; do
@@ -34,6 +45,10 @@ chmod 775 jobs_step2_Parquet2Rdata.bch
 message0 "Step 2. Read parquet files and create pseudo Rdata"
 # Download script.
 wget --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/0-ETL/Step2Parquet2Rdata.R"
+sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash jobs_step2_Parquet2Rdata.bch"
+waitTillCommandFinish
+
+
 
 # Calculate total execution time.
 end_time=$(date '+%Y-%m-%d %H:%M:%S')
