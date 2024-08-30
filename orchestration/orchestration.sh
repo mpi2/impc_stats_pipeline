@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 # Assign arguments to variables.
 VERSION="$1"
@@ -23,7 +23,6 @@ function waitTillCommandFinish() {
 }
 
 # Statistical pipeline.
-export start_time=$(date '+%Y-%m-%d %H:%M:%S')
 message0 "Starting the IMPC statistical pipeline..."
 mkdir SP compressed_logs
 export input_path=$(realpath .)
@@ -54,7 +53,7 @@ for dir in $dirs; do
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=50G --time=01:30:00 -e ${dir}/step4_merge_rdatas.err -o ${dir}/step4_merge_rdatas.log --wrap='Rscript Step4MergingRdataFiles.R ${dir}'" >> jobs_step4_MergeRdatas.bch
 done
 
-message0 "Step 4. Merging psudo Rdata files into single files per procedure"
+message0 "Step 4. Merging pseudo Rdata files into single files per procedure"
 wget --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/0-ETL/Step4MergingRdataFiles.R"
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash jobs_step4_MergeRdatas.bch"
 waitTillCommandFinish
@@ -66,10 +65,3 @@ message0 "Phase I. Compressing the log files and house cleaning..."
 zip -rm ../compressed_logs/phase1_jobs.zip *.bch
 rm -rf ProcedureScatterRdata
 
-# Calculate total execution time.
-end_time=$(date '+%Y-%m-%d %H:%M:%S')
-start_seconds=$(date -j -f '%Y-%m-%d %H:%M:%S' "$start_time" '+%s')
-end_seconds=$(date -j -f '%Y-%m-%d %H:%M:%S' "$end_time" '+%s')
-duration_seconds=$((end_seconds - start_seconds))
-duration_minutes=$(echo "scale=2; $duration_seconds / 60" | bc)
-message0 "SP finished in ${duration_minutes}"
