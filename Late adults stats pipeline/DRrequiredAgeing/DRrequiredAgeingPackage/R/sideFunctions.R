@@ -4546,24 +4546,6 @@ StatsPipeline = function(path = getwd(),
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
 
-  message0('Running the IMPC statistical pipeline by submitting jobs ...')
-  # copy stats pipeline driver script
-  if (windowingPipeline) {
-    file.copy(
-      from = file.path(local(),
-                       'StatsPipeline/jobs/function_windowed.R'),
-      to = file.path(path, 'function.R'),
-      overwrite = TRUE
-    )
-  } else{
-    file.copy(
-      from = file.path(local(),
-                       'StatsPipeline/jobs/function.R'),
-      to = file.path(path, 'function.R'),
-      overwrite = TRUE
-    )
-  }
-
   # Specify the DR version in the pipeline
   ReplaceWordInFile(file.path(path, 'function.R'),
                     'DRversionNotSpecified',

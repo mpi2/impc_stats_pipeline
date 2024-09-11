@@ -103,3 +103,11 @@ R --quiet -e \
   updateTheSkipList = TRUE, \
   saveRdata = FALSE \
 )"
+
+message0 "Running the IMPC statistical pipeline by submitting jobs..."
+if [ "${WINDOWING_PIPELINE}" = true ]; then
+  fetch_script jobs/function_windowed.R
+  mv function_windowed.R function.R
+else
+  fetch_script jobs/function.R
+fi
