@@ -111,3 +111,11 @@ if [ "${WINDOWING_PIPELINE}" = true ]; then
 else
   fetch_script jobs/function.R
 fi
+
+R --quiet -e \
+"DRrequiredAgeing:::ReplaceWordInFile( \
+  '$(realpath function.R)', \
+  'DRversionNotSpecified', \
+  ${VERSION} \
+)"
+chmod 775 AllJobs.bch

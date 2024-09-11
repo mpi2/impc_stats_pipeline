@@ -4546,12 +4546,6 @@ StatsPipeline = function(path = getwd(),
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
 
-  # Specify the DR version in the pipeline
-  ReplaceWordInFile(file.path(path, 'function.R'),
-                    'DRversionNotSpecified',
-                    DRversion)
-
-  system('chmod 775 AllJobs.bch', wait = TRUE)
   submit_limit_jobs(bch_file="AllJobs.bch", job_id_logfile="../../compressed_logs/phase3_job_id.txt")
   waitTillCommandFinish(
     WaitIfTheOutputContains = waitUntillSee,
