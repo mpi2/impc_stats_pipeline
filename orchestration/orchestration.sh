@@ -5,6 +5,7 @@ set -e
 VERSION="$1"
 REMOTE="$2"
 BRANCH="$3"
+WINDOWING_PIPELINE="$4"
 
 # Function prints messages to logs.
 function message0() {
@@ -96,7 +97,7 @@ message0 "Phase III. Initialising the statistical analysis..."
 cd jobs
 message0 "Updating the dynamic contents from the IMPReSS..."
 R --quiet -e \
-"DRrequiredAgeing::updateImpress( \
+"DRrequiredAgeing:::updateImpress( \
   updateImpressFileInThePackage = TRUE, \
   updateOptionalParametersList = TRUE, \
   updateTheSkipList = TRUE, \
