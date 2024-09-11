@@ -91,3 +91,14 @@ mv phase2_logs.zip ../compressed_logs/
 message0 "Appending all procedure based jobs into one single file..."
 mkdir jobs
 find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch
+
+message0 "Phase III. Initialising the statistical analysis..."
+cd jobs
+message0 "Updating the dynamic contents from the IMPReSS..."
+R --quiet -e \
+"DRrequiredAgeing::updateImpress( \
+  updateImpressFileInThePackage = TRUE, \
+  updateOptionalParametersList = TRUE, \
+  updateTheSkipList = TRUE, \
+  saveRdata = FALSE \
+)"

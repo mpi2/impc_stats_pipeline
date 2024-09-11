@@ -4546,20 +4546,6 @@ StatsPipeline = function(path = getwd(),
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
 
-  message0('Phase III. Initialising the statistical analysis ...')
-  path = file.path(path, 'jobs')
-  setwd(path)
-
-
-  ## Update procedure/parameters from the IMPReSS
-  message0('Updating the dynamic contents from the IMPReSS ...')
-  updateImpress(
-    updateImpressFileInThePackage = TRUE,
-    updateOptionalParametersList = TRUE,
-    updateTheSkipList = TRUE,
-    saveRdata = FALSE
-  )
-
   message0('Running the IMPC statistical pipeline by submitting jobs ...')
   # copy stats pipeline driver script
   if (windowingPipeline) {
