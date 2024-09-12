@@ -29,6 +29,30 @@ function fetch_script() {
     wget -O ${file_name} --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/$1"
 }
 
+submit_limit_jobs() {
+    local bch_file=$1
+    local job_id_logfile=$2
+    local max_jobs=${3:-800}
+
+    echo "Start submit_limit_jobs"
+    echo > "$job_id_logfile"
+
+    while IFS= read -r command; do
+        while true; do
+            num_running=$(squeue | wc -l)
+
+            if [ "$num_running" -le "$max_jobs" ]; then
+                break
+            fi
+            sleep 0.5
+        done
+        job_id=$(eval "$command")
+        echo "$job_id" >> "$job_id_logfile"
+    done < "$bch_file"
+
+    echo "End submit_limit_jobs"
+}
+
 # Statistical pipeline.
 message0 "Starting the IMPC statistical pipeline..."
 mkdir SP compressed_logs
@@ -119,3 +143,5 @@ R --quiet -e \
   ${VERSION} \
 )"
 chmod 775 AllJobs.bch
+submit_limit_jobs AllJobs.bch ../../compressed_logs/phase3_job_id.txt
+waitTillCommandFinish

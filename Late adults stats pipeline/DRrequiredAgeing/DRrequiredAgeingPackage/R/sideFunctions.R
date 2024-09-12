@@ -4434,27 +4434,6 @@ dictionary2listConvert = function(x) {
   return(r2)
 }
 
-submit_limit_jobs = function(bch_file,
-                             job_id_logfile,
-                             max_jobs=800) {
-  message0("Start submit_limit_jobs")
-  system(paste("echo > ", job_id_logfile))
-  file <- file(bch_file, "r")
-  while (length(command <- readLines(file, n = 1, warn = FALSE)) > 0) {
-    while(TRUE) {
-      num_running <- as.integer(system("squeue | wc -l", wait=TRUE, intern = TRUE))
-      if(num_running <= max_jobs) {
-        break
-      }
-      Sys.sleep(0.5)
-    }
-    job_id <- system(command, wait=TRUE, intern = TRUE)
-    system(paste("echo '", job_id, "' >> ", job_id_logfile))
-  }
-  close(file)
-  message0("End submit_limit_jobs")
-}
-
 filesContain = function(path = getwd(),
                         extension = NULL,
                         containWhat = 'Exit',
@@ -4545,13 +4524,6 @@ StatsPipeline = function(path = getwd(),
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
-
-  submit_limit_jobs(bch_file="AllJobs.bch", job_id_logfile="../../compressed_logs/phase3_job_id.txt")
-  waitTillCommandFinish(
-    WaitIfTheOutputContains = waitUntillSee,
-    ignoreline = ignoreThisLineInWaitingCheck
-  )
-
   message0('Postprocessing the IMPC statistical analysis results ...')
   setwd(SP.results)
 
