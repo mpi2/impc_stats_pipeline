@@ -4391,36 +4391,6 @@ list.dirsDepth = function(path  = getwd(),
   return(unique(dirs))
 }
 
-
-minijobsCreator = function(path  = getwd(),
-                           depth = 2,
-                           fname = 'minijobs.bch',
-                           type = '*.tsv') {
-  lf = list.dirsDepth(path = path, depth = depth)
-  a = paste0(
-    'sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00',
-    ' -e ', basename(lf), '_error.err',
-    ' -o ', basename(lf), '_output.log --wrap="find ',
-    lf,
-    ' -type f -name "',
-    type,
-    '" > ',
-    path,
-    '/FileIndex_',
-    basename(lf),
-    '_',
-    round(runif(length(lf)), 6),
-    '.Ind"'
-  )
-  write(
-    x = a,
-    file = fname,
-    ncolumns = 10 ^ 5,
-    append = FALSE,
-    sep = '\n'
-  )
-}
-
 dictionary2listConvert = function(x) {
   if (is.null(x) || !is(x, 'list'))
     return(x)
@@ -5698,25 +5668,6 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            mp_chooser_file = NULL
 ) {
 
-  DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index for results')
-  DRrequiredAgeing:::message0('Indexing the results ...')
-  setwd(file.path(SP.results))
-
-  system('rm -f minijobs.bch', wait = TRUE)
-  system('rm -f error.err', wait = TRUE)
-  system('rm -f output.out', wait = TRUE)
-  system('rm -f *.Ind', wait = TRUE)
-  system('rm -rf AnnotationExtractorAndHadoopLoader/', wait = TRUE)
-
-  DRrequiredAgeing:::minijobsCreator()
-  system('chmod 775 minijobs.bch', wait = TRUE)
-  DRrequiredAgeing:::submit_limit_jobs(bch_file="minijobs.bch", job_id_logfile="../../../compressed_logs/minijobs_job_id.txt")
-  DRrequiredAgeing:::waitTillCommandFinish(
-    WaitIfTheOutputContains = waitUntillSee,
-    ignoreline = ignoreThisLineInWaitingCheck
-  )
-  
-  system('mv minijobs.bch ../../../compressed_logs', wait = TRUE)
   system(command = "find . -type f -name '*_output.log' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
   system(command = "find . -type f -name '*_error.err' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
 

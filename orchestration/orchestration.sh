@@ -169,3 +169,20 @@ message0 "Compress phase III error files"
 find . -type f -name '*.ClusterErr' -exec zip -m ../compressed_logs/phase3_errs.zip {} +
 
 message0 "This is the last step. If you see no file in the list below, the SP is successfully completed."
+
+# Annotation pipeline.
+message0 "Starting the IMPC annotation pipeline..."
+cd jobs/Results_IMPC_SP_Windowed/
+message0 "Step 1: Clean ups and creating the global index for the results."
+message0 "Indexing the results..."
+dirs=$(find . -mindepth 2 -maxdepth 2 -type d)
+for dir in $dirs; do
+  base_dir=$(basename "$dir")
+  output_file="FileIndex_${base_dir}_$(printf "%.6f" $(echo $RANDOM/32767 | bc -l)).Ind"
+  echo "sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 \
+-e ${base_dir}_error.err -o ${base_dir}_output.log --wrap=\"find $dir -type f -name '*.tsv' > $output_file\"" >> minijobs.bch
+done
+chmod 775 minijobs.bch
+submit_limit_jobs minijobs.bch ../../../compressed_logs/minijobs_job_id.txt
+waitTillCommandFinish
+mv minijobs.bch ../../../compressed_logs
