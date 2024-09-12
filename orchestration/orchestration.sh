@@ -145,3 +145,19 @@ R --quiet -e \
 chmod 775 AllJobs.bch
 submit_limit_jobs AllJobs.bch ../../compressed_logs/phase3_job_id.txt
 waitTillCommandFinish
+
+message0 "Postprocessing the IMPC statistical analysis results..."
+cd ${sp_results}
+
+message0 "Creating backups from the main R packages..."
+mkdir RPackage_backup
+R --quiet -e \
+"DRrequiredAgeing:::packageBackup( \
+  package='DRrequiredAgeing', \
+  storepath='$(realpath RPackage_backup)' \
+)"
+R --quiet -e \
+"DRrequiredAgeing:::packageBackup( \
+  package='OpenStats', \
+  storepath='$(realpath RPackage_backup)' \
+)"

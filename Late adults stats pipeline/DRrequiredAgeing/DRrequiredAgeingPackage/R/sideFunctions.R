@@ -4524,16 +4524,6 @@ StatsPipeline = function(path = getwd(),
                          ignoreThisLineInWaitingCheck = 0,
                          windowingPipeline = TRUE,
                          DRversion = 'not_specified') {
-  message0('Postprocessing the IMPC statistical analysis results ...')
-  setwd(SP.results)
-
-  message0('Creating backups from the main R packages ...')
-  if (dir.exists('RPackage_backup')) {
-    system(command = 'rm -rf RPackage_backup', wait = TRUE)
-  }
-  packageBackup('DRrequiredAgeing', storepath = file.path(getwd(), 'RPackage_backup'))
-  packageBackup('OpenStats', storepath = file.path(getwd(), 'RPackage_backup'))
-
   if (dir.exists('logs')) {
     system(command = 'rm -rf logs', wait = TRUE)
   }
