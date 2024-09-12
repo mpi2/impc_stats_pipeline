@@ -29,6 +29,7 @@ function fetch_script() {
     wget -O ${file_name} --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/$1"
 }
 
+# Function to submit limited number of jobs.
 submit_limit_jobs() {
     local bch_file=$1
     local job_id_logfile=$2
