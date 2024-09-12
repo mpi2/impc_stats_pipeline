@@ -5695,31 +5695,8 @@ changeRpackageDirectory = function(path = '~/DRs/R/packages') {
 IMPC_HadoopLoad = function(SP.results = getwd(),
                            waitUntillSee = 'impc_stats_pipeline_job',
                            ignoreThisLineInWaitingCheck = 0,
-                           ###
-                           mp_chooser_file = NULL,
-                           host =  "hh-hdp-master-02.ebi.ac.uk",
-                           path = 'impc/statpackets',
-                           prefix = 'DRXXX_',
-                           port = '50070',
-                           user =  Sys.info()['user'],
-                           password = 'impc',
-                           level = .0001,
-                           rrlevel = .0001,
-                           transfer = TRUE
+                           mp_chooser_file = NULL
 ) {
-
-  configlist = list(
-    mp_chooser_file = mp_chooser_file,
-    host = host,
-    path = path,
-    prefix = prefix,
-    port = port,
-    user = user,
-    password = password,
-    level = level,
-    rrlevel = rrlevel,
-    transfer = transfer
-  )
 
   DRrequiredAgeing:::message0('Step 1: Clean ups and creating the global index for results')
   DRrequiredAgeing:::message0('Indexing the results ...')
@@ -5763,16 +5740,12 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
 
   system('rm -f annotation_jobs.bch', wait = TRUE)
   system('rm -f config.Rdata', wait = TRUE)
-  system('rm -f configHadoop.Rdata', wait = TRUE)
   system('rm -f logs.zip' , wait = TRUE)
   system('rm -f loader.R', wait = TRUE)
 
   system('rm -rf err', wait = TRUE)
   system('rm -rf out', wait = TRUE)
   system('rm -rf log', wait = TRUE)
-
-  DRrequiredAgeing:::message0('Writing the config file ...')
-  save(configlist,file = 'configHadoop.Rdata')
 
   if (is.null(mp_chooser_file) || !file.exists(mp_chooser_file)) {
     DRrequiredAgeing:::message0(
