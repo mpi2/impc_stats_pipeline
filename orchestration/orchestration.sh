@@ -186,3 +186,17 @@ chmod 775 minijobs.bch
 submit_limit_jobs minijobs.bch ../../../compressed_logs/minijobs_job_id.txt
 waitTillCommandFinish
 mv minijobs.bch ../../../compressed_logs
+
+find . -type f -name '*_output.log' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +
+find . -type f -name '*_error.err' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +
+message0 "Moving single indeces into a separate directory called AnnotationExtractorAndHadoopLoader..."
+mkdir AnnotationExtractorAndHadoopLoader
+chmod 775 AnnotationExtractorAndHadoopLoader
+mv *.Ind AnnotationExtractorAndHadoopLoader
+cd AnnotationExtractorAndHadoopLoader
+
+message0 "Concatenating single index files to create a global index for the results..."
+cat *.Ind >> AllResultsIndeces.txt
+message0 "Zipping the single indeces..."
+zip -rm allsingleindeces.zip *.Ind
+split -50 AllResultsIndeces.txt split_index_

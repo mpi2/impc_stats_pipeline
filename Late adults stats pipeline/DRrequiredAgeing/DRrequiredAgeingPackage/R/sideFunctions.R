@@ -5667,37 +5667,6 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            ignoreThisLineInWaitingCheck = 0,
                            mp_chooser_file = NULL
 ) {
-
-  system(command = "find . -type f -name '*_output.log' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
-  system(command = "find . -type f -name '*_error.err' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +", wait = TRUE)
-
-  DRrequiredAgeing:::message0('Moving single indeces into a separate directory called AnnotationExtractorAndHadoopLoader ...')
-  system('rm -rf AnnotationExtractorAndHadoopLoader/', wait = TRUE)
-  system('mkdir AnnotationExtractorAndHadoopLoader', wait = TRUE)
-  system('chmod 775 AnnotationExtractorAndHadoopLoader/', wait = TRUE)
-  system('mv *.Ind AnnotationExtractorAndHadoopLoader/', wait = TRUE)
-
-  setwd(file.path(SP.results, 'AnnotationExtractorAndHadoopLoader'))
-  DRrequiredAgeing:::message0('Concating single index files to create a global index for the results ...')
-  system('cat *.Ind >> AllResultsIndeces.txt', wait = TRUE)
-
-  DRrequiredAgeing:::message0('Zipping the single indeces ...')
-  system('zip -rm allsingleindeces.zip *.Ind', wait = TRUE)
-
-  system('rm -f split_index_*', wait = TRUE)
-  system('rm -f splits.zip', wait = TRUE)
-  system('split -50 AllResultsIndeces.txt split_index_', wait = TRUE)
-
-
-  system('rm -f annotation_jobs.bch', wait = TRUE)
-  system('rm -f config.Rdata', wait = TRUE)
-  system('rm -f logs.zip' , wait = TRUE)
-  system('rm -f loader.R', wait = TRUE)
-
-  system('rm -rf err', wait = TRUE)
-  system('rm -rf out', wait = TRUE)
-  system('rm -rf log', wait = TRUE)
-
   if (is.null(mp_chooser_file) || !file.exists(mp_chooser_file)) {
     DRrequiredAgeing:::message0(
       'ERROR: mp_chooser not found at location\n\t',
