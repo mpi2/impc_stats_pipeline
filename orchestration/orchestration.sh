@@ -161,3 +161,10 @@ R --quiet -e \
   package='OpenStats', \
   storepath='$(realpath RPackage_backup)' \
 )"
+
+message0 "Compress phase III log files"
+find . -type f -name '*.ClusterOut' -exec zip -m ../compressed_logs/phase3_logs.zip {} +
+message0 "Compress phase III error files"
+find . -type f -name '*.ClusterErr' -exec zip -m ../compressed_logs/phase3_errs.zip {} +
+
+message0 "This is the last step. If you see no file in the list below, the SP is successfully completed."

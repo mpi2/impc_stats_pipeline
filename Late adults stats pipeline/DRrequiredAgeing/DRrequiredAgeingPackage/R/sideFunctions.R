@@ -4518,28 +4518,6 @@ ReplaceWordInFile = function(file,
   return (invisible(file))
 }
 
-StatsPipeline = function(path = getwd(),
-                         SP.results = file.path(getwd(), 'SP'),
-                         waitUntillSee = 'impc_stats_pipeline_job',
-                         ignoreThisLineInWaitingCheck = 0,
-                         windowingPipeline = TRUE,
-                         DRversion = 'not_specified') {
-  if (dir.exists('logs')) {
-    system(command = 'rm -rf logs', wait = TRUE)
-  }
-
-  system(command = 'mkdir logs', wait = TRUE)
-
-
-  system(command = "find . -type f -name '*.ClusterOut' -exec zip -m ../compressed_logs/phase3_logs.zip {} +", wait = TRUE)
-  system(command = "find . -type f -name '*.ClusterErr' -exec zip -m ../compressed_logs/phase3_errs.zip {} +", wait = TRUE)
-
-  message0(
-    'This is the last step. If you see no file in the list below, the SP is successfully completed.'
-  )
-  setwd(file.path(SP.results, 'logs'))
-}
-
 install.packages.auto <- function(x) {
   x <- as.character(substitute(x))
   if(isTRUE(x %in% .packages(all.available=TRUE))) {
