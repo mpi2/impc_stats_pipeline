@@ -5624,33 +5624,6 @@ changeRpackageDirectory = function(path = '~/DRs/R/packages') {
   message(' => new package path set to: ', wdirc)
 }
 
-
-IMPC_HadoopLoad = function(SP.results = getwd(),
-                           waitUntillSee = 'impc_stats_pipeline_job',
-                           ignoreThisLineInWaitingCheck = 0,
-) {
-
-  DRrequiredAgeing:::submit_limit_jobs(bch_file="annotation_jobs.bch", job_id_logfile="../../../../compressed_logs/annotation_job_id.txt")
-  DRrequiredAgeing:::waitTillCommandFinish(
-    WaitIfTheOutputContains = waitUntillSee,
-    ignoreline = ignoreThisLineInWaitingCheck
-  )
-
-  DRrequiredAgeing:::message0('Check for errors in the process ...')
-  setwd(file.path(SP.results, 'AnnotationExtractorAndHadoopLoader','out'))
-  if(system(command = 'grep "exit" * -lR', wait = TRUE)==0)
-    stop ('Oh no! we found some errors in the process!')
-
-  DRrequiredAgeing:::message0('Zipping logs ...')
-  setwd(file.path(SP.results, 'AnnotationExtractorAndHadoopLoader'))
-  system('mv annotation_jobs.bch ../../../../compressed_logs', wait = TRUE)
-  system('zip -rm ../../../../compressed_logs/annotation_logs.zip log/* err/* out/*', wait = TRUE)
-  system('zip -rm splits.zip split_index_*', wait = TRUE)
-
-  DRrequiredAgeing:::message0('Job done.')
-
-}
-
 #library(quantreg)
 extractRiskyGenesFromDRs = function(newDRReportpath = '../DR19_Reports/DR19_AllSuccessful_WithQvaluesAndMPtermsdata_point_of_type_unidimensional.csv.gz',
                                     oldDRReportpath = '../DR18_Reports/DR18StatisticalResultsReportContinuous.csv.gz') {
