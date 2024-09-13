@@ -20,6 +20,11 @@ WINDOWING_PIPELINE=${7:-"true"}
 LOGFILE=${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_logs/orchestration_${VERSION}.log
 exec > >(tee -a "$LOGFILE") 2>&1
 
+echo "Starting pipeline run. Data release $VERSION. Fetching packages from $REMOTE / $BRANCH."
+echo "Data from $KOMP_PATH/$PARQUET_FOLDER." 
+echo "MP_CHOOSER in $MP_CHOOSER_FOLDER."
+echo "Windowing pipeline set to $WINDOWING_PIPELINE."
+
 # Function prints messages to logs.
 function message0() {
     echo "$(date '+%Y-%m-%d %H:%M:%S.') $1"
