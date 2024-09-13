@@ -6,6 +6,7 @@ VERSION="$1"
 REMOTE="$2"
 BRANCH="$3"
 WINDOWING_PIPELINE="$4"
+MP_CHOOSER_FILE="$5"
 
 # Function prints messages to logs.
 function message0() {
@@ -200,3 +201,8 @@ cat *.Ind >> AllResultsIndeces.txt
 message0 "Zipping the single indeces..."
 zip -rm allsingleindeces.zip *.Ind
 split -50 AllResultsIndeces.txt split_index_
+
+if [[ -z "${MP_CHOOSER_FILE}" || ! -f "${MP_CHOOSER_FILE}" ]]; then
+    echo -e "ERROR: mp_chooser not found at location\n\t${MP_CHOOSER_FILE}"
+    exit 1
+fi

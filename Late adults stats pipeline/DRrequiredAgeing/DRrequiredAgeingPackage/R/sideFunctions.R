@@ -5665,15 +5665,7 @@ changeRpackageDirectory = function(path = '~/DRs/R/packages') {
 IMPC_HadoopLoad = function(SP.results = getwd(),
                            waitUntillSee = 'impc_stats_pipeline_job',
                            ignoreThisLineInWaitingCheck = 0,
-                           mp_chooser_file = NULL
 ) {
-  if (is.null(mp_chooser_file) || !file.exists(mp_chooser_file)) {
-    DRrequiredAgeing:::message0(
-      'ERROR: mp_chooser not found at location\n\t',
-      mp_chooser_file
-    )
-    quit()
-  }
 
   DRrequiredAgeing:::annotationIndexCreator(
     path = getwd(),
