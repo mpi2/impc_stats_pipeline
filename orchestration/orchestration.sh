@@ -176,8 +176,7 @@ message0 "Starting the IMPC annotation pipeline..."
 cd jobs/Results_IMPC_SP_Windowed/
 message0 "Step 1: Clean ups and creating the global index for the results."
 message0 "Indexing the results..."
-dirs=$(find . -mindepth 2 -maxdepth 2 -type d)
-for dir in $dirs; do
+for dir in $(find . -mindepth 2 -maxdepth 2 -type d); do
   base_dir=$(basename "$dir")
   output_file="FileIndex_${base_dir}_$(printf "%.6f" $(echo $RANDOM/32767 | bc -l)).Ind"
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 \
@@ -206,3 +205,9 @@ if [[ -z "${MP_CHOOSER_FILE}" || ! -f "${MP_CHOOSER_FILE}" ]]; then
     echo -e "ERROR: mp_chooser not found at location\n\t${MP_CHOOSER_FILE}"
     exit 1
 fi
+
+mkdir err log out
+for file in $(find . -maxdepth 1 -type f -name "split_index*"); do
+  echo "sbatch --job-name=impc_stats_pipeline_job --mem=5G --time=2-00 \
+  -e err/$(basename "$file").err -o out/$(basename "$file").out --wrap='Rscript loader.R $(basename "$file")'" >> annotation_jobs.bch
+done

@@ -5598,43 +5598,6 @@ StratifiedMPTerms = function(object, name = 'MPTERM') {
   }
   return(r)
 }
-
-annotationIndexCreator = function(path = getwd(),
-                                  pattern = 'split_index',
-                                  mem = "12G",
-                                  time = "2-00",
-                                  outputfile = 'annotation_jobs.bch') {
-  lf = list.files(
-    path = path,
-    pattern = pattern,
-    full.names = TRUE,
-    recursive = FALSE,
-    include.dirs = FALSE
-  )
-
-  if (!dir.exists(file.path(path, 'err')))
-    dir.create(file.path(path, 'err'), recursive = TRUE)
-
-  if (!dir.exists(file.path(path, 'out')))
-    dir.create(file.path(path, 'out'), recursive = TRUE)
-
-  if (!dir.exists(file.path(path, 'log')))
-    dir.create(file.path(path, 'log'), recursive = TRUE)
-
-  err = paste0(' -e ', dirname(lf), '/err/', basename(lf))
-  out = paste0(' -o ', dirname(lf), '/out/', basename(lf))
-  batch = paste0("sbatch --job-name=impc_stats_pipeline_job --mem=", mem,
-                 " --time=", time,
-                 ' ',
-                 err,
-                 out,
-                 " --wrap='Rscript loader.R ",
-                 '"',
-                 basename(lf),
-                 '"',
-                 "'")
-  write(batch, outputfile)
-}
 ##########################################
 ############## End of annotation pipeline
 ##########################################
@@ -5666,14 +5629,6 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            waitUntillSee = 'impc_stats_pipeline_job',
                            ignoreThisLineInWaitingCheck = 0,
 ) {
-
-  DRrequiredAgeing:::annotationIndexCreator(
-    path = getwd(),
-    pattern = 'split_index',
-    mem = "5G",
-    time = "2-00",
-    outputfile = 'annotation_jobs.bch'
-  )
   system('chmod 775 annotation_jobs.bch', wait = TRUE)
 
   DRrequiredAgeing:::message0('Downloading the action script ...')
