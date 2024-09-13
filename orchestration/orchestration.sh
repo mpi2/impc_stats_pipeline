@@ -1,12 +1,20 @@
 #!/bin/bash
 set -e
 
+# Check if the correct number of arguments are provided
+if [ "$#" -ne 6 ] && [ "$#" -ne 7 ]; then
+    echo "Usage: $0 <VERSION> <REMOTE>"
+    exit 1
+fi
+
 # Assign arguments to variables.
 VERSION="$1"
 REMOTE="$2"
 BRANCH="$3"
-WINDOWING_PIPELINE="$4"
-MP_CHOOSER_FILE="$5"
+KOMP_PATH="$4"
+PARQUET_FOLDER="$5"
+MP_CHOOSER_FOLDER="$6"
+WINDOWING_PIPELINE=${7:-"true"}
 
 # Function prints messages to logs.
 function message0() {
@@ -32,7 +40,7 @@ function fetch_script() {
 }
 
 # Function to submit limited number of jobs.
-submit_limit_jobs() {
+function submit_limit_jobs() {
     local bch_file=$1
     local job_id_logfile=$2
     local max_jobs=${3:-800}
@@ -55,6 +63,18 @@ submit_limit_jobs() {
 
     echo "End submit_limit_jobs"
 }
+
+# Preparation
+mkdir --mode=775 ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
+cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
+cp ${PARQUET_FOLDER}/*.parquet ./
+cp ${MP_CHOOSER_FOLDER}/part*.txt ./mp_chooser.json
+
+message0 "Update packages to the latest version"
+fetch_script UpdatePackagesFromGithub.R
+Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH} FALSE
+rm UpdatePackagesFromGithub.R
+message0 "Update completed"
 
 # Statistical pipeline.
 message0 "Starting the IMPC statistical pipeline..."
@@ -201,6 +221,10 @@ cat *.Ind >> AllResultsIndeces.txt
 message0 "Zipping the single indeces..."
 zip -rm allsingleindeces.zip *.Ind
 split -50 AllResultsIndeces.txt split_index_
+
+message0 "Convert the mp_chooser JSON file to Rdata..."
+R --quiet -e "a = jsonlite::fromJSON('mp_chooser.json');save(a,file='mp_chooser.json.Rdata')"
+export MP_CHOOSER_FILE=$(echo -n '"'; realpath mp_chooser.json.Rdata | tr -d '\n'; echo -n '"')
 
 if [[ -z "${MP_CHOOSER_FILE}" || ! -f "${MP_CHOOSER_FILE}" ]]; then
     echo -e "ERROR: mp_chooser not found at location\n\t${MP_CHOOSER_FILE}"
