@@ -16,6 +16,10 @@ PARQUET_FOLDER="$5"
 MP_CHOOSER_FOLDER="$6"
 WINDOWING_PIPELINE=${7:-"true"}
 
+# Redirect all output and errors to the log file
+LOGFILE=${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_logs/orchestration_${VERSION}.log
+exec > >(tee -a "$LOGFILE") 2>&1
+
 # Function prints messages to logs.
 function message0() {
     echo "$(date '+%Y-%m-%d %H:%M:%S.') $1"
@@ -64,7 +68,7 @@ function submit_limit_jobs() {
     echo "End submit_limit_jobs"
 }
 
-# Preparation
+# Preparation.
 mkdir --mode=775 ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
 cp ${PARQUET_FOLDER}/*.parquet ./
