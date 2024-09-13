@@ -27,7 +27,8 @@ function waitTillCommandFinish() {
 # Function to fetch a specific R script.
 function fetch_script() {
     file_name=$(basename $1)
-    wget -O ${file_name} --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline/$1"
+    folder_path=${2:-"Late%20adults%20stats%20pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/inst/extdata/StatsPipeline"}
+    wget -O ${file_name} --quiet "https://github.com/${REMOTE}/impc_stats_pipeline/raw/${BRANCH}/${folder_path}/$1"
 }
 
 # Function to submit limited number of jobs.
@@ -211,3 +212,7 @@ for file in $(find . -maxdepth 1 -type f -name "split_index*"); do
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=5G --time=2-00 \
   -e err/$(basename "$file").err -o out/$(basename "$file").out --wrap='Rscript loader.R $(basename "$file")'" >> annotation_jobs.bch
 done
+chmod 775 annotation_jobs.bch
+
+message0 "Downloading the action script..."
+fetch_script loaderHadoop.R IMPC%20annotation%20pipeline

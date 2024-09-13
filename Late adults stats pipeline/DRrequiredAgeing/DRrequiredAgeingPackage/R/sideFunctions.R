@@ -5629,13 +5629,6 @@ IMPC_HadoopLoad = function(SP.results = getwd(),
                            waitUntillSee = 'impc_stats_pipeline_job',
                            ignoreThisLineInWaitingCheck = 0,
 ) {
-  system('chmod 775 annotation_jobs.bch', wait = TRUE)
-
-  DRrequiredAgeing:::message0('Downloading the action script ...')
-  system(
-    'wget -O loader.R https://raw.githubusercontent.com/mpi2/impc_stats_pipeline/dev/IMPC%20annotation%20pipeline/loaderHadoop.R',
-    wait = TRUE
-  )
 
   DRrequiredAgeing:::submit_limit_jobs(bch_file="annotation_jobs.bch", job_id_logfile="../../../../compressed_logs/annotation_job_id.txt")
   DRrequiredAgeing:::waitTillCommandFinish(
