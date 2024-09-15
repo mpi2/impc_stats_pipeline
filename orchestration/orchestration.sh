@@ -21,7 +21,7 @@ LOGFILE=${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_logs/orch
 exec > >(tee -a "$LOGFILE") 2>&1
 
 echo "Starting pipeline run. Data release $VERSION. Fetching packages from $REMOTE / $BRANCH."
-echo "Data from $KOMP_PATH/$PARQUET_FOLDER." 
+echo "Data from $PARQUET_FOLDER." 
 echo "MP_CHOOSER in $MP_CHOOSER_FOLDER."
 echo "Windowing pipeline set to $WINDOWING_PIPELINE."
 
@@ -232,8 +232,8 @@ zip -rm allsingleindeces.zip *.Ind
 split -50 AllResultsIndeces.txt split_index_
 
 message0 "Convert the mp_chooser JSON file to Rdata..."
-R --quiet -e "a = jsonlite::fromJSON('../../../../mp_chooser.json');save(a,file='../../../../mp_chooser.json')"
-export MP_CHOOSER_FILE=$(echo -n '"'; realpath ../../../../mp_chooser.json | tr -d '\n'; echo -n '"')
+R --quiet -e "a = jsonlite::fromJSON('../../../../mp_chooser.json');save(a,file='../../../../mp_chooser.json.Rdata')"
+export MP_CHOOSER_FILE=$(echo -n '"'; realpath ../../../../mp_chooser.json.Rdata | tr -d '\n'; echo -n '"')
 
 if [[ -z "${MP_CHOOSER_FILE}" || ! -f "${MP_CHOOSER_FILE}" ]]; then
     echo -e "ERROR: mp_chooser not found at location\n\t${MP_CHOOSER_FILE}"
