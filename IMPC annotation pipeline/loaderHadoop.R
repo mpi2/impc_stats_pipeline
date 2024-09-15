@@ -1,32 +1,27 @@
-orgfile = commandArgs(trailingOnly = TRUE)
-file = orgfile
-library('data.table')
-########################### Annotation pipeline #################################
-##############################
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 2) {
+  stop("Two arguments are required: the file path and the mp_chooser_file.")
+}
+file <- args[1]
+mp_chooser_file <- args[2]
+
+# Load necessary libraries
 library(data.table)
 library(jsonlite)
 library(rlist)
 library(Tmisc)
 library(rwebhdfs)
-###########################################
-load('configHadoop.Rdata')
-mp_chooser_file = configlist$mp_chooser_file
-host =  configlist$host
-path = configlist$path
-prefix = configlist$prefix
-port = configlist$port
-user = configlist$user
-password = configlist$password
-level = configlist$level
-rrlevel = configlist$rrlevel
-transfer = configlist$transfer
-###########################################
-today = format(Sys.time(), '%d%m%Y')
-flist = readLines(con = file[1])
-lflist = length(flist)
 
+# Set levels
+level <- .0001
+rrlevel <- .0001
 
-# store StatPackets temporary
+# Start annotation pipeline
+today <- format(Sys.time(), "%d%m%Y")
+flist <- readLines(con = file)
+lflist <- length(flist)
+
+# Store StatPackets temporary
 if (!dir.exists("tmp")) {
   dir.create("tmp")
 }
@@ -80,39 +75,4 @@ for (i in 1:lflist) {
 
 # statpackets need to be stored as characters
 # statpackets_out = as.character(statpackets_out)
-
-if (transfer) {
-  # Prepare and transfer files to hadoop
-  hadoopPath = file.path(path,
-                         prefix,
-                         today,
-                         paste0(basename(orgfile[1]), '_.statpackets'))
-
-  hdfs <-
-    webhdfs(
-      namenode_host = host,
-      namenode_port = port,
-      hdfs_username =  user
-    )
-  rwebhdfs::mkdir(hdfs, dirname(hadoopPath))
-
-  transfered = rwebhdfs::write_file(
-    fs = hdfs,
-    targetPath = hadoopPath,
-    srcPath = tmplocalfile,
-    sizeWarn = 10 ^ 16,
-    append = FALSE,
-    overwrite = TRUE
-  )
-  gc()
-  if (transfered) {
-    message('Transfer successful.')
-    message('Compressing the temp statpacket file.')
-    system(command = paste0('gzip ', tmplocalfile),
-           wait = TRUE)
-    message('Done!')
-  }  else{
-    stop('Transfered not successful!')
-  }
-}
 gc()

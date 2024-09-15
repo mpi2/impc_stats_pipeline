@@ -243,7 +243,7 @@ fi
 mkdir err log out
 for file in $(find . -maxdepth 1 -type f -name "split_index*"); do
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=5G --time=2-00 \
-  -e err/$(basename "$file").err -o out/$(basename "$file").out --wrap='Rscript loader.R $(basename "$file")'" >> annotation_jobs.bch
+  -e err/$(basename "$file").err -o out/$(basename "$file").out --wrap='Rscript loader.R $(basename "$file") ${MP_CHOOSER_FILE}'" >> annotation_jobs.bch
 done
 chmod 775 annotation_jobs.bch
 
