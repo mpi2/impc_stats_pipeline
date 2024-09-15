@@ -233,7 +233,7 @@ split -50 AllResultsIndeces.txt split_index_
 
 message0 "Convert the mp_chooser JSON file to Rdata..."
 R --quiet -e "a = jsonlite::fromJSON('../../../../mp_chooser.json');save(a,file='../../../../mp_chooser.json.Rdata')"
-export MP_CHOOSER_FILE=$(echo -n '"'; realpath ../../../../mp_chooser.json.Rdata | tr -d '\n'; echo -n '"')
+export MP_CHOOSER_FILE=$(realpath ../../../../mp_chooser.json.Rdata | tr -d '\n')
 
 if [[ -z "${MP_CHOOSER_FILE}" || ! -f "${MP_CHOOSER_FILE}" ]]; then
     echo -e "ERROR: mp_chooser not found at location\n\t${MP_CHOOSER_FILE}"
