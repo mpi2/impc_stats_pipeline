@@ -98,7 +98,6 @@ mainAgeing = function(file = NULL                                    ,
   # Config files
   message0('Loading configuration ...')
   methodmap                      = readConf('MethodMap.conf')
-  equationmap                    = readConf('EquationMap.conf')
   CategoryMap                    = readConf('CategoryMap.conf')
   MergeCategoryParameters        = read.csv(file = file.path(local(), 'MergeParameterList.txt'))
   initial                        = readConf('Initialize.conf')
@@ -802,8 +801,7 @@ mainAgeing = function(file = NULL                                    ,
                                 data = a@datasetPL
                               ) <= .2 &&
                               EnoughWeightForTheSexGenInteraction(a@datasetPL)         ,
-                            getEquation(var = parameter,
-                                        equationMap = equationmap),
+                            'withWeight',
                             'withoutWeight'
                           )
                         } else{
