@@ -98,7 +98,6 @@ mainAgeing = function(file = NULL                                    ,
   # Config files
   message0('Loading configuration ...')
   methodmap                      = readConf('MethodMap.conf')
-  equationmap                    = readConf('EquationMap.conf')
   CategoryMap                    = readConf('CategoryMap.conf')
   MergeCategoryParameters        = read.csv(file = file.path(local(), 'MergeParameterList.txt'))
   initial                        = readConf('Initialize.conf')
@@ -672,31 +671,6 @@ mainAgeing = function(file = NULL                                    ,
                       )
                       ###
                       n3.5.2[, depVar] = MergLev$x
-                      ################## Only for Gross Morphology group
-                      # n3.5.2_summary = SummaryStatisticsOriginal(x      = n3.5.2,
-                      #                                          depVar = depVar,
-                      #                                          label  = 'GEL data summary statistics')
-                      # write(
-                      #   paste(
-                      #     c(
-                      #       procedure,
-                      #       parameter,
-                      #       center,
-                      #       strain,
-                      #       zyg,
-                      #       meta,
-                      #       colony,
-                      #       FlatteningTheSummary(n3.5.2_summary, 'GEL data summary statistics')
-                      #     ),
-                      #     sep = '\t',
-                      #     collapse = '\t'
-                      #   ),
-                      #   file = 'summaryStats.tsv',
-                      #   append = TRUE,
-                      #   ncolumns = 10 ^ 4
-                      # )
-                      # return(NULL)
-                      ##################################
                       n3.5.2           = droplevels0(n3.5.2[!is.na(n3.5.2[, depVar]), ])
                       n3.5.2OnlyKO     = subset(n3.5.2,
                                                 n3.5.2$biological_sample_group %in% 'experimental')
@@ -827,8 +801,7 @@ mainAgeing = function(file = NULL                                    ,
                                 data = a@datasetPL
                               ) <= .2 &&
                               EnoughWeightForTheSexGenInteraction(a@datasetPL)         ,
-                            getEquation(var = parameter,
-                                        equationMap = equationmap),
+                            'withWeight',
                             'withoutWeight'
                           )
                         } else{
