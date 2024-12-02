@@ -26,7 +26,7 @@ if (!dir.exists("tmp")) {
   dir.create("tmp")
 }
 
-tmplocalfile    =  file.path('tmp', paste0(basename(orgfile[1]), '_.statpackets'))
+tmplocalfile <- file.path('tmp', paste0(basename(file), '_.statpackets'))
 
 
 statpackets_out = NULL
