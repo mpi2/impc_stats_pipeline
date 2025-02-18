@@ -80,9 +80,9 @@ cp ${PARQUET_FOLDER}/*.parquet ./
 cp ${MP_CHOOSER_FOLDER}/part*.txt ./mp_chooser.json
 
 message0 "Update packages to the latest version"
-#fetch_script UpdatePackagesFromGithub.R
-#Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH} FALSE
-#rm UpdatePackagesFromGithub.R
+fetch_script UpdatePackagesFromGithub.R
+Rscript UpdatePackagesFromGithub.R ${REMOTE} ${BRANCH} FALSE
+rm UpdatePackagesFromGithub.R
 message0 "Update completed"
 
 # Statistical pipeline.
@@ -152,13 +152,13 @@ find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch
 message0 "Phase III. Initialising the statistical analysis..."
 cd jobs
 message0 "Updating the dynamic contents from the IMPReSS..."
-#R --quiet -e \
-#"DRrequiredAgeing:::updateImpress( \
-#  updateImpressFileInThePackage = TRUE, \
-#  updateOptionalParametersList = TRUE, \
-#  updateTheSkipList = TRUE, \
-#  saveRdata = FALSE \
-#)"
+R --quiet -e \
+"DRrequiredAgeing:::updateImpress( \
+ updateImpressFileInThePackage = TRUE, \
+ updateOptionalParametersList = TRUE, \
+ updateTheSkipList = TRUE, \
+ saveRdata = FALSE \
+)"
 
 message0 "Running the IMPC statistical pipeline by submitting jobs..."
 if [ "${WINDOWING_PIPELINE}" = true ]; then
