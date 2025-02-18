@@ -195,9 +195,9 @@ R --quiet -e \
 )"
 
 message0 "Compress phase III log files"
-find . -type f -name '*.ClusterOut' -exec zip -m ../compressed_logs/phase3_logs.zip {} +
+find . -type f -name '*.ClusterOut' -exec zip -q -m ../compressed_logs/phase3_logs.zip {} +
 message0 "Compress phase III error files"
-find . -type f -name '*.ClusterErr' -exec zip -m ../compressed_logs/phase3_errs.zip {} +
+find . -type f -name '*.ClusterErr' -exec zip -q -m ../compressed_logs/phase3_errs.zip {} +
 
 message0 "This is the last step. If you see no file in the list below, the SP is successfully completed."
 
@@ -217,8 +217,8 @@ submit_limit_jobs minijobs.bch ../../../compressed_logs/minijobs_job_id.txt
 waitTillCommandFinish
 mv minijobs.bch ../../../compressed_logs
 
-find . -type f -name '*_output.log' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +
-find . -type f -name '*_error.err' -exec zip -m ../../../compressed_logs/minijobs_logs.zip {} +
+find . -type f -name '*_output.log' -exec zip -q -m ../../../compressed_logs/minijobs_logs.zip {} +
+find . -type f -name '*_error.err' -exec zip -q -m ../../../compressed_logs/minijobs_logs.zip {} +
 message0 "Moving single indeces into a separate directory called AnnotationExtractorAndHadoopLoader..."
 mkdir AnnotationExtractorAndHadoopLoader
 chmod 775 AnnotationExtractorAndHadoopLoader
@@ -228,7 +228,7 @@ cd AnnotationExtractorAndHadoopLoader
 message0 "Concatenating single index files to create a global index for the results..."
 cat *.Ind >> AllResultsIndeces.txt
 message0 "Zipping the single indeces..."
-zip -rm allsingleindeces.zip *.Ind
+zip -q -rm allsingleindeces.zip *.Ind
 split -50 AllResultsIndeces.txt split_index_
 
 message0 "Convert the mp_chooser JSON file to Rdata..."
@@ -254,6 +254,6 @@ waitTillCommandFinish
 
 message0 "Zipping logs..."
 mv annotation_jobs.bch ../../../../compressed_logs
-zip -rm ../../../../compressed_logs/annotation_logs.zip log/* err/* out/*
-zip -rm splits.zip split_index_*
+zip -q -rm ../../../../compressed_logs/annotation_logs.zip log/* err/* out/*
+zip -q -rm splits.zip split_index_*
 message0 "Job done."
