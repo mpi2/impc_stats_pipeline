@@ -16,7 +16,7 @@ PARQUET_FOLDER="$5"
 MP_CHOOSER_FOLDER="$6"
 WINDOWING_PIPELINE=${7:-"true"}
 
-# Redirect all output and errors to the log file
+# Redirect all output and errors to the log file.
 LOGFILE=${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_logs/orchestration_${VERSION}.log
 exec > >(tee -a "$LOGFILE") 2>&1
 
