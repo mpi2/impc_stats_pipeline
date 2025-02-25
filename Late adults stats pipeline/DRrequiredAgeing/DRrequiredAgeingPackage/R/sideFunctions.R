@@ -4833,7 +4833,7 @@ GenotypeTag = function(obj,
       return(NULL)
     #### Make the list as sequence of names attached with dot (.)
     AllCombinations1 = unlist(AllCombinations)
-    ####
+    # Remove unrealistic combinations.
     AllCombinations1 = AllCombinations1[!(grepl(
       pattern = 'Low.',
       x = names(AllCombinations1),
