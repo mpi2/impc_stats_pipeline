@@ -68,5 +68,3 @@ for (i in 1:lflist) {
           append = TRUE)
   }
 }
-
-gc()
