@@ -1,8 +1,9 @@
 import argparse
-import pandas as pd
+from pathlib import Path
+
 from rpy2.robjects import r, pandas2ri
 from rpy2.robjects.packages import importr
-from pathlib import Path
+
 
 # Activate pandas conversion.
 pandas2ri.activate()
@@ -17,9 +18,9 @@ def main():
     mp_chooser_file = args.mp_chooser_file
 
     # Load necessary R libraries.
-    base = importr('base')
-    jsonlite = importr('jsonlite')
-    utils = importr('utils')
+    importr('base')
+    importr('jsonlite')
+    importr('utils')
     data_table = importr('data.table')
     
     r['load'](mp_chooser_file)
