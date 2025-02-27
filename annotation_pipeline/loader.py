@@ -9,7 +9,7 @@ from rpy2.robjects.packages import importr
 pandas2ri.activate()
 
 def main():
-    parser = argparse.ArgumentParser(description="Process files and annotate them using R's annotationChooser.")
+    parser = argparse.ArgumentParser(description="Process files and using annotationChooser.")
     parser.add_argument("file", help="Path to the file containing the list of files to process.")
     parser.add_argument("mp_chooser_file", help="Path to the mp_chooser.json.Rdata file.")
     args = parser.parse_args()
@@ -22,7 +22,7 @@ def main():
     importr("jsonlite")
     importr("utils")
     data_table = importr("data.table")
-    
+
     r["load"](mp_chooser_file)
 
     with open(file_list_path, "r") as f:
@@ -35,7 +35,7 @@ def main():
         tmp_dir.mkdir()
 
     tmplocalfile = tmp_dir / (file_list_path.name + "_.statpackets")
-    
+
     for i, file in enumerate(file_list):
         print(f"\r{i+1}/{total_files}", end="")
         print(f"\n{i+1}/{total_files} ~> {file}")
@@ -49,25 +49,25 @@ def main():
                     quote="",
                     stringsAsFactors=False
               )
-              
+
                 # Convert R's ncol and nrow to Python integers
                 num_cols = int(r["ncol"](df)[0])
                 num_rows = int(r["nrow"](df)[0])
-              
+
                 if num_cols != 20 or num_rows > 1:
                     print(f"file ignored (!=20 columns): {file}")
                     continue
-                  
+
                 # Call R's annotationChooser
                 DRrequiredAgeing = importr("DRrequiredAgeing")
-              
+
                 rN = DRrequiredAgeing.annotationChooser(
                     statpacket=df,
                     level=0.0001,
                     rrlevel=0.0001,
                     mp_chooser_file=mp_chooser_file
                 )
-              
+
                 rW = DRrequiredAgeing.annotationChooser(
                     statpacket=rN.rx2("statpacket"),
                     level=0.0001,
@@ -76,9 +76,9 @@ def main():
                     TermKey="WMPTERM",
                     mp_chooser_file=mp_chooser_file
                 )
-              
+
                 statpacket_v20_values = rW.rx2("statpacket").rx2("V20")
-              
+
                 with open(tmplocalfile, "a") as outfile:
                     outfile.write("".join(r["as.character"](statpacket_v20_values)) + "\n")
 
