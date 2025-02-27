@@ -1,5 +1,6 @@
 """Run annotationChooser on a list of files."""
 import argparse
+import logging
 from pathlib import Path
 
 from rpy2.robjects import r, pandas2ri
@@ -8,6 +9,9 @@ from rpy2.robjects.packages import importr
 
 # Activate pandas conversion.
 pandas2ri.activate()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def main():
     """Process statpackets using annotationChooser."""
@@ -22,6 +26,11 @@ def main():
     )
     args = parser.parse_args()
 
+    # Log the arguments
+    logging.info("Starting loader.R with arguments:")
+    logging.info(f"  file: %s", args.file)
+    logging.info(f"  mp_chooser_file: %s", args.mp_chooser_file)
+    
     file_list_path = Path(args.file)
     mp_chooser_file = args.mp_chooser_file
 
@@ -45,8 +54,6 @@ def main():
     output_file = output_dir / (file_list_path.name + "_.statpackets")
 
     for i, file in enumerate(file_list):
-        print(f"\r{i+1}/{total_files}", end="")
-        print(f"\n{i+1}/{total_files} ~> {file}")
         file_path = Path(file)
         if file_path.exists() and (
             "NotProcessed" in file or "Successful" in file
@@ -65,7 +72,7 @@ def main():
                 num_rows = int(r["nrow"](df)[0])
 
                 if num_cols != 20 or num_rows > 1:
-                    print(f"file ignored (!=20 columns): {file}")
+                    logging.error("Invalid file format !=20 columns or >1 rows: %s", file)
                     continue
 
                 # Call R's annotationChooser.
@@ -93,9 +100,10 @@ def main():
                     outfile.write(
                         "".join(r["as.character"](statpacket_v20_values)) + "\n"
                     )
+                logging.info("File processed successfully %s out of %s: %s", i+1, total_files, file)
 
             except Exception as e:
-                print(f"Error processing file {file}: {e}")
+                logging.error(f"Error processing {file}:\n%s", e)
 
 if __name__ == "__main__":
     main()
