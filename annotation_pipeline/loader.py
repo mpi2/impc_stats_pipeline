@@ -1,8 +1,8 @@
 import argparse
-import os
 import pandas as pd
 from rpy2.robjects import r, pandas2ri
 from rpy2.robjects.packages import importr
+from pathlib import Path
 
 # Activate pandas conversion
 pandas2ri.activate()
@@ -13,7 +13,7 @@ def main():
     parser.add_argument("mp_chooser_file", help="Path to the mp_chooser.json.Rdata file.")
     args = parser.parse_args()
 
-    file_list_path = args.file
+    file_list_path = Path(args.file)
     mp_chooser_file = args.mp_chooser_file
 
     # Load necessary R libraries
@@ -38,18 +38,20 @@ def main():
     lflist = len(file_list)
 
     # Store StatPackets temporary
-    if not os.path.exists("tmp"):
-        os.makedirs("tmp")
+    tmp_dir = Path("tmp")
+    if not tmp_dir.exists():
+        tmp_dir.mkdir()
 
-    tmplocalfile = os.path.join('tmp', os.path.basename(file_list_path) + '_.statpackets')
+    tmplocalfile = tmp_dir / (file_list_path.name + '_.statpackets')
     
     for i, file in enumerate(file_list):
         print(f"\r{i+1}/{lflist}", end="")
         print(f"\n{i+1}/{lflist} ~> {file}")
-        if os.path.exists(file) and ( 'NotProcessed' in file or 'Successful' in file):
+        file_path = Path(file)
+        if file_path.exists() and ( 'NotProcessed' in file or 'Successful' in file):
             try:
               df = data_table.fread(
-                  file=file,
+                  file=str(file_path),
                   header=False,
                   sep='\t',
                   quote="",
