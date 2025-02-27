@@ -28,8 +28,8 @@ def main():
 
     # Log the arguments
     logging.info("Starting loader.R with arguments:")
-    logging.info(f"  file: %s", args.file)
-    logging.info(f"  mp_chooser_file: %s", args.mp_chooser_file)
+    logging.info("  file: %s", args.file)
+    logging.info("  mp_chooser_file: %s", args.mp_chooser_file)
     
     file_list_path = Path(args.file)
     mp_chooser_file = args.mp_chooser_file
@@ -65,7 +65,7 @@ def main():
                     sep="\t",
                     quote="",
                     stringsAsFactors=False
-              )
+                )
 
                 # Convert R's ncol and nrow to Python integers.
                 num_cols = int(r["ncol"](df)[0])
