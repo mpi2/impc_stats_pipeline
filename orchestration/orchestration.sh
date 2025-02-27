@@ -248,7 +248,7 @@ done
 chmod 775 annotation_jobs.bch
 
 message0 "Downloading the action script..."
-fetch_script loader.R IMPC%20annotation%20pipeline
+fetch_script loader.R annotation_pipeline
 submit_limit_jobs annotation_jobs.bch ../../../../compressed_logs/annotation_job_id.txt
 waitTillCommandFinish
 
