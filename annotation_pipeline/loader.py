@@ -4,7 +4,7 @@ from rpy2.robjects import r, pandas2ri
 from rpy2.robjects.packages import importr
 from pathlib import Path
 
-# Activate pandas conversion
+# Activate pandas conversion.
 pandas2ri.activate()
 
 def main():
@@ -16,28 +16,19 @@ def main():
     file_list_path = Path(args.file)
     mp_chooser_file = args.mp_chooser_file
 
-    # Load necessary R libraries
+    # Load necessary R libraries.
     base = importr('base')
     jsonlite = importr('jsonlite')
     utils = importr('utils')
     data_table = importr('data.table')
     
     r['load'](mp_chooser_file)
-    a = r['a']
-
-    # Set levels
-    level = 0.0001
-    rrlevel = 0.0001
-
-    # Start annotation pipeline
-        # today = r['format'](r['Sys.time'](), "%d%m%Y")
-        # today_str = r['as.character'](today)[0] # Convert R character vector to python string.
 
     with open(file_list_path, 'r') as f:
         file_list = [line.strip() for line in f]
     lflist = len(file_list)
 
-    # Store StatPackets temporary
+    # Store StatPackets temporary.
     tmp_dir = Path("tmp")
     if not tmp_dir.exists():
         tmp_dir.mkdir()
@@ -67,15 +58,15 @@ def main():
               
               rN = DRrequiredAgeing.annotationChooser(
                   statpacket=df,
-                  level=level,
-                  rrlevel=rrlevel,
+                  level=0.0001,
+                  rrlevel=0.0001,
                   mp_chooser_file=mp_chooser_file
               )
               
               rW = DRrequiredAgeing.annotationChooser(
                   statpacket=rN.rx2('statpacket'),
-                  level=level,
-                  rrlevel=rrlevel,
+                  level=0.0001,
+                  rrlevel=0.0001,
                   resultKey='Windowed result',
                   TermKey='WMPTERM',
                   mp_chooser_file=mp_chooser_file
