@@ -49,9 +49,13 @@ def main():
                   stringsAsFactors=False
               )
               
-            #   if r['ncol'](df) != 20 or r['nrow'](df) > 1:
-            #       print(f'file ignored (!=20 columns): {file}')
-            #       continue
+              # Convert R's ncol and nrow to Python integers
+              num_cols = int(r['ncol'](df)[0])
+              num_rows = int(r['nrow'](df)[0])
+              
+              if num_cols != 20 or num_rows > 1:
+                  print(f'file ignored (!=20 columns): {file}')
+                  continue
                   
               # Call R's annotationChooser
               DRrequiredAgeing = importr('DRrequiredAgeing')
