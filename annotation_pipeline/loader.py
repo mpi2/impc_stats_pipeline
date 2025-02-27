@@ -18,14 +18,14 @@ def main():
     mp_chooser_file = args.mp_chooser_file
 
     # Load necessary R libraries.
-    importr('base')
-    importr('jsonlite')
-    importr('utils')
-    data_table = importr('data.table')
+    importr("base")
+    importr("jsonlite")
+    importr("utils")
+    data_table = importr("data.table")
     
-    r['load'](mp_chooser_file)
+    r["load"](mp_chooser_file)
 
-    with open(file_list_path, 'r') as f:
+    with open(file_list_path, "r") as f:
         file_list = [line.strip() for line in f]
     total_files = len(file_list)
 
@@ -34,32 +34,32 @@ def main():
     if not tmp_dir.exists():
         tmp_dir.mkdir()
 
-    tmplocalfile = tmp_dir / (file_list_path.name + '_.statpackets')
+    tmplocalfile = tmp_dir / (file_list_path.name + "_.statpackets")
     
     for i, file in enumerate(file_list):
         print(f"\r{i+1}/{total_files}", end="")
         print(f"\n{i+1}/{total_files} ~> {file}")
         file_path = Path(file)
-        if file_path.exists() and ( 'NotProcessed' in file or 'Successful' in file):
+        if file_path.exists() and ( "NotProcessed" in file or "Successful" in file):
             try:
               df = data_table.fread(
                   file=str(file_path),
                   header=False,
-                  sep='\t',
+                  sep="\t",
                   quote="",
                   stringsAsFactors=False
               )
               
               # Convert R's ncol and nrow to Python integers
-              num_cols = int(r['ncol'](df)[0])
-              num_rows = int(r['nrow'](df)[0])
+              num_cols = int(r["ncol"](df)[0])
+              num_rows = int(r["nrow"](df)[0])
               
               if num_cols != 20 or num_rows > 1:
-                  print(f'file ignored (!=20 columns): {file}')
+                  print(f"file ignored (!=20 columns): {file}")
                   continue
                   
               # Call R's annotationChooser
-              DRrequiredAgeing = importr('DRrequiredAgeing')
+              DRrequiredAgeing = importr("DRrequiredAgeing")
               
               rN = DRrequiredAgeing.annotationChooser(
                   statpacket=df,
@@ -69,18 +69,18 @@ def main():
               )
               
               rW = DRrequiredAgeing.annotationChooser(
-                  statpacket=rN.rx2('statpacket'),
+                  statpacket=rN.rx2("statpacket"),
                   level=0.0001,
                   rrlevel=0.0001,
-                  resultKey='Windowed result',
-                  TermKey='WMPTERM',
+                  resultKey="Windowed result",
+                  TermKey="WMPTERM",
                   mp_chooser_file=mp_chooser_file
               )
               
-              statpacket_v20_values = rW.rx2('statpacket').rx2('V20')
+              statpacket_v20_values = rW.rx2("statpacket").rx2("V20")
               
-              with open(tmplocalfile, 'a') as outfile:
-                  outfile.write("".join(r['as.character'](statpacket_v20_values)) + "\n")
+              with open(tmplocalfile, "a") as outfile:
+                  outfile.write("".join(r["as.character"](statpacket_v20_values)) + "\n")
 
             except Exception as e:
               print(f"Error processing file {file}: {e}")
