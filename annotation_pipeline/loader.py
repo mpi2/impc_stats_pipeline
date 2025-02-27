@@ -26,7 +26,7 @@ def main():
 
     with open(file_list_path, 'r') as f:
         file_list = [line.strip() for line in f]
-    lflist = len(file_list)
+    total_files = len(file_list)
 
     # Store StatPackets temporary.
     tmp_dir = Path("tmp")
@@ -36,8 +36,8 @@ def main():
     tmplocalfile = tmp_dir / (file_list_path.name + '_.statpackets')
     
     for i, file in enumerate(file_list):
-        print(f"\r{i+1}/{lflist}", end="")
-        print(f"\n{i+1}/{lflist} ~> {file}")
+        print(f"\r{i+1}/{total_files}", end="")
+        print(f"\n{i+1}/{total_files} ~> {file}")
         file_path = Path(file)
         if file_path.exists() and ( 'NotProcessed' in file or 'Successful' in file):
             try:
