@@ -38,11 +38,11 @@ def main():
     total_files = len(file_list)
 
     # Store StatPackets temporary.
-    tmp_dir = Path("tmp")
-    if not tmp_dir.exists():
-        tmp_dir.mkdir()
+    output_dir = Path("tmp")
+    if not output_dir.exists():
+        output_dir.mkdir()
 
-    tmplocalfile = tmp_dir / (file_list_path.name + "_.statpackets")
+    output_file = output_dir / (file_list_path.name + "_.statpackets")
 
     for i, file in enumerate(file_list):
         print(f"\r{i+1}/{total_files}", end="")
@@ -89,7 +89,7 @@ def main():
 
                 statpacket_v20_values = rW.rx2("statpacket").rx2("V20")
 
-                with open(tmplocalfile, "a", encoding="utf-8") as outfile:
+                with open(output_file, "a", encoding="utf-8") as outfile:
                     outfile.write(
                         "".join(r["as.character"](statpacket_v20_values)) + "\n"
                     )
