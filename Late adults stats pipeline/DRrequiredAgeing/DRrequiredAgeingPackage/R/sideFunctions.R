@@ -5396,16 +5396,14 @@ annotationChooser = function(statpacket = NULL,
   parameter = statpacket$V6
   json      =  jsonlite::fromJSON(statpacket$V20)
   method   =   GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
-  ##################################################################
+
   Gtag = GenotypeTag(
     obj = json$Result$`Vector output`[[resultKey]],
     parameter_stable_id = statpacket$V6,
     threshold = level,
     rrlevel = rrlevel
   )
-  ##################################################################
 
-  ################################
   b = a[[unScrewProcedure(pipeline)[1]]]
   c = b[[unScrewProcedure(procedure)[1]]]
   d = c[[unScrewProcedure(parameter)[1]]]
@@ -5415,21 +5413,20 @@ annotationChooser = function(statpacket = NULL,
       MPTERM = ulistTag3, statpacket = statpacket
     )))
   }
-  ################################
-  if (length(d) > 0 &&
-      length(Gtag) > 0) {
-    ################################
+
+  if (length(Gtag) > 0) {
     ulistTag  = unlist(Gtag)
     ulistD    = unlist(d)
     names(ulistD)  = toupper(names(ulistD))
     ulistD         = removeAbnormalIfIncDecDetected(ulistD, method = method, active = FALSE)
+
     if (length(ulistD) < 1) {
       message('No annotation available by IMPC. See https://www.mousephenotype.org/impress/')
       return(invisible(list(
         MPTERM = ulistTag3, statpacket = statpacket
       )))
     }
-    ################################
+
     ulistTag2 = ulistTag
     names(ulistTag2) = gsub(
       pattern = 'MALE|FEMALE',
@@ -5439,7 +5436,6 @@ annotationChooser = function(statpacket = NULL,
 
     ulistTag3 = merge.two(ulistTag2, ulistTag)
     for (name in names(ulistTag3)) {
-      # print(name)
       splN = unlist(strsplit(name, split = '.', fixed = TRUE))
       splN = splN[!splN %in% c('LOW', 'HIGH','DATA_POINT','GENOTYPE')]
       splnI = multiGrepl(pattern = splN,
@@ -5447,23 +5443,22 @@ annotationChooser = function(statpacket = NULL,
                          fixed = TRUE)
       ulistTag3[names(ulistTag3) %in% name] = ifelse(is.null(ulistD[splnI]), 'CanNotFindMPTerm', head(ulistD[splnI], 1))
     }
-    #print(ulistD)
-    ################################
+
     if (length(ulistTag3) < 1)
       return(invisible(list(
         MPTERM = ulistTag3, statpacket = statpacket
       )))
-    ##########################
+
     ulistTag3 =  MatchTheRestHalfWithTheFirstOne(ulistTag3)
     ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
-    ##########################
+
     if (length(ulistTag3) < 1)
       return(invisible(list(
         MPTERM = ulistTag3, statpacket = statpacket
       )))
-    ##########################
+
     ulistTag3 = ulistTag3[!is.na(ulistTag3)]
-    ################################
+
     if (length(ulistTag3) > 0 &&
         method %in% 'RR') {
       lIncDec = multiGrepl(pattern = c('INCREASED|DECREASED'),
@@ -5481,13 +5476,14 @@ annotationChooser = function(statpacket = NULL,
     if (length(ulistTag3) > 0) {
       ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
     }
-    ################################
+ 
     MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
                                            method = method,
                                            MPTERMS = ulistD,
                                            json = json)
     MPTERMS = rlist::list.clean(MPTERMS)
   }
+
   if (!is.null(MPTERMS)     &&
       length(ulistTag3) > 0 &&
       length(na.omit(ulistTag3)) > 0) {
