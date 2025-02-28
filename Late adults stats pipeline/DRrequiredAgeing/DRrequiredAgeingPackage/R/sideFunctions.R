@@ -4911,19 +4911,6 @@ unScrewProcedure = function(x) {
   r = unlist(strsplit(x = x, split = '~'))
   return(r)
 }
-
-
-merge.two = function(l1, l2) {
-  if (is.null(l1) && is.null(l2))
-    return(NULL)
-  if (is.null(l1) && !is.null(l2))
-    return(l1)
-  if (!is.null(l1) && is.null(l2))
-    return(l2)
-  #l = c(l1, l2[!names(l2) %in% names(l1)])
-  l = c(l1, l2)
-  return(l)
-}
 ###########################
 
 MatchTheRestHalfWithTheFirstOne = function(x) {
@@ -5413,8 +5400,7 @@ annotationChooser = function(statpacket = NULL,
       x = names(ulistTag2),
       replacement = 'UNSPECIFIED'
     )
-
-    ulistTag3 = merge.two(ulistTag2, ulistTag)
+    ulistTag3 = c(ulistTag2, ulistTag)
     for (name in names(ulistTag3)) {
       splN = unlist(strsplit(name, split = '.', fixed = TRUE))
       splN = splN[!splN %in% c('LOW', 'HIGH','DATA_POINT','GENOTYPE')]
