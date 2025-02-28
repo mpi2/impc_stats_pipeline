@@ -13,6 +13,10 @@ pandas2ri.activate()
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Load the local version of annotationChooser
+r('source("../Late adults stats pipeline/DRrequiredAgeing/DRrequiredAgeingPackage/R/sideFunctions.R")')
+annotationChooser = r['annotationChooser']
+
 def process_statpacket(file, output_file, mp_chooser_file):
     data_table = importr("data.table")
     df = data_table.fread(
@@ -32,16 +36,18 @@ def process_statpacket(file, output_file, mp_chooser_file):
         return
 
     # Call R's annotationChooser.
-    dr_required_ageing = importr("DRrequiredAgeing")
+    # dr_required_ageing = importr("DRrequiredAgeing")
 
-    rN = dr_required_ageing.annotationChooser(
+    # rN = dr_required_ageing.annotationChooser(
+    rN = annotationChooser(
         statpacket=df,
         level=0.0001,
         rrlevel=0.0001,
         mp_chooser_file=mp_chooser_file
     )
 
-    rW = dr_required_ageing.annotationChooser(
+    # rW = dr_required_ageing.annotationChooser(
+    rW = annotationChooser(
         statpacket=rN.rx2("statpacket"),
         level=0.0001,
         rrlevel=0.0001,
