@@ -4926,25 +4926,6 @@ merge.two = function(l1, l2) {
 }
 ###########################
 
-removeAbnormalIfIncDecDetected = function(x = NULL,
-                                          method = 'MM',
-                                          active = 1) {
-  if (!active)
-    return(x)
-  if (length(x) > 0 &&
-      !method %in% 'RR' &&
-      any(grepl(
-        x = names(x),
-        pattern = ('\\.INCREASED\\.|\\.DECREASED\\.')
-      ))) {
-    message('\t INCREASED/DECREASED detected. ABNORMAL will be ignored')
-    x = x[!grepl(x = names(x),
-                 pattern = ('.ABNORMAL.'),
-                 fixed = TRUE)]
-  }
-  return(x)
-}
-
 MatchTheRestHalfWithTheFirstOne = function(x) {
   if (length(x) < 1)
     return(x)
@@ -5418,7 +5399,6 @@ annotationChooser = function(statpacket = NULL,
     ulistTag  = unlist(Gtag)
     ulistD    = unlist(d)
     names(ulistD)  = toupper(names(ulistD))
-    ulistD         = removeAbnormalIfIncDecDetected(ulistD, method = method, active = FALSE)
 
     if (length(ulistD) < 1) {
       message('No annotation available by IMPC. See https://www.mousephenotype.org/impress/')
