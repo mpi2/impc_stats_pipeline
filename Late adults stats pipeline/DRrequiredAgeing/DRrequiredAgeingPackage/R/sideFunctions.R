@@ -5412,20 +5412,6 @@ annotationChooser = function(statpacket = NULL,
     rrlevel = rrlevel
   )
   ##################################################################
-  message('\t Reading the index file ...')
-  load(mp_chooser_file)
-  message(
-    '\t~>',
-    paste(
-      pipeline,
-      procedure,
-      parameter,
-      sep = '~>',
-      collapse = '~>'
-    ),
-    '\n\t~>',
-    json$Result$Details$`Gene page URL`
-  )
 
   ################################
   b = a[[unScrewProcedure(pipeline)[1]]]
