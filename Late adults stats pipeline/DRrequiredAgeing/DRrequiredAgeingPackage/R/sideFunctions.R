@@ -4914,9 +4914,6 @@ unScrewProcedure = function(x) {
 ###########################
 
 MatchTheRestHalfWithTheFirstOne = function(x) {
-  if (length(x) < 1)
-    return(x)
-  #x = x[!is.na(x)]
   mid = length(x) / 2
   x[(mid + 1):(2 * mid)] = x[1:mid]
   return(x)
@@ -5227,12 +5224,11 @@ MoreThan2Length = function(xx,
   return(index)
 }
 
-MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,json=NULL) {
+MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,sex_levels = NULL) {
   fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
   mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
   agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
     !fgrep & !mgrep
-  sexlevels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
 
   if (method %in% 'MM') {
     fgrep = MoreThan2Length(names(x), fgrep, MPTERMS)
@@ -5276,9 +5272,9 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,json=NU
                                1, fA(x[agrep], pasteterms = FALSE)[1], fA(x[agrep])),
           event = oevent,
           sex = ifelse(
-            length(unique(sexlevels)) > 1 ,
+            length(unique(sex_levels)) > 1 ,
             "not_considered",
-            unique(sexlevels)[1]
+            unique(sex_levels)[1]
           ),
           otherPossibilities = ifelse(length(fA(x[agrep], pasteterms = FALSE)) >
                                         1, fA(x[agrep]), '')
@@ -5314,9 +5310,9 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,json=NU
                           'term_id' = bselect(x[agrep]),
                           event = oevent,
                           sex = ifelse(
-                            length(unique(sexlevels)) > 1 ,
+                            length(unique(sex_levels)) > 1 ,
                             "not_considered",
-                            unique(sexlevels)[1]
+                            unique(sex_levels)[1]
                           )
                         )),
       NullOrvalueReturn(x[fgrep], list(
@@ -5401,6 +5397,7 @@ annotationChooser = function(statpacket = NULL,
       replacement = 'UNSPECIFIED'
     )
     ulistTag3 = c(ulistTag2, ulistTag)
+
     for (name in names(ulistTag3)) {
       splN = unlist(strsplit(name, split = '.', fixed = TRUE))
       splN = splN[!splN %in% c('LOW', 'HIGH','DATA_POINT','GENOTYPE')]
@@ -5442,11 +5439,12 @@ annotationChooser = function(statpacket = NULL,
     if (length(ulistTag3) > 0) {
       ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
     }
- 
+
+    sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
     MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
                                            method = method,
                                            MPTERMS = ulistD,
-                                           json = json)
+                                           sex_levels = sex_levels)
     MPTERMS = rlist::list.clean(MPTERMS)
   }
 
