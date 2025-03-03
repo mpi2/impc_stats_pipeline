@@ -4607,19 +4607,11 @@ multiGrepl = function (x = NULL, pattern = NULL, ...)
 
 returnWhatBasedOnThreshold = function(x = NULL,
                                       threshold = .0001,
-                                      Return = 'ABNORMAL',
-                                      ReturnNull = 'IgnoreThisCaseAtALL') {
-  if (is.null(x)      ||
-      is.null(Return) ||
-      is.null(threshold) ||
-      length(x) < 1      ||
-      length(Return) < 1 ||
-      length(threshold) < 1) {
-    return(ReturnNull)
-  } else if (is.numeric(x) && x < threshold) {
+                                      Return = 'ABNORMAL') {
+  if (is.numeric(x) && x < threshold) {
     return(Return)
-  } else{
-    return(ReturnNull)
+  } else {
+    return('IgnoreThisCaseAtALL')
   }
 }
 
