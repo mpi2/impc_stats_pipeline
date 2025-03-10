@@ -5444,12 +5444,20 @@ annotationChooser = function(statpacket = NULL,
       }
     }
 
-    sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
-    MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
-                                           method = method,
-                                           MPTERMS = ulistD,
-                                           sex_levels = sex_levels)
-    MPTERMS = rlist::list.clean(MPTERMS)
+    # 8. Implement male/female specific abnormal categories.
+    if (method %in% "MM") {
+      print("This part is NOT YET IMPLEMENTED in the new approach.")
+   } else {
+      sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
+      print("Levels")
+      print(sex_levels)
+      MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
+                                            method = method,
+                                            MPTERMS = ulistD,
+                                            sex_levels = sex_levels)
+      MPTERMS = rlist::list.clean(MPTERMS)
+    }
+    
   }
 
   # Inject MPTERMS into the data.
