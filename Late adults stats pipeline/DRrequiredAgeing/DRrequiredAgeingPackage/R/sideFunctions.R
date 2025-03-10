@@ -4655,7 +4655,8 @@ GenotypeTag = function(obj,
             threshold = threshold,
             Return = 'INFERRED'
           )
-        )
+        ),
+        Level = "OVERALL"
       ))
     }
   } else if (method %in% 'FE') {
