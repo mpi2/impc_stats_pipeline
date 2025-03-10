@@ -5399,13 +5399,8 @@ annotationChooser = function(statpacket = NULL,
       }
     }
 
-    if (length(ulistTag3) < 1)
-      return(invisible(list(
-        MPTERM = ulistTag3, statpacket = statpacket
-      )))
-
-    ulistTag3 =  MatchTheRestHalfWithTheFirstOne(ulistTag3)
-    ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
+    ulistTag3 = MatchTheRestHalfWithTheFirstOne(ulistTag3)
+    ulistTag3 = ulistTag3[!duplicated(names(ulistTag3))]
 
     if (length(ulistTag3) < 1)
       return(invisible(list(
