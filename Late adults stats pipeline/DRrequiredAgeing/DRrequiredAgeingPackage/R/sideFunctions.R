@@ -5365,9 +5365,9 @@ annotationChooser = function(statpacket = NULL,
     }
 
     # 2. Duplicate all entries, replace MALE/FEMALE with UNSPECIFIED, concatenate back.
-    # This is only done for compatibility with the original approach and will be refactored later.
+    # This part is not required for new approach.
     if (method %in% "MM") {
-      Gtag <- rbind(Gtag, transform(Gtag, Sex = gsub("MALE|FEMALE", "UNSPECIFIED", Sex)))
+      print("This part is not required in new approach.")
     } else {
       ulistTag2 = ulistTag
       names(ulistTag2) = gsub(
@@ -5380,14 +5380,16 @@ annotationChooser = function(statpacket = NULL,
 
     # 3. Join MP term information from mp_chooser.
     if (method %in% "MM") {
+      # Only keep the UNSPECIFIED sex records for now.
+      # This is to replicate the original functionality.
+      # Will be refactored further later.
+      d_unspecified <- subset(d, Sex == "UNSPECIFIED", select = -Sex)
       Gtag <- merge(
         Gtag,
-        d,
-        by = c("Sex", "StatisticalTestResult", "Level"),
+        d_unspecified,
+        by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
-      print("After")
-      print(Gtag)
     } else {
       for (name in names(ulistTag3)) {
         splN = unlist(strsplit(name, split = '.', fixed = TRUE))
@@ -5399,8 +5401,14 @@ annotationChooser = function(statpacket = NULL,
       }
     }
 
-    ulistTag3 = MatchTheRestHalfWithTheFirstOne(ulistTag3)
-    ulistTag3 = ulistTag3[!duplicated(names(ulistTag3))]
+    # 4. Remove the duplication introduced in step 2.
+    # This part is not required for new approach.
+    if (method %in% "MM") {
+      print("This part is not required in new approach.")
+    } else {
+      ulistTag3 = MatchTheRestHalfWithTheFirstOne(ulistTag3)
+      ulistTag3 = ulistTag3[!duplicated(names(ulistTag3))]
+    }
 
     if (length(ulistTag3) < 1)
       return(invisible(list(
