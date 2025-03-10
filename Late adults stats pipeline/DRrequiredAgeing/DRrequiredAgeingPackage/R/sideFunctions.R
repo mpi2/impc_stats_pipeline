@@ -5410,7 +5410,13 @@ annotationChooser = function(statpacket = NULL,
       ulistTag3 = ulistTag3[!duplicated(names(ulistTag3))]
     }
 
-    ulistTag3 = ulistTag3[!is.na(ulistTag3)]
+    # 5. Remove records with no assigned MP terms.
+    # This filters out all rows with no statistically significant results.
+    if (method %in% "MM") {
+      Gtag <- Gtag[!is.na(Gtag$MpTerm), ]
+    } else {
+      ulistTag3 = ulistTag3[!is.na(ulistTag3)]
+    }
 
     if (length(ulistTag3) > 0 &&
         method %in% 'RR') {
