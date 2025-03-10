@@ -5418,6 +5418,7 @@ annotationChooser = function(statpacket = NULL,
       ulistTag3 = ulistTag3[!is.na(ulistTag3)]
     }
 
+    # 6. Special case for RR. Not refactored for now.
     if (length(ulistTag3) > 0 &&
         method %in% 'RR') {
       lIncDec = multiGrepl(pattern = c('INCREASED|DECREASED'),
@@ -5431,9 +5432,16 @@ annotationChooser = function(statpacket = NULL,
                                 names(ulistTag3))
       }
     }
-    # Do not use unique!
-    if (length(ulistTag3) > 0) {
-      ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
+
+    # 7. Remove duplicated records.
+    # This is not required in the new approach, because duplicated records do not arise in the first place.
+    if (method %in% "MM") {
+      print("This part is not required in new approach.")
+    } else {
+      # Do not use unique!
+      if (length(ulistTag3) > 0) {
+        ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
+      }
     }
 
     sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
@@ -5444,6 +5452,7 @@ annotationChooser = function(statpacket = NULL,
     MPTERMS = rlist::list.clean(MPTERMS)
   }
 
+  # Inject MPTERMS into the data.
   if (!is.null(MPTERMS)     &&
       length(ulistTag3) > 0 &&
       length(na.omit(ulistTag3)) > 0) {
@@ -5452,6 +5461,8 @@ annotationChooser = function(statpacket = NULL,
   }else{
     message('No MP term found ...')
   }
+
+  # Return the final data structure.
   return(invisible(list(
     MPTERM = MPTERMS, statpacket = statpacket
   )))
