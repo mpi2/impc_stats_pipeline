@@ -4683,7 +4683,7 @@ GenotypeTag = function(obj,
         returnWhatBasedOnThreshold(
           x = obj$`Sex MvKO p-value`,
           threshold = threshold,
-          Return = 'INFERRED'
+          Return = 'ABNORMAL'
         )
       ),
       MALE = listM(
