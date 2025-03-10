@@ -5350,22 +5350,32 @@ annotationChooser = function(statpacket = NULL,
   }
 
   if (length(Gtag) > 0) {
+
+    # 1. Prepare genotype tag and mp_chooser annotation.
     if (method %in% "MM") {
       # Convert the nested mp_chooser structure into the flat dataframe.
       d <- flatten_mp_chooser(d)
     } else {
+      # Unpack d (mp_chooser annotation) and convert everything to upper case.
       ulistD = unlist(d)
       names(ulistD) = toupper(names(ulistD))
+      # Unpack Gtag.
+      ulistTag = unlist(Gtag)
     }
 
-    ulistTag  = unlist(Gtag)
-    ulistTag2 = ulistTag
-    names(ulistTag2) = gsub(
-      pattern = 'MALE|FEMALE',
-      x = names(ulistTag2),
-      replacement = 'UNSPECIFIED'
-    )
-    ulistTag3 = c(ulistTag2, ulistTag)
+    # 2. Duplicate all entries, replace MALE/FEMALE with UNSPECIFIED, concatenate back.
+    # This is only done for compatibility with the original approach and will be refactored later.
+    if (method %in% "MM") {
+      Gtag <- rbind(Gtag, transform(Gtag, Sex = gsub("MALE|FEMALE", "UNSPECIFIED", Sex)))
+    } else {
+      ulistTag2 = ulistTag
+      names(ulistTag2) = gsub(
+        pattern = 'MALE|FEMALE',
+        x = names(ulistTag2),
+        replacement = 'UNSPECIFIED'
+      )
+      ulistTag3 = c(ulistTag2, ulistTag)
+    }
 
     for (name in names(ulistTag3)) {
       splN = unlist(strsplit(name, split = '.', fixed = TRUE))
