@@ -4869,6 +4869,12 @@ MatchTheRestHalfWithTheFirstOne = function(x) {
   return(x)
 }
 
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#######################################################################################
+
 DecIncDetector = function(x) {
   if (length(x) < 1)
     return(NA)
@@ -5042,13 +5048,6 @@ DecIncDetectorRR = function(x) {
   return(r)
 }
 
-detectLevel = function(x, level) {
-  if (is.null(x) || length(x) < 1)
-    return(FALSE)
-  r = grepl(pattern = level, x = x)
-  return(any(r))
-}
-
 NullOrvalueReturn = function(x, list) {
   if (length(x) < 1)
     return(NULL)
@@ -5136,8 +5135,6 @@ bselect = function(x) {
     xx = na.omit(xx)
   return(xx)
 }
-
-
 
 MoreThan2Length = function(xx,
                            index,
@@ -5276,6 +5273,12 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,sex_lev
   }
   return(MPTERM)
 }
+
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#######################################################################################
+#######################################################################################
 
 # This function flattens the mp_chooser structure into a dataframe which is easy to work with.
 flatten_mp_chooser <- function(d) {
@@ -5442,9 +5445,15 @@ annotationChooser = function(statpacket = NULL,
 
     # 8. Implement male/female specific abnormal categories.
     if (method %in% "MM") {
-      print("This part is NOT YET IMPLEMENTED in the new approach.")
+      print("ABCD")
+      print(Gtag)
    } else {
       sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
+      print("Inject")
+      print(x)
+      print(method)
+      print(ulistD)
+      print(sex_levels)
       MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
                                             method = method,
                                             MPTERMS = ulistD,
