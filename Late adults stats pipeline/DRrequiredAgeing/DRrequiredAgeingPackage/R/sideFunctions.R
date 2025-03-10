@@ -5279,6 +5279,23 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,sex_lev
   return(MPTERM)
 }
 ##############################
+
+# This function flattens the mp_chooser structure into a dataframe which is easy to work with.
+flatten_mp_chooser <- function(d) {
+  do.call(rbind, lapply(names(d), function(sex) {
+    do.call(rbind, lapply(names(d[[sex]]), function(test) {
+      do.call(rbind, lapply(names(d[[sex]][[test]]), function(level) {
+        data.frame(
+          Sex = sex,
+          StatisticalTestResult = test,
+          Level = level,
+          MpTerm = unname(unlist(d[[sex]][[test]][[level]]))
+        )
+      }))
+    }))
+  }))
+}
+
 annotationChooser = function(statpacket = NULL,
                              level = 10 ^ -4,
                              rrlevel = .005,
@@ -5332,8 +5349,13 @@ annotationChooser = function(statpacket = NULL,
   }
 
   if (length(Gtag) > 0) {
-    ulistD    = unlist(d)
-    names(ulistD)  = toupper(names(ulistD))
+    if (method %in% "MM") {
+      # Convert the nested mp_chooser structure into the flat dataframe.
+      d <- flatten_mp_chooser(d)
+    } else {
+      ulistD = unlist(d)
+      names(ulistD) = toupper(names(ulistD))
+    }
 
     ulistTag  = unlist(Gtag)
     ulistTag2 = ulistTag
