@@ -5287,8 +5287,9 @@ flatten_mp_chooser <- function(d) {
       do.call(rbind, lapply(names(d[[sex]][[test]]), function(level) {
         data.frame(
           Sex = sex,
-          StatisticalTestResult = test,
-          Level = level,
+          # This and next toupper() are for compatibility with the old approach.
+          StatisticalTestResult = toupper(test),
+          Level = toupper(level),
           MpTerm = unname(unlist(d[[sex]][[test]][[level]]))
         )
       }))
