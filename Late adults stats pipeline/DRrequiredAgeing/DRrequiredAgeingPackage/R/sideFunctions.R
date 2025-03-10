@@ -4619,59 +4619,45 @@ GenotypeTag = function(obj,
           ' and for the RR method it is ',
           rrlevel)
   if (method %in% 'MM') {
+    # Initialise an empty data frame.
     tag <- data.frame(
-      Sex = c("UNSPECIFIED", "UNSPECIFIED", "UNSPECIFIED",
-              "FEMALE", "FEMALE", "FEMALE",
-              "MALE", "MALE", "MALE"),
-      StatisticalTestResult = c(
-        DirectionTagMM(
-          x      = obj$`Genotype estimate`$Value,
-          pvalue = obj$`Genotype p-value`,
-          threshold = threshold
-        ),
-        returnWhatBasedOnThreshold(
-          x = obj$`Genotype p-value`,
-          threshold = threshold,
-          Return = 'ABNORMAL'
-        ),
-        returnWhatBasedOnThreshold(
-          x = obj$`Genotype p-value`,
-          threshold = threshold,
-          Return = 'INFERRED'
-        ),
-        DirectionTagMM(
-          x      = obj$`Sex FvKO estimate`$Value,
-          pvalue = obj$`Sex FvKO p-value`,
-          threshold = threshold
-        ),
-        returnWhatBasedOnThreshold(
-          x = obj$`Sex FvKO p-value`,
-          threshold = threshold,
-          Return = 'ABNORMAL'
-        ),
-        returnWhatBasedOnThreshold(
-          x = obj$`Sex FvKO p-value`,
-          threshold = threshold,
-          Return = 'INFERRED'
-        ),
-        DirectionTagMM(
-          x      = obj$`Sex MvKO estimate`$Value,
-          pvalue = obj$`Sex MvKO p-value`,
-          threshold = threshold
-        ),
-        returnWhatBasedOnThreshold(
-          x = obj$`Sex MvKO p-value`,
-          threshold = threshold,
-          Return = 'ABNORMAL'
-        ),
-        returnWhatBasedOnThreshold(
-          x = obj$`Sex MvKO p-value`,
-          threshold = threshold,
-          Return = 'INFERRED'
-        )
-      )
+      Sex = character(),
+      StatisticalTestResult = character()
     )
-    print(tag)
+    # Define sex/column prefix info.
+    sex_column_prefix_pairs <- list(
+      c("UNSPECIFIED", "Genotype"),
+      c("FEMALE", "Sex FvKO"),
+      c("MALE", "Sex MvKO")
+    )
+    # Iterate over sexes and their corresponding column prefixes.
+    for (pair in sex_column_prefix_pairs) {
+      sex <- pair[1]
+      column_prefix <- pair[2]
+      # Append to existing dataframe.
+      tag <- rbind(tag, data.frame(
+        Sex = sex,
+        StatisticalTestResult = c(
+          # Statistical test based on genotype effect estimate and p-value.
+          DirectionTagMM(
+            x = obj[[paste0(column_prefix, " estimate")]]$Value,
+            pvalue = obj[[paste0(column_prefix, " p-value")]],
+            threshold = threshold
+          ),
+          # Simple statistical test based on p-value only.
+          returnWhatBasedOnThreshold(
+            x = obj[[paste0(column_prefix, " p-value")]],
+            threshold = threshold,
+            Return = 'ABNORMAL'
+          ),
+          returnWhatBasedOnThreshold(
+            x = obj[[paste0(column_prefix, " p-value")]],
+            threshold = threshold,
+            Return = 'INFERRED'
+          )
+        )
+      ))
+    }
   } else if (method %in% 'FE') {
     ###########################################################################
     fmodels = obj$`Additional information`$Analysis$`Further models`$category
