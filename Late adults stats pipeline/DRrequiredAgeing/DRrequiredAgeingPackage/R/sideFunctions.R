@@ -4575,16 +4575,6 @@ DirectionTagFE = function(x,
   return(tag)
 }
 
-listM = function(x, What2Attach = list('OVERALL' = list('MPTERM' = NA))) {
-  if (is.null(x))
-    return(NULL)
-  al = as.list(x)
-  names(al) = al
-  al[[names(al)]] = What2Attach
-  return(al)
-}
-
-
 numbers_only <- function(x) {
   r = !grepl("\\D", x)
   return(r)
@@ -4629,64 +4619,51 @@ GenotypeTag = function(obj,
           ' and for the RR method it is ',
           rrlevel)
   if (method %in% 'MM') {
-    tag = list(
-      UNSPECIFIED = listM(
+    tag <- data.frame(
+      Sex = c("UNSPECIFIED", "UNSPECIFIED", "UNSPECIFIED",
+              "FEMALE", "FEMALE", "FEMALE",
+              "MALE", "MALE", "MALE"),
+      StatisticalTestResult = c(
         DirectionTagMM(
           x      = obj$`Genotype estimate`$Value,
           pvalue = obj$`Genotype p-value`,
           threshold = threshold
-        )
-      ),
-      UNSPECIFIED = listM(
+        ),
         returnWhatBasedOnThreshold(
           x = obj$`Genotype p-value`,
           threshold = threshold,
           Return = 'ABNORMAL'
-        )
-      ),
-      UNSPECIFIED = listM(
+        ),
         returnWhatBasedOnThreshold(
           x = obj$`Genotype p-value`,
           threshold = threshold,
           Return = 'INFERRED'
-        )
-      ),
-      FEMALE        = listM(
+        ),
         DirectionTagMM(
           x      = obj$`Sex FvKO estimate`$Value,
           pvalue = obj$`Sex FvKO p-value`,
           threshold = threshold
-        )
-      ),
-      FEMALE = listM(
+        ),
         returnWhatBasedOnThreshold(
           x = obj$`Sex FvKO p-value`,
           threshold = threshold,
           Return = 'ABNORMAL'
-        )
-      ),
-      FEMALE = listM(
+        ),
         returnWhatBasedOnThreshold(
           x = obj$`Sex FvKO p-value`,
           threshold = threshold,
           Return = 'INFERRED'
-        )
-      ),
-      MALE      = listM(
+        ),
         DirectionTagMM(
           x      = obj$`Sex MvKO estimate`$Value,
           pvalue = obj$`Sex MvKO p-value`,
           threshold = threshold
-        )
-      ),
-      MALE = listM(
+        ),
         returnWhatBasedOnThreshold(
           x = obj$`Sex MvKO p-value`,
           threshold = threshold,
           Return = 'ABNORMAL'
-        )
-      ),
-      MALE = listM(
+        ),
         returnWhatBasedOnThreshold(
           x = obj$`Sex MvKO p-value`,
           threshold = threshold,
@@ -4694,6 +4671,7 @@ GenotypeTag = function(obj,
         )
       )
     )
+    print(tag)
   } else if (method %in% 'FE') {
     ###########################################################################
     fmodels = obj$`Additional information`$Analysis$`Further models`$category
