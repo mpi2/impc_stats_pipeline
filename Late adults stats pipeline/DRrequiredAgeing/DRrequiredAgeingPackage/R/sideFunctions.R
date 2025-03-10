@@ -5410,11 +5410,6 @@ annotationChooser = function(statpacket = NULL,
       ulistTag3 = ulistTag3[!duplicated(names(ulistTag3))]
     }
 
-    if (length(ulistTag3) < 1)
-      return(invisible(list(
-        MPTERM = ulistTag3, statpacket = statpacket
-      )))
-
     ulistTag3 = ulistTag3[!is.na(ulistTag3)]
 
     if (length(ulistTag3) > 0 &&
