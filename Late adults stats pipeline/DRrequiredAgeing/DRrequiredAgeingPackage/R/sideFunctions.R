@@ -5332,17 +5332,10 @@ annotationChooser = function(statpacket = NULL,
   }
 
   if (length(Gtag) > 0) {
-    ulistTag  = unlist(Gtag)
     ulistD    = unlist(d)
     names(ulistD)  = toupper(names(ulistD))
 
-    if (length(ulistD) < 1) {
-      message('No annotation available by IMPC. See https://www.mousephenotype.org/impress/')
-      return(invisible(list(
-        MPTERM = ulistTag3, statpacket = statpacket
-      )))
-    }
-
+    ulistTag  = unlist(Gtag)
     ulistTag2 = ulistTag
     names(ulistTag2) = gsub(
       pattern = 'MALE|FEMALE',
