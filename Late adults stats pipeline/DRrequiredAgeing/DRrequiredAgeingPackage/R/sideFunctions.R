@@ -5378,13 +5378,25 @@ annotationChooser = function(statpacket = NULL,
       ulistTag3 = c(ulistTag2, ulistTag)
     }
 
-    for (name in names(ulistTag3)) {
-      splN = unlist(strsplit(name, split = '.', fixed = TRUE))
-      splN = splN[!splN %in% c('LOW', 'HIGH','DATA_POINT','GENOTYPE')]
-      splnI = multiGrepl(pattern = splN,
-                         x = names(ulistD),
-                         fixed = TRUE)
-      ulistTag3[names(ulistTag3) %in% name] = ifelse(is.null(ulistD[splnI]), 'CanNotFindMPTerm', head(ulistD[splnI], 1))
+    # 3. Join MP term information from mp_chooser.
+    if (method %in% "MM") {
+      Gtag <- merge(
+        Gtag,
+        d,
+        by = c("Sex", "StatisticalTestResult", "Level"),
+        all.x = TRUE
+      )
+      print("After")
+      print(Gtag)
+    } else {
+      for (name in names(ulistTag3)) {
+        splN = unlist(strsplit(name, split = '.', fixed = TRUE))
+        splN = splN[!splN %in% c('LOW', 'HIGH','DATA_POINT','GENOTYPE')]
+        splnI = multiGrepl(pattern = splN,
+                          x = names(ulistD),
+                          fixed = TRUE)
+        ulistTag3[names(ulistTag3) %in% name] = ifelse(is.null(ulistD[splnI]), 'CanNotFindMPTerm', head(ulistD[splnI], 1))
+      }
     }
 
     if (length(ulistTag3) < 1)
