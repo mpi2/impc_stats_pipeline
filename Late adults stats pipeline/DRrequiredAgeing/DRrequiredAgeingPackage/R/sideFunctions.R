@@ -5114,7 +5114,6 @@ fF = function(x, pasteterms = TRUE) {
 }
 
 bselect = function(x) {
-  # order important, see MoreThan2Length
   if(length(x)<1)
     return(x)
   nx = names(x)
@@ -5144,7 +5143,6 @@ MoreThan2Length = function(xx,
                            index,
                            MPTERMS = NULL,
                            general = TRUE) {
-  # order important, see bselect
   if (length(xx) > 1 &&
       sum(index) > 1 &&
       !is.null(MPTERMS) &&
@@ -5208,11 +5206,10 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,sex_lev
     oevent = fmevents[2]
   if (!is.na(fmevents[1]) && is.na(fmevents[2]))
     oevent = fmevents[1]
-  #############################
   # if male and/or female specific term found then ignore the combined sex mp terms
   if (length(x[fgrep]) > 0 || length(x[mgrep]) > 0)
     agrep = FALSE
-  #############################
+
   if (method %in% 'RR') {
     MPTERM = list(
       NullOrvalueReturn(
@@ -5279,7 +5276,6 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,sex_lev
   }
   return(MPTERM)
 }
-##############################
 
 # This function flattens the mp_chooser structure into a dataframe which is easy to work with.
 flatten_mp_chooser <- function(d) {
@@ -5449,8 +5445,6 @@ annotationChooser = function(statpacket = NULL,
       print("This part is NOT YET IMPLEMENTED in the new approach.")
    } else {
       sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
-      print("Levels")
-      print(sex_levels)
       MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
                                             method = method,
                                             MPTERMS = ulistD,
