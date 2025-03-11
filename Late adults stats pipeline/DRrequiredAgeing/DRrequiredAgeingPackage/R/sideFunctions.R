@@ -4648,7 +4648,9 @@ GenotypeTag = function(obj,
           returnWhatBasedOnThreshold(
             x = obj[[paste0(column_prefix, " p-value")]],
             threshold = threshold,
-            Return = 'ABNORMAL'
+            # FIXME: this deliberately recapitulates old behavior with the
+            # copy-paste bug. Should be further refactored in the future.
+            Return = ifelse(sex == "MALE", "INFERRED", "ABNORMAL")
           ),
           returnWhatBasedOnThreshold(
             x = obj[[paste0(column_prefix, " p-value")]],
