@@ -5309,6 +5309,7 @@ annotationChooser = function(statpacket = NULL,
   requireNamespace("jsonlite")
   requireNamespace("rlist")
   requireNamespace("Tmisc")
+  library(dplyr)
 
   ulistTag3 = MPTERMS = NA
   message('Running the annotation pipeline')
@@ -5444,10 +5445,51 @@ annotationChooser = function(statpacket = NULL,
     }
 
     # 8. Implement male/female specific abnormal categories.
+    sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
     if (method %in% "MM") {
-      print("Not implemented yet")
+      if (nrow(Gtag) == 0) {
+        MPTERMS <- list()
+      } else {
+        # Define the priority order for StatisticalTestResult.
+        priority_order <- c("INCREASED", "DECREASED", "INFERRED", "ABNORMAL")
+        # Check if the input dataframe is empty.
+        if (nrow(Gtag) == 0) {
+          MPTERMS <- list()
+        } else {
+          # Group by Sex and select one row per group based on priority.
+          filtered_data <- Gtag %>%
+            group_by(Sex) %>%
+            arrange(match(StatisticalTestResult, priority_order)) %>%
+            slice(1) %>%
+            ungroup()
+          # Drop UNSPECIFIED if MALE or FEMALE data is present.
+          if (any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
+            filtered_data <- filtered_data %>% filter(Sex != "UNSPECIFIED")
+          }
+          # Handle UNSPECIFIED case if no MALE or FEMALE data is present.
+          if (!any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
+            if (length(sex_levels) == 1) {
+              filtered_data$Sex <- toupper(sex_levels)
+            }
+          }
+          # Convert Sex column to lowercase and replace "unspecified" with "not_considered".
+          filtered_data <- filtered_data %>%
+            mutate(Sex = tolower(Sex),
+                  Sex = ifelse(Sex == "unspecified", "not_considered", Sex))
+          # Ensure female comes before male if both are present.
+          filtered_data <- filtered_data %>%
+            arrange(Sex)
+          # Convert to the desired list format.
+          MPTERMS <- filtered_data %>%
+            mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm) %>%
+            select(term_id, event, sex) %>%
+            # Use `purrr::transpose()` to create an unnamed list of objects
+            purrr::transpose() %>%
+            # Remove names from the list
+            unname()
+        }
+      }
     } else {
-      sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
       MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
                                             method = method,
                                             MPTERMS = ulistD,
@@ -5458,13 +5500,22 @@ annotationChooser = function(statpacket = NULL,
   }
 
   # Inject MPTERMS into the data.
-  if (!is.null(MPTERMS)     &&
-      length(ulistTag3) > 0 &&
-      length(na.omit(ulistTag3)) > 0) {
-    json$Result$Details[[TermKey]] = MPTERMS
-    statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
-  }else{
-    message('No MP term found ...')
+  if (method %in% "MM") {
+    if (length(MPTERMS) > 0) {
+      print("APPENDING")
+      print(MPTERMS)
+      json$Result$Details[[TermKey]] = MPTERMS
+      statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
+    }
+  } else {
+    if (!is.null(MPTERMS) &&
+        length(ulistTag3) > 0 &&
+        length(na.omit(ulistTag3)) > 0) {
+      json$Result$Details[[TermKey]] = MPTERMS
+      statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
+    }else{
+      message('No MP term found...')
+    }
   }
 
   # Return the final data structure.
