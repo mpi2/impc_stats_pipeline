@@ -5445,15 +5445,9 @@ annotationChooser = function(statpacket = NULL,
 
     # 8. Implement male/female specific abnormal categories.
     if (method %in% "MM") {
-      print("ABCD")
-      print(Gtag)
-   } else {
+      print("Not implemented yet")
+    } else {
       sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
-      print("Inject")
-      print(x)
-      print(method)
-      print(ulistD)
-      print(sex_levels)
       MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
                                             method = method,
                                             MPTERMS = ulistD,
