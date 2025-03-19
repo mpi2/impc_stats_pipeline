@@ -4994,61 +4994,45 @@ NullOrvalueReturn = function(x, list) {
     return(list)
 }
 
-fA = function(x, pasteterms = TRUE) {
-  if (length(x) > 0)
-    x = x[!duplicated(x)]
-  if (length(x) > 1) {
-    x2 = x[!grepl(pattern = c('(MALE)|(FEMALE)'), names(x)) &
-             grepl(pattern = c('ABNORMAL'), names(x))]
-    x3 = x[grepl(pattern = c('ABNORMAL'), names(x))]
-    if (length(x2) > 1 && length(x3) > 0 && pasteterms)
-      x = paste(x3, sep = '~', collapse = '~')
-    else if (length(x2) > 1 && length(x3) < 1 && pasteterms)
-      x = paste(x2, sep = '~', collapse = '~')
-    else if (pasteterms)
-      x = paste(x, sep = '~', collapse = '~')
-    else
-      x = x
+# Former fA, fM, fF
+fAMF <- function(x, pattern_exclude, pattern_include, pasteterms = TRUE, sex = NULL) {
+  # Remove duplicates
+  if (length(x) > 0) {
+    x <- x[!duplicated(x)]
   }
+  
+  # Process if more than one element
+  if (length(x) > 1) {
+    x2 <- x[!grepl(pattern = pattern_exclude, names(x)) & 
+              grepl(pattern = pattern_include, names(x))]
+    x3 <- x[grepl(pattern = pattern_include, names(x))]
+    
+    if (pasteterms) {
+      if (length(x2) > 1 && length(x3) > 0) {
+        x <- paste(x3, sep = '~', collapse = '~')
+      } else if (length(x2) > 1 && length(x3) < 1) {
+        x <- paste(x2, sep = '~', collapse = '~')
+      } else {
+        x <- paste(x, sep = '~', collapse = '~')
+      }
+    }
+  }
+  
+  # Return processed result
   return(x)
 }
 
-fM = function(x, pasteterms = TRUE) {
-  if (length(x) > 0)
-    x = x[!duplicated(x)]
-  if (length(x) > 1) {
-    x2 = x[!grepl(pattern = c('ABNORMAL'), names(x)) &
-             grepl(pattern = c('MALE'), names(x))]
-    x3 = x[grepl(pattern = c('ABNORMAL'), names(x))]
-    if (length(x2) > 1 && length(x3) > 0 && pasteterms)
-      x = paste(x3, sep = '~', collapse = '~')
-    else if (length(x2) > 1 && length(x3) < 1 && pasteterms)
-      x = paste(x2, sep = '~', collapse = '~')
-    else if (pasteterms)
-      x = paste(x, sep = '~', collapse = '~')
-    else
-      x = x
-  }
-  return(x)
-}
-
-fF = function(x, pasteterms = TRUE) {
-  if (length(x) > 0)
-    x = x[!duplicated(x)]
-  if (length(x) > 1) {
-    x2 = x[!grepl(pattern = c('ABNORMAL'), names(x)) &
-             grepl(pattern = c('FEMALE'), names(x))]
-    x3 = x[grepl(pattern = c('ABNORMAL'), names(x))]
-    if (length(x2) > 1 && length(x3) > 0 && pasteterms)
-      x = paste(x3, sep = '~', collapse = '~')
-    else if (length(x2) > 1 && length(x3) < 1 && pasteterms)
-      x = paste(x2, sep = '~', collapse = '~')
-    else if (pasteterms)
-      x = paste(x, sep = '~', collapse = '~')
-    else
-      x = x
-  }
-  return(x)
+# Helper function to create term entries
+create_term_entry <- function(x, pattern_exclude, pattern_include, event, sex_levels) {
+  term_id <- fAMF(x, pattern_exclude, pattern_include, pasteterms = FALSE)
+  other_possibilities <- fAMF(x, pattern_exclude, pattern_include)
+  
+  list(
+    'term_id' = ifelse(length(term_id) > 1, term_id[1], fAMF(x, pattern_exclude, pattern_include)),
+    event = event,
+    sex = ifelse(length(unique(sex_levels)) > 1, "not_considered", unique(sex_levels)[1]),
+    otherPossibilities = ifelse(length(term_id) > 1, other_possibilities, '')
+  )
 }
 
 bselect = function(x) {
@@ -5137,43 +5121,18 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,sex_lev
     agrep = FALSE
 
   if (method %in% 'RR') {
-    MPTERM = list(
+    MPTERM <- list(
       NullOrvalueReturn(
         x[agrep],
-        list(
-          'term_id' = ifelse(length(fA(x[agrep], pasteterms = FALSE)) >
-                               1, fA(x[agrep], pasteterms = FALSE)[1], fA(x[agrep])),
-          event = oevent,
-          sex = ifelse(
-            length(unique(sex_levels)) > 1 ,
-            "not_considered",
-            unique(sex_levels)[1]
-          ),
-          otherPossibilities = ifelse(length(fA(x[agrep], pasteterms = FALSE)) >
-                                        1, fA(x[agrep]), '')
-        )
+        create_term_entry(x[agrep], '(MALE)|(FEMALE)', 'ABNORMAL', oevent, sex_levels)
       ),
       NullOrvalueReturn(
         x[fgrep],
-        list(
-          'term_id' = ifelse(length(fF(x[fgrep], pasteterms = FALSE)) >
-                               1, fF(x[fgrep], pasteterms = FALSE)[1], fF(x[fgrep])),
-          event = fevent,
-          sex = "female",
-          otherPossibilities = ifelse(length(fF(x[fgrep], pasteterms = FALSE)) >
-                                        1, fF(x[fgrep]), '')
-        )
+        create_term_entry(x[fgrep], 'ABNORMAL', 'FEMALE', fevent, "female")
       ),
       NullOrvalueReturn(
         x[mgrep],
-        list(
-          'term_id' = ifelse(length(fM(x[mgrep], pasteterms = FALSE)) >
-                               1, fM(x[mgrep], pasteterms = FALSE)[1], fM(x[mgrep])),
-          event = mevent,
-          sex = "male",
-          otherPossibilities = ifelse(length(fM(x[mgrep], pasteterms = FALSE)) >
-                                        1, fM(x[mgrep]), '')
-        )
+        create_term_entry(x[mgrep], 'ABNORMAL', 'MALE', mevent, "male")
       )
     )
   } else{
