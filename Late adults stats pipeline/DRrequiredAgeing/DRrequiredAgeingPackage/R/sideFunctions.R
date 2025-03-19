@@ -4509,6 +4509,7 @@ install.packages.auto <- function(x) {
 ##########################################
 ############## For the annotation pipeline
 ##########################################
+
 GetMethodStPa <- function(x) {
   if (is.null(x)) {
     return("UNK")
@@ -5172,9 +5173,7 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,sex_lev
     !fgrep & !mgrep
 
   if (method %in% 'MM') {
-    fgrep = MoreThan2Length(names(x), fgrep, MPTERMS)
-    mgrep = MoreThan2Length(names(x), mgrep, MPTERMS)
-    agrep = MoreThan2Length(names(x), agrep, MPTERMS)
+    print(">>> This function must not be called with MM method.")
   } else{
     # bug reported 30/10/2020 - (improvement)
     fgrep = MoreThan2Length(names(x), fgrep, MPTERMS, general = FALSE)
@@ -5515,6 +5514,7 @@ annotationChooser = function(statpacket = NULL,
 }
 
 #################################################################################
+
 Write2Postg = function(df,
                        dbname = 'test',
                        host = "hh-yoda-05-01",
