@@ -5132,14 +5132,6 @@ MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,sex_lev
     mevent = DecIncDetector(x[mgrep])
     oevent = DecIncDetector(x[agrep])
   }
-  # if males and females are in cross direction set abnormal otherwise select male/females
-  fmevents = c(fevent, mevent)
-  if (all(!is.na(fmevents)) && fmevents[1] == fmevents[2])
-    oevent = mevent
-  if (is.na(fmevents[1]) && !is.na(fmevents[2]))
-    oevent = fmevents[2]
-  if (!is.na(fmevents[1]) && is.na(fmevents[2]))
-    oevent = fmevents[1]
   # if male and/or female specific term found then ignore the combined sex mp terms
   if (length(x[fgrep]) > 0 || length(x[mgrep]) > 0)
     agrep = FALSE
