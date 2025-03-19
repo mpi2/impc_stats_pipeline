@@ -2532,64 +2532,6 @@ WriteToDB = function(df,
   }
 }
 
-FinalJson2ObjectCreator = function(FinalList,
-                                   null = 'null',
-                                   na = 'null' ,
-                                   auto_unbox = TRUE,
-                                   SpecialString = '==!!(:HAMED:)!!==',
-                                   rep = 3,
-                                   removeSpecialsFromNames = FALSE) {
-  requireNamespace('jsonlite')
-  message0('Forming the JSON object ...')
-  FinalList = replaceInList(
-    FinalList,
-    FUN  = function(x) {
-      if (is.null(x)) {
-        x = SpecialString
-      } else{
-        x
-      }
-    }
-  )
-
-  FinalList = replaceInList(
-    FinalList,
-    FUN  = function(x) {
-      if (!is.null(x) && any(is.infinite(x))) {
-        x[is.infinite(x)] = sign(x[is.infinite(x)])*10^16
-      } else{
-        x
-      }
-    }
-  )
-
-  if (removeSpecialsFromNames)
-    FinalList = LowerandRemoveSpecials(FinalList)
-  for (i in 1:rep) {
-    JsonObj  = jsonlite::toJSON(
-      x = FinalList,
-      null = null,
-      na   = na,
-      digits = NA,
-      auto_unbox = ifelse(i == rep, auto_unbox, FALSE)
-    )
-    FinalList = jsonlite::fromJSON(txt =   JsonObj)
-  }
-  JsonObj = gsub(
-    pattern = paste0('"', SpecialString, '"'),
-    replacement = '{}',
-    x = JsonObj,
-    ignore.case = FALSE,
-    fixed = TRUE
-  )
-  # Remove new lines! e.g. in Corneal Reflex
-  JsonObj = gsub(pattern = '\n',
-                 replacement = ' ',
-                 x = JsonObj)
-  return(JsonObj)
-}
-
-
 
 LowerandRemoveSpecials <- function(x)
 {
@@ -5284,6 +5226,63 @@ flatten_mp_chooser <- function(d) {
       }))
     }))
   }))
+}
+
+FinalJson2ObjectCreator = function(FinalList,
+                                   null = 'null',
+                                   na = 'null' ,
+                                   auto_unbox = TRUE,
+                                   SpecialString = '==!!(:HAMED:)!!==',
+                                   rep = 3,
+                                   removeSpecialsFromNames = FALSE) {
+  requireNamespace('jsonlite')
+  message0('Forming the JSON object ...')
+  FinalList = replaceInList(
+    FinalList,
+    FUN  = function(x) {
+      if (is.null(x)) {
+        x = SpecialString
+      } else{
+        x
+      }
+    }
+  )
+
+  FinalList = replaceInList(
+    FinalList,
+    FUN  = function(x) {
+      if (!is.null(x) && any(is.infinite(x))) {
+        x[is.infinite(x)] = sign(x[is.infinite(x)])*10^16
+      } else{
+        x
+      }
+    }
+  )
+
+  if (removeSpecialsFromNames)
+    FinalList = LowerandRemoveSpecials(FinalList)
+  for (i in 1:rep) {
+    JsonObj  = jsonlite::toJSON(
+      x = FinalList,
+      null = null,
+      na   = na,
+      digits = NA,
+      auto_unbox = ifelse(i == rep, auto_unbox, FALSE)
+    )
+    FinalList = jsonlite::fromJSON(txt =   JsonObj)
+  }
+  JsonObj = gsub(
+    pattern = paste0('"', SpecialString, '"'),
+    replacement = '{}',
+    x = JsonObj,
+    ignore.case = FALSE,
+    fixed = TRUE
+  )
+  # Remove new lines! e.g. in Corneal Reflex
+  JsonObj = gsub(pattern = '\n',
+                 replacement = ' ',
+                 x = JsonObj)
+  return(JsonObj)
 }
 
 annotationChooser = function(statpacket = NULL,
