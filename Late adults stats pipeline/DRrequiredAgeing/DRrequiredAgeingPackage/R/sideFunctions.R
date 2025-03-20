@@ -4557,13 +4557,15 @@ GenotypeTag = function(obj,
     # Initialise an empty data frame.
     tag <- data.frame(
       Sex = character(),
-      StatisticalTestResult = character()
+      StatisticalTestResult = character(),
+      Level = character()
     )
     # Define sex/column prefix info.
     sex_column_prefix_pairs <- list(
       c("UNSPECIFIED", "Genotype"),
       c("FEMALE", "Sex FvKO"),
-      c("MALE", "Sex MvKO")
+      c("MALE", "Sex MvKO"),
+      stringsAsFactors = FALSE
     )
     # Iterate over sexes and their corresponding column prefixes.
     for (pair in sex_column_prefix_pairs) {
@@ -4593,7 +4595,8 @@ GenotypeTag = function(obj,
             Return = 'INFERRED'
           )
         ),
-        Level = "OVERALL"
+        Level = "OVERALL",
+        stringsAsFactors = FALSE
       ))
     }
   } else if (method %in% 'FE') {
