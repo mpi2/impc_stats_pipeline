@@ -4671,29 +4671,6 @@ GenotypeTag = function(obj,
     gp7 = grepl(pattern = '.MPTERM', x = nam, fixed = TRUE)
     nam[!gp7] = paste0(nam[!gp7], '.MPTERM')
 
-    ############# step 8
-    if (!is.null(parameter_stable_id)) {
-      controlCat = read.delim(file.path(local(),'annotation','CategoryRemapping.tsv'), sep = '\t')
-      conCat = controlCat[controlCat$IMPRESS.ID %in% parameter_stable_id,]
-      control = conCat[conCat$CATEGORY.1 == 0, 2]
-      if (length(control) > 0) {
-        for (c in control) {
-          nam =   gsub(
-            pattern = paste0('.', toupper(c), '.'),
-            replacement = '.',
-            x = nam,
-            fixed = TRUE
-          )
-        }
-        nam = gsub(
-          pattern = '..',
-          replacement = '.',
-          x = nam,
-          fixed = TRUE
-        )
-      }
-    }
-
     # Assign names back to the dataframe and return
     names(AllCombinations2) = nam
     tag = AllCombinations2
