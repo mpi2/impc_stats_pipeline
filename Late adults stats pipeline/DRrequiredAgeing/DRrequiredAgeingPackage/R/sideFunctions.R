@@ -4607,7 +4607,8 @@ GenotypeTag = function(obj,
       fmodels$`Complete table` = NULL
     }
 
-
+    # Apply either "NORMAL", or ("ABNORMAL" + "INCREASED" + "DECREASED")
+    # All possible combinations are added at this point.
     AllCombinations = lapply(fmodels, function(x) {
       lapply(x, function(y) {
         DirectionTagFE(x = y$p.value, threshold = threshold)
@@ -4616,15 +4617,18 @@ GenotypeTag = function(obj,
     if (is.null(AllCombinations))
       return(NULL)
 
-    #### Make the list as sequence of names attached with dot (.)
+    # Keep only genotype complete tables: U, F, M
     AllCombinations1 = unlist(AllCombinations)
     AllCombinations1 = AllCombinations1[grepl('Complete table',names(AllCombinations1))]
-    #### Keep only genotype analysis
-    AllCombinations2 = AllCombinations1[grepl(pattern = 'Genotype', x =
-                                                names(AllCombinations1))]
-    #### The abnormal case is made from the data
+    AllCombinations2 = AllCombinations1[grepl(pattern = 'Genotype', x = names(AllCombinations1))]
+    
+    # Process the names.
     for (i in seq_along(AllCombinations2)) {
-      ############# step 1
+
+      print(">>>>>>>>")
+      print(AllCombinations2[i])
+
+      # 1. Convert names to Genotype_{/Male/Female}.{ABNORMAL.OVERALL/INCREASED/DECREASED}.MPTERM
       names(AllCombinations2)[i] = gsub(
         pattern = 'Complete table',
         replacement = paste0(
@@ -4637,22 +4641,9 @@ GenotypeTag = function(obj,
         ),
         x = names(AllCombinations2)[i]
       )
-      ############# step 2
-      gind = !multiGrepl(pattern = c('Genotype', 'OVERALL'),
-                         x = names(AllCombinations2)[i])
-      if (gind) {
-        strs = unlist(strsplit(
-          names(AllCombinations2)[i],
-          split = '.',
-          fixed = TRUE
-        ))
-        u = unique(c(strs[1],
-                     AllCombinations2[i],
-                     strs[-1]))
-        names(AllCombinations2)[i] = paste(u,
-                                           collapse = '.',
-                                           sep = '.')
-      }
+      
+      print(AllCombinations2[i])
+
       ############# step 3
       names(AllCombinations2)[i] = gsub(
         pattern = 'Genotype.',
@@ -4662,6 +4653,7 @@ GenotypeTag = function(obj,
       ############# step 4
       names(AllCombinations2)[i] = toupper(names(AllCombinations2)[i])
     }
+
     ############# step 5
     AllCombinations2 = AllCombinations2[grepl(
       pattern = '(MALE)|(FEMALE)|(OVERALL)',
@@ -4711,6 +4703,9 @@ GenotypeTag = function(obj,
     ############# Finally!
     names(AllCombinations2) = nam
     tag = AllCombinations2
+
+    print("+++++++++++++++++++++++++")
+    print(tag)
 
   } else if (method %in% 'RR') {
     ###########################################################################
@@ -5260,6 +5255,10 @@ annotationChooser = function(statpacket = NULL,
   parameter = statpacket$V6
   json      =  jsonlite::fromJSON(statpacket$V20)
   method   =   GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
+
+  print(pipeline)
+  print(procedure)
+  print(parameter)
 
   Gtag = GenotypeTag(
     obj = json$Result$`Vector output`[[resultKey]],
