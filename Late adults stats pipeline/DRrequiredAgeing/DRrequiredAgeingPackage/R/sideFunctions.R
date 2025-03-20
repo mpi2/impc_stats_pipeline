@@ -4624,11 +4624,7 @@ GenotypeTag = function(obj,
     
     # Process the names.
     for (i in seq_along(AllCombinations2)) {
-
-      print(">>>>>>>>")
-      print(AllCombinations2[i])
-
-      # 1. Convert names to Genotype_{/Male/Female}.{ABNORMAL.OVERALL/INCREASED/DECREASED}.MPTERM
+      # Convert names to Genotype_{/Male/Female}.{NORMAL/ABNORMAL.OVERALL/INCREASED/DECREASED}.MPTERM
       names(AllCombinations2)[i] = gsub(
         pattern = 'Complete table',
         replacement = paste0(
@@ -4641,28 +4637,28 @@ GenotypeTag = function(obj,
         ),
         x = names(AllCombinations2)[i]
       )
-      
-      print(AllCombinations2[i])
-
-      ############# step 3
+      # Remove the "Genotype" prefix
       names(AllCombinations2)[i] = gsub(
         pattern = 'Genotype.',
         replacement = '',
         x = names(AllCombinations2)[i]
       )
-      ############# step 4
+      # Convert everything to upper case: {/MALE/FEMALE}.{NORMAL/ABNORMAL.OVERALL/INCREASED/DECREASED}.MPTERM
       names(AllCombinations2)[i] = toupper(names(AllCombinations2)[i])
     }
 
-    ############# step 5
+    # Keep: all MALE; all FEMALE; and only ABNORMAL.OVERALL for UNSPECIFIED.
     AllCombinations2 = AllCombinations2[grepl(
       pattern = '(MALE)|(FEMALE)|(OVERALL)',
       x = names(AllCombinations2),
       ignore.case = TRUE
     )]
-    ############# step 6
+
+    # If nothing remains, return NULL.
     if (length(AllCombinations2) < 1)
       return(NULL)
+
+    # Remove trailing numbers in a... questionable way
     nam = names(AllCombinations2)
     for (i in 0:1000) {
       sb = substr(nam, start = nchar(nam) - i, nchar(nam))
@@ -4672,10 +4668,7 @@ GenotypeTag = function(obj,
                             1)
       }
     }
-    ############# step 7
-    gp7 = grepl(pattern = '.MPTERM',
-                x = nam,
-                fixed = TRUE)
+    gp7 = grepl(pattern = '.MPTERM', x = nam, fixed = TRUE)
     nam[!gp7] = paste0(nam[!gp7], '.MPTERM')
 
     ############# step 8
@@ -4700,13 +4693,10 @@ GenotypeTag = function(obj,
         )
       }
     }
-    ############# Finally!
+
+    # Assign names back to the dataframe and return
     names(AllCombinations2) = nam
     tag = AllCombinations2
-
-    print("+++++++++++++++++++++++++")
-    print(tag)
-
   } else if (method %in% 'RR') {
     ###########################################################################
     fmodels = obj$`Additional information`$Analysis$`Further models`
