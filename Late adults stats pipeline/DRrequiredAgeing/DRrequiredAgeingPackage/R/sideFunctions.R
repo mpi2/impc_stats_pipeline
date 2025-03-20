@@ -5191,10 +5191,6 @@ annotationChooser = function(statpacket = NULL,
   json      =  jsonlite::fromJSON(statpacket$V20)
   method   =   GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
 
-  print(pipeline)
-  print(procedure)
-  print(parameter)
-
   Gtag = GenotypeTag(
     obj = json$Result$`Vector output`[[resultKey]],
     parameter_stable_id = statpacket$V6,
