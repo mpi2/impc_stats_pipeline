@@ -5218,7 +5218,7 @@ annotationChooser = function(statpacket = NULL,
   if (length(Gtag) > 0) {
 
     # 1. Prepare genotype tag and mp_chooser annotation.
-    if (method %in% "MM") {
+    if (method %in% c("MM", "FE")) {
       # Convert the nested mp_chooser structure into the flat dataframe.
       d <- flatten_mp_chooser(d)
     } else {
@@ -5231,7 +5231,7 @@ annotationChooser = function(statpacket = NULL,
 
     # 2. Duplicate all entries, replace MALE/FEMALE with UNSPECIFIED, concatenate back.
     # This part is not required for new approach.
-    if (method %in% "MM") {
+    if (method %in% c("MM", "FE")) {
       print("This part is not required in new approach.")
     } else {
       ulistTag2 = ulistTag
@@ -5244,7 +5244,7 @@ annotationChooser = function(statpacket = NULL,
     }
 
     # 3. Join MP term information from mp_chooser.
-    if (method %in% "MM") {
+    if (method %in% c("MM", "FE")) {
       # Only keep the UNSPECIFIED sex records for now.
       # This is to replicate the original functionality.
       # Will be refactored further later.
@@ -5268,7 +5268,7 @@ annotationChooser = function(statpacket = NULL,
 
     # 4. Remove the duplication introduced in step 2.
     # This part is not required for new approach.
-    if (method %in% "MM") {
+    if (method %in% c("MM", "FE")) {
       print("This part is not required in new approach.")
     } else {
       ulistTag3 = MatchTheRestHalfWithTheFirstOne(ulistTag3)
@@ -5277,7 +5277,7 @@ annotationChooser = function(statpacket = NULL,
 
     # 5. Remove records with no assigned MP terms.
     # This filters out all rows with no statistically significant results.
-    if (method %in% "MM") {
+    if (method %in% c("MM", "FE")) {
       Gtag <- Gtag[!is.na(Gtag$MpTerm), ]
     } else {
       ulistTag3 = ulistTag3[!is.na(ulistTag3)]
@@ -5300,7 +5300,7 @@ annotationChooser = function(statpacket = NULL,
 
     # 7. Remove duplicated records.
     # This is not required in the new approach, because duplicated records do not arise in the first place.
-    if (method %in% "MM") {
+    if (method %in% c("MM", "FE")) {
       print("This part is not required in new approach.")
     } else {
       # Do not use unique!
@@ -5311,7 +5311,7 @@ annotationChooser = function(statpacket = NULL,
 
     # 8. Implement male/female specific abnormal categories.
     sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
-    if (method %in% "MM") {
+    if (method %in% c("MM", "FE")) {
       if (nrow(Gtag) == 0) {
         MPTERMS <- list()
       } else {
@@ -5365,7 +5365,7 @@ annotationChooser = function(statpacket = NULL,
   }
 
   # Inject MPTERMS into the data.
-  if (method %in% "MM") {
+  if (method %in% c("MM", "FE")) {
     if (length(MPTERMS) > 0) {
       print("APPENDING")
       print(MPTERMS)
