@@ -4496,14 +4496,6 @@ DirectionTagMM = function(x,
 DirectionTagFE = function(x,
                           threshold = .0001,
                           group = c('ABNORMAL', 'INCREASED', 'DECREASED')) {
-  default = c('ABNORMAL', 'INCREASED', 'DECREASED')
-  if (length(group) < 1) {
-    message(
-      'No group for the so called ABNORMAL category provided, swith to the backup plan:\n\t ',
-      default
-    )
-    group = default
-  }
   tag = if (is.null(x) || length(x) < 1) {
     'NoEffectCalculated'
   } else if (x < threshold) {
@@ -4605,17 +4597,17 @@ GenotypeTag = function(obj,
       ))
     }
   } else if (method %in% 'FE') {
-    ###########################################################################
+    # Load fmodels and adjust stucture, if necessary.
     fmodels = obj$`Additional information`$Analysis$`Further models`$category
     if (is.null(fmodels))
       return(NULL)
-
     if (length(names(fmodels)) == 1 &&
         names(fmodels) == 'Complete table') {
       fmodels$Genotype$`Complete table` = fmodels$`Complete table`
       fmodels$`Complete table` = NULL
     }
-    #fmodels$Genotype$`Complete table`
+
+
     AllCombinations = lapply(fmodels, function(x) {
       lapply(x, function(y) {
         DirectionTagFE(x = y$p.value, threshold = threshold)
@@ -4623,6 +4615,7 @@ GenotypeTag = function(obj,
     })
     if (is.null(AllCombinations))
       return(NULL)
+
     #### Make the list as sequence of names attached with dot (.)
     AllCombinations1 = unlist(AllCombinations)
     AllCombinations1 = AllCombinations1[grepl('Complete table',names(AllCombinations1))]
