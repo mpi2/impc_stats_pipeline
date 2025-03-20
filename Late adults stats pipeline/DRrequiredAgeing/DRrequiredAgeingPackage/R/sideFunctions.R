@@ -2532,7 +2532,6 @@ WriteToDB = function(df,
   }
 }
 
-
 FinalJson2ObjectCreator = function(FinalList,
                                    null = 'null',
                                    na = 'null' ,
