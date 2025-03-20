@@ -4609,74 +4609,38 @@ GenotypeTag = function(obj,
       fmodels$Genotype$`Complete table` = fmodels$`Complete table`
       fmodels$`Complete table` = NULL
     }
-
-    # Apply either "NORMAL", or ("ABNORMAL" + "INCREASED" + "DECREASED")
-    # All possible combinations are added at this point.
-    AllCombinations = lapply(fmodels, function(x) {
-      lapply(x, function(y) {
-        DirectionTagFE(x = y$p.value, threshold = threshold)
-      })
-    })
-    if (is.null(AllCombinations))
-      return(NULL)
-
-    # Keep only genotype complete tables: U, F, M
-    AllCombinations1 = unlist(AllCombinations)
-    AllCombinations1 = AllCombinations1[grepl('Complete table',names(AllCombinations1))]
-    AllCombinations2 = AllCombinations1[grepl(pattern = 'Genotype', x = names(AllCombinations1))]
-    
-    # Process the names.
-    for (i in seq_along(AllCombinations2)) {
-      # Convert names to Genotype_{/Male/Female}.{NORMAL/ABNORMAL.OVERALL/INCREASED/DECREASED}.MPTERM
-      names(AllCombinations2)[i] = gsub(
-        pattern = 'Complete table',
-        replacement = paste0(
-          AllCombinations2[i],
-          ifelse(
-            AllCombinations2[i] == 'ABNORMAL',
-            '.OVERALL.MPTERM',
-            '.MPTERM'
-          )
-        ),
-        x = names(AllCombinations2)[i]
+    # Initialise an empty data frame.
+    tag <- data.frame(
+      Sex = character(),
+      StatisticalTestResult = character(),
+      Level = character(),
+      stringsAsFactors = FALSE
+    )
+    # Define sex/column prefix info.
+    sex_column_prefix_pairs <- list(
+      c("UNSPECIFIED", "Genotype"),
+      c("FEMALE", "Genotype_Female"),
+      c("MALE", "Genotype_Male")
+    )
+    # Iterate over sexes and their corresponding column prefixes.
+    for (pair in sex_column_prefix_pairs) {
+      sex <- pair[1]
+      column_prefix <- pair[2]
+      # Append to existing dataframe.
+      tag <- rbind(
+        tag,
+        data.frame(
+          Sex = sex,
+          StatisticalTestResult = DirectionTagFE(
+            x = fmodels[[column_prefix]]$`Complete table`$p.value,
+            threshold = threshold,
+            group="ABNORMAL"
+          ),
+          Level = "OVERALL",
+          stringsAsFactors = FALSE
+        )
       )
-      # Remove the "Genotype" prefix
-      names(AllCombinations2)[i] = gsub(
-        pattern = 'Genotype.',
-        replacement = '',
-        x = names(AllCombinations2)[i]
-      )
-      # Convert everything to upper case: {/MALE/FEMALE}.{NORMAL/ABNORMAL.OVERALL/INCREASED/DECREASED}.MPTERM
-      names(AllCombinations2)[i] = toupper(names(AllCombinations2)[i])
     }
-
-    # Keep: all MALE; all FEMALE; and only ABNORMAL.OVERALL for UNSPECIFIED.
-    AllCombinations2 = AllCombinations2[grepl(
-      pattern = '(MALE)|(FEMALE)|(OVERALL)',
-      x = names(AllCombinations2),
-      ignore.case = TRUE
-    )]
-
-    # If nothing remains, return NULL.
-    if (length(AllCombinations2) < 1)
-      return(NULL)
-
-    # Remove trailing numbers in a... questionable way
-    nam = names(AllCombinations2)
-    for (i in 0:1000) {
-      sb = substr(nam, start = nchar(nam) - i, nchar(nam))
-      for (j in 1:length(sb)) {
-        if (numbers_only(sb[j]) && i < nchar(sb[j]))
-          nam[j] = substr(nam[j], start = 0, stop = nchar(nam[j]) - i -
-                            1)
-      }
-    }
-    gp7 = grepl(pattern = '.MPTERM', x = nam, fixed = TRUE)
-    nam[!gp7] = paste0(nam[!gp7], '.MPTERM')
-
-    # Assign names back to the dataframe and return
-    names(AllCombinations2) = nam
-    tag = AllCombinations2
   } else if (method %in% 'RR') {
     ###########################################################################
     fmodels = obj$`Additional information`$Analysis$`Further models`
