@@ -5241,7 +5241,8 @@ annotationChooser = function(statpacket = NULL,
     }
 
     # 3. Join MP term information from mp_chooser.
-    if (method %in% c("MM", "FE")) {
+    if (method %in% "MM") {
+      # Bug 2
       # Only keep the UNSPECIFIED sex records for now.
       # This is to replicate the original functionality.
       # Will be refactored further later.
@@ -5252,6 +5253,31 @@ annotationChooser = function(statpacket = NULL,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
+    } else if (method %in% "FE") {
+      # Bug 5. Replicating original behaviour for FE.
+      # While MALE/FEMALE still never match MALE/FEMALE terms
+      # because of Bug 2, rows without a particular sex do match
+      # all terms, MALE/FEMALE included.
+      # First, map unspecified.
+      GtagUnspecified <- subset(Gtag, Sex == "UNSPECIFIED")
+      dNotUnspecified <- subset(d, Sex != "UNSPECIFIED", select = -Sex)
+      Gtag1 <- merge(
+        GtagUnspecified,
+        dNotUnspecified,
+        by = c("StatisticalTestResult", "Level"),
+        all.x = TRUE
+      )
+      # Now map all of the rest.
+      GtagNotUnspecified <- subset(Gtag, Sex != "UNSPECIFIED")
+      d_unspecified <- subset(d, Sex == "UNSPECIFIED", select = -Sex)
+      Gtag2 <- merge(
+        GtagNotUnspecified,
+        d_unspecified,
+        by = c("StatisticalTestResult", "Level"),
+        all.x = TRUE
+      )
+      # Combine the two dataframes.
+      Gtag <- rbind(Gtag1, Gtag2)
     } else {
       for (name in names(ulistTag3)) {
         splN = unlist(strsplit(name, split = '.', fixed = TRUE))
@@ -5364,8 +5390,6 @@ annotationChooser = function(statpacket = NULL,
   # Inject MPTERMS into the data.
   if (method %in% c("MM", "FE")) {
     if (length(MPTERMS) > 0) {
-      print("APPENDING")
-      print(MPTERMS)
       json$Result$Details[[TermKey]] = MPTERMS
       statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
     }
