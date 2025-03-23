@@ -5260,7 +5260,7 @@ annotationChooser = function(statpacket = NULL,
       # all terms, MALE/FEMALE included.
       # First, map unspecified.
       GtagUnspecified <- subset(Gtag, Sex == "UNSPECIFIED")
-      dNotUnspecified <- subset(d, Sex != "UNSPECIFIED", select = -Sex)
+      dNotUnspecified <- subset(d, select = -Sex)
       Gtag1 <- merge(
         GtagUnspecified,
         dNotUnspecified,
