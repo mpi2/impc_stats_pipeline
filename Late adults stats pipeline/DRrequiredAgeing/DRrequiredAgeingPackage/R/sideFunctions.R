@@ -5256,9 +5256,9 @@ annotationChooser = function(statpacket = NULL,
     } else if (method %in% "FE") {
       # Bug 5. Replicating original behaviour for FE.
       # While MALE/FEMALE still never match MALE/FEMALE terms
-      # because of Bug 2, rows without a particular sex do match
+      # because of Bug 2, rows without a particular sex *do* match
       # all terms, MALE/FEMALE included.
-      # First, map unspecified.
+      # First, map unspecified to anything.
       GtagUnspecified <- subset(Gtag, Sex == "UNSPECIFIED")
       dNotUnspecified <- subset(d, select = -Sex)
       Gtag1 <- merge(
@@ -5267,7 +5267,7 @@ annotationChooser = function(statpacket = NULL,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
-      # Now map all of the rest.
+      # Now map all of the rest, only to unspecified.
       GtagNotUnspecified <- subset(Gtag, Sex != "UNSPECIFIED")
       d_unspecified <- subset(d, Sex == "UNSPECIFIED", select = -Sex)
       Gtag2 <- merge(
