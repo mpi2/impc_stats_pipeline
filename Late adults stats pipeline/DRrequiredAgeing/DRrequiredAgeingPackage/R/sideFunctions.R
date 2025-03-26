@@ -4691,8 +4691,7 @@ GenotypeTag = function(obj,
           Sex = sex,
           StatisticalTestResult = DirectionTagFE(
             x = fmodels[[column_prefix]]$`Complete table`$p.value,
-            threshold = threshold,
-            group="ABNORMAL"
+            threshold = threshold
           ),
           Level = "OVERALL",
           stringsAsFactors = FALSE
@@ -5254,30 +5253,43 @@ annotationChooser = function(statpacket = NULL,
         all.x = TRUE
       )
     } else if (method %in% "FE") {
-      # Bug 5. Replicating original behaviour for FE.
+
+      # Bug 5. Mapping the UNSPECIFIED records.
       # While MALE/FEMALE still never match MALE/FEMALE terms
       # because of Bug 2, rows without a particular sex *do* match
       # all terms, MALE/FEMALE included.
       # First, map unspecified to anything.
       GtagUnspecified <- subset(Gtag, Sex == "UNSPECIFIED")
-      dNotUnspecified <- subset(d, select = -Sex)
+      d_not_unspecified <- subset(d, select = -Sex)
       Gtag1 <- merge(
         GtagUnspecified,
-        dNotUnspecified,
+        d_not_unspecified,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
-      # Now map all of the rest, only to unspecified.
+
+      # Bug 6. While INCREASED/DECREASED is normally not processed for FE (Bug 4),
+      # when a level of a I/D record contains keywords such as ABNORMAL, INFERRED or OVERAL,
+      # it will still get matched and reported. But only for M/F.
+      d_unspecified <- d[
+        d$StatisticalTestResult == "ABNORMAL" |
+        (
+          d$StatisticalTestResult %in% c("INCREASED", "DECREASED") &
+          grepl("ABNORMAL|INFERRED|OVERAL", d$Level)
+        ),
+      ]
+      d_unspecified <- subset(d_unspecified, Sex == "UNSPECIFIED", select = -c(Sex, Level))
       GtagNotUnspecified <- subset(Gtag, Sex != "UNSPECIFIED")
-      d_unspecified <- subset(d, Sex == "UNSPECIFIED", select = -Sex)
       Gtag2 <- merge(
         GtagNotUnspecified,
         d_unspecified,
-        by = c("StatisticalTestResult", "Level"),
+        by = c("StatisticalTestResult"),
         all.x = TRUE
       )
+
       # Combine the two dataframes.
       Gtag <- rbind(Gtag1, Gtag2)
+
     } else {
       for (name in names(ulistTag3)) {
         splN = unlist(strsplit(name, split = '.', fixed = TRUE))
