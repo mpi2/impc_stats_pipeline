@@ -5241,6 +5241,7 @@ annotationChooser = function(statpacket = NULL,
 
     # 3. Join MP term information from mp_chooser.
     if (method %in% "MM") {
+
       # Bug 2
       # Only keep the UNSPECIFIED sex records for now.
       # This is to replicate the original functionality.
@@ -5252,43 +5253,49 @@ annotationChooser = function(statpacket = NULL,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
+
     } else if (method %in% "FE") {
 
-      # Bug 5. Mapping the UNSPECIFIED records.
-      # While MALE/FEMALE still never match MALE/FEMALE terms
-      # because of Bug 2, rows without a particular sex *do* match
-      # all terms, MALE/FEMALE included.
-      # First, map unspecified to anything.
-      GtagUnspecified <- subset(Gtag, Sex == "UNSPECIFIED")
-      d_not_unspecified <- subset(d, select = -Sex)
+      # Bug 2. In general, all calls (U, M, F) are always mapped to U records
+      # in mp_chooser. This is the same behaviour as for the MM branch.
       Gtag1 <- merge(
-        GtagUnspecified,
-        d_not_unspecified,
+        Gtag,
+        subset(d, Sex == "UNSPECIFIED", select = -Sex),
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
 
-      # Bug 6. While INCREASED/DECREASED is normally not processed for FE (Bug 4),
-      # when a level of a I/D record contains keywords such as ABNORMAL, INFERRED or OVERAL,
-      # it will still get matched and reported. But only for M/F.
-      d_unspecified <- d[
-        d$StatisticalTestResult == "ABNORMAL" |
-        (
-          d$StatisticalTestResult %in% c("INCREASED", "DECREASED") &
-          grepl("ABNORMAL|INFERRED|OVERAL", d$Level)
-        ),
-      ]
-      d_unspecified <- subset(d_unspecified, Sex == "UNSPECIFIED", select = -c(Sex, Level))
-      GtagNotUnspecified <- subset(Gtag, Sex != "UNSPECIFIED")
+      # Bug 5. While MALE/FEMALE still never match MALE/FEMALE terms, rows
+      # without a particular sex *do* match all terms, MALE/FEMALE included.
       Gtag2 <- merge(
-        GtagNotUnspecified,
-        d_unspecified,
+        subset(Gtag, Sex == "UNSPECIFIED"),
+        # We are only matching to MALE/FEMALE in mp_chooser because we already
+        # matched to UNSPECIFIED in the previous step.
+        subset(d, Sex %in% c("MALE", "FEMALE"), select = -Sex),
+        by = c("StatisticalTestResult", "Level"),
+        all.x = TRUE
+      )
+
+      # Bug 6. While INCREASED/DECREASED is normally not processed for FE, when
+      # a level of a I/D record contains keywords such as ABNORMAL, INFERRED
+      # or OVERAL, it will still get matched and reported.
+      Gtag3 <- merge(
+        subset(
+          Gtag,
+          Sex %in% c("MALE", "FEMALE") & StatisticalTestResult %in% c("INCREASED", "DECREASED")
+        ),
+        subset(
+          d,
+          grepl("ABNORMAL|INFERRED|OVERAL", Level) & Sex == "UNSPECIFIED",
+          # Note that level from mp_chooser is ignored when joining.
+          select = -c(Sex, Level)
+        ),
         by = c("StatisticalTestResult"),
         all.x = TRUE
       )
 
-      # Combine the two dataframes.
-      Gtag <- rbind(Gtag1, Gtag2)
+      # Combine the three dataframes.
+      Gtag <- rbind(Gtag1, Gtag2, Gtag3)
 
     } else {
       for (name in names(ulistTag3)) {
