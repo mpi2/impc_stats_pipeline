@@ -5276,26 +5276,23 @@ annotationChooser = function(statpacket = NULL,
         all.x = TRUE
       )
 
-      # Bug 6. While INCREASED/DECREASED is normally not processed for FE, when
-      # a level of a I/D record contains keywords such as ABNORMAL, INFERRED
-      # or OVERAL, it will still get matched and reported.
-      Gtag3 <- merge(
-        subset(
-          Gtag,
-          Sex %in% c("MALE", "FEMALE") & StatisticalTestResult %in% c("INCREASED", "DECREASED")
-        ),
-        subset(
-          d,
-          grepl("ABNORMAL|INFERRED|OVERAL", Level) & Sex == "UNSPECIFIED",
-          # Note that level from mp_chooser is ignored when joining.
-          select = -c(Sex, Level)
-        ),
-        by = c("StatisticalTestResult"),
-        all.x = TRUE
-      )
+      # Combine the two dataframes.
+      GtagCombined <- rbind(Gtag1, Gtag2)
+      GtagCombined <- GtagCombined[!is.na(GtagCombined$MpTerm), ]
 
-      # Combine the three dataframes.
-      Gtag <- rbind(Gtag1, Gtag2, Gtag3)
+      # Bug 6. While INCREASED/DECREASED is normally not processed for FE, when
+      # no ABNORMAL entry is matched from mp_chooser, they *are* returned.
+      # In this case, Level is ignored, but Sex and StatisticalTestResult are checked.
+      if (nrow(GtagCombined) == 0) {
+        Gtag <- merge(
+          subset(Gtag, StatisticalTestResult %in% c("INCREASED", "DECREASED")),
+          subset(d, Sex == "UNSPECIFIED", select = -c(Sex, Level)),
+          by = c("StatisticalTestResult"),
+          all.x = TRUE
+        )
+      } else {
+        Gtag <- GtagCombined
+      }
 
     } else {
       for (name in names(ulistTag3)) {
