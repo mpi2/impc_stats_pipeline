@@ -5256,10 +5256,12 @@ annotationChooser = function(statpacket = NULL,
 
     } else if (method %in% "FE") {
 
+      # For FE, except for rare exceptions, only the ABNORMAL calls are mapped.
+
       # Bug 2. In general, all calls (U, M, F) are always mapped to U records
       # in mp_chooser. This is the same behaviour as for the MM branch.
       Gtag1 <- merge(
-        Gtag,
+        subset(Gtag, StatisticalTestResult == "ABNORMAL"),
         subset(d, Sex == "UNSPECIFIED", select = -Sex),
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
@@ -5268,7 +5270,7 @@ annotationChooser = function(statpacket = NULL,
       # Bug 5. While MALE/FEMALE still never match MALE/FEMALE terms, rows
       # without a particular sex *do* match all terms, MALE/FEMALE included.
       Gtag2 <- merge(
-        subset(Gtag, Sex == "UNSPECIFIED"),
+        subset(Gtag, Sex == "UNSPECIFIED" & StatisticalTestResult == "ABNORMAL"),
         # We are only matching to MALE/FEMALE in mp_chooser because we already
         # matched to UNSPECIFIED in the previous step.
         subset(d, Sex %in% c("MALE", "FEMALE"), select = -Sex),
