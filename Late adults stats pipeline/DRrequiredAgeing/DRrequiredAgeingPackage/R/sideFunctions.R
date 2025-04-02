@@ -5287,7 +5287,7 @@ annotationChooser = function(statpacket = NULL,
       # In this case, Level is ignored, but Sex and StatisticalTestResult are checked.
       if (nrow(GtagCombined) == 0) {
         Gtag <- merge(
-          subset(Gtag, StatisticalTestResult %in% c("INCREASED", "DECREASED")),
+          subset(Gtag, StatisticalTestResult %in% c("INCREASED", "DECREASED") & Sex %in% c("MALE", "FEMALE")),
           subset(d, Sex == "UNSPECIFIED", select = -c(Sex, Level)),
           by = c("StatisticalTestResult"),
           all.x = TRUE
