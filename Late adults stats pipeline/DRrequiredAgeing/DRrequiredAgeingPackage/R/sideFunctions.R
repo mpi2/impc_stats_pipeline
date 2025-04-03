@@ -5062,20 +5062,9 @@ annotationChooser = function(statpacket = NULL,
   }
 
   # Inject MPTERMS into the data.
-  if (method %in% c("MM", "FE", "RR")) {
-    if (length(MPTERMS) > 0) {
-      json$Result$Details[[TermKey]] = MPTERMS
-      statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
-    }
-  } else {
-    if (!is.null(MPTERMS) &&
-        length(ulistTag3) > 0 &&
-        length(na.omit(ulistTag3)) > 0) {
-      json$Result$Details[[TermKey]] = MPTERMS
-      statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
-    }else{
-      message('No MP term found...')
-    }
+  if (length(MPTERMS) > 0) {
+    json$Result$Details[[TermKey]] = MPTERMS
+    statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
   }
 
   # Return the final data structure.
