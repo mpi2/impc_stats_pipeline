@@ -4822,30 +4822,25 @@ DecIncDetector = function(x) {
 }
 
 DecIncDetectorRR = function(x) {
+
   if (length(x) < 1)
     return(NA)
+
   r = c()
+
   ###################################### MALE
   ###################################### LOW
-  r1 = multiGrepl(pattern = c('(DECREASED)|(INCREASED)', 'LOW', 'MALE'),
-                  x = names(x))
-  if (sum(r1) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r1])))
-      rlowM = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r1])))
-      rlowM = c('DECREASED')
+  r1 = multiGrepl(pattern = c('DECREASED', 'LOW', 'MALE'), x = names(x))
+  if (any(r1)) {
+    rlowM = 'DECREASED'
   } else {
     rlowM = NA
   }
-  ###################################### High
-  r2 = multiGrepl(pattern = c('(DECREASED)|(INCREASED)', 'HIGH', 'MALE'),
-                  x = names(x))
-  if (sum(r2) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r2])))
-      rhighM = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r2])))
-      rhighM = c('DECREASED')
-  } else{
+  ###################################### HIGH
+  r2 = multiGrepl(pattern = c('INCREASED', 'HIGH', 'MALE'), x = names(x))
+  if (any(r2)) {
+    rhighM = 'INCREASED'
+  } else {
     rhighM = NA
   }
   ######################################
@@ -4859,27 +4854,20 @@ DecIncDetectorRR = function(x) {
   }
   ###################################### FEMALE
   ###################################### LOW
-  r4 = multiGrepl(pattern = c('(DECREASED)|(INCREASED)', 'LOW', 'FEMALE'),
+  r4 = multiGrepl(pattern = c('DECREASED', 'LOW', 'FEMALE'),
                   x = names(x))
-  if (sum(r4) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r4])))
-      rlowF = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r4])))
-      rlowF = c('DECREASED')
-  } else{
+  if (any(r4)) {
+    rlowF = 'DECREASED'
+  } else {
     rlowF = NA
   }
-  ######################################
-  r5 = multiGrepl(
-    pattern = c('(DECREASED)|(INCREASED)', 'HIGH', 'FEMALE'),
-    x = names(x)
-  )
-  if (sum(r5) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r5])))
-      rhighF = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r5])))
-      rhighF = c('DECREASED')
-  } else{
+
+  ###################################### HIGH
+  r5 = multiGrepl(pattern = c('INCREASED', 'HIGH', 'FEMALE'),
+                  x = names(x))
+  if (any(r5)) {
+    rhighF = 'INCREASED'
+  } else {
     rhighF = NA
   }
   ######################################
