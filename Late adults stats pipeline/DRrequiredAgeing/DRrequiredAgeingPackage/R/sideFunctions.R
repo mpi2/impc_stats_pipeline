@@ -4599,7 +4599,6 @@ returnWhatBasedOnThreshold = function(x = NULL,
 }
 
 GenotypeTag = function(obj,
-                       parameter_stable_id = NULL,
                        threshold = 10 ^ -4,
                        expDetailsForErrorOnly = NULL,
                        rrlevel = 10 ^ -4) {
@@ -4611,6 +4610,7 @@ GenotypeTag = function(obj,
           threshold,
           ' and for the RR method it is ',
           rrlevel)
+
   if (method %in% 'MM') {
     # Initialise an empty data frame.
     tag <- data.frame(
@@ -4657,6 +4657,7 @@ GenotypeTag = function(obj,
         stringsAsFactors = FALSE
       ))
     }
+
   } else if (method %in% 'FE') {
     # Load fmodels and adjust stucture, if necessary.
     fmodels = obj$`Additional information`$Analysis$`Further models`$category
@@ -4698,8 +4699,9 @@ GenotypeTag = function(obj,
         )
       )
     }
+
   } else if (method %in% 'RR') {
-    ###########################################################################
+
     fmodels = obj$`Additional information`$Analysis$`Further models`
     if (is.null(fmodels))
       return(NULL)
@@ -4709,9 +4711,9 @@ GenotypeTag = function(obj,
         DirectionTagFE(x = y$Result$p.value, threshold = rrlevel)
       })
     })
-
     if (is.null(AllCombinations))
       return(NULL)
+
     #### Make the list as sequence of names attached with dot (.)
     AllCombinations1 = unlist(AllCombinations)
     # Remove unrealistic combinations.
@@ -4772,7 +4774,8 @@ GenotypeTag = function(obj,
     ############# Finally!
     names(AllCombinations2) = nam #gsub(pattern = 'LOW.|HIGH.',replacement = '',x = nam)
     tag = AllCombinations2
-  } else{
+
+  } else {
     tag = NULL
     write(
       x = paste(
@@ -4819,10 +4822,6 @@ DecIncDetector = function(x) {
       r = 'INFERRED'
   }
   return(r)
-}
-
-DecIncDetectorRR = function(x) {
-  return ("ABNORMAL")
 }
 
 NullOrvalueReturn = function(x, list) {
@@ -4930,73 +4929,39 @@ MoreThan2Length = function(xx,
   return(index)
 }
 
-MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,sex_levels = NULL) {
+MaleFemaleAbnormalCategories = function(x, method = 'RR', MPTERMS = NULL,sex_levels = NULL) {
   fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
   mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
   agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
     !fgrep & !mgrep
 
-  if (method %in% 'MM') {
-    print(">>> This function must not be called with MM method.")
-  } else{
-    # bug reported 30/10/2020 - (improvement)
-    fgrep = MoreThan2Length(names(x), fgrep, MPTERMS, general = FALSE)
-    mgrep = MoreThan2Length(names(x), mgrep, MPTERMS, general = FALSE)
-    agrep = MoreThan2Length(names(x), agrep, MPTERMS, general = FALSE)
-  }
+  fgrep = MoreThan2Length(names(x), fgrep, MPTERMS, general = FALSE)
+  mgrep = MoreThan2Length(names(x), mgrep, MPTERMS, general = FALSE)
+  agrep = MoreThan2Length(names(x), agrep, MPTERMS, general = FALSE)
 
-  if (method %in% 'RR') {
-    fevent = DecIncDetectorRR(x[fgrep])
-    mevent = DecIncDetectorRR(x[mgrep])
-    oevent = DecIncDetectorRR(x[agrep])
-  } else{
-    fevent = DecIncDetector(x[fgrep])
-    mevent = DecIncDetector(x[mgrep])
-    oevent = DecIncDetector(x[agrep])
-  }
+  fevent = "ABNORMAL"
+  mevent = "ABNORMAL"
+  oevent = "ABNORMAL"
+
   # if male and/or female specific term found then ignore the combined sex mp terms
   if (length(x[fgrep]) > 0 || length(x[mgrep]) > 0)
     agrep = FALSE
 
-  if (method %in% 'RR') {
-    MPTERM <- list(
-      NullOrvalueReturn(
-        x[agrep],
-        create_term_entry(x[agrep], '(MALE)|(FEMALE)', 'ABNORMAL', oevent, sex_levels)
-      ),
-      NullOrvalueReturn(
-        x[fgrep],
-        create_term_entry(x[fgrep], 'ABNORMAL', 'FEMALE', fevent, "female")
-      ),
-      NullOrvalueReturn(
-        x[mgrep],
-        create_term_entry(x[mgrep], 'ABNORMAL', 'MALE', mevent, "male")
-      )
+  MPTERM <- list(
+    NullOrvalueReturn(
+      x[agrep],
+      create_term_entry(x[agrep], '(MALE)|(FEMALE)', 'ABNORMAL', oevent, sex_levels)
+    ),
+    NullOrvalueReturn(
+      x[fgrep],
+      create_term_entry(x[fgrep], 'ABNORMAL', 'FEMALE', fevent, "female")
+    ),
+    NullOrvalueReturn(
+      x[mgrep],
+      create_term_entry(x[mgrep], 'ABNORMAL', 'MALE', mevent, "male")
     )
-  } else{
-    MPTERM = list(
-      NullOrvalueReturn(x[agrep],
-                        list(
-                          'term_id' = bselect(x[agrep]),
-                          event = oevent,
-                          sex = ifelse(
-                            length(unique(sex_levels)) > 1 ,
-                            "not_considered",
-                            unique(sex_levels)[1]
-                          )
-                        )),
-      NullOrvalueReturn(x[fgrep], list(
-        'term_id' = bselect(x[fgrep]),
-        event = fevent,
-        sex = "female"
-      )),
-      NullOrvalueReturn(x[mgrep], list(
-        'term_id' = bselect(x[mgrep]),
-        event = mevent,
-        sex = "male"
-      ))
-    )
-  }
+  )
+
   return(MPTERM)
 }
 
@@ -5051,7 +5016,6 @@ annotationChooser = function(statpacket = NULL,
 
   Gtag = GenotypeTag(
     obj = json$Result$`Vector output`[[resultKey]],
-    parameter_stable_id = statpacket$V6,
     threshold = level,
     rrlevel = rrlevel
   )
