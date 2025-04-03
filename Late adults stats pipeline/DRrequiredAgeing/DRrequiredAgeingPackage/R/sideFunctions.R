@@ -4828,57 +4828,12 @@ DecIncDetectorRR = function(x) {
 
   r = c()
 
-  ###################################### MALE
-  ###################################### LOW
-  r1 = multiGrepl(pattern = c('DECREASED', 'LOW', 'MALE'), x = names(x))
-  if (any(r1)) {
-    rlowM = 'DECREASED'
-  } else {
-    rlowM = NA
-  }
-  ###################################### HIGH
-  r2 = multiGrepl(pattern = c('INCREASED', 'HIGH', 'MALE'), x = names(x))
-  if (any(r2)) {
-    rhighM = 'INCREASED'
-  } else {
-    rhighM = NA
-  }
-  ######################################
-  r3 = na.omit(c(rlowM, rhighM))
-  if (length(r3) > 0) {
-    if (length(r3) == 1) {
-      r = c(r, na.omit(r3))
-    } else{
-      r = c(r, 'ABNORMAL')
-    }
-  }
-  ###################################### FEMALE
-  ###################################### LOW
-  r4 = multiGrepl(pattern = c('DECREASED', 'LOW', 'FEMALE'),
-                  x = names(x))
-  if (any(r4)) {
-    rlowF = 'DECREASED'
-  } else {
-    rlowF = NA
-  }
+  # MALE: always just "ABNORMAL"
+  r = c(r, 'ABNORMAL')
 
-  ###################################### HIGH
-  r5 = multiGrepl(pattern = c('INCREASED', 'HIGH', 'FEMALE'),
-                  x = names(x))
-  if (any(r5)) {
-    rhighF = 'INCREASED'
-  } else {
-    rhighF = NA
-  }
-  ######################################
-  r6 = na.omit(c(rlowF, rhighF))
-  if (length(r6) > 0) {
-    if (length(r6) == 1) {
-      r = c(r, na.omit(r6))
-    } else{
-      r = c(r, 'ABNORMAL')
-    }
-  }
+  # FEMALE: always just "ABNORMAL"
+  r = c(r, 'ABNORMAL')
+
   ######################################
   ###################################### ABNORMAL
   r7 = multiGrepl(
