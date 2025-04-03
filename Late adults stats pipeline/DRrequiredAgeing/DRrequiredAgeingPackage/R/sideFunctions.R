@@ -4834,46 +4834,9 @@ DecIncDetectorRR = function(x) {
   # FEMALE: always just "ABNORMAL"
   r = c(r, 'ABNORMAL')
 
-  ######################################
-  ###################################### ABNORMAL
-  r7 = multiGrepl(
-    pattern = c('(DECREASED)|(INCREASED)', 'LOW', 'ABNORMAL'),
-    x = names(x)
-  )
-  if (sum(r7) > 1) {
-    rlowA = c('ABNORMAL')
-  } else if (sum(r7) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r7])))
-      rlowA = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r7])))
-      rlowA = c('DECREASED')
-  } else{
-    rlowA = NA
-  }
-  ######################################
-  r8 = multiGrepl(
-    pattern = c('(DECREASED)|(INCREASED)', 'HIGH', 'ABNORMAL'),
-    x = names(x)
-  )
-  if (sum(r8) > 1) {
-    rhighA = c('ABNORMAL')
-  } else if (sum(r8) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r8])))
-      rhighA = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r8])))
-      rhighA = c('DECREASED')
-  } else{
-    rhighA = NA
-  }
-  ######################################
-  r9 = na.omit(c(rlowA, rhighA))
-  if (length(r9) > 0) {
-    if (length(r9) == 1) {
-      r = c(r, na.omit(r9))
-    } else{
-      r = c(r, 'ABNORMAL')
-    }
-  }
+  # ABNORMAL: always just "ABNORMAL"
+  r = c(r, 'ABNORMAL')
+
   ######################################
   abpattern = inferpattern = FALSE
 
