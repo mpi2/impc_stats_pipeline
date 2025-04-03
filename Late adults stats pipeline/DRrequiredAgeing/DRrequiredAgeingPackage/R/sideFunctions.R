@@ -4506,9 +4506,9 @@ install.packages.auto <- function(x) {
   }
 }
 
-##########################################
-############## For the annotation pipeline
-##########################################
+#######################
+# Annotation pipeline #
+#######################
 
 GetMethodStPa <- function(x) {
   if (is.null(x)) {
@@ -4566,36 +4566,6 @@ DirectionTagFE = function(x,
            ')')
   }
   return(tag)
-}
-
-numbers_only <- function(x) {
-  r = !grepl("\\D", x)
-  return(r)
-}
-
-multiGrepl = function (x = NULL, pattern = NULL, ...)
-{
-  if (is.null(x)) {
-    return(NULL)
-  }
-  if (is.null(pattern)) {
-    return(TRUE)
-  }
-  r <- rep(TRUE, length(x))
-  for (p in pattern) {
-    r <- r & grepl(pattern = p, x = x, ...)
-  }
-  return(r)
-}
-
-returnWhatBasedOnThreshold = function(x = NULL,
-                                      threshold = .0001,
-                                      Return = 'ABNORMAL') {
-  if (is.numeric(x) && x < threshold) {
-    return(Return)
-  } else {
-    return('IgnoreThisCaseAtALL')
-  }
 }
 
 GenotypeTag = function(obj,
@@ -4714,9 +4684,9 @@ GenotypeTag = function(obj,
     )
     # Define sex/column prefix info.
     sex_column_prefix_pairs <- list(
-      c("UNSPECIFIED", "Genotype"),     # $Low.data_point.Genotype$Genotype$Result$p.value
-      c("FEMALE", "Genotype_Female"),   # $Low.data_point.Genotype$Genotype_Female$Result$p.value
-      c("MALE", "Genotype_Male")        # $Low.data_point.Genotype$Genotype_Male$Result$p.value
+      c("UNSPECIFIED", "Genotype"),
+      c("FEMALE", "Genotype_Female"),
+      c("MALE", "Genotype_Male")
     )
     # Iterate over sexes and their corresponding column prefixes.
     for (pair in sex_column_prefix_pairs) {
@@ -4763,98 +4733,6 @@ GenotypeTag = function(obj,
   return(tag)
 }
 
-MatchTheRestHalfWithTheFirstOne = function(x) {
-  mid = length(x) / 2
-  x[(mid + 1):(2 * mid)] = x[1:mid]
-  return(x)
-}
-
-NullOrvalueReturn = function(x, list) {
-  if (length(x) < 1)
-    return(NULL)
-  else
-    return(list)
-}
-
-# Helper function to create term entries
-create_term_entry <- function(x, event, sex_levels) {
-  term_id <- x
-  other_possibilities <- paste(x, sep = '~', collapse = '~')
-  
-  list(
-    'term_id' = ifelse(length(term_id) > 1, term_id[1], other_possibilities),
-    event = event,
-    sex = ifelse(length(unique(sex_levels)) > 1, "not_considered", unique(sex_levels)[1]),
-    otherPossibilities = ifelse(length(term_id) > 1, other_possibilities, '')
-  )
-}
-
-MoreThan2Length = function(xx,
-                           index,
-                           MPTERMS = NULL,
-                           general = TRUE) {
-  if (length(xx) > 1 &&
-      sum(index) > 1 &&
-      !is.null(MPTERMS) &&
-      length(MPTERMS) > 0) {
-    if (general && any(grepl(pattern = 'INCREASED', xx)) &&
-        any(grepl(pattern = 'INCREASED', names(MPTERMS)))) {
-      return(grepl(pattern = 'INCREASED', xx))
-
-    } else if (general && any(grepl(pattern = 'DECREASED', xx)) &&
-               any(grepl(pattern = 'DECREASED', names(MPTERMS)))) {
-      return(grepl(pattern = 'DECREASED', xx))
-
-    } else if (any(grepl(pattern = 'INFERRED', xx)) &&
-               any(grepl(pattern = 'INFERRED', names(MPTERMS)))) {
-      return(grepl(pattern = 'INFERRED', xx))
-
-    } else if (any(grepl(pattern = 'ABNORMAL', xx)) &&
-               any(grepl(pattern = 'ABNORMAL', names(MPTERMS)))) {
-      return(grepl(pattern = 'ABNORMAL', xx))
-
-    } else if (any(grepl(pattern = 'OVERAL', xx)) &&
-               any(grepl(pattern = 'OVERAL', names(MPTERMS)))) {
-      return(grepl(pattern = 'OVERAL', xx))
-    }
-
-  }
-  return(index)
-}
-
-MaleFemaleAbnormalCategories = function(x, method = 'RR', MPTERMS = NULL, sex_levels = NULL) {
-
-  fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
-  mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
-  agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
-    !fgrep & !mgrep
-
-  fgrep = MoreThan2Length(names(x), fgrep, MPTERMS, general = FALSE)
-  mgrep = MoreThan2Length(names(x), mgrep, MPTERMS, general = FALSE)
-  agrep = MoreThan2Length(names(x), agrep, MPTERMS, general = FALSE)
-
-  # if male and/or female specific term found then ignore the combined sex mp terms
-  if (length(x[fgrep]) > 0 || length(x[mgrep]) > 0)
-    agrep = FALSE
-
-  MPTERM <- list(
-    NullOrvalueReturn(
-      x[agrep],
-      create_term_entry(x[agrep], "ABNORMAL", sex_levels)
-    ),
-    NullOrvalueReturn(
-      x[fgrep],
-      create_term_entry(x[fgrep], "ABNORMAL", "female")
-    ),
-    NullOrvalueReturn(
-      x[mgrep],
-      create_term_entry(x[mgrep], "ABNORMAL", "male")
-    )
-  )
-
-  return(MPTERM)
-}
-
 # This function flattens the mp_chooser structure into a dataframe which is easy to work with.
 flatten_mp_chooser <- function(d) {
   do.call(rbind, lapply(names(d), function(sex) {
@@ -4872,17 +4750,14 @@ flatten_mp_chooser <- function(d) {
   }))
 }
 
+# Main annotation pipeline function.
 annotationChooser = function(statpacket = NULL,
                              level = 10 ^ -4,
                              rrlevel = .005,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
                              mp_chooser_file = NULL) {
-
-  message('Running the annotation pipeline')
-
   requireNamespace('RPostgreSQL')
-  requireNamespace('data.table')
   requireNamespace("data.table")
   requireNamespace("jsonlite")
   requireNamespace("rlist")
