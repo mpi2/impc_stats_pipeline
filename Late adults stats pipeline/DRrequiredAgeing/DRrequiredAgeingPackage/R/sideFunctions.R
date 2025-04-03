@@ -4803,30 +4803,10 @@ NullOrvalueReturn = function(x, list) {
     return(list)
 }
 
-# Former fA, fM, fF
-fAMF <- function(x, pattern_exclude, pattern_include) {
-  # Process if more than one element
-  if (length(x) > 1) {
-    x2 <- x[!grepl(pattern = pattern_exclude, names(x)) & grepl(pattern = pattern_include, names(x))]
-    x3 <- x[grepl(pattern = pattern_include, names(x))]
-    
-    if (length(x2) > 1 && length(x3) > 0) {
-      x <- paste(x3, sep = '~', collapse = '~')
-    } else if (length(x2) > 1 && length(x3) < 1) {
-      x <- paste(x2, sep = '~', collapse = '~')
-    } else {
-      x <- paste(x, sep = '~', collapse = '~')
-    }
-  }
-  
-  # Return processed result
-  return(x)
-}
-
 # Helper function to create term entries
 create_term_entry <- function(x, pattern_exclude, pattern_include, event, sex_levels) {
   term_id <- x
-  other_possibilities <- fAMF(x, pattern_exclude, pattern_include)
+  other_possibilities <- paste(x, sep = '~', collapse = '~')
   
   list(
     'term_id' = ifelse(length(term_id) > 1, term_id[1], other_possibilities),
@@ -4870,10 +4850,6 @@ MoreThan2Length = function(xx,
 }
 
 MaleFemaleAbnormalCategories = function(x, method = 'RR', MPTERMS = NULL, sex_levels = NULL) {
-
-  print(">>>>>>>>>>>>>>>")
-  print(x)
-
   fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
   mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
   agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
@@ -4905,9 +4881,6 @@ MaleFemaleAbnormalCategories = function(x, method = 'RR', MPTERMS = NULL, sex_le
       create_term_entry(x[mgrep], 'ABNORMAL', 'MALE', mevent, "male")
     )
   )
-
-  print("vvvvvvvvvvvvvvvvvv")
-  print(MPTERM)
 
   return(MPTERM)
 }
