@@ -4767,26 +4767,32 @@ annotationChooser = function(statpacket = NULL,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
                              mp_chooser_file = NULL) {
-  requireNamespace("jsonlite")
-  library(dplyr)
 
-  MPTERMS = NA
-  if (is.null(statpacket) ||
-      length(statpacket) < 1 ||
-      is.null(statpacket$V2) ||
-      length(statpacket$V2)<1 ||
-      !statpacket$V2 %in% 'Successful') {
+  # Load the necessary library.
+  requireNamespace("jsonlite")
+
+  # Handle unsuccessful StatPackages.
+  if (
+    is.null(statpacket) ||
+    length(statpacket) < 1 ||
+    is.null(statpacket$V2) ||
+    length(statpacket$V2)<1 ||
+    !statpacket$V2 %in% 'Successful'
+  ) {
     message('Not a successfull StatPackage!')
     return(invisible(list(
       MPTERM = NULL, statpacket = statpacket
     )))
   }
+
+  # Fetch fields from the input file.
   pipeline = statpacket$V15
   procedure = statpacket$V3
   parameter = statpacket$V6
-  json      =  jsonlite::fromJSON(statpacket$V20)
-  method   =   GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
+  json = jsonlite::fromJSON(statpacket$V20)
+  method = GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
 
+  # Assign genotype tag.
   Gtag = GenotypeTag(
     obj = json$Result$`Vector output`[[resultKey]],
     threshold = level,
@@ -4797,6 +4803,7 @@ annotationChooser = function(statpacket = NULL,
   load(mp_chooser_file)
   # The variable "a" is contained within the file we just loaded, and it has some specific structure.
   mp_chooser <- a
+
   # Try to get the annotation for the given pipeline > procedure > parameter trio.
   # If any level is not available, return NULL.
   d <- tryCatch(mp_chooser[[pipeline]][[procedure]][[parameter]], error = function(e) NULL)
@@ -4806,6 +4813,10 @@ annotationChooser = function(statpacket = NULL,
       MPTERM = NULL, statpacket = statpacket
     )))
   }
+
+  # By default, do not put anything into MPTERMS.This is important for input
+  # files which use neither of the supported analysis methods (MM, FE, RR).
+  MPTERMS = NA
 
   if (length(Gtag) > 0) {
 
