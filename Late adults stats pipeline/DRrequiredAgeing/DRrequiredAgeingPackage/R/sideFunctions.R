@@ -4804,7 +4804,7 @@ NullOrvalueReturn = function(x, list) {
 }
 
 # Helper function to create term entries
-create_term_entry <- function(x, pattern_exclude, pattern_include, event, sex_levels) {
+create_term_entry <- function(x, event, sex_levels) {
   term_id <- x
   other_possibilities <- paste(x, sep = '~', collapse = '~')
   
@@ -4859,10 +4859,6 @@ MaleFemaleAbnormalCategories = function(x, method = 'RR', MPTERMS = NULL, sex_le
   mgrep = MoreThan2Length(names(x), mgrep, MPTERMS, general = FALSE)
   agrep = MoreThan2Length(names(x), agrep, MPTERMS, general = FALSE)
 
-  fevent = "ABNORMAL"
-  mevent = "ABNORMAL"
-  oevent = "ABNORMAL"
-
   # if male and/or female specific term found then ignore the combined sex mp terms
   if (length(x[fgrep]) > 0 || length(x[mgrep]) > 0)
     agrep = FALSE
@@ -4870,15 +4866,15 @@ MaleFemaleAbnormalCategories = function(x, method = 'RR', MPTERMS = NULL, sex_le
   MPTERM <- list(
     NullOrvalueReturn(
       x[agrep],
-      create_term_entry(x[agrep], '(MALE)|(FEMALE)', 'ABNORMAL', oevent, sex_levels)
+      create_term_entry(x[agrep], "ABNORMAL", sex_levels)
     ),
     NullOrvalueReturn(
       x[fgrep],
-      create_term_entry(x[fgrep], 'ABNORMAL', 'FEMALE', fevent, "female")
+      create_term_entry(x[fgrep], "ABNORMAL", "female")
     ),
     NullOrvalueReturn(
       x[mgrep],
-      create_term_entry(x[mgrep], 'ABNORMAL', 'MALE', mevent, "male")
+      create_term_entry(x[mgrep], "ABNORMAL", "male")
     )
   )
 
