@@ -4805,11 +4805,6 @@ NullOrvalueReturn = function(x, list) {
 
 # Former fA, fM, fF
 fAMF <- function(x, pattern_exclude, pattern_include, pasteterms = TRUE) {
-  # Remove duplicates
-  if (length(x) > 0) {
-    x <- x[!duplicated(x)]
-  }
-  
   # Process if more than one element
   if (length(x) > 1) {
     x2 <- x[!grepl(pattern = pattern_exclude, names(x)) & 
@@ -4837,7 +4832,7 @@ create_term_entry <- function(x, pattern_exclude, pattern_include, event, sex_le
   other_possibilities <- fAMF(x, pattern_exclude, pattern_include)
   
   list(
-    'term_id' = ifelse(length(term_id) > 1, term_id[1], fAMF(x, pattern_exclude, pattern_include)),
+    'term_id' = ifelse(length(term_id) > 1, term_id[1], other_possibilities),
     event = event,
     sex = ifelse(length(unique(sex_levels)) > 1, "not_considered", unique(sex_levels)[1]),
     otherPossibilities = ifelse(length(term_id) > 1, other_possibilities, '')
