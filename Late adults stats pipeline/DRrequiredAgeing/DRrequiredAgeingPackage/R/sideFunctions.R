@@ -4603,7 +4603,7 @@ GenotypeTag = function(obj,
                        expDetailsForErrorOnly = NULL,
                        rrlevel = 10 ^ -4) {
   if (is.null(obj))
-    return('NotAnalysed')
+    return(NULL)
   method = GetMethodStPa(x = obj$`Applied method`)
   message('\t The analysis method = ', method)
   message('\t The decision threshold = ',
@@ -4823,6 +4823,7 @@ MoreThan2Length = function(xx,
 }
 
 MaleFemaleAbnormalCategories = function(x, method = 'RR', MPTERMS = NULL, sex_levels = NULL) {
+
   fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
   mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
   agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
