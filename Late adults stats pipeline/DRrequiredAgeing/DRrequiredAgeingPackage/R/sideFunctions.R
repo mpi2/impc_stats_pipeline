@@ -4804,7 +4804,7 @@ NullOrvalueReturn = function(x, list) {
 }
 
 # Former fA, fM, fF
-fAMF <- function(x, pattern_exclude, pattern_include, pasteterms = TRUE, sex = NULL) {
+fAMF <- function(x, pattern_exclude, pattern_include, pasteterms = TRUE) {
   # Remove duplicates
   if (length(x) > 0) {
     x <- x[!duplicated(x)]
@@ -4842,30 +4842,6 @@ create_term_entry <- function(x, pattern_exclude, pattern_include, event, sex_le
     sex = ifelse(length(unique(sex_levels)) > 1, "not_considered", unique(sex_levels)[1]),
     otherPossibilities = ifelse(length(term_id) > 1, other_possibilities, '')
   )
-}
-
-bselect = function(x) {
-  if(length(x)<1)
-    return(x)
-  nx = names(x)
-  xx = x
-  if (length(nx) > 1 && any(grepl(pattern = 'INFERRED', x = nx))) {
-    xx = x[grepl(pattern = 'INFERRED', x = nx)][1]
-    return(xx)
-  }
-  if (length(nx) > 1 && any(grepl(pattern = 'ABNORMAL', x = nx))) {
-    xx = x[grepl(pattern = 'ABNORMAL', x = nx)][1]
-    return(xx)
-  }
-
-  if (length(nx) > 1 && any(grepl(pattern = 'OVERAL', x = nx))) {
-    xx = x[grepl(pattern = 'OVERAL', x = nx)][1]
-    return(xx)
-  }
-
-  if (length(xx) > 0)
-    xx = na.omit(xx)
-  return(xx)
 }
 
 MoreThan2Length = function(xx,
