@@ -4568,6 +4568,16 @@ DirectionTagFE = function(x,
   return(tag)
 }
 
+returnWhatBasedOnThreshold = function(x = NULL,
+                                      threshold = .0001,
+                                      Return = 'ABNORMAL') {
+  if (is.numeric(x) && x < threshold) {
+    return(Return)
+  } else {
+    return('IgnoreThisCaseAtALL')
+  }
+}
+
 GenotypeTag = function(obj,
                        threshold = 10 ^ -4,
                        expDetailsForErrorOnly = NULL,
@@ -4757,11 +4767,7 @@ annotationChooser = function(statpacket = NULL,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
                              mp_chooser_file = NULL) {
-  requireNamespace('RPostgreSQL')
-  requireNamespace("data.table")
   requireNamespace("jsonlite")
-  requireNamespace("rlist")
-  requireNamespace("Tmisc")
   library(dplyr)
 
   MPTERMS = NA
@@ -4938,13 +4944,11 @@ annotationChooser = function(statpacket = NULL,
 
   }
 
-  # Inject MPTERMS into the data.
+  # Return the final data structure.
   if (length(MPTERMS) > 0) {
     json$Result$Details[[TermKey]] = MPTERMS
     statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
   }
-
-  # Return the final data structure.
   return(invisible(list(
     MPTERM = MPTERMS, statpacket = statpacket
   )))
