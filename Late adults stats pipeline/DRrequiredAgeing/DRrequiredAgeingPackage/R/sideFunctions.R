@@ -4796,34 +4796,6 @@ MatchTheRestHalfWithTheFirstOne = function(x) {
   return(x)
 }
 
-DecIncDetector = function(x) {
-  if (length(x) < 1)
-    return(NA)
-  r = c()
-  if (any(grepl(pattern = 'DECREASED', x = names(x))))
-    r = c(r, 'DECREASED')
-  if (any(grepl(pattern = 'INCREASED', x = names(x))))
-    r = c(r, 'INCREASED')
-  if (any(grepl(pattern = 'ABNORMAL', x = names(x))))
-    r = c(r, 'ABNORMAL')
-  if (any(grepl(pattern = 'INFERRED', x = names(x))))
-    r = c(r, 'INFERRED')
-
-  if (length(r) < 1)
-    r = NA
-  if (length(r) > 1) {
-    if (any(grepl(pattern = 'DECREASED', x = r)) && !any(grepl(pattern = 'INCREASED', x = r)))
-      r = 'DECREASED'
-    if (any(grepl(pattern = 'INCREASED', x = r)) && !any(grepl(pattern = 'DECREASED', x = r)))
-      r = 'INCREASED'
-    if (any(grepl(pattern = 'ABNORMAL', x = r)))
-      r = 'ABNORMAL'
-    if (any(grepl(pattern = 'INFERRED', x = r)))
-      r = 'INFERRED'
-  }
-  return(r)
-}
-
 NullOrvalueReturn = function(x, list) {
   if (length(x) < 1)
     return(NULL)
@@ -4929,7 +4901,7 @@ MoreThan2Length = function(xx,
   return(index)
 }
 
-MaleFemaleAbnormalCategories = function(x, method = 'RR', MPTERMS = NULL,sex_levels = NULL) {
+MaleFemaleAbnormalCategories = function(x, method = 'RR', MPTERMS = NULL, sex_levels = NULL) {
   fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
   mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
   agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
