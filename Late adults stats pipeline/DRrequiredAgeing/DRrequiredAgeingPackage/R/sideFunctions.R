@@ -4822,46 +4822,7 @@ DecIncDetector = function(x) {
 }
 
 DecIncDetectorRR = function(x) {
-
-  if (length(x) < 1)
-    return(NA)
-
-  r = c()
-
-  # MALE: always just "ABNORMAL"
-  r = c(r, 'ABNORMAL')
-
-  # FEMALE: always just "ABNORMAL"
-  r = c(r, 'ABNORMAL')
-
-  # ABNORMAL: always just "ABNORMAL"
-  r = c(r, 'ABNORMAL')
-
-  ######################################
-  abpattern = inferpattern = FALSE
-
-  if (length(x) > 0) {
-    abpattern = grepl(pattern = 'ABNORMAL', x = names(x))
-    inferpattern = grepl(pattern = 'INFERRED', x = names(x))
-  }
-
-  if (length(r) < 1 && !(any(abpattern) || any(inferpattern)))
-    r = NA
-  ######################################
-  if (length(r) < 1 && (any(abpattern) || any(inferpattern)))
-    if (any(grepl(pattern = 'ABNORMAL', x = names(x))))
-      r = 'ABNORMAL'
-  if (any(grepl(pattern = 'INFERRED', x = names(x))))
-    r = 'INFERRED'
-  ######################################
-  if (length(r) > 1) {
-    if (any(grepl(pattern = 'ABNORMAL', x = r)))
-      r = 'ABNORMAL'
-    if (any(grepl(pattern = 'INFERRED', x = r)))
-      r = 'INFERRED'
-  }
-  ######################################
-  return(r)
+  return ("ABNORMAL")
 }
 
 NullOrvalueReturn = function(x, list) {
