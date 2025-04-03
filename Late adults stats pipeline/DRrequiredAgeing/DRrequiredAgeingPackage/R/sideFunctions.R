@@ -4926,35 +4926,11 @@ annotationChooser = function(statpacket = NULL,
 
   if (length(Gtag) > 0) {
 
-    # 1. Prepare genotype tag and mp_chooser annotation.
-    if (method %in% c("MM", "FE", "RR")) {
-      # Convert the nested mp_chooser structure into the flat dataframe.
-      d <- flatten_mp_chooser(d)
-    } else {
-      # Unpack d (mp_chooser annotation) and convert everything to upper case.
-      ulistD = unlist(d)
-      names(ulistD) = toupper(names(ulistD))
-      # Unpack Gtag.
-      ulistTag = unlist(Gtag)
-    }
+    # 1. Convert the nested mp_chooser structure into the flat dataframe.
+    d <- flatten_mp_chooser(d)
 
-    # 2. Duplicate all entries, replace MALE/FEMALE with UNSPECIFIED, concatenate back.
-    # This part is not required for new approach.
-    if (method %in% c("MM", "FE", "RR")) {
-      print("This part is not required in new approach.")
-    } else {
-      ulistTag2 = ulistTag
-      names(ulistTag2) = gsub(
-        pattern = 'MALE|FEMALE',
-        x = names(ulistTag2),
-        replacement = 'UNSPECIFIED'
-      )
-      ulistTag3 = c(ulistTag2, ulistTag)
-    }
-
-    # 3. Join MP term information from mp_chooser.
+    # 2. Join MP term information from mp_chooser.
     if (method %in% "MM") {
-
       # Bug 2
       # Only keep the UNSPECIFIED sex records for now.
       # This is to replicate the original functionality.
@@ -4966,11 +4942,7 @@ annotationChooser = function(statpacket = NULL,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
-
     } else if (method %in% "FE") {
-
-      # For FE, except for rare exceptions, only the ABNORMAL calls are mapped.
-
       # Bug 2. In general, all calls (U, M, F) are always mapped to U records
       # in mp_chooser. This is the same behaviour as for the MM branch.
       Gtag1 <- merge(
@@ -4979,7 +4951,6 @@ annotationChooser = function(statpacket = NULL,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
-
       # Bug 5. While MALE/FEMALE still never match MALE/FEMALE terms, rows
       # without a particular sex *do* match all terms, MALE/FEMALE included.
       Gtag2 <- merge(
@@ -4990,11 +4961,9 @@ annotationChooser = function(statpacket = NULL,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
-
       # Combine the two dataframes.
       GtagCombined <- rbind(Gtag1, Gtag2)
       GtagCombined <- GtagCombined[!is.na(GtagCombined$MpTerm), ]
-
       # Bug 6. While INCREASED/DECREASED is normally not processed for FE, when
       # no ABNORMAL entry is matched from mp_chooser, they *are* returned.
       # In this case, Level is ignored, but Sex and StatisticalTestResult are checked.
@@ -5008,9 +4977,7 @@ annotationChooser = function(statpacket = NULL,
       } else {
         Gtag <- GtagCombined
       }
-
     } else if (method %in% "RR") {
-
       # Bug 2. In general, all calls (U, M, F) are always mapped to U records
       # in mp_chooser. This is the same behaviour as for the MM branch.
       GtagCombined <- merge(
@@ -5019,7 +4986,6 @@ annotationChooser = function(statpacket = NULL,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
-
       # Bug 6. (Slightly different to FE.) While INCREASED/DECREASED is normally
       # not processed for RR, when no ABNORMAL entry is matched from mp_chooser,
       # they *are* returned. In this case, Level and StatisticalSexResult are
@@ -5035,103 +5001,62 @@ annotationChooser = function(statpacket = NULL,
         Gtag <- GtagCombined
       }
 
-    } else {
-      for (name in names(ulistTag3)) {
-        splN = unlist(strsplit(name, split = '.', fixed = TRUE))
-        splN = splN[!splN %in% c('LOW', 'HIGH','DATA_POINT','GENOTYPE')]
-        splnI = multiGrepl(pattern = splN,
-                          x = names(ulistD),
-                          fixed = TRUE)
-        ulistTag3[names(ulistTag3) %in% name] = ifelse(is.null(ulistD[splnI]), 'CanNotFindMPTerm', head(ulistD[splnI], 1))
-      }
     }
 
-    # 4. Remove the duplication introduced in step 2.
-    # This part is not required for new approach.
-    if (method %in% c("MM", "FE", "RR")) {
-      print("This part is not required in new approach.")
-    } else {
-      ulistTag3 = MatchTheRestHalfWithTheFirstOne(ulistTag3)
-      ulistTag3 = ulistTag3[!duplicated(names(ulistTag3))]
-    }
-
-    # 5. Remove records with no assigned MP terms.
+    # 3. Remove records with no assigned MP terms.
     # This filters out all rows with no statistically significant results.
-    if (method %in% c("MM", "FE", "RR")) {
-      Gtag <- Gtag[!is.na(Gtag$MpTerm), ]
-    } else {
-      ulistTag3 = ulistTag3[!is.na(ulistTag3)]
-    }
+    Gtag <- Gtag[!is.na(Gtag$MpTerm), ]
 
-    # 6. Remove duplicated records.
-    # This is not required in the new approach, because duplicated records do not arise in the first place.
-    if (method %in% c("MM", "FE", "RR")) {
-      print("This part is not required in new approach.")
-    } else {
-      # Do not use unique!
-      if (length(ulistTag3) > 0) {
-        ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
-      }
-    }
-
-    # 7. Implement male/female specific abnormal categories.
+    # 4. Implement male/female specific abnormal categories.
     sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
-    if (method %in% c("MM", "FE", "RR")) {
+    if (nrow(Gtag) == 0) {
+      MPTERMS <- list()
+    } else {
+      # Define the priority order for StatisticalTestResult.
+      priority_order <- c("INCREASED", "DECREASED", "INFERRED", "ABNORMAL")
+      # Check if the input dataframe is empty.
       if (nrow(Gtag) == 0) {
         MPTERMS <- list()
       } else {
-        # Define the priority order for StatisticalTestResult.
-        priority_order <- c("INCREASED", "DECREASED", "INFERRED", "ABNORMAL")
-        # Check if the input dataframe is empty.
-        if (nrow(Gtag) == 0) {
-          MPTERMS <- list()
-        } else {
-          # Group by Sex and select one row per group based on priority.
-          filtered_data <- Gtag %>%
-            group_by(Sex) %>%
-            arrange(match(StatisticalTestResult, priority_order)) %>%
-            slice(1) %>%
-            ungroup()
-          # Drop UNSPECIFIED if MALE or FEMALE data is present.
-          if (any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
-            filtered_data <- filtered_data %>% filter(Sex != "UNSPECIFIED")
-          }
-          # Handle UNSPECIFIED case if no MALE or FEMALE data is present.
-          if (!any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
-            if (length(sex_levels) == 1) {
-              filtered_data$Sex <- toupper(sex_levels)
-            }
-          }
-          # Convert Sex column to lowercase and replace "unspecified" with "not_considered".
-          filtered_data <- filtered_data %>%
-            mutate(Sex = tolower(Sex),
-                   Sex = ifelse(Sex == "unspecified", "not_considered", Sex))
-          # Ensure female comes before male if both are present.
-          filtered_data <- filtered_data %>%
-            arrange(Sex)
-          # Convert to the desired list format.
-          MPTERMS <- filtered_data %>%
-            mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm) %>%
-            select(term_id, event, sex) %>%
-            # Use `purrr::transpose()` to create an unnamed list of objects
-            purrr::transpose() %>%
-            # Remove names from the list
-            unname()
-          # Special case for RR: add an empty `otherPossibilities` field for compatibility.
-          if (method == "RR") {
-            MPTERMS <- purrr::map(MPTERMS, ~ {
-              .x$otherPossibilities <- ""
-              .x
-            })
+        # Group by Sex and select one row per group based on priority.
+        filtered_data <- Gtag %>%
+          group_by(Sex) %>%
+          arrange(match(StatisticalTestResult, priority_order)) %>%
+          slice(1) %>%
+          ungroup()
+        # Drop UNSPECIFIED if MALE or FEMALE data is present.
+        if (any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
+          filtered_data <- filtered_data %>% filter(Sex != "UNSPECIFIED")
+        }
+        # Handle UNSPECIFIED case if no MALE or FEMALE data is present.
+        if (!any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
+          if (length(sex_levels) == 1) {
+            filtered_data$Sex <- toupper(sex_levels)
           }
         }
+        # Convert Sex column to lowercase and replace "unspecified" with "not_considered".
+        filtered_data <- filtered_data %>%
+          mutate(Sex = tolower(Sex),
+                  Sex = ifelse(Sex == "unspecified", "not_considered", Sex))
+        # Ensure female comes before male if both are present.
+        filtered_data <- filtered_data %>%
+          arrange(Sex)
+        # Convert to the desired list format.
+        MPTERMS <- filtered_data %>%
+          mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm) %>%
+          select(term_id, event, sex) %>%
+          # Use `purrr::transpose()` to create an unnamed list of objects
+          purrr::transpose() %>%
+          # Remove names from the list
+          unname()
+        # Special case for RR: add an empty `otherPossibilities` field for compatibility.
+        if (method == "RR") {
+          MPTERMS <- purrr::map(MPTERMS, ~ {
+            .x$otherPossibilities <- ""
+            .x
+          })
+        }
       }
-    } else {
-      MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
-                                            method = method,
-                                            MPTERMS = ulistD,
-                                            sex_levels = sex_levels)
-      MPTERMS = rlist::list.clean(MPTERMS)
     }
 
   }
