@@ -4701,79 +4701,52 @@ GenotypeTag = function(obj,
     }
 
   } else if (method %in% 'RR') {
-
+    # Load fmodels.
     fmodels = obj$`Additional information`$Analysis$`Further models`
     if (is.null(fmodels))
       return(NULL)
-
-    AllCombinations = lapply(fmodels, function(x) {
-      lapply(x, function(y) {
-        DirectionTagFE(x = y$Result$p.value, threshold = rrlevel)
-      })
-    })
-    if (is.null(AllCombinations))
-      return(NULL)
-
-    #### Make the list as sequence of names attached with dot (.)
-    AllCombinations1 = unlist(AllCombinations)
-    # Remove unrealistic combinations.
-    AllCombinations1 = AllCombinations1[!(grepl(
-      pattern = 'Low.',
-      x = names(AllCombinations1),
-      fixed = TRUE
-    ) & AllCombinations1 %in% 'INCREASED')]
-    AllCombinations1 = AllCombinations1[!(grepl(
-      pattern = 'High.',
-      x = names(AllCombinations1),
-      fixed = TRUE
-    ) & AllCombinations1 %in% 'DECREASED')]
-
-    #### Keep only genotype analysis
-    AllCombinations2 = AllCombinations1[grepl(pattern = '(Genotype.Genotype)|(Genotype.Male.Genotype)|(Genotype.Female.Genotype)', x =
-                                                names(AllCombinations1))]
-    #### The abnormal case is made from the data
-    for (i in seq_along(AllCombinations2)) {
-      names(AllCombinations2)[i]  = gsub(
-        pattern = 'data_point.Genotype.Male.Genotype',
-        paste0('MALE.', AllCombinations2[i], '.OVERALL.MPTERM'),
-        x = names(AllCombinations2)[i]
+    # Initialise an empty data frame.
+    tag <- data.frame(
+      Sex = character(),
+      StatisticalTestResult = character(),
+      Level = character(),
+      stringsAsFactors = FALSE
+    )
+    # Define sex/column prefix info.
+    sex_column_prefix_pairs <- list(
+      c("UNSPECIFIED", "Genotype"),     # $Low.data_point.Genotype$Genotype$Result$p.value
+      c("FEMALE", "Genotype_Female"),   # $Low.data_point.Genotype$Genotype_Female$Result$p.value
+      c("MALE", "Genotype_Male")        # $Low.data_point.Genotype$Genotype_Male$Result$p.value
+    )
+    # Iterate over sexes and their corresponding column prefixes.
+    for (pair in sex_column_prefix_pairs) {
+      sex <- pair[1]
+      column_prefix <- pair[2]
+      # Get data for LOW and HIGH tails.
+      low_results <- DirectionTagFE(
+        x = fmodels$Low.data_point.Genotype[[column_prefix]]$Result$p.value,
+        threshold = rrlevel,
+        group = c("ABNORMAL", "DECREASED")
       )
-      names(AllCombinations2)[i]  = gsub(
-        pattern = 'data_point.Genotype.Female.Genotype',
-        paste0('FEMALE.', AllCombinations2[i], '.OVERALL.MPTERM'),
-        x = names(AllCombinations2)[i]
+      high_results <- DirectionTagFE(
+        x = fmodels$High.data_point.Genotype[[column_prefix]]$Result$p.value,
+        threshold = rrlevel,
+        group = c("ABNORMAL", "INCREASED")
       )
-      names(AllCombinations2)[i]  = gsub(
-        pattern = 'data_point.Genotype.Genotype',
-        paste0('UNSPECIFIED.', AllCombinations2[i], '.OVERALL.MPTERM'),
-        x = names(AllCombinations2)[i]
-      )
-      names(AllCombinations2)[i] = gsub(
-        pattern = '..',
-        replacement = '.',
-        x = names(AllCombinations2)[i],
-        fixed = TRUE
-      )
-      ############# step 4
-      names(AllCombinations2)[i] = toupper(names(AllCombinations2)[i])
-    }
-    AllCombinations2 = AllCombinations2[!grepl('(_FEMALE)|(_MALE)',names(AllCombinations2),fixed = FALSE)]
-    ############# step 6
-    if (length(AllCombinations2) < 1)
-      return(NULL)
-    nam = names(AllCombinations2)
-    for (i in 0:1000) {
-      sb = substr(nam, start = nchar(nam) - i, nchar(nam))
-      for (j in 1:length(sb)) {
-        if (numbers_only(sb[j]) && i < nchar(sb[j]))
-          nam[j] = substr(nam[j], start = 0, stop = nchar(nam[j]) - i -
-                            1)
+      all_results <- c(low_results, high_results)
+      # Append all to existing dataframe.
+      for (result in all_results) {
+        tag <- rbind(
+          tag,
+          data.frame(
+            Sex = sex,
+            StatisticalTestResult = result,
+            Level = "OVERALL",
+            stringsAsFactors = FALSE
+          )
+        )
       }
     }
-
-    ############# Finally!
-    names(AllCombinations2) = nam #gsub(pattern = 'LOW.|HIGH.',replacement = '',x = nam)
-    tag = AllCombinations2
 
   } else {
     tag = NULL
@@ -4953,7 +4926,7 @@ annotationChooser = function(statpacket = NULL,
   if (length(Gtag) > 0) {
 
     # 1. Prepare genotype tag and mp_chooser annotation.
-    if (method %in% c("MM", "FE")) {
+    if (method %in% c("MM", "FE", "RR")) {
       # Convert the nested mp_chooser structure into the flat dataframe.
       d <- flatten_mp_chooser(d)
     } else {
@@ -4966,7 +4939,7 @@ annotationChooser = function(statpacket = NULL,
 
     # 2. Duplicate all entries, replace MALE/FEMALE with UNSPECIFIED, concatenate back.
     # This part is not required for new approach.
-    if (method %in% c("MM", "FE")) {
+    if (method %in% c("MM", "FE", "RR")) {
       print("This part is not required in new approach.")
     } else {
       ulistTag2 = ulistTag
@@ -5035,6 +5008,32 @@ annotationChooser = function(statpacket = NULL,
         Gtag <- GtagCombined
       }
 
+    } else if (method %in% "RR") {
+
+      # Bug 2. In general, all calls (U, M, F) are always mapped to U records
+      # in mp_chooser. This is the same behaviour as for the MM branch.
+      GtagCombined <- merge(
+        subset(Gtag, StatisticalTestResult == "ABNORMAL"),
+        subset(d, Sex == "UNSPECIFIED", select = -Sex),
+        by = c("StatisticalTestResult", "Level"),
+        all.x = TRUE
+      )
+
+      # Bug 6. (Slightly different to FE.) While INCREASED/DECREASED is normally
+      # not processed for RR, when no ABNORMAL entry is matched from mp_chooser,
+      # they *are* returned. In this case, Level and StatisticalSexResult are
+      # all checked, in contrast with FE.
+      if (nrow(GtagCombined) == 0) {
+        Gtag <- merge(
+          subset(Gtag, StatisticalTestResult %in% c("INCREASED", "DECREASED")),
+          subset(d, Sex == "UNSPECIFIED", select = -Sex),
+          by = c("StatisticalTestResult", "Level"),
+          all.x = TRUE
+        )
+      } else {
+        Gtag <- GtagCombined
+      }
+
     } else {
       for (name in names(ulistTag3)) {
         splN = unlist(strsplit(name, split = '.', fixed = TRUE))
@@ -5048,7 +5047,7 @@ annotationChooser = function(statpacket = NULL,
 
     # 4. Remove the duplication introduced in step 2.
     # This part is not required for new approach.
-    if (method %in% c("MM", "FE")) {
+    if (method %in% c("MM", "FE", "RR")) {
       print("This part is not required in new approach.")
     } else {
       ulistTag3 = MatchTheRestHalfWithTheFirstOne(ulistTag3)
@@ -5057,30 +5056,15 @@ annotationChooser = function(statpacket = NULL,
 
     # 5. Remove records with no assigned MP terms.
     # This filters out all rows with no statistically significant results.
-    if (method %in% c("MM", "FE")) {
+    if (method %in% c("MM", "FE", "RR")) {
       Gtag <- Gtag[!is.na(Gtag$MpTerm), ]
     } else {
       ulistTag3 = ulistTag3[!is.na(ulistTag3)]
     }
 
-    # 6. Special case for RR. Not refactored for now.
-    if (length(ulistTag3) > 0 &&
-        method %in% 'RR') {
-      lIncDec = multiGrepl(pattern = c('INCREASED|DECREASED'),
-                           x = names(ulistTag3))
-      lAbn    = multiGrepl(pattern = c('ABNORMAL'),
-                           x = names(ulistTag3))
-      if (sum(lIncDec) >= 2 && sum(lAbn) > 0) {
-        ulistTag3 = ulistTag3[lAbn][1]
-        names(ulistTag3) = gsub(pattern = '(LOW\\.)|(\\.HIGH)',
-                                replacement = '',
-                                names(ulistTag3))
-      }
-    }
-
-    # 7. Remove duplicated records.
+    # 6. Remove duplicated records.
     # This is not required in the new approach, because duplicated records do not arise in the first place.
-    if (method %in% c("MM", "FE")) {
+    if (method %in% c("MM", "FE", "RR")) {
       print("This part is not required in new approach.")
     } else {
       # Do not use unique!
@@ -5089,9 +5073,9 @@ annotationChooser = function(statpacket = NULL,
       }
     }
 
-    # 8. Implement male/female specific abnormal categories.
+    # 7. Implement male/female specific abnormal categories.
     sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
-    if (method %in% c("MM", "FE")) {
+    if (method %in% c("MM", "FE", "RR")) {
       if (nrow(Gtag) == 0) {
         MPTERMS <- list()
       } else {
@@ -5120,7 +5104,7 @@ annotationChooser = function(statpacket = NULL,
           # Convert Sex column to lowercase and replace "unspecified" with "not_considered".
           filtered_data <- filtered_data %>%
             mutate(Sex = tolower(Sex),
-                  Sex = ifelse(Sex == "unspecified", "not_considered", Sex))
+                   Sex = ifelse(Sex == "unspecified", "not_considered", Sex))
           # Ensure female comes before male if both are present.
           filtered_data <- filtered_data %>%
             arrange(Sex)
@@ -5132,6 +5116,13 @@ annotationChooser = function(statpacket = NULL,
             purrr::transpose() %>%
             # Remove names from the list
             unname()
+          # Special case for RR: add an empty `otherPossibilities` field for compatibility.
+          if (method == "RR") {
+            MPTERMS <- purrr::map(MPTERMS, ~ {
+              .x$otherPossibilities <- ""
+              .x
+            })
+          }
         }
       }
     } else {
@@ -5145,7 +5136,7 @@ annotationChooser = function(statpacket = NULL,
   }
 
   # Inject MPTERMS into the data.
-  if (method %in% c("MM", "FE")) {
+  if (method %in% c("MM", "FE", "RR")) {
     if (length(MPTERMS) > 0) {
       json$Result$Details[[TermKey]] = MPTERMS
       statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
