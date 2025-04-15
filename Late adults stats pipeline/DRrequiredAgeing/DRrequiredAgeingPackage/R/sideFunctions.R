@@ -4768,8 +4768,9 @@ annotationChooser = function(statpacket = NULL,
                              resultKey = 'Normal result',
                              mp_chooser_file = NULL) {
 
-  # Load the necessary library.
+  # Load the necessary libraries.
   requireNamespace("jsonlite")
+  library(dplyr)
 
   # Handle unsuccessful StatPackages.
   if (
