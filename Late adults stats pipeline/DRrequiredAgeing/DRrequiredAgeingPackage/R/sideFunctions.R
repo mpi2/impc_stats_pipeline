@@ -4933,6 +4933,10 @@ annotationChooser = function(statpacket = NULL,
         filtered_data <- filtered_data %>%
           mutate(Sex = tolower(Sex),
                   Sex = ifelse(Sex == "unspecified", "not_considered", Sex))
+        # Bug 7: in RR, when len(sex_levels) > 1, sex is always set to not_considered
+        if (length(sex_levels) > 1 && method == "RR") {
+          filtered_data$Sex <- "not_considered"
+        }
         # Ensure female comes before male if both are present.
         filtered_data <- filtered_data %>%
           arrange(Sex)
