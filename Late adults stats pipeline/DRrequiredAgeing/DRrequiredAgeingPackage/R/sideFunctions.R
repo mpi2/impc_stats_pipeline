@@ -4695,8 +4695,8 @@ GenotypeTag = function(obj,
     # Define sex/column prefix info.
     sex_column_prefix_pairs <- list(
       c("UNSPECIFIED", "Genotype"),
-      c("FEMALE", "Genotype_Female"),
-      c("MALE", "Genotype_Male")
+      c("FEMALE", "Genotype.Female"),
+      c("MALE", "Genotype.Male")
     )
     # Iterate over sexes and their corresponding column prefixes.
     for (pair in sex_column_prefix_pairs) {
@@ -4704,12 +4704,12 @@ GenotypeTag = function(obj,
       column_prefix <- pair[2]
       # Get data for LOW and HIGH tails.
       low_results <- DirectionTagFE(
-        x = fmodels$Low.data_point.Genotype[[column_prefix]]$Result$p.value,
+        x = fmodels[[paste0("Low.data_point.", column_prefix)]]$Genotype$Result$p.value,
         threshold = rrlevel,
         group = c("ABNORMAL", "DECREASED")
       )
       high_results <- DirectionTagFE(
-        x = fmodels$High.data_point.Genotype[[column_prefix]]$Result$p.value,
+        x = fmodels[[paste0("High.data_point.", column_prefix)]]$Genotype$Result$p.value,
         threshold = rrlevel,
         group = c("ABNORMAL", "INCREASED")
       )
