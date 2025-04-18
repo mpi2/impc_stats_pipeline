@@ -4862,6 +4862,8 @@ annotationChooser = function(statpacket = NULL,
       # Bug 6. While INCREASED/DECREASED is normally not processed for FE, when
       # no ABNORMAL entry is matched from mp_chooser, they *are* returned.
       # In this case, Level is ignored, but Sex and StatisticalTestResult are checked.
+      # This works only for MALE/FEMALE calls, because for UNSPECIFIED, any
+      # INCREASED/DECREASED terms are always filtered out.
       if (nrow(GtagCombined) == 0) {
         Gtag <- merge(
           subset(Gtag, StatisticalTestResult %in% c("INCREASED", "DECREASED") & Sex %in% c("MALE", "FEMALE")),
@@ -4881,10 +4883,16 @@ annotationChooser = function(statpacket = NULL,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
+      # Immediately remove all rows without statistically significant results,
+      # because we need this for correct check of Bug 6 later.
+      GtagCombined <- GtagCombined[!is.na(GtagCombined$MpTerm), ]
+
       # Bug 6. (Slightly different to FE.) While INCREASED/DECREASED is normally
       # not processed for RR, when no ABNORMAL entry is matched from mp_chooser,
       # they *are* returned. In this case, Level and StatisticalSexResult are
-      # all checked, in contrast with FE.
+      # all checked, in contrast with FE. Note also that this is mapped for all
+      # calls: male, female, unspecified; in contrast with FE, where it only happens
+      # for male/female calls.
       if (nrow(GtagCombined) == 0) {
         Gtag <- merge(
           subset(Gtag, StatisticalTestResult %in% c("INCREASED", "DECREASED")),
