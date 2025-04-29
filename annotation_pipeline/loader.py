@@ -82,14 +82,11 @@ def main():
     logging.info("  mp_chooser_file: %s", args.mp_chooser_file)
 
     file_list_path = Path(args.file)
-    mp_chooser_file = args.mp_chooser_file
 
     # Load necessary R libraries.
     importr("base")
     importr("jsonlite")
     importr("utils")
-
-    r["load"](mp_chooser_file)
 
     with open(file_list_path, "r", encoding="utf-8") as f:
         file_list = [line.strip() for line in f]
@@ -108,7 +105,7 @@ def main():
             "NotProcessed" in file or "Successful" in file
         ):
             try:
-                process_statpacket(file, output_file, mp_chooser_file)
+                process_statpacket(file, output_file, args.mp_chooser_file)
                 logging.info("File processed successfully %s out of %s: %s", i+1, total_files, file)
             except Exception as e:
                 logging.error(f"Error processing {file}:\n%s", e)
