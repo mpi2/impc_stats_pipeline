@@ -4906,13 +4906,6 @@ GenotypeTag = function(obj,
   return(tag)
 }
 
-
-unScrewProcedure = function(x) {
-  r = unlist(strsplit(x = x, split = '~'))
-  return(r)
-}
-###########################
-
 MatchTheRestHalfWithTheFirstOne = function(x) {
   mid = length(x) / 2
   x[(mid + 1):(2 * mid)] = x[1:mid]
@@ -5368,9 +5361,13 @@ annotationChooser = function(statpacket = NULL,
     rrlevel = rrlevel
   )
 
-  b = a[[unScrewProcedure(pipeline)[1]]]
-  c = b[[unScrewProcedure(procedure)[1]]]
-  d = c[[unScrewProcedure(parameter)[1]]]
+  # Load mp_chooser Rdata file.
+  load(mp_chooser_file)
+  # The variable "a" is contained within the file we just loaded, and it has some specific structure.
+  mp_chooser <- a
+  # Try to get the annotation for the given pipeline > procedure > parameter trio.
+  # If any level is not available, return NULL.
+  d <- tryCatch(mp_chooser[[pipeline]][[procedure]][[parameter]], error = function(e) NULL)
   if (is.null(d)) {
     message('No annotation available by IMPC. See https://www.mousephenotype.org/impress/')
     return(invisible(list(
