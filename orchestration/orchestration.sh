@@ -243,12 +243,12 @@ fi
 mkdir err log out
 for file in $(find . -maxdepth 1 -type f -name "split_index*"); do
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=5G --time=2-00 \
-  -e err/$(basename "$file").err -o out/$(basename "$file").out --wrap='Rscript loader.R $(basename "$file") ${MP_CHOOSER_FILE}'" >> annotation_jobs.bch
+  -e err/$(basename "$file").err -o out/$(basename "$file").out --wrap='python3 loader.py $(basename "$file") ${MP_CHOOSER_FILE}'" >> annotation_jobs.bch
 done
 chmod 775 annotation_jobs.bch
 
 message0 "Downloading the action script..."
-fetch_script loader.R annotation_pipeline
+fetch_script loader.py annotation_pipeline
 submit_limit_jobs annotation_jobs.bch ../../../../compressed_logs/annotation_job_id.txt
 waitTillCommandFinish
 
