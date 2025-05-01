@@ -28,8 +28,6 @@ if (!dir.exists("tmp")) {
 
 tmplocalfile <- file.path('tmp', paste0(basename(file), '_.statpackets'))
 
-
-statpackets_out = NULL
 for (i in 1:lflist) {
   cat('\r', i, '/', lflist)
   file = flist[i]
@@ -68,11 +66,5 @@ for (i in 1:lflist) {
     write(paste0(as.character(rW$statpacket$V20), collapse = ''),
           file = tmplocalfile,
           append = TRUE)
-    #statpackets_out = c(statpackets_out, rW$statpacket)
-    #writeLines(statpackets_out, con = tmplocalfile)
   }
 }
-
-# statpackets need to be stored as characters
-# statpackets_out = as.character(statpackets_out)
-gc()
