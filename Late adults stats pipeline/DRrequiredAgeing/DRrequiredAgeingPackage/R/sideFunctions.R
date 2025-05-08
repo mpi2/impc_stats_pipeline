@@ -4856,22 +4856,7 @@ annotationChooser = function(statpacket = NULL,
       )
       # Combine the two dataframes.
       GtagCombined <- rbind(Gtag1, Gtag2)
-      GtagCombined <- GtagCombined[!is.na(GtagCombined$MpTerm), ]
-      # Bug 6. While INCREASED/DECREASED is normally not processed for FE, when
-      # no ABNORMAL entry is matched from mp_chooser, they *are* returned.
-      # In this case, Level is ignored, but Sex and StatisticalTestResult are checked.
-      # This works only for MALE/FEMALE calls, because for UNSPECIFIED, any
-      # INCREASED/DECREASED terms are always filtered out.
-      if (nrow(GtagCombined) == 0) {
-        Gtag <- merge(
-          subset(Gtag, StatisticalTestResult %in% c("INCREASED", "DECREASED") & Sex %in% c("MALE", "FEMALE")),
-          subset(d, Sex == "UNSPECIFIED", select = -c(Sex, Level)),
-          by = c("StatisticalTestResult"),
-          all.x = TRUE
-        )
-      } else {
-        Gtag <- GtagCombined
-      }
+      Gtag <- GtagCombined[!is.na(GtagCombined$MpTerm), ]
     } else if (method %in% "RR") {
       # Bug 2. In general, all calls (U, M, F) are always mapped to U records
       # in mp_chooser. This is the same behaviour as for the MM branch.
