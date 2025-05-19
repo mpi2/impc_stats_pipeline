@@ -4813,7 +4813,7 @@ annotationChooser = function(statpacket = NULL,
     )))
   }
 
-  # By default, do not put anything into MPTERMS.This is important for input
+  # By default, do not put anything into MPTERMS. This is important for input
   # files which use neither of the supported analysis methods (MM, FE, RR).
   MPTERMS = NA
 
@@ -4866,16 +4866,9 @@ annotationChooser = function(statpacket = NULL,
         by = c("StatisticalTestResult", "Level"),
         all.x = TRUE
       )
-      # Immediately remove all rows without statistically significant results,
-      # because we need this for correct check of Bug 6 later.
+      # In case no ABNORMAL MP terms were found, try to match INCREASED/DECREASED terms.
+      # This approach is left unchanged from the original annotation pipeline.
       GtagCombined <- GtagCombined[!is.na(GtagCombined$MpTerm), ]
-
-      # Bug 6. (Slightly different to FE.) While INCREASED/DECREASED is normally
-      # not processed for RR, when no ABNORMAL entry is matched from mp_chooser,
-      # they *are* returned. In this case, Level and StatisticalSexResult are
-      # all checked, in contrast with FE. Note also that this is mapped for all
-      # calls: male, female, unspecified; in contrast with FE, where it only happens
-      # for male/female calls.
       if (nrow(GtagCombined) == 0) {
         Gtag <- merge(
           subset(Gtag, StatisticalTestResult %in% c("INCREASED", "DECREASED")),
@@ -4931,7 +4924,7 @@ annotationChooser = function(statpacket = NULL,
         MPTERMS <- filtered_data %>%
           mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm) %>%
           select(term_id, event, sex) %>%
-          # Use `purrr::transpose()` to create an unnamed list of objects
+          # Use `purrr::transpose()` to create an unnamed list of objects.
           purrr::transpose() %>%
           # Remove names from the list
           unname()
