@@ -4758,6 +4758,32 @@ flatten_mp_chooser <- function(d) {
   }))
 }
 
+match_mp_terms <- function(Gtag, d, allowed_results = NA) {
+  # If provided, restrict the data to a list of allowed statistical test results.
+  if (!is.na(allowed_results)) {
+    Gtag <- subset(Gtag, StatisticalTestResult %in% allowed_results)
+  }
+  # First, try to join by exact sex, for example M call to M term.
+  GtagExact <- merge(
+    Gtag,
+    d,
+    by = c("StatisticalTestResult", "Level", "Sex"),
+    all.x = TRUE
+  )
+  # Separate rows where we did / did not find a MP term.
+  GtagExactMatched <- subset(GtagExact, !is.na(MpTerm))
+  GtagExactUnmatched <- subset(GtagExact, is.na(MpTerm))
+  # Now, for the unmatched records, try to find a U term as a fallback.
+  GtagUnspecified <- merge(
+    Gtag,
+    subset(d, Sex == "UNSPECIFIED", select = -Sex),
+    by = c("StatisticalTestResult", "Level"),
+    all.x = TRUE
+  )
+  # Return all rows.
+  return(rbind(GtagExactMatched, GtagUnspecified))
+}
+
 # Main annotation pipeline function.
 annotationChooser = function(statpacket = NULL,
                              level = 10 ^ -4,
@@ -4824,67 +4850,22 @@ annotationChooser = function(statpacket = NULL,
 
     # 2. Join MP term information from mp_chooser.
     if (method %in% "MM") {
-      # Bug 2
-      # Only keep the UNSPECIFIED sex records for now.
-      # This is to replicate the original functionality.
-      # Will be refactored further later.
-      d_unspecified <- subset(d, Sex == "UNSPECIFIED", select = -Sex)
-      Gtag <- merge(
-        Gtag,
-        d_unspecified,
-        by = c("StatisticalTestResult", "Level"),
-        all.x = TRUE
-      )
+      Gtag <- match_mp_terms(Gtag, d)
     } else if (method %in% "FE") {
-      # Bug 2. In general, all calls (U, M, F) are always mapped to U records
-      # in mp_chooser. This is the same behaviour as for the MM branch.
-      Gtag1 <- merge(
-        subset(Gtag, StatisticalTestResult == "ABNORMAL"),
-        subset(d, Sex == "UNSPECIFIED", select = -Sex),
-        by = c("StatisticalTestResult", "Level"),
-        all.x = TRUE
-      )
-      # Bug 5. While MALE/FEMALE still never match MALE/FEMALE terms, rows
-      # without a particular sex *do* match all terms, MALE/FEMALE included.
-      Gtag2 <- merge(
-        subset(Gtag, Sex == "UNSPECIFIED" & StatisticalTestResult == "ABNORMAL"),
-        # We are only matching to MALE/FEMALE in mp_chooser because we already
-        # matched to UNSPECIFIED in the previous step.
-        subset(d, Sex %in% c("MALE", "FEMALE"), select = -Sex),
-        by = c("StatisticalTestResult", "Level"),
-        all.x = TRUE
-      )
-      # Combine the two dataframes.
-      GtagCombined <- rbind(Gtag1, Gtag2)
-      Gtag <- GtagCombined[!is.na(GtagCombined$MpTerm), ]
+      Gtag <- match_mp_terms(Gtag, d, c("ABNORMAL"))
     } else if (method %in% "RR") {
-      # Bug 2. In general, all calls (U, M, F) are always mapped to U records
-      # in mp_chooser. This is the same behaviour as for the MM branch.
-      GtagCombined <- merge(
-        subset(Gtag, StatisticalTestResult == "ABNORMAL"),
-        subset(d, Sex == "UNSPECIFIED", select = -Sex),
-        by = c("StatisticalTestResult", "Level"),
-        all.x = TRUE
-      )
+      # By default, only ABNORMAL calls are used for RR.
+      Gtag <- match_mp_terms(Gtag, d, c("ABNORMAL"))
       # In case no ABNORMAL MP terms were found, try to match INCREASED/DECREASED terms.
       # This approach is left unchanged from the original annotation pipeline.
-      GtagCombined <- GtagCombined[!is.na(GtagCombined$MpTerm), ]
-      if (nrow(GtagCombined) == 0) {
-        Gtag <- merge(
-          subset(Gtag, StatisticalTestResult %in% c("INCREASED", "DECREASED")),
-          subset(d, Sex == "UNSPECIFIED", select = -Sex),
-          by = c("StatisticalTestResult", "Level"),
-          all.x = TRUE
-        )
-      } else {
-        Gtag <- GtagCombined
+      if (nrow(subset(Gtag, !is.na(MpTerm))) == 0) {
+        Gtag <- match_mp_terms(Gtag, d, c("INCREASED", "DECREASED"))
       }
-
     }
 
     # 3. Remove records with no assigned MP terms.
     # This filters out all rows with no statistically significant results.
-    Gtag <- Gtag[!is.na(Gtag$MpTerm), ]
+    Gtag <- subset(Gtag, !is.na(MpTerm))
 
     # 4. Implement male/female specific abnormal categories.
     sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
