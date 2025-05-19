@@ -4758,9 +4758,9 @@ flatten_mp_chooser <- function(d) {
   }))
 }
 
-match_mp_terms <- function(Gtag, d, allowed_results = NA) {
+match_mp_terms <- function(Gtag, d, allowed_results = c()) {
   # If provided, restrict the data to a list of allowed statistical test results.
-  if (!is.na(allowed_results)) {
+  if (length(allowed_results) > 0) {
     Gtag <- subset(Gtag, StatisticalTestResult %in% allowed_results)
   }
   # First, try to join by exact sex, for example M call to M term.
