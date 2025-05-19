@@ -4855,10 +4855,12 @@ annotationChooser = function(statpacket = NULL,
       Gtag <- match_mp_terms(Gtag, d, c("ABNORMAL"))
     } else if (method %in% "RR") {
       # By default, only ABNORMAL calls are used for RR.
-      Gtag <- match_mp_terms(Gtag, d, c("ABNORMAL"))
+      GtagAbnormal <- match_mp_terms(Gtag, d, c("ABNORMAL"))
       # In case no ABNORMAL MP terms were found, try to match INCREASED/DECREASED terms.
       # This approach is left unchanged from the original annotation pipeline.
-      if (nrow(subset(Gtag, !is.na(MpTerm))) == 0) {
+      if (nrow(subset(GtagAbnormal, !is.na(MpTerm))) > 0) {
+        Gtag <- GtagAbnormal
+      } else {
         Gtag <- match_mp_terms(Gtag, d, c("INCREASED", "DECREASED"))
       }
     }
