@@ -4615,6 +4615,7 @@ GenotypeTag = function(obj,
           if (is.numeric(pvalue) && pvalue < threshold) "INFERRED" else "IgnoreThisCaseAtALL"
         ),
         Level = "OVERALL",
+        PValue = pvalue,
         stringsAsFactors = FALSE
       ))
     }
@@ -4888,8 +4889,8 @@ annotationChooser = function(statpacket = NULL,
           arrange(Sex)
         # Convert to the desired list format.
         MPTERMS <- filtered_data %>%
-          mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm) %>%
-          select(term_id, event, sex) %>%
+          mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm, p_value = PValue) %>%
+          select(term_id, event, sex, p_value) %>%
           # Use `purrr::transpose()` to create an unnamed list of objects.
           purrr::transpose() %>%
           # Remove names from the list
