@@ -4685,25 +4685,41 @@ GenotypeTag = function(obj,
       sex <- pair[1]
       column_prefix <- pair[2]
       # Get data for LOW and HIGH tails.
+      low_pvalue <- fmodels[[paste0("Low.data_point.", column_prefix)]]$Genotype$Result$p.value
+      high_pvalue <- fmodels[[paste0("High.data_point.", column_prefix)]]$Genotype$Result$p.value
       low_results <- DirectionTagFE(
-        x = fmodels[[paste0("Low.data_point.", column_prefix)]]$Genotype$Result$p.value,
+        x = low_pvalue,
         threshold = rrlevel,
         group = c("ABNORMAL", "DECREASED")
       )
       high_results <- DirectionTagFE(
-        x = fmodels[[paste0("High.data_point.", column_prefix)]]$Genotype$Result$p.value,
+        x = high_pvalue,
         threshold = rrlevel,
         group = c("ABNORMAL", "INCREASED")
       )
-      all_results <- c(low_results, high_results)
+
       # Append all to existing dataframe.
-      for (result in all_results) {
+      for (result in low_results) {
         tag <- rbind(
           tag,
           data.frame(
             Sex = sex,
             StatisticalTestResult = result,
             Level = "OVERALL",
+            PValue = low_pvalue,
+            stringsAsFactors = FALSE
+          )
+        )
+      }
+
+      for (result in high_results) {
+        tag <- rbind(
+          tag,
+          data.frame(
+            Sex = sex,
+            StatisticalTestResult = result,
+            Level = "OVERALL",
+            PValue = high_pvalue,
             stringsAsFactors = FALSE
           )
         )
