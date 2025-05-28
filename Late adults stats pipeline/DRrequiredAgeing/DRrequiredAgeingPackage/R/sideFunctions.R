@@ -4656,6 +4656,7 @@ GenotypeTag = function(obj,
             threshold = threshold
           ),
           Level = "OVERALL",
+          PValue = fmodels[[column_prefix]]$`Complete table`$p.value,
           stringsAsFactors = FALSE
         )
       )
