@@ -4568,16 +4568,6 @@ DirectionTagFE = function(x,
   return(tag)
 }
 
-returnWhatBasedOnThreshold = function(x = NULL,
-                                      threshold = .0001,
-                                      Return = 'ABNORMAL') {
-  if (is.numeric(x) && x < threshold) {
-    return(Return)
-  } else {
-    return('IgnoreThisCaseAtALL')
-  }
-}
-
 GenotypeTag = function(obj,
                        threshold = 10 ^ -4,
                        expDetailsForErrorOnly = NULL,
@@ -4609,6 +4599,7 @@ GenotypeTag = function(obj,
     for (pair in sex_column_prefix_pairs) {
       sex <- pair[1]
       column_prefix <- pair[2]
+      pvalue = obj[[paste0(column_prefix, " p-value")]]
       # Append to existing dataframe.
       tag <- rbind(tag, data.frame(
         Sex = sex,
@@ -4616,20 +4607,12 @@ GenotypeTag = function(obj,
           # Statistical test based on genotype effect estimate and p-value.
           DirectionTagMM(
             x = obj[[paste0(column_prefix, " estimate")]]$Value,
-            pvalue = obj[[paste0(column_prefix, " p-value")]],
+            pvalue = pvalue,
             threshold = threshold
           ),
           # Simple statistical test based on p-value only.
-          returnWhatBasedOnThreshold(
-            x = obj[[paste0(column_prefix, " p-value")]],
-            threshold = threshold,
-            Return = "ABNORMAL"
-          ),
-          returnWhatBasedOnThreshold(
-            x = obj[[paste0(column_prefix, " p-value")]],
-            threshold = threshold,
-            Return = 'INFERRED'
-          )
+          if (is.numeric(pvalue) && pvalue < threshold) "ABNORMAL" else "IgnoreThisCaseAtALL",
+          if (is.numeric(pvalue) && pvalue < threshold) "INFERRED" else "IgnoreThisCaseAtALL"
         ),
         Level = "OVERALL",
         stringsAsFactors = FALSE
