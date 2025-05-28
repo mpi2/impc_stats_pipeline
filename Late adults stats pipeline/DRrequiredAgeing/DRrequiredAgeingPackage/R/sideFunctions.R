@@ -4592,8 +4592,7 @@ GenotypeTag = function(obj,
     sex_column_prefix_pairs <- list(
       c("UNSPECIFIED", "Genotype"),
       c("FEMALE", "Sex FvKO"),
-      c("MALE", "Sex MvKO"),
-      stringsAsFactors = FALSE
+      c("MALE", "Sex MvKO")
     )
     # Iterate over sexes and their corresponding column prefixes.
     for (pair in sex_column_prefix_pairs) {
