@@ -4614,7 +4614,7 @@ GenotypeTag = function(obj,
           if (is.numeric(pvalue) && pvalue < threshold) "INFERRED" else "IgnoreThisCaseAtALL"
         ),
         Level = "OVERALL",
-        PValue = pvalue,
+        PValue = if (is.null(pvalue)) NA else pvalue,
         stringsAsFactors = FALSE
       ))
     }
