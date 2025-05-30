@@ -4646,17 +4646,18 @@ GenotypeTag = function(obj,
     for (pair in sex_column_prefix_pairs) {
       sex <- pair[1]
       column_prefix <- pair[2]
+      pvalue <- fmodels[[column_prefix]]$`Complete table`$p.value
       # Append to existing dataframe.
       tag <- rbind(
         tag,
         data.frame(
           Sex = sex,
           StatisticalTestResult = DirectionTagFE(
-            x = fmodels[[column_prefix]]$`Complete table`$p.value,
+            x = pvalue,
             threshold = threshold
           ),
           Level = "OVERALL",
-          PValue = fmodels[[column_prefix]]$`Complete table`$p.value,
+          PValue = if (is.null(pvalue)) NA else pvalue,
           stringsAsFactors = FALSE
         )
       )
@@ -4706,7 +4707,7 @@ GenotypeTag = function(obj,
             Sex = sex,
             StatisticalTestResult = result,
             Level = "OVERALL",
-            PValue = low_pvalue,
+            PValue = if (is.null(low_pvalue)) NA else low_pvalue,
             stringsAsFactors = FALSE
           )
         )
@@ -4719,7 +4720,7 @@ GenotypeTag = function(obj,
             Sex = sex,
             StatisticalTestResult = result,
             Level = "OVERALL",
-            PValue = high_pvalue,
+            PValue = if (is.null(high_pvalue)) NA else high_pvalue,
             stringsAsFactors = FALSE
           )
         )
