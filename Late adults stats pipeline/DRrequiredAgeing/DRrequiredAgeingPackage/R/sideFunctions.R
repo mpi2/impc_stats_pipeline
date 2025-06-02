@@ -4851,7 +4851,6 @@ annotationChooser = function(statpacket = NULL,
         })
       }
     }
-
   }
 
   # Return the final data structure.
@@ -4859,7 +4858,5 @@ annotationChooser = function(statpacket = NULL,
     json$Result$Details[[TermKey]] = MPTERMS
     statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
   }
-  return(invisible(list(
-    MPTERM = MPTERMS, statpacket = statpacket
-  )))
+  return(invisible(list(MPTERM = MPTERMS, statpacket = statpacket)))
 }
