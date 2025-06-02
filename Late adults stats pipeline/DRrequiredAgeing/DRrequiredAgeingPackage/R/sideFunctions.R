@@ -4712,11 +4712,7 @@ flatten_mp_chooser <- function(d) {
   }))
 }
 
-match_mp_terms <- function(Gtag, d, allowed_results = c()) {
-  # If provided, restrict the data to a list of allowed statistical test results.
-  if (length(allowed_results) > 0) {
-    Gtag <- subset(Gtag, StatisticalTestResult %in% allowed_results)
-  }
+match_mp_terms <- function(Gtag, d) {
   # First, try to join by exact sex, for example M call to M term.
   GtagExact <- merge(
     Gtag,
@@ -4803,21 +4799,7 @@ annotationChooser = function(statpacket = NULL,
     d <- flatten_mp_chooser(d)
 
     # 2. Join MP term information from mp_chooser.
-    if (method %in% "MM") {
-      Gtag <- match_mp_terms(Gtag, d)
-    } else if (method %in% "FE") {
-      Gtag <- match_mp_terms(Gtag, d, c("ABNORMAL"))
-    } else if (method %in% "RR") {
-      # By default, only ABNORMAL calls are used for RR.
-      GtagAbnormal <- match_mp_terms(Gtag, d, c("ABNORMAL"))
-      # In case no ABNORMAL MP terms were found, try to match INCREASED/DECREASED terms.
-      # This approach is left unchanged from the original annotation pipeline.
-      if (nrow(subset(GtagAbnormal, !is.na(MpTerm))) > 0) {
-        Gtag <- GtagAbnormal
-      } else {
-        Gtag <- match_mp_terms(Gtag, d, c("INCREASED", "DECREASED"))
-      }
-    }
+    Gtag <- match_mp_terms(Gtag, d)
 
     # 3. Remove records with no assigned MP terms.
     # This filters out all rows with no statistically significant results.
