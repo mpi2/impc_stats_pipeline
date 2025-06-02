@@ -4553,11 +4553,10 @@ DirectionTagMM = function(x,
 
 GenotypeTag = function(obj,
                        threshold = 10 ^ -4,
-                       expDetailsForErrorOnly = NULL,
-                       rrlevel = 10 ^ -4) {
+                       rrlevel = 10 ^ -4,
+                       method = NULL) {
   if (is.null(obj))
     return(NULL)
-  method = GetMethodStPa(x = obj$`Applied method`)
   message('\t The analysis method = ', method)
   message('\t The decision threshold = ',
           threshold,
@@ -4682,15 +4681,6 @@ GenotypeTag = function(obj,
 
   } else {
     tag = NULL
-    write(
-      x = paste(
-        head(expDetailsForErrorOnly, 18),
-        sep = '\t',
-        collapse = '\t'
-      ),
-      file = 'ErrorneousCases.tsv.err',
-      ncolumns = 5000
-    )
   }
   return(tag)
 }
@@ -4746,7 +4736,7 @@ annotationChooser = function(statpacket = NULL,
   requireNamespace("jsonlite")
   library(dplyr)
 
-  # Handle unsuccessful StatPackages.
+  # Handle unsuccessful StatPackets.
   if (
     is.null(statpacket) ||
     length(statpacket) < 1 ||
@@ -4771,7 +4761,8 @@ annotationChooser = function(statpacket = NULL,
   Gtag = GenotypeTag(
     obj = json$Result$`Vector output`[[resultKey]],
     threshold = level,
-    rrlevel = rrlevel
+    rrlevel = rrlevel,
+    method = method
   )
 
   # Load mp_chooser Rdata file.
@@ -4841,15 +4832,8 @@ annotationChooser = function(statpacket = NULL,
         select(term_id, event, sex, p_value) %>%
         # Use `purrr::transpose()` to create an unnamed list of objects.
         purrr::transpose() %>%
-        # Remove names from the list
+        # Remove names from the list.
         unname()
-      # Special case for RR: add an empty `otherPossibilities` field for compatibility.
-      if (method == "RR") {
-        MPTERMS <- purrr::map(MPTERMS, ~ {
-          .x$otherPossibilities <- ""
-          .x
-        })
-      }
     }
   }
 
