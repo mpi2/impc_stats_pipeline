@@ -4713,6 +4713,7 @@ match_mp_terms <- function(Gtag, d) {
   # Separate rows where we did / did not find a MP term.
   GtagExactMatched <- subset(GtagExact, !is.na(MpTerm))
   GtagExactUnmatched <- subset(GtagExact, is.na(MpTerm))
+  GtagExactUnmatched <- subset(GtagExactUnmatched, select = -MpTerm)
   # Now, for the unmatched records, try to find a U term as a fallback.
   GtagUnspecified <- merge(
     GtagExactUnmatched,
