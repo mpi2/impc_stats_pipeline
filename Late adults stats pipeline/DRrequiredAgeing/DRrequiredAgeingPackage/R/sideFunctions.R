@@ -4776,7 +4776,7 @@ match_mp_terms <- function(Gtag, d, allowed_results = c()) {
   GtagExactUnmatched <- subset(GtagExact, is.na(MpTerm))
   # Now, for the unmatched records, try to find a U term as a fallback.
   GtagUnspecified <- merge(
-    Gtag,
+    GtagExactUnmatched,
     subset(d, Sex == "UNSPECIFIED", select = -Sex),
     by = c("StatisticalTestResult", "Level"),
     all.x = TRUE
