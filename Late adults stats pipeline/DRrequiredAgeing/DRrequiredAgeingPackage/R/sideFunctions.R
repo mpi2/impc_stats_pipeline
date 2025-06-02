@@ -4581,13 +4581,16 @@ GenotypeTag = function(obj,
           ' and for the RR method it is ',
           rrlevel)
 
+  # Initialise an empty data frame.
+  tag <- data.frame(
+    Sex = character(),
+    StatisticalTestResult = character(),
+    Level = character(),
+    PValue = numeric(),
+    stringsAsFactors = FALSE
+  )
+
   if (method %in% 'MM') {
-    # Initialise an empty data frame.
-    tag <- data.frame(
-      Sex = character(),
-      StatisticalTestResult = character(),
-      Level = character()
-    )
     # Define sex/column prefix info.
     sex_column_prefix_pairs <- list(
       c("UNSPECIFIED", "Genotype"),
@@ -4629,13 +4632,6 @@ GenotypeTag = function(obj,
       fmodels$Genotype$`Complete table` = fmodels$`Complete table`
       fmodels$`Complete table` = NULL
     }
-    # Initialise an empty data frame.
-    tag <- data.frame(
-      Sex = character(),
-      StatisticalTestResult = character(),
-      Level = character(),
-      stringsAsFactors = FALSE
-    )
     # Define sex/column prefix info.
     sex_column_prefix_pairs <- list(
       c("UNSPECIFIED", "Genotype"),
@@ -4668,13 +4664,6 @@ GenotypeTag = function(obj,
     fmodels = obj$`Additional information`$Analysis$`Further models`
     if (is.null(fmodels))
       return(NULL)
-    # Initialise an empty data frame.
-    tag <- data.frame(
-      Sex = character(),
-      StatisticalTestResult = character(),
-      Level = character(),
-      stringsAsFactors = FALSE
-    )
     # Define sex/column prefix info.
     sex_column_prefix_pairs <- list(
       c("UNSPECIFIED", "Genotype"),
