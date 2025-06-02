@@ -4551,23 +4551,6 @@ DirectionTagMM = function(x,
   return(tag)
 }
 
-DirectionTagFE = function(x,
-                          threshold = .0001,
-                          group = c('ABNORMAL', 'INCREASED', 'DECREASED')) {
-  tag = if (is.null(x) || length(x) < 1) {
-    'NoEffectCalculated'
-  } else if (x < threshold) {
-    group
-  } else {
-    paste0('NORMAL - Test not significant at the level of ',
-           threshold,
-           ' (pvalue = ',
-           x,
-           ')')
-  }
-  return(tag)
-}
-
 GenotypeTag = function(obj,
                        threshold = 10 ^ -4,
                        expDetailsForErrorOnly = NULL,
@@ -4612,9 +4595,9 @@ GenotypeTag = function(obj,
             pvalue = pvalue,
             threshold = threshold
           ),
-          # Simple statistical test based on p-value only.
-          if (is.numeric(pvalue) && pvalue < threshold) "ABNORMAL" else "IgnoreThisCaseAtALL",
-          if (is.numeric(pvalue) && pvalue < threshold) "INFERRED" else "IgnoreThisCaseAtALL"
+          # Comparing test based on p-value only.
+          if (is.numeric(pvalue) && pvalue < threshold) "ABNORMAL" else NA,
+          if (is.numeric(pvalue) && pvalue < threshold) "INFERRED" else NA
         ),
         Level = "OVERALL",
         PValue = if (is.null(pvalue)) NA else pvalue,
@@ -4648,10 +4631,7 @@ GenotypeTag = function(obj,
         tag,
         data.frame(
           Sex = sex,
-          StatisticalTestResult = DirectionTagFE(
-            x = pvalue,
-            threshold = threshold
-          ),
+          StatisticalTestResult = if (is.numeric(pvalue) && pvalue < threshold) "ABNORMAL" else NA,
           Level = "OVERALL",
           PValue = if (is.null(pvalue)) NA else pvalue,
           stringsAsFactors = FALSE
@@ -4677,43 +4657,27 @@ GenotypeTag = function(obj,
       # Get data for LOW and HIGH tails.
       low_pvalue <- fmodels[[paste0("Low.data_point.", column_prefix)]]$Genotype$Result$p.value
       high_pvalue <- fmodels[[paste0("High.data_point.", column_prefix)]]$Genotype$Result$p.value
-      low_results <- DirectionTagFE(
-        x = low_pvalue,
-        threshold = rrlevel,
-        group = c("ABNORMAL", "DECREASED")
-      )
-      high_results <- DirectionTagFE(
-        x = high_pvalue,
-        threshold = rrlevel,
-        group = c("ABNORMAL", "INCREASED")
-      )
-
       # Append all to existing dataframe.
-      for (result in low_results) {
-        tag <- rbind(
-          tag,
-          data.frame(
-            Sex = sex,
-            StatisticalTestResult = result,
-            Level = "OVERALL",
-            PValue = if (is.null(low_pvalue)) NA else low_pvalue,
-            stringsAsFactors = FALSE
-          )
+      tag <- rbind(
+        tag,
+        data.frame(
+          Sex = sex,
+          StatisticalTestResult = if (is.numeric(low_pvalue) && low_pvalue < rrlevel) "ABNORMAL" else NA,
+          Level = "OVERALL",
+          PValue = if (is.null(low_pvalue)) NA else low_pvalue,
+          stringsAsFactors = FALSE
         )
-      }
-
-      for (result in high_results) {
-        tag <- rbind(
-          tag,
-          data.frame(
-            Sex = sex,
-            StatisticalTestResult = result,
-            Level = "OVERALL",
-            PValue = if (is.null(high_pvalue)) NA else high_pvalue,
-            stringsAsFactors = FALSE
-          )
+      )
+      tag <- rbind(
+        tag,
+        data.frame(
+          Sex = sex,
+          StatisticalTestResult = if (is.numeric(high_pvalue) && high_pvalue < rrlevel) "ABNORMAL" else NA,
+          Level = "OVERALL",
+          PValue = if (is.null(high_pvalue)) NA else high_pvalue,
+          stringsAsFactors = FALSE
         )
-      }
+      )
     }
 
   } else {
