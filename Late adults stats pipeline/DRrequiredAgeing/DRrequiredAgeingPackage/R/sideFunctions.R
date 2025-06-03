@@ -2081,18 +2081,6 @@ VectorOutput0 = function(c.ww0,
 #   return(x)
 # }
 
-# Area under the curve
-AUC = function(x, y) {
-  lx = length(x)
-  s = 0
-  if (lx > 1) {
-    for (i in 1:(lx - 1)) {
-      s = s + abs(y[i] + y[i + 1]) * abs(x[i + 1] - x[i]) / 2
-    }
-  }
-  return(s)
-}
-
 # Chunk a vector of in particular colonies into chunks (used mainly in Batch production)
 chunkVector =  function(x,
                         n = 10,
