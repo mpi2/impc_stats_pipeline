@@ -1595,24 +1595,6 @@ boxplot_win = function(phenlistObject, we, threshold, ...) {
   )
 }
 
-# make JSON vector (with [ or not)
-SingleOrMore = function(name, value, comma = FALSE) {
-  NewVal = ifelse(
-    is.numeric(value),
-    paste0(value, collapse = ', '),
-    paste0('"', value, '"', collapse = ', ')
-  )
-  if (length(value) > 1) {
-    outp = paste0('"', name, '":[', NewVal, ']', collapse = '')
-  } else{
-    outp = paste0('"', name, '":', NewVal, '', collapse = '')
-  }
-  if (comma)
-    outp = paste(outp, ', ', sep = '', collapse = '')
-  return(outp)
-}
-
-
 # cut the filename is it is too long
 CutFileNameIfTooLong = function(fullPath,
                                 max = 255,
