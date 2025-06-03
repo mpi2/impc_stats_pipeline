@@ -1315,16 +1315,6 @@ ReadFactorLevelsFromSolr = function(parameter,
   return(list(levels = unique(trimws(fLevels)), note = note))
 }
 
-# Fast replacement of nulls
-replaceNull = function(x, replace = '-') {
-  if (length(x) > 1) {
-    x[is.null(x)] == replace
-  } else{
-    x = replace
-  }
-  return(x)
-}
-
 mapLevelsToFactor = function(levels, newlevels, name = 'response') {
   #############
   res  = NULL
