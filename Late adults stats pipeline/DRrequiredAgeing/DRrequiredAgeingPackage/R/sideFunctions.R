@@ -454,19 +454,6 @@ is.ABR = function(x) {
   length(grep("_ABR", x, fixed = TRUE)) > 0
 }
 
-# Exception map
-getException =  function(parameter,
-                         exceptionMap = NULL)
-{
-  matched001 = sapply(names(exceptionMap), grepl, parameter)
-  if (sum(matched001) > 0) {
-    result = FALSE
-  } else{
-    result = TRUE
-  }
-  return(result)
-}
-
 # Method map
 getMethodi =  function(var,
                        type = 'numeric',
