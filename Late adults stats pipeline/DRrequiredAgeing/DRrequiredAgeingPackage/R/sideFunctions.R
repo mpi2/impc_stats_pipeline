@@ -184,18 +184,6 @@ MeanVarOverTime = function(mm, tt, data = phenlistObject@datasetPL) {
   }
 }
 
-IsInBlackListCategories = function(x, len = 1, blackList = NULL) {
-  note = NULL
-  if (!is.null(blackList) && !is.numeric(x) && nlevels(x) == len) {
-    r    = levels(x) %in% blackList
-    note = 'The categorical variable has only one level that is found in the skip list'
-  } else{
-    r    = FALSE
-  }
-  return(list(result = r, note = note))
-}
-
-
 #
 MergeLevels = function(x                         ,
                        listOfLevelMaps           ,
