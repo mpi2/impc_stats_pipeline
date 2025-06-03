@@ -786,26 +786,6 @@ is.numeric0 = function(x) {
   return(!r)
 }
 
-## solve "}"]  and ["
-RemoveTwoSpecialFromOutput  =  function(x) {
-  ind = grepl(pattern = '{',
-              x = x,
-              fixed = TRUE)
-  for (i in 1:length(x)) {
-    if (!ind[i]) {
-      x[i] = paste(
-        ifelse(length(x[i]) > 1, '[', ''),
-        ifelse(is.numeric0(x[i]), as.numeric0(x[i]), paste0('"', x[i], '"')),
-        ifelse(length(x[i]) > 1, ']', ''),
-        sep = ''
-      )
-    } else{
-      x[i] = paste('{', x[i], '}', sep = '')
-    }
-  }
-  return(x)
-}
-
 ### removeObject if exist
 rm0 = function(x, silent = FALSE) {
   x      = unique(x)
