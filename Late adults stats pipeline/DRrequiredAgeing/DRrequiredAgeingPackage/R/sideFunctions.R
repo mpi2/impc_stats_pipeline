@@ -3089,35 +3089,6 @@ dictionary2listConvert = function(x) {
   return(r2)
 }
 
-filesContain = function(path = getwd(),
-                        extension = NULL,
-                        containWhat = 'Exit',
-                        ...) {
-  res = FALSE
-  files = list.files(
-    path = path,
-    pattern = extension,
-    all.files = TRUE,
-    full.names = TRUE,
-    include.dirs = FALSE,
-    recursive = TRUE,
-    ...
-  )
-  for (file in files) {
-    message0('checking for term "', containWhat, '":', file)
-    fcontent = readLines(file, warn = FALSE)
-    for (l in fcontent) {
-      if (is.null(l))
-        next
-      if (grepl(pattern = containWhat, x = l))
-        return(TRUE)
-    }
-    message0('\t Passed ...')
-  }
-
-  return(res)
-}
-
 packageBackup = function(package = NULL,
                          storepath = NULL,
                          flags = '-r9Xq') {
