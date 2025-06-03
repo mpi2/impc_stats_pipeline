@@ -4506,9 +4506,10 @@ install.packages.auto <- function(x) {
   }
 }
 
-##########################################
-############## For the annotation pipeline
-##########################################
+#######################
+# Annotation pipeline #
+#######################
+
 GetMethodStPa <- function(x) {
   if (is.null(x)) {
     return("UNK")
@@ -4553,14 +4554,6 @@ DirectionTagMM = function(x,
 DirectionTagFE = function(x,
                           threshold = .0001,
                           group = c('ABNORMAL', 'INCREASED', 'DECREASED')) {
-  default = c('ABNORMAL', 'INCREASED', 'DECREASED')
-  if (length(group) < 1) {
-    message(
-      'No group for the so called ABNORMAL category provided, swith to the backup plan:\n\t ',
-      default
-    )
-    group = default
-  }
   tag = if (is.null(x) || length(x) < 1) {
     'NoEffectCalculated'
   } else if (x < threshold) {
@@ -4575,331 +4568,165 @@ DirectionTagFE = function(x,
   return(tag)
 }
 
-listM = function(x, What2Attach = list('OVERALL' = list('MPTERM' = NA))) {
-  if (is.null(x))
-    return(NULL)
-  al = as.list(x)
-  names(al) = al
-  al[[names(al)]] = What2Attach
-  return(al)
-}
-
-
-numbers_only <- function(x) {
-  r = !grepl("\\D", x)
-  return(r)
-}
-
-multiGrepl = function (x = NULL, pattern = NULL, ...)
-{
-  if (is.null(x)) {
-    return(NULL)
-  }
-  if (is.null(pattern)) {
-    return(TRUE)
-  }
-  r <- rep(TRUE, length(x))
-  for (p in pattern) {
-    r <- r & grepl(pattern = p, x = x, ...)
-  }
-  return(r)
-}
-
 returnWhatBasedOnThreshold = function(x = NULL,
                                       threshold = .0001,
-                                      Return = 'ABNORMAL',
-                                      ReturnNull = 'IgnoreThisCaseAtALL') {
-  if (is.null(x)      ||
-      is.null(Return) ||
-      is.null(threshold) ||
-      length(x) < 1      ||
-      length(Return) < 1 ||
-      length(threshold) < 1) {
-    return(ReturnNull)
-  } else if (is.numeric(x) && x < threshold) {
+                                      Return = 'ABNORMAL') {
+  if (is.numeric(x) && x < threshold) {
     return(Return)
-  } else{
-    return(ReturnNull)
+  } else {
+    return('IgnoreThisCaseAtALL')
   }
 }
 
 GenotypeTag = function(obj,
-                       parameter_stable_id = NULL,
                        threshold = 10 ^ -4,
                        expDetailsForErrorOnly = NULL,
                        rrlevel = 10 ^ -4) {
   if (is.null(obj))
-    return('NotAnalysed')
+    return(NULL)
   method = GetMethodStPa(x = obj$`Applied method`)
   message('\t The analysis method = ', method)
   message('\t The decision threshold = ',
           threshold,
           ' and for the RR method it is ',
           rrlevel)
+
   if (method %in% 'MM') {
-    tag = list(
-      UNSPECIFIED = listM(
-        DirectionTagMM(
-          x      = obj$`Genotype estimate`$Value,
-          pvalue = obj$`Genotype p-value`,
-          threshold = threshold
-        )
-      ),
-      UNSPECIFIED = listM(
-        returnWhatBasedOnThreshold(
-          x = obj$`Genotype p-value`,
-          threshold = threshold,
-          Return = 'ABNORMAL'
-        )
-      ),
-      UNSPECIFIED = listM(
-        returnWhatBasedOnThreshold(
-          x = obj$`Genotype p-value`,
-          threshold = threshold,
-          Return = 'INFERRED'
-        )
-      ),
-      FEMALE        = listM(
-        DirectionTagMM(
-          x      = obj$`Sex FvKO estimate`$Value,
-          pvalue = obj$`Sex FvKO p-value`,
-          threshold = threshold
-        )
-      ),
-      FEMALE = listM(
-        returnWhatBasedOnThreshold(
-          x = obj$`Sex FvKO p-value`,
-          threshold = threshold,
-          Return = 'ABNORMAL'
-        )
-      ),
-      FEMALE = listM(
-        returnWhatBasedOnThreshold(
-          x = obj$`Sex FvKO p-value`,
-          threshold = threshold,
-          Return = 'INFERRED'
-        )
-      ),
-      MALE      = listM(
-        DirectionTagMM(
-          x      = obj$`Sex MvKO estimate`$Value,
-          pvalue = obj$`Sex MvKO p-value`,
-          threshold = threshold
-        )
-      ),
-      MALE = listM(
-        returnWhatBasedOnThreshold(
-          x = obj$`Sex MvKO p-value`,
-          threshold = threshold,
-          Return = 'INFERRED'
-        )
-      ),
-      MALE = listM(
-        returnWhatBasedOnThreshold(
-          x = obj$`Sex MvKO p-value`,
-          threshold = threshold,
-          Return = 'INFERRED'
-        )
-      )
+    # Initialise an empty data frame.
+    tag <- data.frame(
+      Sex = character(),
+      StatisticalTestResult = character(),
+      Level = character()
     )
+    # Define sex/column prefix info.
+    sex_column_prefix_pairs <- list(
+      c("UNSPECIFIED", "Genotype"),
+      c("FEMALE", "Sex FvKO"),
+      c("MALE", "Sex MvKO"),
+      stringsAsFactors = FALSE
+    )
+    # Iterate over sexes and their corresponding column prefixes.
+    for (pair in sex_column_prefix_pairs) {
+      sex <- pair[1]
+      column_prefix <- pair[2]
+      # Append to existing dataframe.
+      tag <- rbind(tag, data.frame(
+        Sex = sex,
+        StatisticalTestResult = c(
+          # Statistical test based on genotype effect estimate and p-value.
+          DirectionTagMM(
+            x = obj[[paste0(column_prefix, " estimate")]]$Value,
+            pvalue = obj[[paste0(column_prefix, " p-value")]],
+            threshold = threshold
+          ),
+          # Simple statistical test based on p-value only.
+          returnWhatBasedOnThreshold(
+            x = obj[[paste0(column_prefix, " p-value")]],
+            threshold = threshold,
+            Return = "ABNORMAL"
+          ),
+          returnWhatBasedOnThreshold(
+            x = obj[[paste0(column_prefix, " p-value")]],
+            threshold = threshold,
+            Return = 'INFERRED'
+          )
+        ),
+        Level = "OVERALL",
+        stringsAsFactors = FALSE
+      ))
+    }
+
   } else if (method %in% 'FE') {
-    ###########################################################################
+    # Load fmodels and adjust stucture, if necessary.
     fmodels = obj$`Additional information`$Analysis$`Further models`$category
     if (is.null(fmodels))
       return(NULL)
-
     if (length(names(fmodels)) == 1 &&
         names(fmodels) == 'Complete table') {
       fmodels$Genotype$`Complete table` = fmodels$`Complete table`
       fmodels$`Complete table` = NULL
     }
-    #fmodels$Genotype$`Complete table`
-    AllCombinations = lapply(fmodels, function(x) {
-      if (length(fmodels) > 0) {
-        lapply(x, function(y) {
-          DirectionTagFE(x = y$p.value, threshold = threshold)
-        })
-      } else{
-        DirectionTagFE(x = x$p.value, threshold = threshold)
-      }
-    })
-    if (is.null(AllCombinations))
-      return(NULL)
-    #### Make the list as sequence of names attached with dot (.)
-    AllCombinations1 = unlist(AllCombinations)
-    if (!is.null(AllCombinations1)){
-      AllCombinations1 = AllCombinations1[grepl('Complete table',names(AllCombinations1))]
-    }
-    if (is.null(AllCombinations1))
-      return(NULL)
-    #### Keep only genotype analysis
-    AllCombinations2 = AllCombinations1[grepl(pattern = 'Genotype', x =
-                                                names(AllCombinations1))]
-    #### The abnormal case is made from the data
-    for (i in seq_along(AllCombinations2)) {
-      ############# step 1
-      names(AllCombinations2)[i] = gsub(
-        pattern = 'Complete table',
-        replacement = paste0(
-          AllCombinations2[i],
-          ifelse(
-            AllCombinations2[i] == 'ABNORMAL',
-            '.OVERALL.MPTERM',
-            '.MPTERM'
-          )
-        ),
-        x = names(AllCombinations2)[i]
-      )
-      ############# step 2
-      gind = !multiGrepl(pattern = c('Genotype', 'OVERALL'),
-                         x = names(AllCombinations2)[i])
-      if (gind) {
-        strs = unlist(strsplit(
-          names(AllCombinations2)[i],
-          split = '.',
-          fixed = TRUE
-        ))
-        u = unique(c(strs[1],
-                     AllCombinations2[i],
-                     strs[-1]))
-        names(AllCombinations2)[i] = paste(u,
-                                           collapse = '.',
-                                           sep = '.')
-      }
-      ############# step 3
-      names(AllCombinations2)[i] = gsub(
-        pattern = 'Genotype.',
-        replacement = '',
-        x = names(AllCombinations2)[i]
-      )
-      ############# step 4
-      names(AllCombinations2)[i] = toupper(names(AllCombinations2)[i])
-    }
-    ############# step 5
-    AllCombinations2 = AllCombinations2[grepl(
-      pattern = '(MALE)|(FEMALE)|(OVERALL)',
-      x = names(AllCombinations2),
-      ignore.case = TRUE
-    )]
-    ############# step 6
-    if (length(AllCombinations2) < 1)
-      return(NULL)
-    nam = names(AllCombinations2)
-    for (i in 0:1000) {
-      sb = substr(nam, start = nchar(nam) - i, nchar(nam))
-      for (j in 1:length(sb)) {
-        if (numbers_only(sb[j]) && i < nchar(sb[j]))
-          nam[j] = substr(nam[j], start = 0, stop = nchar(nam[j]) - i -
-                            1)
-      }
-    }
-    ############# step 7
-    gp7 = grepl(pattern = '.MPTERM',
-                x = nam,
-                fixed = TRUE)
-    nam[!gp7] = paste0(nam[!gp7], '.MPTERM')
-
-    ############# step 8
-    if (!is.null(parameter_stable_id)) {
-      controlCat = read.delim(file.path(local(),'annotation','CategoryRemapping.tsv'), sep = '\t')
-      conCat = controlCat[controlCat$IMPRESS.ID %in% parameter_stable_id,]
-      control = conCat[conCat$CATEGORY.1 == 0, 2]
-      if (length(control) > 0) {
-        for (c in control) {
-          nam =   gsub(
-            pattern = paste0('.', toupper(c), '.'),
-            replacement = '.',
-            x = nam,
-            fixed = TRUE
-          )
-        }
-        nam = gsub(
-          pattern = '..',
-          replacement = '.',
-          x = nam,
-          fixed = TRUE
+    # Initialise an empty data frame.
+    tag <- data.frame(
+      Sex = character(),
+      StatisticalTestResult = character(),
+      Level = character(),
+      stringsAsFactors = FALSE
+    )
+    # Define sex/column prefix info.
+    sex_column_prefix_pairs <- list(
+      c("UNSPECIFIED", "Genotype"),
+      c("FEMALE", "Genotype_Female"),
+      c("MALE", "Genotype_Male")
+    )
+    # Iterate over sexes and their corresponding column prefixes.
+    for (pair in sex_column_prefix_pairs) {
+      sex <- pair[1]
+      column_prefix <- pair[2]
+      # Append to existing dataframe.
+      tag <- rbind(
+        tag,
+        data.frame(
+          Sex = sex,
+          StatisticalTestResult = DirectionTagFE(
+            x = fmodels[[column_prefix]]$`Complete table`$p.value,
+            threshold = threshold
+          ),
+          Level = "OVERALL",
+          stringsAsFactors = FALSE
         )
-      }
+      )
     }
-    ############# Finally!
-    names(AllCombinations2) = nam
-    tag = AllCombinations2
 
   } else if (method %in% 'RR') {
-    ###########################################################################
+    # Load fmodels.
     fmodels = obj$`Additional information`$Analysis$`Further models`
     if (is.null(fmodels))
       return(NULL)
-
-    AllCombinations = lapply(fmodels, function(x) {
-      lapply(x, function(y) {
-        DirectionTagFE(x = y$Result$p.value, threshold = rrlevel)
-      })
-    })
-
-    if (is.null(AllCombinations))
-      return(NULL)
-    #### Make the list as sequence of names attached with dot (.)
-    AllCombinations1 = unlist(AllCombinations)
-    ####
-    AllCombinations1 = AllCombinations1[!(grepl(
-      pattern = 'Low.',
-      x = names(AllCombinations1),
-      fixed = TRUE
-    ) & AllCombinations1 %in% 'INCREASED')]
-    AllCombinations1 = AllCombinations1[!(grepl(
-      pattern = 'High.',
-      x = names(AllCombinations1),
-      fixed = TRUE
-    ) & AllCombinations1 %in% 'DECREASED')]
-
-    #### Keep only genotype analysis
-    AllCombinations2 = AllCombinations1[grepl(pattern = '(Genotype.Genotype)|(Genotype.Male.Genotype)|(Genotype.Female.Genotype)', x =
-                                                names(AllCombinations1))]
-    #### The abnormal case is made from the data
-    for (i in seq_along(AllCombinations2)) {
-      names(AllCombinations2)[i]  = gsub(
-        pattern = 'data_point.Genotype.Male.Genotype',
-        paste0('MALE.', AllCombinations2[i], '.OVERALL.MPTERM'),
-        x = names(AllCombinations2)[i]
+    # Initialise an empty data frame.
+    tag <- data.frame(
+      Sex = character(),
+      StatisticalTestResult = character(),
+      Level = character(),
+      stringsAsFactors = FALSE
+    )
+    # Define sex/column prefix info.
+    sex_column_prefix_pairs <- list(
+      c("UNSPECIFIED", "Genotype"),
+      c("FEMALE", "Genotype.Female"),
+      c("MALE", "Genotype.Male")
+    )
+    # Iterate over sexes and their corresponding column prefixes.
+    for (pair in sex_column_prefix_pairs) {
+      sex <- pair[1]
+      column_prefix <- pair[2]
+      # Get data for LOW and HIGH tails.
+      low_results <- DirectionTagFE(
+        x = fmodels[[paste0("Low.data_point.", column_prefix)]]$Genotype$Result$p.value,
+        threshold = rrlevel,
+        group = c("ABNORMAL", "DECREASED")
       )
-      names(AllCombinations2)[i]  = gsub(
-        pattern = 'data_point.Genotype.Female.Genotype',
-        paste0('FEMALE.', AllCombinations2[i], '.OVERALL.MPTERM'),
-        x = names(AllCombinations2)[i]
+      high_results <- DirectionTagFE(
+        x = fmodels[[paste0("High.data_point.", column_prefix)]]$Genotype$Result$p.value,
+        threshold = rrlevel,
+        group = c("ABNORMAL", "INCREASED")
       )
-      names(AllCombinations2)[i]  = gsub(
-        pattern = 'data_point.Genotype.Genotype',
-        paste0('UNSPECIFIED.', AllCombinations2[i], '.OVERALL.MPTERM'),
-        x = names(AllCombinations2)[i]
-      )
-      names(AllCombinations2)[i] = gsub(
-        pattern = '..',
-        replacement = '.',
-        x = names(AllCombinations2)[i],
-        fixed = TRUE
-      )
-      ############# step 4
-      names(AllCombinations2)[i] = toupper(names(AllCombinations2)[i])
-    }
-    AllCombinations2 = AllCombinations2[!grepl('(_FEMALE)|(_MALE)',names(AllCombinations2),fixed = FALSE)]
-    ############# step 6
-    if (length(AllCombinations2) < 1)
-      return(NULL)
-    nam = names(AllCombinations2)
-    for (i in 0:1000) {
-      sb = substr(nam, start = nchar(nam) - i, nchar(nam))
-      for (j in 1:length(sb)) {
-        if (numbers_only(sb[j]) && i < nchar(sb[j]))
-          nam[j] = substr(nam[j], start = 0, stop = nchar(nam[j]) - i -
-                            1)
+      all_results <- c(low_results, high_results)
+      # Append all to existing dataframe.
+      for (result in all_results) {
+        tag <- rbind(
+          tag,
+          data.frame(
+            Sex = sex,
+            StatisticalTestResult = result,
+            Level = "OVERALL",
+            stringsAsFactors = FALSE
+          )
+        )
       }
     }
 
-    ############# Finally!
-    names(AllCombinations2) = nam #gsub(pattern = 'LOW.|HIGH.',replacement = '',x = nam)
-    tag = AllCombinations2
-  } else{
+  } else {
     tag = NULL
     write(
       x = paste(
@@ -4914,877 +4741,194 @@ GenotypeTag = function(obj,
   return(tag)
 }
 
-
-unScrewProcedure = function(x) {
-  r = unlist(strsplit(x = x, split = '~'))
-  return(r)
-}
-
-
-merge.two = function(l1, l2) {
-  if (is.null(l1) && is.null(l2))
-    return(NULL)
-  if (is.null(l1) && !is.null(l2))
-    return(l1)
-  if (!is.null(l1) && is.null(l2))
-    return(l2)
-  #l = c(l1, l2[!names(l2) %in% names(l1)])
-  l = c(l1, l2)
-  return(l)
-}
-###########################
-
-removeAbnormalIfIncDecDetected = function(x = NULL,
-                                          method = 'MM',
-                                          active = 1) {
-  if (!active)
-    return(x)
-  if (length(x) > 0 &&
-      !method %in% 'RR' &&
-      any(grepl(
-        x = names(x),
-        pattern = ('\\.INCREASED\\.|\\.DECREASED\\.')
-      ))) {
-    message('\t INCREASED/DECREASED detected. ABNORMAL will be ignored')
-    x = x[!grepl(x = names(x),
-                 pattern = ('.ABNORMAL.'),
-                 fixed = TRUE)]
-  }
-  return(x)
-}
-
-MatchTheRestHalfWithTheFirstOne = function(x) {
-  if (length(x) < 1)
-    return(x)
-  #x = x[!is.na(x)]
-  mid = length(x) / 2
-  x[(mid + 1):(2 * mid)] = x[1:mid]
-  return(x)
-}
-
-DecIncDetector = function(x) {
-  if (length(x) < 1)
-    return(NA)
-  r = c()
-  if (any(grepl(pattern = 'DECREASED', x = names(x))))
-    r = c(r, 'DECREASED')
-  if (any(grepl(pattern = 'INCREASED', x = names(x))))
-    r = c(r, 'INCREASED')
-  if (any(grepl(pattern = 'ABNORMAL', x = names(x))))
-    r = c(r, 'ABNORMAL')
-  if (any(grepl(pattern = 'INFERRED', x = names(x))))
-    r = c(r, 'INFERRED')
-
-  if (length(r) < 1)
-    r = NA
-  if (length(r) > 1) {
-    if (any(grepl(pattern = 'DECREASED', x = r)) && !any(grepl(pattern = 'INCREASED', x = r)))
-      r = 'DECREASED'
-    if (any(grepl(pattern = 'INCREASED', x = r)) && !any(grepl(pattern = 'DECREASED', x = r)))
-      r = 'INCREASED'
-    if (any(grepl(pattern = 'ABNORMAL', x = r)))
-      r = 'ABNORMAL'
-    if (any(grepl(pattern = 'INFERRED', x = r)))
-      r = 'INFERRED'
-  }
-  return(r)
-}
-
-DecIncDetectorRR = function(x) {
-  if (length(x) < 1)
-    return(NA)
-  r = c()
-  ###################################### MALE
-  ###################################### LOW
-  r1 = multiGrepl(pattern = c('(DECREASED)|(INCREASED)', 'LOW', 'MALE'),
-                  x = names(x))
-  if (sum(r1) > 1) {
-    rlowM = c('ABNORMAL')
-  } else if (sum(r1) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r1])))
-      rlowM = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r1])))
-      rlowM = c('DECREASED')
-  } else{
-    rlowM = NA
-  }
-  ###################################### High
-  r2 = multiGrepl(pattern = c('(DECREASED)|(INCREASED)', 'HIGH', 'MALE'),
-                  x = names(x))
-  if (sum(r2) > 1) {
-    rhighM = c('ABNORMAL')
-  } else if (sum(r2) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r2])))
-      rhighM = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r2])))
-      rhighM = c('DECREASED')
-  } else{
-    rhighM = NA
-  }
-  ######################################
-  r3 = na.omit(c(rlowM, rhighM))
-  if (length(r3) > 0) {
-    if (length(r3) == 1) {
-      r = c(r, na.omit(r3))
-    } else{
-      r = c(r, 'ABNORMAL')
-    }
-  }
-  ###################################### FEMALE
-  ###################################### LOW
-  r4 = multiGrepl(pattern = c('(DECREASED)|(INCREASED)', 'LOW', 'FEMALE'),
-                  x = names(x))
-  if (sum(r4) > 1) {
-    rlowF = c('ABNORMAL')
-  } else if (sum(r4) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r4])))
-      rlowF = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r4])))
-      rlowF = c('DECREASED')
-  } else{
-    rlowF = NA
-  }
-  ######################################
-  r5 = multiGrepl(
-    pattern = c('(DECREASED)|(INCREASED)', 'HIGH', 'FEMALE'),
-    x = names(x)
-  )
-  if (sum(r5) > 1) {
-    rhighF = c('ABNORMAL')
-  } else if (sum(r5) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r5])))
-      rhighF = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r5])))
-      rhighF = c('DECREASED')
-  } else{
-    rhighF = NA
-  }
-  ######################################
-  r6 = na.omit(c(rlowF, rhighF))
-  if (length(r6) > 0) {
-    if (length(r6) == 1) {
-      r = c(r, na.omit(r6))
-    } else{
-      r = c(r, 'ABNORMAL')
-    }
-  }
-  ######################################
-  ###################################### ABNORMAL
-  r7 = multiGrepl(
-    pattern = c('(DECREASED)|(INCREASED)', 'LOW', 'ABNORMAL'),
-    x = names(x)
-  )
-  if (sum(r7) > 1) {
-    rlowA = c('ABNORMAL')
-  } else if (sum(r7) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r7])))
-      rlowA = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r7])))
-      rlowA = c('DECREASED')
-  } else{
-    rlowA = NA
-  }
-  ######################################
-  r8 = multiGrepl(
-    pattern = c('(DECREASED)|(INCREASED)', 'HIGH', 'ABNORMAL'),
-    x = names(x)
-  )
-  if (sum(r8) > 1) {
-    rhighA = c('ABNORMAL')
-  } else if (sum(r8) == 1) {
-    if (grepl(pattern = 'INCREASED', x = names(x[r8])))
-      rhighA = c('INCREASED')
-    if (grepl(pattern = 'DECREASED', x = names(x[r8])))
-      rhighA = c('DECREASED')
-  } else{
-    rhighA = NA
-  }
-  ######################################
-  r9 = na.omit(c(rlowA, rhighA))
-  if (length(r9) > 0) {
-    if (length(r9) == 1) {
-      r = c(r, na.omit(r9))
-    } else{
-      r = c(r, 'ABNORMAL')
-    }
-  }
-  ######################################
-  abpattern = inferpattern = FALSE
-
-  if (length(x) > 0) {
-    abpattern = grepl(pattern = 'ABNORMAL', x = names(x))
-    inferpattern = grepl(pattern = 'INFERRED', x = names(x))
-  }
-
-  if (length(r) < 1 && !(any(abpattern) || any(inferpattern)))
-    r = NA
-  ######################################
-  if (length(r) < 1 && (any(abpattern) || any(inferpattern)))
-    if (any(grepl(pattern = 'ABNORMAL', x = names(x))))
-      r = 'ABNORMAL'
-  if (any(grepl(pattern = 'INFERRED', x = names(x))))
-    r = 'INFERRED'
-  ######################################
-  if (length(r) > 1) {
-    if (any(grepl(pattern = 'ABNORMAL', x = r)))
-      r = 'ABNORMAL'
-    if (any(grepl(pattern = 'INFERRED', x = r)))
-      r = 'INFERRED'
-  }
-  ######################################
-  return(r)
-}
-
-detectLevel = function(x, level) {
-  if (is.null(x) || length(x) < 1)
-    return(FALSE)
-  r = grepl(pattern = level, x = x)
-  return(any(r))
-}
-
-NullOrvalueReturn = function(x, list) {
-  if (length(x) < 1)
-    return(NULL)
-  else
-    return(list)
-}
-
-fA = function(x, pasteterms = TRUE) {
-  if (length(x) > 0)
-    x = x[!duplicated(x)]
-  if (length(x) > 1) {
-    x2 = x[!grepl(pattern = c('(MALE)|(FEMALE)'), names(x)) &
-             grepl(pattern = c('ABNORMAL'), names(x))]
-    x3 = x[grepl(pattern = c('ABNORMAL'), names(x))]
-    if (length(x2) > 1 && length(x3) > 0 && pasteterms)
-      x = paste(x3, sep = '~', collapse = '~')
-    else if (length(x2) > 1 && length(x3) < 1 && pasteterms)
-      x = paste(x2, sep = '~', collapse = '~')
-    else if (pasteterms)
-      x = paste(x, sep = '~', collapse = '~')
-    else
-      x = x
-  }
-  return(x)
-}
-
-fM = function(x, pasteterms = TRUE) {
-  if (length(x) > 0)
-    x = x[!duplicated(x)]
-  if (length(x) > 1) {
-    x2 = x[!grepl(pattern = c('ABNORMAL'), names(x)) &
-             grepl(pattern = c('MALE'), names(x))]
-    x3 = x[grepl(pattern = c('ABNORMAL'), names(x))]
-    if (length(x2) > 1 && length(x3) > 0 && pasteterms)
-      x = paste(x3, sep = '~', collapse = '~')
-    else if (length(x2) > 1 && length(x3) < 1 && pasteterms)
-      x = paste(x2, sep = '~', collapse = '~')
-    else if (pasteterms)
-      x = paste(x, sep = '~', collapse = '~')
-    else
-      x = x
-  }
-  return(x)
-}
-
-fF = function(x, pasteterms = TRUE) {
-  if (length(x) > 0)
-    x = x[!duplicated(x)]
-  if (length(x) > 1) {
-    x2 = x[!grepl(pattern = c('ABNORMAL'), names(x)) &
-             grepl(pattern = c('FEMALE'), names(x))]
-    x3 = x[grepl(pattern = c('ABNORMAL'), names(x))]
-    if (length(x2) > 1 && length(x3) > 0 && pasteterms)
-      x = paste(x3, sep = '~', collapse = '~')
-    else if (length(x2) > 1 && length(x3) < 1 && pasteterms)
-      x = paste(x2, sep = '~', collapse = '~')
-    else if (pasteterms)
-      x = paste(x, sep = '~', collapse = '~')
-    else
-      x = x
-  }
-  return(x)
-}
-
-bselect = function(x) {
-  # order important, see MoreThan2Length
-  if(length(x)<1)
-    return(x)
-  nx = names(x)
-  xx = x
-  if (length(nx) > 1 && any(grepl(pattern = 'INFERRED', x = nx))) {
-    xx = x[grepl(pattern = 'INFERRED', x = nx)][1]
-    return(xx)
-  }
-  if (length(nx) > 1 && any(grepl(pattern = 'ABNORMAL', x = nx))) {
-    xx = x[grepl(pattern = 'ABNORMAL', x = nx)][1]
-    return(xx)
-  }
-
-  if (length(nx) > 1 && any(grepl(pattern = 'OVERAL', x = nx))) {
-    xx = x[grepl(pattern = 'OVERAL', x = nx)][1]
-    return(xx)
-  }
-
-  if (length(xx) > 0)
-    xx = na.omit(xx)
-  return(xx)
-}
-
-
-
-MoreThan2Length = function(xx,
-                           index,
-                           MPTERMS = NULL,
-                           general = TRUE) {
-  # order important, see bselect
-  if (length(xx) > 1 &&
-      sum(index) > 1 &&
-      !is.null(MPTERMS) &&
-      length(MPTERMS) > 0) {
-    if (general && any(grepl(pattern = 'INCREASED', xx)) &&
-        any(grepl(pattern = 'INCREASED', names(MPTERMS)))) {
-      return(grepl(pattern = 'INCREASED', xx))
-
-    } else if (general && any(grepl(pattern = 'DECREASED', xx)) &&
-               any(grepl(pattern = 'DECREASED', names(MPTERMS)))) {
-      return(grepl(pattern = 'DECREASED', xx))
-
-    } else if (any(grepl(pattern = 'INFERRED', xx)) &&
-               any(grepl(pattern = 'INFERRED', names(MPTERMS)))) {
-      return(grepl(pattern = 'INFERRED', xx))
-
-    } else if (any(grepl(pattern = 'ABNORMAL', xx)) &&
-               any(grepl(pattern = 'ABNORMAL', names(MPTERMS)))) {
-      return(grepl(pattern = 'ABNORMAL', xx))
-
-    } else if (any(grepl(pattern = 'OVERAL', xx)) &&
-               any(grepl(pattern = 'OVERAL', names(MPTERMS)))) {
-      return(grepl(pattern = 'OVERAL', xx))
-    }
-
-  }
-  return(index)
-}
-
-MaleFemaleAbnormalCategories = function(x, method = 'AA', MPTERMS = NULL,json=NULL) {
-  fgrep = grepl(pattern = 'FEMALE', names(x), fixed = TRUE)
-  mgrep = grepl(pattern = 'MALE', names(x), fixed = TRUE) & !fgrep
-  agrep = grepl(pattern = '(ABNORMAL)|(INFERRED)|(OVERAL)', names(x)) &
-    !fgrep & !mgrep
-  sexlevels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
-
-  if (method %in% 'MM') {
-    fgrep = MoreThan2Length(names(x), fgrep, MPTERMS)
-    mgrep = MoreThan2Length(names(x), mgrep, MPTERMS)
-    agrep = MoreThan2Length(names(x), agrep, MPTERMS)
-  } else{
-    # bug reported 30/10/2020 - (improvement)
-    fgrep = MoreThan2Length(names(x), fgrep, MPTERMS, general = FALSE)
-    mgrep = MoreThan2Length(names(x), mgrep, MPTERMS, general = FALSE)
-    agrep = MoreThan2Length(names(x), agrep, MPTERMS, general = FALSE)
-  }
-
-  if (method %in% 'RR') {
-    fevent = DecIncDetectorRR(x[fgrep])
-    mevent = DecIncDetectorRR(x[mgrep])
-    oevent = DecIncDetectorRR(x[agrep])
-  } else{
-    fevent = DecIncDetector(x[fgrep])
-    mevent = DecIncDetector(x[mgrep])
-    oevent = DecIncDetector(x[agrep])
-  }
-  # if males and females are in cross direction set abnormal otherwise select male/females
-  fmevents = c(fevent, mevent)
-  if (all(!is.na(fmevents)) && fmevents[1] == fmevents[2])
-    oevent = mevent
-  if (is.na(fmevents[1]) && !is.na(fmevents[2]))
-    oevent = fmevents[2]
-  if (!is.na(fmevents[1]) && is.na(fmevents[2]))
-    oevent = fmevents[1]
-  #############################
-  # if male and/or female specific term found then ignore the combined sex mp terms
-  if (length(x[fgrep]) > 0 || length(x[mgrep]) > 0)
-    agrep = FALSE
-  #############################
-  if (method %in% 'RR') {
-    MPTERM = list(
-      NullOrvalueReturn(
-        x[agrep],
-        list(
-          'term_id' = ifelse(length(fA(x[agrep], pasteterms = FALSE)) >
-                               1, fA(x[agrep], pasteterms = FALSE)[1], fA(x[agrep])),
-          event = oevent,
-          sex = ifelse(
-            length(unique(sexlevels)) > 1 ,
-            "not_considered",
-            unique(sexlevels)[1]
-          ),
-          otherPossibilities = ifelse(length(fA(x[agrep], pasteterms = FALSE)) >
-                                        1, fA(x[agrep]), '')
+# This function flattens the mp_chooser structure into a dataframe which is easy to work with.
+flatten_mp_chooser <- function(d) {
+  do.call(rbind, lapply(names(d), function(sex) {
+    do.call(rbind, lapply(names(d[[sex]]), function(test) {
+      do.call(rbind, lapply(names(d[[sex]][[test]]), function(level) {
+        data.frame(
+          Sex = sex,
+          # This and next toupper() are for compatibility with the old approach.
+          StatisticalTestResult = toupper(test),
+          Level = toupper(level),
+          MpTerm = unname(unlist(d[[sex]][[test]][[level]]))
         )
-      ),
-      NullOrvalueReturn(
-        x[fgrep],
-        list(
-          'term_id' = ifelse(length(fF(x[fgrep], pasteterms = FALSE)) >
-                               1, fF(x[fgrep], pasteterms = FALSE)[1], fF(x[fgrep])),
-          event = fevent,
-          sex = "female",
-          otherPossibilities = ifelse(length(fF(x[fgrep], pasteterms = FALSE)) >
-                                        1, fF(x[fgrep]), '')
-        )
-      ),
-      NullOrvalueReturn(
-        x[mgrep],
-        list(
-          'term_id' = ifelse(length(fM(x[mgrep], pasteterms = FALSE)) >
-                               1, fM(x[mgrep], pasteterms = FALSE)[1], fM(x[mgrep])),
-          event = mevent,
-          sex = "male",
-          otherPossibilities = ifelse(length(fM(x[mgrep], pasteterms = FALSE)) >
-                                        1, fM(x[mgrep]), '')
-        )
-      )
-    )
-  } else{
-    MPTERM = list(
-      NullOrvalueReturn(x[agrep],
-                        list(
-                          'term_id' = bselect(x[agrep]),
-                          event = oevent,
-                          sex = ifelse(
-                            length(unique(sexlevels)) > 1 ,
-                            "not_considered",
-                            unique(sexlevels)[1]
-                          )
-                        )),
-      NullOrvalueReturn(x[fgrep], list(
-        'term_id' = bselect(x[fgrep]),
-        event = fevent,
-        sex = "female"
-      )),
-      NullOrvalueReturn(x[mgrep], list(
-        'term_id' = bselect(x[mgrep]),
-        event = mevent,
-        sex = "male"
-      ))
-    )
-  }
-  return(MPTERM)
+      }))
+    }))
+  }))
 }
-##############################
+
+match_mp_terms <- function(Gtag, d, allowed_results = c()) {
+  # If provided, restrict the data to a list of allowed statistical test results.
+  if (length(allowed_results) > 0) {
+    Gtag <- subset(Gtag, StatisticalTestResult %in% allowed_results)
+  }
+  # First, try to join by exact sex, for example M call to M term.
+  GtagExact <- merge(
+    Gtag,
+    d,
+    by = c("StatisticalTestResult", "Level", "Sex"),
+    all.x = TRUE
+  )
+  # Separate rows where we did / did not find a MP term.
+  GtagExactMatched <- subset(GtagExact, !is.na(MpTerm))
+  GtagExactUnmatched <- subset(GtagExact, is.na(MpTerm))
+  # Now, for the unmatched records, try to find a U term as a fallback.
+  GtagUnspecified <- merge(
+    Gtag,
+    subset(d, Sex == "UNSPECIFIED", select = -Sex),
+    by = c("StatisticalTestResult", "Level"),
+    all.x = TRUE
+  )
+  # Return all rows.
+  return(rbind(GtagExactMatched, GtagUnspecified))
+}
+
+# Main annotation pipeline function.
 annotationChooser = function(statpacket = NULL,
                              level = 10 ^ -4,
                              rrlevel = .005,
                              TermKey = 'MPTERM',
                              resultKey = 'Normal result',
                              mp_chooser_file = NULL) {
-  requireNamespace('RPostgreSQL')
-  requireNamespace('data.table')
-  requireNamespace("data.table")
-  requireNamespace("jsonlite")
-  requireNamespace("rlist")
-  requireNamespace("Tmisc")
 
-  ulistTag3 = MPTERMS = NA
-  message('Running the annotation pipeline')
-  if (is.null(statpacket) ||
-      length(statpacket) < 1 ||
-      is.null(statpacket$V2) ||
-      length(statpacket$V2)<1 ||
-      !statpacket$V2 %in% 'Successful') {
+  # Load the necessary libraries.
+  requireNamespace("jsonlite")
+  library(dplyr)
+
+  # Handle unsuccessful StatPackages.
+  if (
+    is.null(statpacket) ||
+    length(statpacket) < 1 ||
+    is.null(statpacket$V2) ||
+    length(statpacket$V2)<1 ||
+    !statpacket$V2 %in% 'Successful'
+  ) {
     message('Not a successfull StatPackage!')
     return(invisible(list(
-      MPTERM = ulistTag3, statpacket = statpacket
+      MPTERM = NULL, statpacket = statpacket
     )))
   }
+
+  # Fetch fields from the input file.
   pipeline = statpacket$V15
   procedure = statpacket$V3
   parameter = statpacket$V6
-  json      =  jsonlite::fromJSON(statpacket$V20)
-  method   =   GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
-  ##################################################################
+  json = jsonlite::fromJSON(statpacket$V20)
+  method = GetMethodStPa(json$Result$`Vector output`[[resultKey]]$`Applied method`)
+
+  # Assign genotype tag.
   Gtag = GenotypeTag(
     obj = json$Result$`Vector output`[[resultKey]],
-    parameter_stable_id = statpacket$V6,
     threshold = level,
     rrlevel = rrlevel
   )
-  ##################################################################
-  message('\t Reading the index file ...')
-  load(mp_chooser_file)
-  message(
-    '\t~>',
-    paste(
-      pipeline,
-      procedure,
-      parameter,
-      sep = '~>',
-      collapse = '~>'
-    ),
-    '\n\t~>',
-    json$Result$Details$`Gene page URL`
-  )
 
-  ################################
-  b = a[[unScrewProcedure(pipeline)[1]]]
-  c = b[[unScrewProcedure(procedure)[1]]]
-  d = c[[unScrewProcedure(parameter)[1]]]
+  # Load mp_chooser Rdata file.
+  load(mp_chooser_file)
+  # The variable "a" is contained within the file we just loaded, and it has some specific structure.
+  mp_chooser <- a
+
+  # Try to get the annotation for the given pipeline > procedure > parameter trio.
+  # If any level is not available, return NULL.
+  d <- tryCatch(mp_chooser[[pipeline]][[procedure]][[parameter]], error = function(e) NULL)
   if (is.null(d)) {
     message('No annotation available by IMPC. See https://www.mousephenotype.org/impress/')
     return(invisible(list(
-      MPTERM = ulistTag3, statpacket = statpacket
+      MPTERM = NULL, statpacket = statpacket
     )))
   }
-  ################################
-  if (length(d) > 0 &&
-      length(Gtag) > 0) {
-    ################################
-    ulistTag  = unlist(Gtag)
-    ulistD    = unlist(d)
-    names(ulistD)  = toupper(names(ulistD))
-    ulistD         = removeAbnormalIfIncDecDetected(ulistD, method = method, active = FALSE)
-    if (length(ulistD) < 1) {
-      message('No annotation available by IMPC. See https://www.mousephenotype.org/impress/')
-      return(invisible(list(
-        MPTERM = ulistTag3, statpacket = statpacket
-      )))
-    }
-    ################################
-    ulistTag2 = ulistTag
-    names(ulistTag2) = gsub(
-      pattern = 'MALE|FEMALE',
-      x = names(ulistTag2),
-      replacement = 'UNSPECIFIED'
-    )
 
-    ulistTag3 = merge.two(ulistTag2, ulistTag)
-    for (name in names(ulistTag3)) {
-      # print(name)
-      splN = unlist(strsplit(name, split = '.', fixed = TRUE))
-      splN = splN[!splN %in% c('LOW', 'HIGH','DATA_POINT','GENOTYPE')]
-      splnI = multiGrepl(pattern = splN,
-                         x = names(ulistD),
-                         fixed = TRUE)
-      ulistTag3[names(ulistTag3) %in% name] = ifelse(is.null(ulistD[splnI]), 'CanNotFindMPTerm', head(ulistD[splnI], 1))
-    }
-    #print(ulistD)
-    ################################
-    if (length(ulistTag3) < 1)
-      return(invisible(list(
-        MPTERM = ulistTag3, statpacket = statpacket
-      )))
-    ##########################
-    ulistTag3 =  MatchTheRestHalfWithTheFirstOne(ulistTag3)
-    ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
-    ##########################
-    if (length(ulistTag3) < 1)
-      return(invisible(list(
-        MPTERM = ulistTag3, statpacket = statpacket
-      )))
-    ##########################
-    ulistTag3 = ulistTag3[!is.na(ulistTag3)]
-    ################################
-    if (length(ulistTag3) > 0 &&
-        method %in% 'RR') {
-      lIncDec = multiGrepl(pattern = c('INCREASED|DECREASED'),
-                           x = names(ulistTag3))
-      lAbn    = multiGrepl(pattern = c('ABNORMAL'),
-                           x = names(ulistTag3))
-      if (sum(lIncDec) >= 2 && sum(lAbn) > 0) {
-        ulistTag3 = ulistTag3[lAbn][1]
-        names(ulistTag3) = gsub(pattern = '(LOW\\.)|(\\.HIGH)',
-                                replacement = '',
-                                names(ulistTag3))
+  # By default, do not put anything into MPTERMS. This is important for input
+  # files which use neither of the supported analysis methods (MM, FE, RR).
+  MPTERMS = NA
+
+  if (length(Gtag) > 0) {
+
+    # 1. Convert the nested mp_chooser structure into the flat dataframe.
+    d <- flatten_mp_chooser(d)
+
+    # 2. Join MP term information from mp_chooser.
+    if (method %in% "MM") {
+      Gtag <- match_mp_terms(Gtag, d)
+    } else if (method %in% "FE") {
+      Gtag <- match_mp_terms(Gtag, d, c("ABNORMAL"))
+    } else if (method %in% "RR") {
+      # By default, only ABNORMAL calls are used for RR.
+      GtagAbnormal <- match_mp_terms(Gtag, d, c("ABNORMAL"))
+      # In case no ABNORMAL MP terms were found, try to match INCREASED/DECREASED terms.
+      # This approach is left unchanged from the original annotation pipeline.
+      if (nrow(subset(GtagAbnormal, !is.na(MpTerm))) > 0) {
+        Gtag <- GtagAbnormal
+      } else {
+        Gtag <- match_mp_terms(Gtag, d, c("INCREASED", "DECREASED"))
       }
     }
-    # Do not use unique!
-    if (length(ulistTag3) > 0) {
-      ulistTag3 =  ulistTag3[!duplicated(names(ulistTag3))]
+
+    # 3. Remove records with no assigned MP terms.
+    # This filters out all rows with no statistically significant results.
+    Gtag <- subset(Gtag, !is.na(MpTerm))
+
+    # 4. Implement male/female specific abnormal categories.
+    sex_levels = json$Result$`Vector output`$`Normal result`$`Classification tag`$`Active Sex levels`
+    if (nrow(Gtag) == 0) {
+      MPTERMS <- list()
+    } else {
+      # Define the priority order for StatisticalTestResult.
+      priority_order <- c("INCREASED", "DECREASED", "INFERRED", "ABNORMAL")
+      # Check if the input dataframe is empty.
+      if (nrow(Gtag) == 0) {
+        MPTERMS <- list()
+      } else {
+        # Group by Sex and select one row per group based on priority.
+        filtered_data <- Gtag %>%
+          group_by(Sex) %>%
+          arrange(match(StatisticalTestResult, priority_order)) %>%
+          slice(1) %>%
+          ungroup()
+        # Drop UNSPECIFIED if MALE or FEMALE data is present.
+        if (any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
+          filtered_data <- filtered_data %>% filter(Sex != "UNSPECIFIED")
+        }
+        # Handle UNSPECIFIED case if no MALE or FEMALE data is present.
+        if (!any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
+          if (length(sex_levels) == 1) {
+            filtered_data$Sex <- toupper(sex_levels)
+          }
+        }
+        # Convert Sex column to lowercase and replace "unspecified" with "not_considered".
+        filtered_data <- filtered_data %>%
+          mutate(Sex = tolower(Sex),
+                  Sex = ifelse(Sex == "unspecified", "not_considered", Sex))
+        # Ensure female comes before male if both are present.
+        filtered_data <- filtered_data %>%
+          arrange(Sex)
+        # Convert to the desired list format.
+        MPTERMS <- filtered_data %>%
+          mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm) %>%
+          select(term_id, event, sex) %>%
+          # Use `purrr::transpose()` to create an unnamed list of objects.
+          purrr::transpose() %>%
+          # Remove names from the list
+          unname()
+        # Special case for RR: add an empty `otherPossibilities` field for compatibility.
+        if (method == "RR") {
+          MPTERMS <- purrr::map(MPTERMS, ~ {
+            .x$otherPossibilities <- ""
+            .x
+          })
+        }
+      }
     }
-    ################################
-    MPTERMS = MaleFemaleAbnormalCategories(x = ulistTag3,
-                                           method = method,
-                                           MPTERMS = ulistD,
-                                           json = json)
-    MPTERMS = rlist::list.clean(MPTERMS)
+
   }
-  if (!is.null(MPTERMS)     &&
-      length(ulistTag3) > 0 &&
-      length(na.omit(ulistTag3)) > 0) {
+
+  # Return the final data structure.
+  if (length(MPTERMS) > 0) {
     json$Result$Details[[TermKey]] = MPTERMS
     statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
-  }else{
-    message('No MP term found ...')
   }
   return(invisible(list(
     MPTERM = MPTERMS, statpacket = statpacket
   )))
-}
-
-#################################################################################
-Write2Postg = function(df,
-                       dbname = 'test',
-                       host = "hh-yoda-05-01",
-                       port = '5432',
-                       user = 'impc',
-                       password = 'impc',
-                       tablename = paste0('db_',
-                                         RemoveSpecialChars(
-                                           format(Sys.time(), '%a%b%d %Y'),
-                                           replaceBy = '_',
-                                           what = ' '
-                                         ))) {
-  requireNamespace('RPostgreSQL')
-  requireNamespace('data.table')
-  requireNamespace('DBI')
-  drv <- dbDriver("PostgreSQL")
-  con <- dbConnect(
-    drv,
-    dbname = dbname,
-    host = host,
-    port = port,
-    user = user,
-    password = password
-  )
-
-  dbBegin(conn = con)
-  r = dbWriteTable(
-    conn = con,
-    name = tablename,
-    value = df,
-    append = TRUE,
-    row.names = FALSE
-  )
-  dbCommit(conn = con)
-  dbDisconnect (conn = con)
-  return(r)
-}
-
-randomIdGenerator = function(l = 10) {
-  r=paste0(sample(
-    x = 0:9,
-    size = l,
-    replace = TRUE
-  ), collapse = '')
-  return(r)
-}
-
-StratifiedMPTerms = function(object, name = 'MPTERM') {
-  # overall, male, female
-  r = c(NA, NA, NA)
-  if (is.null(object))
-    return(r)
-  if (is.null(object) ||
-      is.null(object[[name]]) ||
-      length(object[[name]]) < 1 ||
-      all(is.na(object[[name]])))
-    return (r)
-
-  for (i in seq_along(object[[name]])) {
-    if (!is.null(object[[name]][[i]]$sex) && object[[name]][[i]]$sex == 'not_considered')
-      r[1] = paste(object[[name]][[i]]$term_id,
-                   collapse = '~',
-                   sep = '~')
-    if (!is.null(object[[name]][[i]]$sex) && object[[name]][[i]]$sex == 'male')
-      r[2] = paste(object[[name]][[i]]$term_id,
-                   collapse = '~',
-                   sep = '~')
-    if (!is.null(object[[name]][[i]]$sex) && object[[name]][[i]]$sex == 'female')
-      r[3] = paste(object[[name]][[i]]$term_id,
-                   collapse = '~',
-                   sep = '~')
-  }
-  return(r)
-}
-##########################################
-############## End of annotation pipeline
-##########################################
-
-changeRpackageDirectory = function(path = '~/DRs/R/packages') {
-  #system('module load r-4.0.3-gcc-9.3.0-xiarbub',wait = TRUE)
-  v = paste(
-    R.version$major,
-    gsub(
-      pattern = '.',
-      replacement = '_',
-      R.version$minor,
-      fixed = TRUE
-    ),
-    sep = '_',
-    collapse = '_'
-  )
-  wdirc = file.path(path, v)
-  if (!dir.exists(wdirc))
-    dir.create(wdirc,
-               showWarnings = FALSE,
-               recursive = TRUE)
-  .libPaths(new = wdirc)
-  message(' => new package path set to: ', wdirc)
-}
-
-#library(quantreg)
-extractRiskyGenesFromDRs = function(newDRReportpath = '../DR19_Reports/DR19_AllSuccessful_WithQvaluesAndMPtermsdata_point_of_type_unidimensional.csv.gz',
-                                    oldDRReportpath = '../DR18_Reports/DR18StatisticalResultsReportContinuous.csv.gz') {
-  file = paste0('RiskyGenesToCheck_',
-                DRrequiredAgeing:::RemoveSpecialChars(date()),
-                '.txt')
-  message(
-    'please wait and the results will be displayed on screen (and a version will be stored in ',
-    file,
-    ')'
-  )
-  dfold = read.csv(file = oldDRReportpath)
-  dfnew = read.csv(file = newDRReportpath)
-
-  dfold = subset(dfold, dfold$status == 'Successful')
-  dfnew = subset(dfnew, dfnew$status == 'Successful')
-
-  dfold = subset(dfold, dfold$applied.Method == 'MM')
-  dfnew = subset(dfnew, dfnew$applied.Method == 'MM')
-
-  res10 = paste0('There are ',
-                 nrow(dfnew) - nrow(dfold),
-                 ' more statistical results in the new DR')
-
-
-  res20 = paste0(
-    'There are ',
-    sum(!dfold$metadata_group %in% dfnew$metadata_group),
-    ' metadata in the old DR that does not exist in the new DR'
-  )
-
-  # deep1 = dfold[!dfold$metadata_group %in% dfnew$metadata_group, ]
-  # table(deep1$phenotyping_center)
-
-
-  f1 = function(x) {
-    if (is.numeric(x) && !all(is.na(x)))
-      r = mean(x, na.rm = TRUE)
-    else if ((is.factor(x) || is.character(x)) && !all(is.na(x)))
-      r = paste(unique(as.character(x)),
-                sep = ' | ',
-                collapse = ' | ')
-    else
-      r = NA
-
-    return (r)
-  }
-
-  f2 = function(x) {
-    if (!all(is.na(x)))
-      r = mean(as.numeric(x), na.rm = TRUE)
-    else
-      r = NA
-
-    return (r)
-  }
-
-  f3 = function(x) {
-    if (!all(is.na(x)))
-      r = sum(as.numeric(x), na.rm = TRUE)
-    else
-      r = NA
-
-    return (r)
-  }
-
-  f4 = function(df,
-                col = 'diff',
-                extractcol = 'Group.1',
-                n = 10) {
-    r = df[order(df[, col]),]
-    r0 = c(head(r[, extractcol], n), tail(r[, extractcol], n))
-    return (r0)
-  }
-
-  aoldmp = aggregate(dfold[, c('Total.KO.female',
-                               'Total.KO.male',
-                               'Total.WT.female',
-                               'Total.WT.male')], by = list(dfold$gene_symbol), f3)
-
-  anewmp = aggregate(dfnew[, c('Total.KO.female',
-                               'Total.KO.male',
-                               'Total.WT.female',
-                               'Total.WT.male')], by = list(dfnew$gene_symbol), f3)
-
-
-  aoldm = aggregate(dfold[, c('Total.KO.female',
-                              'Total.KO.male',
-                              'Total.WT.female',
-                              'Total.WT.male')], by = list(dfold$gene_symbol), f2)
-
-  anewm = aggregate(dfnew[, c('Total.KO.female',
-                              'Total.KO.male',
-                              'Total.WT.female',
-                              'Total.WT.male')], by = list(dfnew$gene_symbol), f2)
-
-
-  aoldm = merge(aoldm,
-                data.frame('Group.1' = aoldmp$Group.1, 'total' = rowSums(aoldmp[,-1])),
-                by = 'Group.1')
-  anewm = merge(anewm,
-                data.frame('Group.1' = anewmp$Group.1, 'total' = rowSums(anewmp[,-1])),
-                by = 'Group.1')
-
-
-  aold = aggregate(dfold$gene_symbol, by = list(dfold$gene_symbol), length)
-  anew = aggregate(dfnew$gene_symbol, by = list(dfnew$gene_symbol), length)
-
-
-  dfm0 = merge(anewm,
-               aoldm,
-               by = 'Group.1',
-               suffixes = c('_dfnew', '_dfold'))
-
-  dfm1 = merge(anew,
-               aold,
-               by = 'Group.1',
-               suffixes = c('_dfnew', '_dfold'))
-  dfm1$diff = dfm1$x_dfnew - dfm1$x_dfold
-  dfm12 = dfm1[dfm1$diff != 0,]
-  dfm12[order(dfm12$diff),]
-
-
-  dfm  = merge(dfm0, dfm1, by = 'Group.1')
-  dfm = dfm[, order(names(dfm))]
-
-  dfm$KOFemaleDiff = dfm$Total.KO.female_dfnew < dfm$Total.KO.female_dfold
-  dfm$KOMaleDiff   = dfm$Total.KO.male_dfnew  < dfm$Total.KO.male_dfold
-
-
-  res30 = f4(dfm[dfm$KOFemaleDiff, c('Group.1', 'diff')])
-  res40 = f4(dfm[dfm$KOMaleDiff, c('Group.1', 'diff')])
-
-  res50 = f4(dfm[dfm$Total.WT.female_dfnew < dfm$Total.WT.female_dfold, c('Group.1', 'diff')])
-  res60 = f4(dfm[dfm$Total.WT.male_dfnew < dfm$Total.WT.male_dfold, c('Group.1', 'diff')])
-
-
-  # dif  = log(dfm1$x_dfnew) - log(dfm1$x_dfold)
-  # hist(dif, breaks = 100)
-  # summary(dif)
-  # plot(dfm1$xdfnew,dfm1$xdfold,pch='.')
-  # qline=rq(dfm1$xdfnew~dfm1$xdfold)
-  # abline(qline)
-  #
-  # dfchange = dfm[dfm$x_dfnew < dfm$x_dfold &
-  #                  dfm$total_dfnew < dfm$total_dfold,]
-  # dfchange
-
-  result = unique(c(
-    res10,
-    res20,
-    "Check these risky genes: ",
-    res30,
-    res40,
-    res50,
-    res60
-  ))
-
-  print(result)
-  print(paste0('Check: ./', file))
-  write(result,
-        file)
-  return(invisible(result))
 }
