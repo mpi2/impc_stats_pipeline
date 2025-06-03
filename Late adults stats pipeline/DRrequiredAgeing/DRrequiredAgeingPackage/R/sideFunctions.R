@@ -772,22 +772,6 @@ UniqueAndNNull = function(x,
   return(x)
 }
 
-# remove useless characters
-removeNAPipe = function(x,
-                        pattern = 'NA',
-                        replacement = '') {
-  x = na.omit(x)
-  if (length(x) > 0)
-    x = gsub(
-      pattern     = pattern,
-      replacement = replacement,
-      x           = x,
-      fixed       = FALSE
-    )
-  return(x)
-}
-
-
 # as.numeric with quote!
 as.numeric0 = function(x, ...) {
   r = suppressWarnings(as.numeric(x, ...))
