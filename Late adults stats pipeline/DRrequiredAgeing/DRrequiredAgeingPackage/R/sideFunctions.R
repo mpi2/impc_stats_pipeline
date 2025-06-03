@@ -745,14 +745,6 @@ RemoveSpecialChars = function(x,
   return(r)
 }
 
-
-# Create sub directory from a url if does not exist
-CreateSubDirIfNotExist = function(x) {
-  base = dirname(x)
-  dir.create0(base)
-  return(x)
-}
-
 # Unique and not NULL
 UniqueAndNNull = function(x,
                           removeSpecials = TRUE,
