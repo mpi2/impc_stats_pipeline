@@ -1067,23 +1067,6 @@ varsInColsOrReturn = function(x, vars, retValue = NULL) {
   return(r)
 }
 
-FlatteningTheSummary = function(x, name = 'Raw data summary statistics') {
-  rs = lapply(x[[name]], function(y) {
-    y[1]
-  })
-  rs1  = unlist(rs)
-  r1   = c(min(rs1),
-           max(rs1),
-           mean(rs1),
-           median(rs1),
-           sd(rs1),
-           names(rs)[(which.min(rs1))],
-           names(rs)[(which.max(rs1))])
-  r2   = paste(sort(paste(names(rs)  , rs1, sep = '=')), collapse = '~', sep =
-                 '~')
-  return(c(r1, r2))
-}
-
 SummaryStatisticsOriginal = function(x,
                                      depVar,
                                      sex = 'sex',
