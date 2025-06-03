@@ -778,14 +778,6 @@ as.numeric0 = function(x, ...) {
   return(r)
 }
 
-# is.numeric with quote!
-is.numeric0 = function(x) {
-  r0  = is.na(as.numeric0(x))
-  r1  = is.na(x) | (x %in% c('na', 'NA', 'TRUE', 'FALSE'))
-  r   = r0 | r1
-  return(!r)
-}
-
 ### removeObject if exist
 rm0 = function(x, silent = FALSE) {
   x      = unique(x)
