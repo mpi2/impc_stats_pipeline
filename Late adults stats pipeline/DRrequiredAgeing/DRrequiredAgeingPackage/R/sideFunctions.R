@@ -23,66 +23,6 @@ noSexes0 = function(obj){
     r = 1
   }
   return(r)
-}
-
-# Behaviour parameters
-BehviourParamters = function(x, ...) {
-  r =  c(
-    "IMPC_ACS_006_001",
-    "IMPC_ACS_033_001",
-    "IMPC_ACS_034_001",
-    "IMPC_ACS_035_001",
-    "IMPC_ACS_036_001",
-    "IMPC_ACS_037_001",
-    "IMPC_CSD_026_001",
-    "MGP_CSD_064_001",
-    "IMPC_CSD_029_001",
-    "IMPC_CSD_030_001",
-    "MGP_CSD_007_001",
-    "IMPC_CSD_032_001",
-    "IMPC_CSD_033_001",
-    "MGP_CSD_005_001",
-    "IMPC_CSD_036_001",
-    "MGP_CSD_008_001",
-    "IMPC_CSD_037_001",
-    "IMPC_CSD_038_001",
-    "MGP_CSD_003_001",
-    "IMPC_CSD_039_001",
-    "MGP_CSD_002_001",
-    "IMPC_CSD_077_001",
-    "MGP_CSD_011_001",
-    "IMPC_CSD_078_001",
-    "IMPC_CSD_079_001",
-    "IMPC_CSD_080_001",
-    "MGP_CSD_012_001",
-    "IMPC_FEA_003_001",
-    "IMPC_FEA_009_001",
-    "IMPC_FEA_015_001",
-    "IMPC_FEA_021_001",
-    "IMPC_GRS_008_001",
-    "IMPC_GRS_009_001",
-    "JAX_HBD_001_001",
-    "IMPC_LDT_001_001",
-    "JAX_LDT_001_001",
-    "IMPC_LDT_006_001",
-    "IMPC_LDT_007_001",
-    "JAX_LDT_008_001",
-    "JAX_LDT_006_001",
-    "IMPC_OFD_007_001",
-    "IMPC_OFD_009_001",
-    "IMPC_OFD_014_001",
-    "IMPC_OFD_020_001",
-    "IMPC_OFD_022_001",
-    "JAX_ROT_002_001",
-    "ICS_ROT_002_001",
-    "HMGU_ROT_002_001",
-    "JAX_ROT_004_001",
-    "JAX_TLS_001_001"
-  )
-  return(r)
-}
-
-
 
 # Objects that must be removed at each iterations
 ObjectsThatMustBeRemovedInEachIteration = function(x = NULL, ...) {
