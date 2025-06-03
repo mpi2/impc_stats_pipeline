@@ -2096,22 +2096,6 @@ chunkVector =  function(x,
   return(r)
 }
 
-# Plan B for JSON not quouted keys!
-checkQouteNAandNaN = function(pattern, replacement, x, ignoreCase = FALSE) {
-  for (i in 1:length(pattern)) {
-    pt  = pattern[i]
-    rep = replacement[i]
-    x = gsub(
-      pattern = pt,
-      replacement = rep,
-      x = x,
-      fixed = TRUE,
-      ignore.case = ignoreCase
-    )
-  }
-  return(x)
-}
-
 # Add windowing weights and store the data again
 StoreRawDataAndWindowingWeights = function(storeRawData,
                                            activeWindowing        ,
