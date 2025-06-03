@@ -454,18 +454,6 @@ is.ABR = function(x) {
   length(grep("_ABR", x, fixed = TRUE)) > 0
 }
 
-# Is this a 3I screen
-is.3i = function(x) {
-  length(
-    grep(
-      "MGP_BCI|MGP_PBI|MGP_ANA|MGP_CTL|MGP_EEI|MGP_BMI|MGP_MLN|MGP_IMM|MGP_BHP|MGP_MIC",
-      x,
-      fixed = FALSE
-    )
-  ) > 0
-
-}
-
 # Exception map
 getException =  function(parameter,
                          exceptionMap = NULL)
