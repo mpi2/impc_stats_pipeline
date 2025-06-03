@@ -3144,24 +3144,6 @@ ReplaceWordInFile = function(file,
   return (invisible(file))
 }
 
-install.packages.auto <- function(x) {
-  x <- as.character(substitute(x))
-  if(isTRUE(x %in% .packages(all.available=TRUE))) {
-    eval(parse(text = sprintf("require(\"%s\")", x)))
-  } else {
-    #update.packages(ask= FALSE) #update installed packages.
-    eval(parse(text = sprintf("install.packages(\"%s\", dependencies = TRUE)", x)))
-  }
-  if(isTRUE(x %in% .packages(all.available=TRUE))) {
-    eval(parse(text = sprintf("require(\"%s\")", x)))
-  } else {
-    source("http://bioconductor.org/biocLite.R")
-    #biocLite(character(), ask=FALSE) #update installed packages.
-    eval(parse(text = sprintf("biocLite(\"%s\")", x)))
-    eval(parse(text = sprintf("require(\"%s\")", x)))
-  }
-}
-
 #######################
 # Annotation pipeline #
 #######################
