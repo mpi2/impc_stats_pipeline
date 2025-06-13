@@ -19,6 +19,22 @@ The `annotationChooser` function is processes statistical analysis results calle
 The annotation pipeline requires a reference table that summarises the available MP terms for a given IMPC parameter. This reference can be retrieved from [IMPReSS](https://www.mousephenotype.org/impress/index).
 The ETL pipeline handles this by generating the `mp_chooser.json` file.
 
+- We will denote p-value calls made from:
+    - ♂ Male only data
+    - ♀ Female only data
+    - ⚤ All data combined
+
+- We will denote `mp_chooser.json` terms as they are:
+    - MALE
+    - FEMALE
+    - UNSPECIFIED
+
+In the `mp_chooser.json` file each MP term can have different levels:
+- Ontology term levels: ABNORMAL, INCREASE, DECREASE.
+- Sex levels: FEMALE, MALE and UNSPECIFIED.
+
+MP term assignment logic can be seen below:
+
 ```mermaid
 %%{
     init: {
@@ -32,11 +48,12 @@ The ETL pipeline handles this by generating the `mp_chooser.json` file.
     }
 }%%
 graph TD;
-    A[Repeat separately for Overall, Females and Males] --> B{Is genotype effect significant?}
-    B -- No --> C[Do not assign MP term]
-    B -- Yes --> D{Is the direction of genotype effect specified?}
-    D -- No --> E[Select Abnormal term]
-    D -- Yes --> F{Is there any conflict of direction? <br> example: Low.Decrease/High.Increase <br> or Male.Decrease/Female.Increase}
-    F -- No --> G[Choose an MP term corresponding to the direction of change]
-    F -- Yes --> H[Select Abnormal term]
-```
+    Start{Which method is used for the analysis?} --> |MM| MM[Prioritise INCREASE/DECREASE MP term] --> A
+    Start --> |FE or RR| FE_RR[Only use ABNORMAL MP term] --> A
+
+    A{"Is FEMALE/MALE specific MP term available in the mp_chooser file?"}
+    A --> |Yes| A2[Use sex specific MP term] --> B{Is ♀/♂ call observed?}
+    A --> |No| A3[Use UNSPECIFIED term] --> B
+
+    B --> |Yes| B1[Drop UNSPECIFIED and report sex-specific MP term]
+    B --> |No| B2[Keep and report UNSPECIFIED MP term]
