@@ -87,7 +87,7 @@ def main():
     total_files = len(file_list)
 
     # Store StatPackets temporary.
-    output_dir = Path("tmp")
+    output_dir = Path("annotation_pipeline_output")
     if not output_dir.exists():
         output_dir.mkdir()
 
