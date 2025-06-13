@@ -76,7 +76,8 @@ function submit_limit_jobs() {
 # Preparation.
 mkdir --mode=775 ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
 cd ${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_input_dr${VERSION}
-cp ${PARQUET_FOLDER}/*.parquet ./
+mkdir input_parquet_files
+cp ${PARQUET_FOLDER}/*.parquet ./input_parquet_files
 cp ${MP_CHOOSER_FOLDER}/part*.txt ./mp_chooser.json
 
 message0 "Update packages to the latest version"
