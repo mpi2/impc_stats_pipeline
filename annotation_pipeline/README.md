@@ -5,6 +5,9 @@ At the IMPC, genetic effects are identified using three statistical analysis pla
 2. Fisher Exact Test framework or FE
 3. Reference Range Plus Test framework or RR
 
+The annotation pipeline requires a reference table that summarises the available MP terms for a given IMPC parameter. This reference can be retrieved from [IMPReSS](https://www.mousephenotype.org/impress/index).
+The ETL pipeline handles this by generating the `mp_chooser.json` file.
+
 ```mermaid
 %%{
     init: {
