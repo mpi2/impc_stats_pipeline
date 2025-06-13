@@ -146,11 +146,11 @@ zip -q -rm phase2_logs.zip DataGeneratingLog/
 mv phase2_logs.zip ../compressed_logs/
 
 message0 "Appending all procedure based jobs into one single file..."
-mkdir jobs
-find ./*/*_RawData/*.bch -type f | xargs  cat >> jobs/AllJobs.bch
+mkdir ../jobs
+find ./*/*_RawData/*.bch -type f | xargs  cat >> ../jobs/AllJobs.bch
 
 message0 "Phase III. Initialising the statistical analysis..."
-cd jobs
+cd ../jobs
 message0 "Updating the dynamic contents from the IMPReSS..."
 R --quiet -e \
 "DRrequiredAgeing:::updateImpress( \
@@ -162,20 +162,20 @@ R --quiet -e \
 
 message0 "Running the IMPC statistical pipeline by submitting jobs..."
 if [ "${WINDOWING_PIPELINE}" = true ]; then
-  fetch_script jobs/function_windowed.R
+  fetch_script ../jobs/function_windowed.R
   mv function_windowed.R function.R
 else
-  fetch_script jobs/function.R
+  fetch_script ../jobs/function.R
 fi
 
 R --quiet -e \
 "DRrequiredAgeing:::ReplaceWordInFile( \
-  '$(realpath function.R)', \
+  '$(realpath ../jobs/function.R)', \
   'DRversionNotSpecified', \
   ${VERSION} \
 )"
 chmod 775 AllJobs.bch
-submit_limit_jobs AllJobs.bch ../../compressed_logs/phase3_job_id.txt
+submit_limit_jobs AllJobs.bch ../compressed_logs/phase3_job_id.txt
 waitTillCommandFinish
 
 message0 "Postprocessing the IMPC statistical analysis results..."
@@ -203,7 +203,7 @@ message0 "This is the last step. If you see no file in the list below, the SP is
 
 # Annotation pipeline.
 message0 "Starting the IMPC annotation pipeline..."
-cd jobs/Results_IMPC_SP_Windowed/
+cd ../jobs/Results_IMPC_SP_Windowed/
 message0 "Step 1: Clean ups and creating the global index for the results."
 message0 "Indexing the results..."
 for dir in $(find . -mindepth 2 -maxdepth 2 -type d); do
@@ -213,12 +213,12 @@ for dir in $(find . -mindepth 2 -maxdepth 2 -type d); do
 -e ${base_dir}_error.err -o ${base_dir}_output.log --wrap=\"find $dir -type f -name '*.tsv' -exec realpath {} \; > $output_file\"" >> minijobs.bch
 done
 chmod 775 minijobs.bch
-submit_limit_jobs minijobs.bch ../../../compressed_logs/minijobs_job_id.txt
+submit_limit_jobs minijobs.bch ../../compressed_logs/minijobs_job_id.txt
 waitTillCommandFinish
-mv minijobs.bch ../../../compressed_logs
+mv minijobs.bch ../../compressed_logs
 
-find . -type f -name '*_output.log' -exec zip -q -m ../../../compressed_logs/minijobs_logs.zip {} +
-find . -type f -name '*_error.err' -exec zip -q -m ../../../compressed_logs/minijobs_logs.zip {} +
+find . -type f -name '*_output.log' -exec zip -q -m ../../compressed_logs/minijobs_logs.zip {} +
+find . -type f -name '*_error.err' -exec zip -q -m ../../compressed_logs/minijobs_logs.zip {} +
 message0 "Moving single indeces into a separate directory called AnnotationExtractorAndHadoopLoader..."
 mkdir AnnotationExtractorAndHadoopLoader
 chmod 775 AnnotationExtractorAndHadoopLoader
