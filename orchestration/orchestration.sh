@@ -247,6 +247,12 @@ for file in $(find . -maxdepth 1 -type f -name "split_index*"); do
 done
 chmod 775 annotation_jobs.bch
 
+message0 "Installing Python dependencies..."
+module load python-3.10.2-gcc-9.3.0-gswnsij
+python3.10 -m pip install rpy2
+python3.10 -m pip install numpy
+python3.10 -m pip install pandas
+
 message0 "Downloading the action script..."
 fetch_script loader.py annotation_pipeline
 submit_limit_jobs annotation_jobs.bch ../../../../compressed_logs/annotation_job_id.txt
