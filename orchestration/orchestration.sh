@@ -226,10 +226,10 @@ mv *.Ind AnnotationExtractorAndHadoopLoader
 cd AnnotationExtractorAndHadoopLoader
 
 message0 "Concatenating single index files to create a global index for the results..."
-cat *.Ind >> AllResultsIndeces.txt
+cat *.Ind | shuf >> AllResultsIndeces.txt
 message0 "Zipping the single indeces..."
 zip -q -rm allsingleindeces.zip *.Ind
-split -50 AllResultsIndeces.txt split_index_
+split -1000 AllResultsIndeces.txt split_index_
 
 message0 "Convert the mp_chooser JSON file to Rdata..."
 R --quiet -e "a = jsonlite::fromJSON('../../../../mp_chooser.json');save(a,file='../../../../mp_chooser.json.Rdata')"
