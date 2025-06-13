@@ -220,10 +220,10 @@ mv minijobs.bch ../../compressed_logs
 find . -type f -name '*_output.log' -exec zip -q -m ../../compressed_logs/minijobs_logs.zip {} +
 find . -type f -name '*_error.err' -exec zip -q -m ../../compressed_logs/minijobs_logs.zip {} +
 message0 "Moving single indeces into a separate directory called annotation_extractor..."
-mkdir annotation_extractor
-chmod 775 annotation_extractor
-mv *.Ind annotation_extractor
-cd annotation_extractor
+mkdir ../annotation_extractor
+chmod 775 ../annotation_extractor
+mv *.Ind ../annotation_extractor
+cd ../annotation_extractor
 
 message0 "Concatenating single index files to create a global index for the results..."
 cat *.Ind | shuf >> AllResultsIndeces.txt
@@ -232,8 +232,8 @@ zip -q -rm allsingleindeces.zip *.Ind
 split -1000 AllResultsIndeces.txt split_index_
 
 message0 "Convert the mp_chooser JSON file to Rdata..."
-R --quiet -e "a = jsonlite::fromJSON('../../../../mp_chooser.json');save(a,file='../../../../mp_chooser.json.Rdata')"
-export MP_CHOOSER_FILE=$(realpath ../../../../mp_chooser.json.Rdata | tr -d '\n')
+R --quiet -e "a = jsonlite::fromJSON('../mp_chooser.json');save(a,file='../mp_chooser.json.Rdata')"
+export MP_CHOOSER_FILE=$(realpath ../mp_chooser.json.Rdata | tr -d '\n')
 
 if [[ -z "${MP_CHOOSER_FILE}" || ! -f "${MP_CHOOSER_FILE}" ]]; then
     echo -e "ERROR: mp_chooser not found at location\n\t${MP_CHOOSER_FILE}"
@@ -255,11 +255,11 @@ python3.10 -m pip install pandas
 
 message0 "Downloading the action script..."
 fetch_script loader.py annotation_pipeline
-submit_limit_jobs annotation_jobs.bch ../../../../compressed_logs/annotation_job_id.txt
+submit_limit_jobs annotation_jobs.bch ../compressed_logs/annotation_job_id.txt
 waitTillCommandFinish
 
 message0 "Zipping logs..."
-mv annotation_jobs.bch ../../../../compressed_logs
-zip -q -rm ../../../../compressed_logs/annotation_logs.zip log/* err/* out/*
+mv annotation_jobs.bch ../compressed_logs
+zip -q -rm ../compressed_logs/annotation_logs.zip log/* err/* out/*
 zip -q -rm splits.zip split_index_*
 message0 "Job done."
