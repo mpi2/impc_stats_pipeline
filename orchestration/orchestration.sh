@@ -219,11 +219,11 @@ mv minijobs.bch ../../compressed_logs
 
 find . -type f -name '*_output.log' -exec zip -q -m ../../compressed_logs/minijobs_logs.zip {} +
 find . -type f -name '*_error.err' -exec zip -q -m ../../compressed_logs/minijobs_logs.zip {} +
-message0 "Moving single indeces into a separate directory called AnnotationExtractorAndHadoopLoader..."
-mkdir AnnotationExtractorAndHadoopLoader
-chmod 775 AnnotationExtractorAndHadoopLoader
-mv *.Ind AnnotationExtractorAndHadoopLoader
-cd AnnotationExtractorAndHadoopLoader
+message0 "Moving single indeces into a separate directory called annotation_extractor..."
+mkdir annotation_extractor
+chmod 775 annotation_extractor
+mv *.Ind annotation_extractor
+cd annotation_extractor
 
 message0 "Concatenating single index files to create a global index for the results..."
 cat *.Ind | shuf >> AllResultsIndeces.txt
