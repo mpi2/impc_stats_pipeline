@@ -88,12 +88,12 @@ message0 "Update completed"
 
 # Statistical pipeline.
 message0 "Starting the IMPC statistical pipeline..."
-mkdir SP compressed_logs
+mkdir stats_batching compressed_logs
 export input_path=$(realpath .)
-export sp_results=$(realpath SP)
+export sp_results=$(realpath stats_batching)
 message0 "Parquet files path: ${input_path}"
 message0 "Output path: ${sp_results}"
-cd SP
+cd stats_batching
 
 message0 "Phase I. Convert parquet files into Rdata..."
 
@@ -147,11 +147,11 @@ zip -q -rm phase2_logs.zip DataGeneratingLog/
 mv phase2_logs.zip ../compressed_logs/
 
 message0 "Appending all procedure based jobs into one single file..."
-mkdir ../jobs
-find ./*/*_RawData/*.bch -type f | xargs  cat >> ../jobs/AllJobs.bch
+mkdir ../stats_results
+find ./*/*_RawData/*.bch -type f | xargs  cat >> ../stats_results/AllJobs.bch
 
 message0 "Phase III. Initialising the statistical analysis..."
-cd ../jobs
+cd ../stats_results
 message0 "Updating the dynamic contents from the IMPReSS..."
 R --quiet -e \
 "DRrequiredAgeing:::updateImpress( \
@@ -163,15 +163,15 @@ R --quiet -e \
 
 message0 "Running the IMPC statistical pipeline by submitting jobs..."
 if [ "${WINDOWING_PIPELINE}" = true ]; then
-  fetch_script ../jobs/function_windowed.R
-  mv function_windowed.R function.R
+  fetch_script ../stats_results/function_windowed.R
+  mv ../stats_results/function_windowed.R ../stats_results/function.R
 else
-  fetch_script ../jobs/function.R
+  fetch_script ../stats_results/function.R
 fi
 
 R --quiet -e \
 "DRrequiredAgeing:::ReplaceWordInFile( \
-  '$(realpath ../jobs/function.R)', \
+  '$(realpath ../stats_results/function.R)', \
   'DRversionNotSpecified', \
   ${VERSION} \
 )"
@@ -204,7 +204,7 @@ message0 "This is the last step. If you see no file in the list below, the SP is
 
 # Annotation pipeline.
 message0 "Starting the IMPC annotation pipeline..."
-cd ../jobs/Results_IMPC_SP_Windowed/
+cd ../stats_results/Results_IMPC_SP_Windowed/
 message0 "Step 1: Clean ups and creating the global index for the results."
 message0 "Indexing the results..."
 for dir in $(find . -mindepth 2 -maxdepth 2 -type d); do
