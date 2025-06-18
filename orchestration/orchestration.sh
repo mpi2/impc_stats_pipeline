@@ -163,18 +163,23 @@ cd ../stats_results
 
 message0 "Running the IMPC statistical pipeline by submitting jobs..."
 if [ "${WINDOWING_PIPELINE}" = true ]; then
+  message0 "Inside loop"
   fetch_script function_windowed.R
+  message0 "Downloaded"
   mv function_windowed.R function.R
+  message0 "Renamed"
 else
   fetch_script function.R
 fi
 
+message0 "Before replace"
 R --quiet -e \
 "DRrequiredAgeing:::ReplaceWordInFile( \
-  '$(realpath ../stats_results/function.R)', \
+  '$(realpath function.R)', \
   'DRversionNotSpecified', \
   ${VERSION} \
 )"
+message0 "After replace"
 chmod 775 AllJobs.bch
 submit_limit_jobs AllJobs.bch ../compressed_logs/phase3_job_id.txt
 waitTillCommandFinish
