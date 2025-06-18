@@ -163,10 +163,10 @@ cd ../stats_results
 
 message0 "Running the IMPC statistical pipeline by submitting jobs..."
 if [ "${WINDOWING_PIPELINE}" = true ]; then
-  fetch_script ../stats_results/function_windowed.R
-  mv ../stats_results/function_windowed.R ../stats_results/function.R
+  fetch_script function_windowed.R
+  mv function_windowed.R function.R
 else
-  fetch_script ../stats_results/function.R
+  fetch_script function.R
 fi
 
 R --quiet -e \
