@@ -164,7 +164,7 @@ cd ../stats_results
 message0 "Running the IMPC statistical pipeline by submitting jobs..."
 if [ "${WINDOWING_PIPELINE}" = true ]; then
   message0 "Inside loop"
-  fetch_script function_windowed.R
+  fetch_script jobs/function_windowed.R
   message0 "Downloaded"
   mv function_windowed.R function.R
   message0 "Renamed"
