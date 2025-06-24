@@ -31,7 +31,9 @@ The ETL pipeline handles this by generating the `mp_chooser.json` file.
 
 In the `mp_chooser.json` file each MP term can have different levels:
 - Ontology term levels: ABNORMAL, INCREASED, DECREASED.
-- Sex levels: FEMALE, MALE and UNSPECIFIED.
+- Sex levels: FEMALE, MALE, UNSPECIFIED.
+
+*Note:* Sex-specific MP terms, e.g. those with FEMALE and MALE sex levels, and UNSPECIFIED, are never encountered together for the same parameter. In other words, it is either a FEMALE/MALE term or an UNSPECIFIED term available in the `mp_chooser.json` file.
 
 MP term assignment logic can be seen below:
 
@@ -51,9 +53,9 @@ graph TD;
     Start{Which method is used for the analysis?} --> |MM| MM[Prioritise INCREASED/DECREASED MP term, otherwise use ABNORMAL] --> A
     Start --> |FE or RR| FE_RR[Only use ABNORMAL MP term] --> A
 
-    A{"Is FEMALE/MALE specific MP term available in the mp_chooser file?"}
-    A --> |Yes| A2[Use sex specific MP term] --> B{Is ♀/♂ call observed?}
+    A{"Is sex-specific MP term available in the mp_chooser file?"}
+    A --> |Yes| A2[Use FEMALE/MALE term] --> B{Is ♀ or ♂ call observed?}
     A --> |No| A3[Use UNSPECIFIED term] --> B
 
-    B --> |Yes| B1[Drop UNSPECIFIED and report sex-specific MP term]
-    B --> |No| B2[Keep and report UNSPECIFIED MP term]
+    B --> |Yes| B1[Drop ⚤ call and report MP term for ♀ or ♂ call]
+    B --> |No| B2[Report ⚤ call]
