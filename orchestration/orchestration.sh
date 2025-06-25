@@ -100,7 +100,8 @@ message0 "Phase I. Convert parquet files into Rdata..."
 message0 "Step 1. Create jobs"
 step1_files=$(find ../input_parquet_files -type f -name '*.parquet' -exec realpath {} \;)
 for file in $step1_files; do
-  echo "sbatch --job-name=impc_stats_pipeline_job --mem=10G --time=00:10:00 -e ${file}.err -o ${file}.log --wrap='Rscript Step2Parquet2Rdata.R $file'" >> jobs_step2_Parquet2Rdata.bch
+  file_name=$(basename "${file}" .parquet)
+  echo "sbatch --job-name=impc_stats_pipeline_job --mem=10G --time=00:10:00 -e ../compressed_logs/step2_logs/${file_name}.err -o ../compressed_logs/step2_logs${file_name}.log --wrap='Rscript Step2Parquet2Rdata.R $file'" >> jobs_step2_Parquet2Rdata.bch
 done
 
 message0 "Step 2. Read parquet files and create pseudo Rdata"
@@ -108,8 +109,6 @@ fetch_script 0-ETL/Step2Parquet2Rdata.R
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash jobs_step2_Parquet2Rdata.bch"
 waitTillCommandFinish
 rm Step2Parquet2Rdata.R
-find ../input_parquet_files -type f -name '*.log' -exec zip -q -m ../compressed_logs/step2_logs.zip {} +
-find ../input_parquet_files -type f -name '*.err' -exec zip -q -m ../compressed_logs/step2_logs.zip {} +
 
 message0 "Step 3. Merging pseudo Rdata files into single file for each procedure - jobs creator"
 dirs=$(find "${sp_results}/ProcedureScatterRdata" -maxdepth 1 -type d)
