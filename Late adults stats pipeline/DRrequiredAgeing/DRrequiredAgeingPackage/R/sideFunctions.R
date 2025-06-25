@@ -4584,13 +4584,14 @@ GenotypeTag = function(obj,
       sex <- pair[1]
       column_prefix <- pair[2]
       pvalue = obj[[paste0(column_prefix, " p-value")]]
+      effect_size = obj[[paste0(column_prefix, " estimate")]]$Value
       # Append to existing dataframe.
       tag <- rbind(tag, data.frame(
         Sex = sex,
         StatisticalTestResult = c(
           # Statistical test based on genotype effect estimate and p-value.
           DirectionTagMM(
-            x = obj[[paste0(column_prefix, " estimate")]]$Value,
+            x = effect_size,
             pvalue = pvalue,
             threshold = threshold
           ),
@@ -4600,6 +4601,7 @@ GenotypeTag = function(obj,
         ),
         Level = "OVERALL",
         PValue = if (is.null(pvalue)) NA else pvalue,
+        EffectSize = if (is.null(effect_size)) NA else effect_size,
         stringsAsFactors = FALSE
       ))
     }
@@ -4633,6 +4635,7 @@ GenotypeTag = function(obj,
           StatisticalTestResult = if (is.numeric(pvalue) && pvalue < threshold) "ABNORMAL" else NA,
           Level = "OVERALL",
           PValue = if (is.null(pvalue)) NA else pvalue,
+          EffectSize = NA,
           stringsAsFactors = FALSE
         )
       )
@@ -4664,6 +4667,7 @@ GenotypeTag = function(obj,
           StatisticalTestResult = if (is.numeric(low_pvalue) && low_pvalue < rrlevel) "ABNORMAL" else NA,
           Level = "OVERALL",
           PValue = if (is.null(low_pvalue)) NA else low_pvalue,
+          EffectSize = NA,
           stringsAsFactors = FALSE
         )
       )
@@ -4674,6 +4678,7 @@ GenotypeTag = function(obj,
           StatisticalTestResult = if (is.numeric(high_pvalue) && high_pvalue < rrlevel) "ABNORMAL" else NA,
           Level = "OVERALL",
           PValue = if (is.null(high_pvalue)) NA else high_pvalue,
+          EffectSize = NA,
           stringsAsFactors = FALSE
         )
       )
@@ -4829,8 +4834,8 @@ annotationChooser = function(statpacket = NULL,
         arrange(Sex)
       # Convert to the desired list format.
       MPTERMS <- filtered_data %>%
-        mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm, p_value = PValue) %>%
-        select(term_id, event, sex, p_value) %>%
+        mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm, p_value = PValue, effect_size = EffectSize) %>%
+        select(term_id, event, sex, p_value, effect_size) %>%
         # Use `purrr::transpose()` to create an unnamed list of objects.
         purrr::transpose() %>%
         # Remove names from the list.
