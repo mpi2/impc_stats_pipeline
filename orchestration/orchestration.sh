@@ -229,7 +229,7 @@ message0 "Moving single indeces into a separate directory called annotation_extr
 mkdir ../../annotation_extractor
 chmod 775 ../../annotation_extractor
 cd ../../annotation_extractor
-mv stats_results/Results_IMPC_SP_Windowed/*.Ind .
+mv ../stats_results/Results_IMPC_SP_Windowed/*.Ind .
 
 message0 "Concatenating single index files to create a global index for the results..."
 cat *.Ind | shuf >> AllResultsIndeces.txt
