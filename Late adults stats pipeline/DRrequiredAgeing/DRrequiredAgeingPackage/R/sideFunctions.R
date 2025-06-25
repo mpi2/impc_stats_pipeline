@@ -4551,87 +4551,57 @@ DirectionTagMM = function(x,
   return(tag)
 }
 
-DirectionTagFE = function(x,
-                          threshold = .0001,
-                          group = c('ABNORMAL', 'INCREASED', 'DECREASED')) {
-  tag = if (is.null(x) || length(x) < 1) {
-    'NoEffectCalculated'
-  } else if (x < threshold) {
-    group
-  } else {
-    paste0('NORMAL - Test not significant at the level of ',
-           threshold,
-           ' (pvalue = ',
-           x,
-           ')')
-  }
-  return(tag)
-}
-
-returnWhatBasedOnThreshold = function(x = NULL,
-                                      threshold = .0001,
-                                      Return = 'ABNORMAL') {
-  if (is.numeric(x) && x < threshold) {
-    return(Return)
-  } else {
-    return('IgnoreThisCaseAtALL')
-  }
-}
-
 GenotypeTag = function(obj,
                        threshold = 10 ^ -4,
-                       expDetailsForErrorOnly = NULL,
-                       rrlevel = 10 ^ -4) {
+                       rrlevel = 10 ^ -4,
+                       method = NULL) {
   if (is.null(obj))
     return(NULL)
-  method = GetMethodStPa(x = obj$`Applied method`)
   message('\t The analysis method = ', method)
   message('\t The decision threshold = ',
           threshold,
           ' and for the RR method it is ',
           rrlevel)
 
+  # Initialise an empty data frame.
+  tag <- data.frame(
+    Sex = character(),
+    StatisticalTestResult = character(),
+    Level = character(),
+    PValue = numeric(),
+    stringsAsFactors = FALSE
+  )
+
   if (method %in% 'MM') {
-    # Initialise an empty data frame.
-    tag <- data.frame(
-      Sex = character(),
-      StatisticalTestResult = character(),
-      Level = character()
-    )
     # Define sex/column prefix info.
     sex_column_prefix_pairs <- list(
       c("UNSPECIFIED", "Genotype"),
       c("FEMALE", "Sex FvKO"),
-      c("MALE", "Sex MvKO"),
-      stringsAsFactors = FALSE
+      c("MALE", "Sex MvKO")
     )
     # Iterate over sexes and their corresponding column prefixes.
     for (pair in sex_column_prefix_pairs) {
       sex <- pair[1]
       column_prefix <- pair[2]
+      pvalue = obj[[paste0(column_prefix, " p-value")]]
+      effect_size = obj[[paste0(column_prefix, " estimate")]]$Value
       # Append to existing dataframe.
       tag <- rbind(tag, data.frame(
         Sex = sex,
         StatisticalTestResult = c(
           # Statistical test based on genotype effect estimate and p-value.
           DirectionTagMM(
-            x = obj[[paste0(column_prefix, " estimate")]]$Value,
-            pvalue = obj[[paste0(column_prefix, " p-value")]],
+            x = effect_size,
+            pvalue = pvalue,
             threshold = threshold
           ),
-          # Simple statistical test based on p-value only.
-          returnWhatBasedOnThreshold(
-            x = obj[[paste0(column_prefix, " p-value")]],
-            threshold = threshold,
-            Return = "ABNORMAL"
-          ),
-          returnWhatBasedOnThreshold(
-            x = obj[[paste0(column_prefix, " p-value")]],
-            threshold = threshold,
-            Return = 'INFERRED'
-          )
+          # Comparing test based on p-value only.
+          if (is.numeric(pvalue) && pvalue < threshold) "ABNORMAL" else NA,
+          if (is.numeric(pvalue) && pvalue < threshold) "INFERRED" else NA
         ),
         Level = "OVERALL",
+        PValue = if (is.null(pvalue)) NA else pvalue,
+        EffectSize = if (is.null(effect_size)) NA else effect_size,
         stringsAsFactors = FALSE
       ))
     }
@@ -4646,13 +4616,6 @@ GenotypeTag = function(obj,
       fmodels$Genotype$`Complete table` = fmodels$`Complete table`
       fmodels$`Complete table` = NULL
     }
-    # Initialise an empty data frame.
-    tag <- data.frame(
-      Sex = character(),
-      StatisticalTestResult = character(),
-      Level = character(),
-      stringsAsFactors = FALSE
-    )
     # Define sex/column prefix info.
     sex_column_prefix_pairs <- list(
       c("UNSPECIFIED", "Genotype"),
@@ -4663,16 +4626,16 @@ GenotypeTag = function(obj,
     for (pair in sex_column_prefix_pairs) {
       sex <- pair[1]
       column_prefix <- pair[2]
+      pvalue <- fmodels[[column_prefix]]$`Complete table`$p.value
       # Append to existing dataframe.
       tag <- rbind(
         tag,
         data.frame(
           Sex = sex,
-          StatisticalTestResult = DirectionTagFE(
-            x = fmodels[[column_prefix]]$`Complete table`$p.value,
-            threshold = threshold
-          ),
+          StatisticalTestResult = if (is.numeric(pvalue) && pvalue < threshold) "ABNORMAL" else NA,
           Level = "OVERALL",
+          PValue = if (is.null(pvalue)) NA else pvalue,
+          EffectSize = NA,
           stringsAsFactors = FALSE
         )
       )
@@ -4683,13 +4646,6 @@ GenotypeTag = function(obj,
     fmodels = obj$`Additional information`$Analysis$`Further models`
     if (is.null(fmodels))
       return(NULL)
-    # Initialise an empty data frame.
-    tag <- data.frame(
-      Sex = character(),
-      StatisticalTestResult = character(),
-      Level = character(),
-      stringsAsFactors = FALSE
-    )
     # Define sex/column prefix info.
     sex_column_prefix_pairs <- list(
       c("UNSPECIFIED", "Genotype"),
@@ -4701,42 +4657,35 @@ GenotypeTag = function(obj,
       sex <- pair[1]
       column_prefix <- pair[2]
       # Get data for LOW and HIGH tails.
-      low_results <- DirectionTagFE(
-        x = fmodels[[paste0("Low.data_point.", column_prefix)]]$Genotype$Result$p.value,
-        threshold = rrlevel,
-        group = c("ABNORMAL", "DECREASED")
-      )
-      high_results <- DirectionTagFE(
-        x = fmodels[[paste0("High.data_point.", column_prefix)]]$Genotype$Result$p.value,
-        threshold = rrlevel,
-        group = c("ABNORMAL", "INCREASED")
-      )
-      all_results <- c(low_results, high_results)
+      low_pvalue <- fmodels[[paste0("Low.data_point.", column_prefix)]]$Genotype$Result$p.value
+      high_pvalue <- fmodels[[paste0("High.data_point.", column_prefix)]]$Genotype$Result$p.value
       # Append all to existing dataframe.
-      for (result in all_results) {
-        tag <- rbind(
-          tag,
-          data.frame(
-            Sex = sex,
-            StatisticalTestResult = result,
-            Level = "OVERALL",
-            stringsAsFactors = FALSE
-          )
+      tag <- rbind(
+        tag,
+        data.frame(
+          Sex = sex,
+          StatisticalTestResult = if (is.numeric(low_pvalue) && low_pvalue < rrlevel) "ABNORMAL" else NA,
+          Level = "OVERALL",
+          PValue = if (is.null(low_pvalue)) NA else low_pvalue,
+          EffectSize = NA,
+          stringsAsFactors = FALSE
         )
-      }
+      )
+      tag <- rbind(
+        tag,
+        data.frame(
+          Sex = sex,
+          StatisticalTestResult = if (is.numeric(high_pvalue) && high_pvalue < rrlevel) "ABNORMAL" else NA,
+          Level = "OVERALL",
+          PValue = if (is.null(high_pvalue)) NA else high_pvalue,
+          EffectSize = NA,
+          stringsAsFactors = FALSE
+        )
+      )
     }
 
   } else {
     tag = NULL
-    write(
-      x = paste(
-        head(expDetailsForErrorOnly, 18),
-        sep = '\t',
-        collapse = '\t'
-      ),
-      file = 'ErrorneousCases.tsv.err',
-      ncolumns = 5000
-    )
   }
   return(tag)
 }
@@ -4758,11 +4707,7 @@ flatten_mp_chooser <- function(d) {
   }))
 }
 
-match_mp_terms <- function(Gtag, d, allowed_results = c()) {
-  # If provided, restrict the data to a list of allowed statistical test results.
-  if (length(allowed_results) > 0) {
-    Gtag <- subset(Gtag, StatisticalTestResult %in% allowed_results)
-  }
+match_mp_terms <- function(Gtag, d) {
   # First, try to join by exact sex, for example M call to M term.
   GtagExact <- merge(
     Gtag,
@@ -4773,9 +4718,10 @@ match_mp_terms <- function(Gtag, d, allowed_results = c()) {
   # Separate rows where we did / did not find a MP term.
   GtagExactMatched <- subset(GtagExact, !is.na(MpTerm))
   GtagExactUnmatched <- subset(GtagExact, is.na(MpTerm))
+  GtagExactUnmatched <- subset(GtagExactUnmatched, select = -MpTerm)
   # Now, for the unmatched records, try to find a U term as a fallback.
   GtagUnspecified <- merge(
-    Gtag,
+    GtagExactUnmatched,
     subset(d, Sex == "UNSPECIFIED", select = -Sex),
     by = c("StatisticalTestResult", "Level"),
     all.x = TRUE
@@ -4796,7 +4742,7 @@ annotationChooser = function(statpacket = NULL,
   requireNamespace("jsonlite")
   library(dplyr)
 
-  # Handle unsuccessful StatPackages.
+  # Handle unsuccessful StatPackets.
   if (
     is.null(statpacket) ||
     length(statpacket) < 1 ||
@@ -4821,7 +4767,8 @@ annotationChooser = function(statpacket = NULL,
   Gtag = GenotypeTag(
     obj = json$Result$`Vector output`[[resultKey]],
     threshold = level,
-    rrlevel = rrlevel
+    rrlevel = rrlevel,
+    method = method
   )
 
   # Load mp_chooser Rdata file.
@@ -4849,21 +4796,7 @@ annotationChooser = function(statpacket = NULL,
     d <- flatten_mp_chooser(d)
 
     # 2. Join MP term information from mp_chooser.
-    if (method %in% "MM") {
-      Gtag <- match_mp_terms(Gtag, d)
-    } else if (method %in% "FE") {
-      Gtag <- match_mp_terms(Gtag, d, c("ABNORMAL"))
-    } else if (method %in% "RR") {
-      # By default, only ABNORMAL calls are used for RR.
-      GtagAbnormal <- match_mp_terms(Gtag, d, c("ABNORMAL"))
-      # In case no ABNORMAL MP terms were found, try to match INCREASED/DECREASED terms.
-      # This approach is left unchanged from the original annotation pipeline.
-      if (nrow(subset(GtagAbnormal, !is.na(MpTerm))) > 0) {
-        Gtag <- GtagAbnormal
-      } else {
-        Gtag <- match_mp_terms(Gtag, d, c("INCREASED", "DECREASED"))
-      }
-    }
+    Gtag <- match_mp_terms(Gtag, d)
 
     # 3. Remove records with no assigned MP terms.
     # This filters out all rows with no statistically significant results.
@@ -4876,51 +4809,38 @@ annotationChooser = function(statpacket = NULL,
     } else {
       # Define the priority order for StatisticalTestResult.
       priority_order <- c("INCREASED", "DECREASED", "INFERRED", "ABNORMAL")
-      # Check if the input dataframe is empty.
-      if (nrow(Gtag) == 0) {
-        MPTERMS <- list()
-      } else {
-        # Group by Sex and select one row per group based on priority.
-        filtered_data <- Gtag %>%
-          group_by(Sex) %>%
-          arrange(match(StatisticalTestResult, priority_order)) %>%
-          slice(1) %>%
-          ungroup()
-        # Drop UNSPECIFIED if MALE or FEMALE data is present.
-        if (any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
-          filtered_data <- filtered_data %>% filter(Sex != "UNSPECIFIED")
-        }
-        # Handle UNSPECIFIED case if no MALE or FEMALE data is present.
-        if (!any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
-          if (length(sex_levels) == 1) {
-            filtered_data$Sex <- toupper(sex_levels)
-          }
-        }
-        # Convert Sex column to lowercase and replace "unspecified" with "not_considered".
-        filtered_data <- filtered_data %>%
-          mutate(Sex = tolower(Sex),
-                  Sex = ifelse(Sex == "unspecified", "not_considered", Sex))
-        # Ensure female comes before male if both are present.
-        filtered_data <- filtered_data %>%
-          arrange(Sex)
-        # Convert to the desired list format.
-        MPTERMS <- filtered_data %>%
-          mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm) %>%
-          select(term_id, event, sex) %>%
-          # Use `purrr::transpose()` to create an unnamed list of objects.
-          purrr::transpose() %>%
-          # Remove names from the list
-          unname()
-        # Special case for RR: add an empty `otherPossibilities` field for compatibility.
-        if (method == "RR") {
-          MPTERMS <- purrr::map(MPTERMS, ~ {
-            .x$otherPossibilities <- ""
-            .x
-          })
+      # Group by Sex and select one row per group based on priority.
+      filtered_data <- Gtag %>%
+        group_by(Sex) %>%
+        arrange(match(StatisticalTestResult, priority_order)) %>%
+        slice(1) %>%
+        ungroup()
+      # Drop UNSPECIFIED if MALE or FEMALE data is present.
+      if (any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
+        filtered_data <- filtered_data %>% filter(Sex != "UNSPECIFIED")
+      }
+      # Handle UNSPECIFIED case if no MALE or FEMALE data is present.
+      if (!any(filtered_data$Sex %in% c("MALE", "FEMALE"))) {
+        if (length(sex_levels) == 1) {
+          filtered_data$Sex <- toupper(sex_levels)
         }
       }
+      # Convert Sex column to lowercase and replace "unspecified" with "not_considered".
+      filtered_data <- filtered_data %>%
+        mutate(Sex = tolower(Sex),
+                Sex = ifelse(Sex == "unspecified", "not_considered", Sex))
+      # Ensure female comes before male if both are present.
+      filtered_data <- filtered_data %>%
+        arrange(Sex)
+      # Convert to the desired list format.
+      MPTERMS <- filtered_data %>%
+        mutate(sex = Sex, event = StatisticalTestResult, term_id = MpTerm, p_value = PValue, effect_size = EffectSize) %>%
+        select(term_id, event, sex, p_value, effect_size) %>%
+        # Use `purrr::transpose()` to create an unnamed list of objects.
+        purrr::transpose() %>%
+        # Remove names from the list.
+        unname()
     }
-
   }
 
   # Return the final data structure.
@@ -4928,7 +4848,5 @@ annotationChooser = function(statpacket = NULL,
     json$Result$Details[[TermKey]] = MPTERMS
     statpacket$V20 = FinalJson2ObjectCreator(FinalList = json)
   }
-  return(invisible(list(
-    MPTERM = MPTERMS, statpacket = statpacket
-  )))
+  return(invisible(list(MPTERM = MPTERMS, statpacket = statpacket)))
 }
