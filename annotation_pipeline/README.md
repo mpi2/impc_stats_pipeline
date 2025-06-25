@@ -14,7 +14,9 @@ However, due to the complexity of the data, not all continuous variables can be 
 Categorical data in the IMPC encompasses a range of qualitative measurements and is analysed using Fisher’s Exact Test, as implemented in the R package OpenStats.
 
 # How IMPC Annotation Pipeline Works
-The `annotationChooser` function processes statistical analysis results called statpackets. It determines calls based on significance levels. These calls are then mapped to Mammalian Phenotype (MP) ontology terms using a provided `mp_chooser_file`. Finally, it updates the input statpacket's JSON component with the identified MP terms. If no relevant annotation is found or the statistical result is not significant, it returns the original statpacket with no MP terms added.
+The `annotationChooser` function processes statistical analysis results called statpacket. It determines calls based on significance levels. These calls are then mapped to Mammalian Phenotype (MP) ontology terms using a provided `mp_chooser_file`. Finally, it updates the input statpacket's JSON component with the identified MP terms. If no relevant annotation is found or the statistical result is not significant, it returns the original statpacket with no MP terms added.
+
+*Note:* Several MP terms can be assign to one statpacket, because statpacket can have several "Active sex levels".
 
 The annotation pipeline requires a reference table that summarises the available MP terms for a given IMPC parameter. This reference can be retrieved from [IMPReSS](https://www.mousephenotype.org/impress/index).
 The ETL pipeline handles this by generating the `mp_chooser.json` file.
