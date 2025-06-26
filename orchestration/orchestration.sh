@@ -114,7 +114,8 @@ sbatch --job-name=zip_step2 --time=15:00:00 --mem=1G -o ../compressed_logs/zip_s
 message0 "Step 3. Merging pseudo Rdata files into single file for each procedure - jobs creator"
 dirs=$(find "${sp_results}/ProcedureScatterRdata" -maxdepth 1 -type d)
 for dir in $dirs; do
-  echo "sbatch --job-name=impc_stats_pipeline_job --mem=50G --time=01:30:00 -e ${dir}/step4_merge_rdatas.err -o ${dir}/step4_merge_rdatas.log --wrap='Rscript Step4MergingRdataFiles.R ${dir}'" >> jobs_step4_MergeRdatas.bch
+  file_name=$(basename "${dir}")
+  echo "sbatch --job-name=impc_stats_pipeline_job --mem=50G --time=01:30:00 -e ../compressed_logs/step4_logs/${file_name}_step4.err -o ../compressed_logs/step4_logs/${file_name}_step4.log --wrap='Rscript Step4MergingRdataFiles.R ${dir}'" >> jobs_step4_MergeRdatas.bch
 done
 
 message0 "Step 4. Merging pseudo Rdata files into single files per procedure"
@@ -122,8 +123,7 @@ fetch_script 0-ETL/Step4MergingRdataFiles.R
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash jobs_step4_MergeRdatas.bch"
 waitTillCommandFinish
 rm Step4MergingRdataFiles.R
-find . -type f -name '*.log' -exec zip -q -m ../compressed_logs/step4_logs.zip {} +
-find . -type f -name '*.err' -exec zip -q -m ../compressed_logs/step4_logs.zip {} +
+sbatch --job-name=zip_step2 --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step4.txt --wrap="zip -r -m -q ../compressed_logs/step4_logs.zip ../compressed_logs/step4_logs/"
 
 message0 "Phase I. Compressing the log files and house cleaning..."
 zip -q -rm ../compressed_logs/phase1_jobs.zip *.bch
