@@ -208,7 +208,7 @@ for dir in $(find . -mindepth 2 -maxdepth 2 -type d); do
   base_dir=$(basename "$dir")
   output_file="FileIndex_${base_dir}_$(printf "%.6f" $(echo $RANDOM/32767 | bc -l)).Ind"
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 \
--e ../../compressed_logs/minijobs_logs/ ${base_dir}.err -o ../../compressed_logs/minijobs_logs/${base_dir}.log \
+-e ../../compressed_logs/minijobs_logs/${base_dir}.err -o ../../compressed_logs/minijobs_logs/${base_dir}.log \
 --wrap=\"find $dir -type f -name '*.tsv' -exec realpath {} \; > $output_file\"" >> minijobs.bch
 done
 chmod 775 minijobs.bch
