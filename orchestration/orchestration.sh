@@ -238,10 +238,9 @@ if [[ -z "${MP_CHOOSER_FILE}" || ! -f "${MP_CHOOSER_FILE}" ]]; then
     exit 1
 fi
 
-mkdir err log out
 for file in $(find . -maxdepth 1 -type f -name "split_index*"); do
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=5G --time=2-00 \
-  -e err/$(basename "$file").err -o out/$(basename "$file").out --wrap='python3 loader.py $(basename "$file") ${MP_CHOOSER_FILE}'" >> annotation_jobs.bch
+-e ../compressed_logs/annotation_logs/$(basename "$file").err -o ../compressed_logs/annotation_logs/$(basename "$file").out --wrap='python3 loader.py $(basename "$file") ${MP_CHOOSER_FILE}'" >> annotation_jobs.bch
 done
 chmod 775 annotation_jobs.bch
 
@@ -256,8 +255,8 @@ fetch_script loader.py annotation_pipeline
 submit_limit_jobs annotation_jobs.bch ../compressed_logs/annotation_job_id.txt
 waitTillCommandFinish
 
-message0 "Zipping logs..."
+message0 "Running Slurm jobs to compress logs..."
 mv annotation_jobs.bch ../compressed_logs
-zip -q -rm ../compressed_logs/annotation_logs.zip log/* err/* out/*
-zip -q -rm splits.zip split_index_*
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_annotations.txt --wrap="zip -r -m -q ../compressed_logs/annotation_logs/.zip ../compressed_logs/annotation_logs/"
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_indeces.txt --wrap="find ../ -type f -name 'split_index_*' -exec zip -q -m splits.zip {} +"
 message0 "Job done."
