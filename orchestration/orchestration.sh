@@ -123,7 +123,7 @@ fetch_script 0-ETL/Step4MergingRdataFiles.R
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash jobs_step4_MergeRdatas.bch"
 waitTillCommandFinish
 rm Step4MergingRdataFiles.R
-sbatch --job-name=zip_step2 --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step4.txt --wrap="zip -r -m -q ../compressed_logs/step4_logs.zip ../compressed_logs/step4_logs/"
+sbatch --job-name=zip_step4 --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step4.txt --wrap="zip -r -m -q ../compressed_logs/step4_logs.zip ../compressed_logs/step4_logs/"
 
 message0 "Phase I. Compressing the log files and house cleaning..."
 zip -q -rm ../compressed_logs/phase1_jobs.zip *.bch
