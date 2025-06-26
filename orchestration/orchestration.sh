@@ -109,7 +109,7 @@ fetch_script 0-ETL/Step2Parquet2Rdata.R
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash jobs_step2_Parquet2Rdata.bch"
 waitTillCommandFinish
 rm Step2Parquet2Rdata.R
-sbatch --job-name=zip_step2 --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step2.txt --wrap="zip -r -m -q ../compressed_logs/step2_logs.zip ../compressed_logs/step2_logs/"
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step2.txt --wrap="zip -r -m -q ../compressed_logs/step2_logs.zip ../compressed_logs/step2_logs/"
 
 message0 "Step 3. Merging pseudo Rdata files into single file for each procedure - jobs creator"
 dirs=$(find "${sp_results}/ProcedureScatterRdata" -maxdepth 1 -mindepth 1 -type d)
@@ -123,7 +123,7 @@ fetch_script 0-ETL/Step4MergingRdataFiles.R
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash jobs_step4_MergeRdatas.bch"
 waitTillCommandFinish
 rm Step4MergingRdataFiles.R
-sbatch --job-name=zip_step4 --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step4.txt --wrap="zip -r -m -q ../compressed_logs/step4_logs.zip ../compressed_logs/step4_logs/"
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step4.txt --wrap="zip -r -m -q ../compressed_logs/step4_logs.zip ../compressed_logs/step4_logs/"
 
 message0 "Phase I. Compressing the log files and house cleaning..."
 zip -q -rm ../compressed_logs/phase1_jobs.zip *.bch
@@ -142,7 +142,7 @@ rm InputDataGenerator.R
 message0 "End of packaging data."
 message0 "Phase II. Compressing the log files and house cleaning..."
 mv *.bch  ../compressed_logs/phase2_logs/
-sbatch --job-name=zip_phase2 --time=15:00:00 --mem=1G -o ../compressed_logs/zip_phase2.txt --wrap="zip -r -m -q ../compressed_logs/phase2_logs.zip ../compressed_logs/phase2_logs/"
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_phase2.txt --wrap="zip -r -m -q ../compressed_logs/phase2_logs.zip ../compressed_logs/phase2_logs/"
 
 message0 "Appending all procedure based jobs into one single file..."
 mkdir ../stats_results
