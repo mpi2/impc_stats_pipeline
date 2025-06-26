@@ -101,7 +101,7 @@ message0 "Step 1. Create jobs"
 step1_files=$(find ../input_parquet_files -type f -name '*.parquet' -exec realpath {} \;)
 for file in $step1_files; do
   file_name=$(basename "${file}" .parquet)
-  echo "sbatch --job-name=impc_stats_pipeline_job --mem=10G --time=00:10:00 -e ../compressed_logs/step2_logs/${file_name}.err -o ../compressed_logs/step2_logs${file_name}.log --wrap='Rscript Step2Parquet2Rdata.R $file'" >> jobs_step2_Parquet2Rdata.bch
+  echo "sbatch --job-name=impc_stats_pipeline_job --mem=10G --time=00:10:00 -e ../compressed_logs/step2_logs/${file_name}.err -o ../compressed_logs/step2_logs/${file_name}.log --wrap='Rscript Step2Parquet2Rdata.R $file'" >> jobs_step2_Parquet2Rdata.bch
 done
 
 message0 "Step 2. Read parquet files and create pseudo Rdata"
