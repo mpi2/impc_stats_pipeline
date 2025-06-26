@@ -258,5 +258,5 @@ waitTillCommandFinish
 message0 "Running Slurm jobs to compress logs..."
 mv annotation_jobs.bch ../compressed_logs
 sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_annotations.txt --wrap="zip -r -m -q ../compressed_logs/annotation_logs/.zip ../compressed_logs/annotation_logs/"
-sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_indeces.txt --wrap="find ../ -type f -name 'split_index_*' -exec zip -q -m splits.zip {} +"
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_indeces.txt --wrap="find . -type f -name 'split_index_*' -exec zip -q -m splits.zip {} +"
 message0 "Job done."
