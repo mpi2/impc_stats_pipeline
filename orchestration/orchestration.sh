@@ -224,10 +224,10 @@ cd ../../annotation_extractor
 mv ../stats_results/Results_IMPC_SP_Windowed/*.Ind .
 
 message0 "Concatenating single index files to create a global index for the results..."
-cat *.Ind | shuf >> AllResultsIndeces.txt
+cat *.Ind | shuf --random-source=<(yes "42") >> global_results_index.txt
 message0 "Zipping the single indeces..."
 sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_indeces.txt --wrap="zip -r -m -q allsingleindeces.zip *.Ind"
-split -1000 AllResultsIndeces.txt split_index_
+split -1000 global_results_index.txt split_index_
 
 message0 "Convert the mp_chooser JSON file to Rdata..."
 R --quiet -e "a = jsonlite::fromJSON('../mp_chooser.json');save(a,file='../mp_chooser.json.Rdata')"
