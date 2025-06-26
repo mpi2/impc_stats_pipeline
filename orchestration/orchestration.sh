@@ -146,7 +146,7 @@ sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/z
 
 message0 "Appending all procedure based jobs into one single file..."
 mkdir ../stats_results
-find ./*/*_RawData/*.bch -type f | xargs  cat >> ../stats_results/AllJobs.bch
+find ./*/*_RawData/*.bch -type f | xargs  cat >> ../stats_results/phase3_jobs.bch
 
 message0 "Phase III. Initialising the statistical analysis..."
 cd ../stats_results
@@ -173,8 +173,8 @@ R --quiet -e \
   ${VERSION} \
 )"
 
-chmod 775 AllJobs.bch
-submit_limit_jobs AllJobs.bch ../compressed_logs/phase3_job_id.txt
+chmod 775 phase3_jobs.bch
+submit_limit_jobs phase3_jobs.bch ../compressed_logs/phase3_job_id.txt
 waitTillCommandFinish
 
 message0 "Postprocessing the IMPC statistical analysis results..."
