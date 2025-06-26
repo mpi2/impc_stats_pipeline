@@ -130,10 +130,9 @@ zip -q -rm ../compressed_logs/phase1_jobs.zip *.bch
 rm -rf ProcedureScatterRdata
 
 message0 "Starting Phase II, packaging the big data into small packages ..."
-mkdir DataGeneratingLog
 for file in $(find Rdata -type f -exec realpath {} \;); do
   file_basename=$(basename $file .Rdata)
-  echo "sbatch --job-name=impc_stats_pipeline_job --mem=45G --time=6-00 -e DataGeneratingLog/${file_basename}_errorlog.log -o DataGeneratingLog/${file_basename}_outputlog.log --wrap='Rscript InputDataGenerator.R ${file} ${file_basename}'" >> DataGenerationJobList.bch
+  echo "sbatch --job-name=impc_stats_pipeline_job --mem=45G --time=6-00 -e ../compressed_logs/phase2_logs/${file_basename}.err -o ../compressed_logs/phase2_logs/${file_basename}.log --wrap='Rscript InputDataGenerator.R ${file} ${file_basename}'" >> DataGenerationJobList.bch
 done
 fetch_script jobs/InputDataGenerator.R
 sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/phase2_job_id.txt --wrap="bash DataGenerationJobList.bch"
@@ -142,9 +141,8 @@ rm InputDataGenerator.R
 
 message0 "End of packaging data."
 message0 "Phase II. Compressing the log files and house cleaning..."
-mv *.bch  DataGeneratingLog/
-zip -q -rm phase2_logs.zip DataGeneratingLog/
-mv phase2_logs.zip ../compressed_logs/
+mv *.bch  ../compressed_logs/phase2_logs/
+sbatch --job-name=zip_phase2 --time=15:00:00 --mem=1G -o ../compressed_logs/zip_phase2.txt --wrap="zip -r -m -q ../compressed_logs/phase2_logs.zip ../compressed_logs/phase2_logs/"
 
 message0 "Appending all procedure based jobs into one single file..."
 mkdir ../stats_results
