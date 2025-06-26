@@ -208,15 +208,15 @@ for dir in $(find . -mindepth 2 -maxdepth 2 -type d); do
   base_dir=$(basename "$dir")
   output_file="FileIndex_${base_dir}_$(printf "%.6f" $(echo $RANDOM/32767 | bc -l)).Ind"
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 \
--e ${base_dir}_error.err -o ${base_dir}_output.log --wrap=\"find $dir -type f -name '*.tsv' -exec realpath {} \; > $output_file\"" >> minijobs.bch
+-e ../../compressed_logs/minijobs_logs/ ${base_dir}.err -o ../../compressed_logs/minijobs_logs/${base_dir}.log \
+--wrap=\"find $dir -type f -name '*.tsv' -exec realpath {} \; > $output_file\"" >> minijobs.bch
 done
 chmod 775 minijobs.bch
 submit_limit_jobs minijobs.bch ../../compressed_logs/minijobs_job_id.txt
 waitTillCommandFinish
 mv minijobs.bch ../../compressed_logs
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_minijobs.txt --wrap="zip -r -m -q ../../compressed_logs/minijobs_logs.zip ../../compressed_logs/minijobs_logs/"
 
-find . -type f -name '*_output.log' -exec zip -q -m ../../compressed_logs/minijobs_logs.zip {} +
-find . -type f -name '*_error.err' -exec zip -q -m ../../compressed_logs/minijobs_logs.zip {} +
 message0 "Moving single indeces into a separate directory called annotation_extractor..."
 mkdir ../../annotation_extractor
 chmod 775 ../../annotation_extractor
@@ -226,7 +226,7 @@ mv ../stats_results/Results_IMPC_SP_Windowed/*.Ind .
 message0 "Concatenating single index files to create a global index for the results..."
 cat *.Ind | shuf >> AllResultsIndeces.txt
 message0 "Zipping the single indeces..."
-zip -q -rm allsingleindeces.zip *.Ind
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_indeces.txt --wrap="zip -r -m -q allsingleindeces.zip *.Ind"
 split -1000 AllResultsIndeces.txt split_index_
 
 message0 "Convert the mp_chooser JSON file to Rdata..."
