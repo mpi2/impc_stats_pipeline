@@ -217,7 +217,7 @@ waitTillCommandFinish
 mv minijobs.bch ../../compressed_logs
 sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../../compressed_logs/zip_minijobs.txt --wrap="zip -r -m -q ../../compressed_logs/minijobs_logs.zip ../../compressed_logs/minijobs_logs/"
 
-message0 "Moving single indeces into a separate directory called annotation_extractor..."
+message0 "Moving single indices into a separate directory called annotation_extractor..."
 mkdir ../../annotation_extractor
 chmod 775 ../../annotation_extractor
 cd ../../annotation_extractor
@@ -225,8 +225,8 @@ mv ../stats_results/Results_IMPC_SP_Windowed/*.Ind .
 
 message0 "Concatenating single index files to create a global index for the results..."
 cat *.Ind | shuf --random-source=<(yes "42") >> global_results_index.txt
-message0 "Zipping the single indeces..."
-sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_indeces.txt --wrap="zip -r -m -q allsingleindeces.zip *.Ind"
+message0 "Zipping the single indices..."
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_indices.txt --wrap="zip -r -m -q individual_indices.zip *.Ind"
 split -1000 global_results_index.txt split_index_
 
 message0 "Convert the mp_chooser JSON file to Rdata..."
@@ -258,5 +258,5 @@ waitTillCommandFinish
 message0 "Running Slurm jobs to compress logs..."
 mv annotation_jobs.bch ../compressed_logs
 sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_annotations.txt --wrap="zip -r -m -q ../compressed_logs/annotation_logs.zip ../compressed_logs/annotation_logs/"
-sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_indeces.txt --wrap="find . -type f -name 'split_index_*' -exec zip -q -m splits.zip {} +"
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_splits.txt --wrap="find . -type f -name 'split_index_*' -exec zip -q -m splits.zip {} +"
 message0 "Job done."
