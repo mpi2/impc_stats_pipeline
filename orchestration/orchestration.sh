@@ -198,10 +198,9 @@ R --quiet -e \
   storepath='$(realpath RPackage_backup)' \
 )"
 
-message0 "Compress phase III log files"
-find . -type f -name '*.ClusterOut' -exec zip -q -m ../compressed_logs/phase3_logs.zip {} +
-message0 "Compress phase III error files"
-find . -type f -name '*.ClusterErr' -exec zip -q -m ../compressed_logs/phase3_errs.zip {} +
+message0 "Submit phase III log and err files compression"
+sbatch --job-name=compress_logs --time=1-00:00:00 --mem=1G -o ../compressed_logs/zip_phase3_logs.txt --wrap="find . -type d -name 'ClusterOut' -exec zip -q -r -m ../compressed_logs/phase3_logs.zip {} \;"
+sbatch --job-name=compress_logs --time=1-00:00:00 --mem=1G -o ../compressed_logs/zip_phase3_errs.txt --wrap="find . -type d -name 'ClusterErr' -exec zip -q -r -m ../compressed_logs/phase3_errs.zip {} \;"
 
 message0 "This is the last step. If you see no file in the list below, the SP is successfully completed."
 
