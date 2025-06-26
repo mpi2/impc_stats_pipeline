@@ -215,7 +215,7 @@ chmod 775 minijobs.bch
 submit_limit_jobs minijobs.bch ../../compressed_logs/minijobs_job_id.txt
 waitTillCommandFinish
 mv minijobs.bch ../../compressed_logs
-sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_minijobs.txt --wrap="zip -r -m -q ../../compressed_logs/minijobs_logs.zip ../../compressed_logs/minijobs_logs/"
+sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../../compressed_logs/zip_minijobs.txt --wrap="zip -r -m -q ../../compressed_logs/minijobs_logs.zip ../../compressed_logs/minijobs_logs/"
 
 message0 "Moving single indeces into a separate directory called annotation_extractor..."
 mkdir ../../annotation_extractor
