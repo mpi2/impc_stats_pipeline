@@ -238,6 +238,7 @@ if [[ -z "${MP_CHOOSER_FILE}" || ! -f "${MP_CHOOSER_FILE}" ]]; then
     exit 1
 fi
 
+message0 "Generate annotation jobs..."
 for file in $(find . -maxdepth 1 -type f -name "split_index*"); do
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=5G --time=2-00 \
 -e ../compressed_logs/annotation_logs/$(basename "$file").err -o ../compressed_logs/annotation_logs/$(basename "$file").out --wrap='python3 loader.py $(basename "$file") ${MP_CHOOSER_FILE}'" >> annotation_jobs.bch
@@ -250,7 +251,7 @@ python3.10 -m pip install rpy2
 python3.10 -m pip install numpy
 python3.10 -m pip install pandas
 
-message0 "Downloading the action script..."
+message0 "Downloading the action script loader.py..."
 fetch_script loader.py annotation_pipeline
 submit_limit_jobs annotation_jobs.bch ../compressed_logs/annotation_job_id.txt
 waitTillCommandFinish
