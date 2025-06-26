@@ -112,7 +112,7 @@ rm Step2Parquet2Rdata.R
 sbatch --job-name=zip_step2 --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step2.txt --wrap="zip -r -m -q ../compressed_logs/step2_logs.zip ../compressed_logs/step2_logs/"
 
 message0 "Step 3. Merging pseudo Rdata files into single file for each procedure - jobs creator"
-dirs=$(find "${sp_results}/ProcedureScatterRdata" -maxdepth 1 -type d)
+dirs=$(find "${sp_results}/ProcedureScatterRdata" -maxdepth 1 -mindepth 1 -type d)
 for dir in $dirs; do
   file_name=$(basename "${dir}")
   echo "sbatch --job-name=impc_stats_pipeline_job --mem=50G --time=01:30:00 -e ../compressed_logs/step4_logs/${file_name}_step4.err -o ../compressed_logs/step4_logs/${file_name}_step4.log --wrap='Rscript Step4MergingRdataFiles.R ${dir}'" >> jobs_step4_MergeRdatas.bch
