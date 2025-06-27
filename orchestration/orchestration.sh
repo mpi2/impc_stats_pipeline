@@ -18,6 +18,7 @@ WINDOWING_PIPELINE=${7:-"true"}
 
 # Redirect all output and errors to the log file.
 LOGFILE=${KOMP_PATH}/impc_statistical_pipeline/IMPC_DRs/stats_pipeline_logs/orchestration_${VERSION}.log
+JOBNAME="impc_job_${VERSION}"
 exec > >(tee -a "$LOGFILE") 2>&1
 
 echo "Starting pipeline run. Data release $VERSION. Fetching packages from $REMOTE / $BRANCH."
@@ -33,7 +34,7 @@ function message0() {
 # Function to wait until all jobs on SLURM complete.
 function waitTillCommandFinish() {
     while true; do
-        if ! (squeue --format="%A %.30j" | grep -q "impc_stats_pipeline_job"); then
+        if ! (squeue --format="%A %.30j" | grep -q "$JOBNAME"); then
             message0 "Done waiting for SLURM jobs to complete."
             break
         fi
@@ -101,12 +102,12 @@ message0 "Step 1. Create jobs"
 step1_files=$(find ../input_parquet_files -type f -name '*.parquet' -exec realpath {} \;)
 for file in $step1_files; do
   file_name=$(basename "${file}" .parquet)
-  echo "sbatch --job-name=impc_stats_pipeline_job --mem=10G --time=00:10:00 -e ../compressed_logs/step2_logs/${file_name}.err -o ../compressed_logs/step2_logs/${file_name}.log --wrap='Rscript Step2Parquet2Rdata.R $file'" >> jobs_step2_Parquet2Rdata.bch
+  echo "sbatch --job-name=${JOBNAME} --mem=10G --time=00:10:00 -e ../compressed_logs/step2_logs/${file_name}.err -o ../compressed_logs/step2_logs/${file_name}.log --wrap='Rscript Step2Parquet2Rdata.R $file'" >> jobs_step2_Parquet2Rdata.bch
 done
 
 message0 "Step 2. Read parquet files and create pseudo Rdata"
 fetch_script 0-ETL/Step2Parquet2Rdata.R
-sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash jobs_step2_Parquet2Rdata.bch"
+sbatch --job-name=${JOBNAME} --time=01:00:00 --mem=1G -o ../compressed_logs/step2_job_id.txt --wrap="bash jobs_step2_Parquet2Rdata.bch"
 waitTillCommandFinish
 rm Step2Parquet2Rdata.R
 sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step2.txt --wrap="zip -r -m -q ../compressed_logs/step2_logs.zip ../compressed_logs/step2_logs/"
@@ -115,12 +116,12 @@ message0 "Step 3. Merging pseudo Rdata files into single file for each procedure
 dirs=$(find "${sp_results}/ProcedureScatterRdata" -maxdepth 1 -mindepth 1 -type d)
 for dir in $dirs; do
   file_name=$(basename "${dir}")
-  echo "sbatch --job-name=impc_stats_pipeline_job --mem=50G --time=01:30:00 -e ../compressed_logs/step4_logs/${file_name}_step4.err -o ../compressed_logs/step4_logs/${file_name}_step4.log --wrap='Rscript Step4MergingRdataFiles.R ${dir}'" >> jobs_step4_MergeRdatas.bch
+  echo "sbatch --job-name=${JOBNAME} --mem=50G --time=01:30:00 -e ../compressed_logs/step4_logs/${file_name}_step4.err -o ../compressed_logs/step4_logs/${file_name}_step4.log --wrap='Rscript Step4MergingRdataFiles.R ${dir}'" >> jobs_step4_MergeRdatas.bch
 done
 
 message0 "Step 4. Merging pseudo Rdata files into single files per procedure"
 fetch_script 0-ETL/Step4MergingRdataFiles.R
-sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash jobs_step4_MergeRdatas.bch"
+sbatch --job-name=${JOBNAME} --time=01:00:00 --mem=1G -o ../compressed_logs/step4_job_id.txt --wrap="bash jobs_step4_MergeRdatas.bch"
 waitTillCommandFinish
 rm Step4MergingRdataFiles.R
 sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_step4.txt --wrap="zip -r -m -q ../compressed_logs/step4_logs.zip ../compressed_logs/step4_logs/"
@@ -132,10 +133,10 @@ rm -rf ProcedureScatterRdata
 message0 "Starting Phase II, packaging the big data into small packages ..."
 for file in $(find Rdata -type f -exec realpath {} \;); do
   file_basename=$(basename $file .Rdata)
-  echo "sbatch --job-name=impc_stats_pipeline_job --mem=45G --time=6-00 -e ../compressed_logs/phase2_logs/${file_basename}.err -o ../compressed_logs/phase2_logs/${file_basename}.log --wrap='Rscript InputDataGenerator.R ${file} ${file_basename}'" >> DataGenerationJobList.bch
+  echo "sbatch --job-name=${JOBNAME} --mem=45G --time=6-00 -e ../compressed_logs/phase2_logs/${file_basename}.err -o ../compressed_logs/phase2_logs/${file_basename}.log --wrap='Rscript InputDataGenerator.R ${file} ${file_basename}'" >> DataGenerationJobList.bch
 done
 fetch_script jobs/InputDataGenerator.R
-sbatch --job-name=impc_stats_pipeline_job --time=01:00:00 --mem=1G -o ../compressed_logs/phase2_job_id.txt --wrap="bash DataGenerationJobList.bch"
+sbatch --job-name=${JOBNAME} --time=01:00:00 --mem=1G -o ../compressed_logs/phase2_job_id.txt --wrap="bash DataGenerationJobList.bch"
 waitTillCommandFinish
 rm InputDataGenerator.R
 
@@ -207,7 +208,7 @@ message0 "Indexing the results..."
 for dir in $(find . -mindepth 2 -maxdepth 2 -type d); do
   base_dir=$(basename "$dir")
   output_file="FileIndex_${base_dir}_$(printf "%.6f" $(echo $RANDOM/32767 | bc -l)).Ind"
-  echo "sbatch --job-name=impc_stats_pipeline_job --mem=1G --time=2-00 \
+  echo "sbatch --job-name=${JOBNAME} --mem=1G --time=2-00 \
 -e ../../compressed_logs/minijobs_logs/${base_dir}.err -o ../../compressed_logs/minijobs_logs/${base_dir}.log \
 --wrap=\"find $dir -type f -name '*.tsv' -exec realpath {} \; > $output_file\"" >> minijobs.bch
 done
@@ -240,7 +241,7 @@ fi
 
 message0 "Generate annotation jobs..."
 for file in $(find . -maxdepth 1 -type f -name "split_index*"); do
-  echo "sbatch --job-name=impc_stats_pipeline_job --mem=5G --time=2-00 \
+  echo "sbatch --job-name=${JOBNAME} --mem=5G --time=2-00 \
 -e ../compressed_logs/annotation_logs/$(basename "$file").err -o ../compressed_logs/annotation_logs/$(basename "$file").out --wrap='python3 loader.py $(basename "$file") ${MP_CHOOSER_FILE}'" >> annotation_jobs.bch
 done
 chmod 775 annotation_jobs.bch
