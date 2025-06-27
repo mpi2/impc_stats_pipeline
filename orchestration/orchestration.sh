@@ -133,7 +133,7 @@ rm -rf ProcedureScatterRdata
 message0 "Starting Phase II, packaging the big data into small packages ..."
 for file in $(find Rdata -type f -exec realpath {} \;); do
   file_basename=$(basename $file .Rdata)
-  echo "sbatch --job-name=${JOBNAME} --mem=45G --time=6-00 -e ../compressed_logs/phase2_logs/${file_basename}.err -o ../compressed_logs/phase2_logs/${file_basename}.log --wrap='Rscript InputDataGenerator.R ${file} ${file_basename}'" >> DataGenerationJobList.bch
+  echo "sbatch --job-name=${JOBNAME} --mem=45G --time=6-00 -e ../compressed_logs/phase2_logs/${file_basename}.err -o ../compressed_logs/phase2_logs/${file_basename}.log --wrap='Rscript InputDataGenerator.R ${file} ${file_basename} ${VERSION}'" >> DataGenerationJobList.bch
 done
 fetch_script jobs/InputDataGenerator.R
 sbatch --job-name=${JOBNAME} --time=01:00:00 --mem=1G -o ../compressed_logs/phase2_job_id.txt --wrap="bash DataGenerationJobList.bch"
