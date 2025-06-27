@@ -152,13 +152,13 @@ find ./*/*_RawData/*.bch -type f | xargs  cat >> ../02_sp_output/phase3_jobs.bch
 message0 "Phase III. Initialising the statistical analysis..."
 cd ../02_sp_output
 message0 "Updating the dynamic contents from the IMPReSS..."
-R --quiet -e \
-"DRrequiredAgeing:::updateImpress( \
- updateImpressFileInThePackage = TRUE, \
- updateOptionalParametersList = TRUE, \
- updateTheSkipList = TRUE, \
- saveRdata = FALSE \
-)"
+# R --quiet -e \
+# "DRrequiredAgeing:::updateImpress( \
+#  updateImpressFileInThePackage = TRUE, \
+#  updateOptionalParametersList = TRUE, \
+#  updateTheSkipList = TRUE, \
+#  saveRdata = FALSE \
+# )"
 
 message0 "Running the IMPC statistical pipeline by submitting jobs..."
 if [ "${WINDOWING_PIPELINE}" = true ]; then
