@@ -88,12 +88,12 @@ message0 "Update completed"
 
 # Statistical pipeline.
 message0 "Starting the IMPC statistical pipeline..."
-mkdir stats_batching compressed_logs
+mkdir 01_batching compressed_logs
 export input_path=$(realpath .)
-export sp_results=$(realpath stats_batching)
+export sp_results=$(realpath 01_batching)
 message0 "Parquet files path: ${input_path}"
 message0 "Output path: ${sp_results}"
-cd stats_batching
+cd 01_batching
 
 message0 "Phase I. Convert parquet files into Rdata..."
 
@@ -145,11 +145,11 @@ mv *.bch  ../compressed_logs/phase2_logs/
 sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../compressed_logs/zip_phase2.txt --wrap="zip -r -m -q ../compressed_logs/phase2_logs.zip ../compressed_logs/phase2_logs/"
 
 message0 "Appending all procedure based jobs into one single file..."
-mkdir ../stats_results
-find ./*/*_RawData/*.bch -type f | xargs  cat >> ../stats_results/phase3_jobs.bch
+mkdir ../02_sp_output
+find ./*/*_RawData/*.bch -type f | xargs  cat >> ../02_sp_output/phase3_jobs.bch
 
 message0 "Phase III. Initialising the statistical analysis..."
-cd ../stats_results
+cd ../02_sp_output
 message0 "Updating the dynamic contents from the IMPReSS..."
 R --quiet -e \
 "DRrequiredAgeing:::updateImpress( \
@@ -201,7 +201,7 @@ message0 "This is the last step. If you see no file in the list below, the SP is
 
 # Annotation pipeline.
 message0 "Starting the IMPC annotation pipeline..."
-cd ../stats_results/Results_IMPC_SP_Windowed/
+cd ../02_sp_output/Results_IMPC_SP_Windowed/
 message0 "Step 1: Clean ups and creating the global index for the results."
 message0 "Indexing the results..."
 for dir in $(find . -mindepth 2 -maxdepth 2 -type d); do
@@ -217,11 +217,11 @@ waitTillCommandFinish
 mv minijobs.bch ../../compressed_logs
 sbatch --job-name=compress_logs --time=15:00:00 --mem=1G -o ../../compressed_logs/zip_minijobs.txt --wrap="zip -r -m -q ../../compressed_logs/minijobs_logs.zip ../../compressed_logs/minijobs_logs/"
 
-message0 "Moving single indices into a separate directory called annotation_extractor..."
-mkdir ../../annotation_extractor
-chmod 775 ../../annotation_extractor
-cd ../../annotation_extractor
-mv ../stats_results/Results_IMPC_SP_Windowed/*.Ind .
+message0 "Moving single indices into a separate directory called 03_indices_and_splits..."
+mkdir ../../03_indices_and_splits
+chmod 775 ../../03_indices_and_splits
+cd ../../03_indices_and_splits
+mv ../02_sp_output/Results_IMPC_SP_Windowed/*.Ind .
 
 message0 "Concatenating single index files to create a global index for the results..."
 cat *.Ind | shuf --random-source=<(yes "42") >> global_results_index.txt
