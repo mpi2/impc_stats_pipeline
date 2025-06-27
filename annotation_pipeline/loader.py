@@ -86,12 +86,12 @@ def main():
         file_list = [line.strip() for line in f]
     total_files = len(file_list)
 
-    # Store StatPackets temporary.
-    output_dir = Path("tmp")
+    # Store StatPackets.
+    output_dir = Path("../annotation_pipeline_output")
     if not output_dir.exists():
         output_dir.mkdir()
 
-    output_file = output_dir / (file_list_path.name + "_.statpackets")
+    output_file = output_dir / (file_list_path.name + ".statpackets")
 
     for i, file in enumerate(file_list):
         file_path = Path(file)

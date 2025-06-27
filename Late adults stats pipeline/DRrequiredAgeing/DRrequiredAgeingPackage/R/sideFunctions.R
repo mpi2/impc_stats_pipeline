@@ -688,6 +688,7 @@ BatchGenerator = function(file                       ,
                           cpu = 1                    ,
                           memory = "8G"              ,
                           time = "10:00:00"          ,
+                          jobname = NULL             ,
                           extraBatchParameters = NULL) {
   dirOut = file.path(dir, 'ClusterOut')
   dirErr = file.path(dir, 'ClusterErr')
@@ -701,7 +702,7 @@ BatchGenerator = function(file                       ,
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
   rf = paste(
-    "sbatch --job-name=impc_stats_pipeline_job --mem=", memory,
+    "sbatch --job-name=", jobname, " --mem=", memory,
     " --time=", time,
     extraBatchParameters  ,
     ' --cpus-per-task='                ,

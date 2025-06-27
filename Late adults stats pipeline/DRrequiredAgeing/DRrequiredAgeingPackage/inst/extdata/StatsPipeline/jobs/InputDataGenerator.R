@@ -20,7 +20,8 @@ generate_data <- function(args, thresh = 4) {
     controlSize = 1500,
     extraBatchParameters = NULL,
     combineEAandLA = FALSE,
-    solrBaseURL = NULL
+    solrBaseURL = NULL,
+    DRversion = args[3]
   )
   trash <- NULL
   gc()
