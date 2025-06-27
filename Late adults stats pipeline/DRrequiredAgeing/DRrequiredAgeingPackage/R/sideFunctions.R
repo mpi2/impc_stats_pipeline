@@ -702,7 +702,7 @@ BatchGenerator = function(file                       ,
   ro = paste(' -o ', paste0('"', oname, '.ClusterOut', '"'), sep = '')
   re = paste(' -e ', paste0('"', ename, '.ClusterErr', '"'), sep = '')
   rf = paste(
-    "sbatch --job-name= ", jobname, " --mem=", memory,
+    "sbatch --job-name=", jobname, " --mem=", memory,
     " --time=", time,
     extraBatchParameters  ,
     ' --cpus-per-task='                ,
