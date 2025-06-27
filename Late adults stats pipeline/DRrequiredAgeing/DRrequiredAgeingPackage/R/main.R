@@ -300,7 +300,7 @@ mainAgeing = function(file = NULL                                    ,
                         cpu                  = cpu              ,
                         memory               = memory           ,
                         time                 = time             ,
-                        jobname              = "impc_job_" + DRversion,
+                        jobname              = paste0("impc_job_", DRversion),
                         extraBatchParameters =  extraBatchParameters
                       )
                       write(
